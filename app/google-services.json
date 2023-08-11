@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "325875259106",
+    "project_id": "monolith-aowen",
+    "storage_bucket": "monolith-aowen.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325875259106:android:a41924af78a6fed3de70bb",
+        "android_client_info": {
+          "package_name": "com.aowen.monolith"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "325875259106-h1h10nmhac1cjqn4sk2ata3rgnovd7qk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBylkIPcou42QJTBHr-epv9O10xC7Q0Oyk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "325875259106-h1h10nmhac1cjqn4sk2ata3rgnovd7qk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

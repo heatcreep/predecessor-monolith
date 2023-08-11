@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Monolith</string>
+    <string name="icon_search">Search</string>
+    <string name="icon_heroes">Heroes</string>
+    <string name="icon_matches">Matches</string>
+    <string name="icon_profile">Profile</string>
+</resources>
