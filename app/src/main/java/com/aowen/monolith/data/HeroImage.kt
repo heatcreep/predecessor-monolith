@@ -31,5 +31,6 @@ enum class HeroImage(val heroName: String, val drawableId: Int) {
     SPARROW("Sparrow", R.drawable.sparrow),
     STEEL("Steel", R.drawable.steel),
     TWINBLAST("TwinBlast", R.drawable.twinblast),
+    UNKNOWN("Unknown", R.drawable.unknown),
 
 }

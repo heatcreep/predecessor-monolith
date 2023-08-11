@@ -2,44 +2,53 @@
 androidGradlePlugin = "8.0.2"
 androidXActivityCompose = "1.7.2"
 androidXCoreKtx = "1.10.1"
-androidXEspresso = "3.5.1"
+androidXEspresso = "3.5.0"
 androidXLifecycleRuntimeKtx = "2.6.1"
+androidXComposeMaterial3 = "1.1.1"
 androidXTestExt = "1.1.5"
-composeBom = "2023.05.01"
+coilCompose = "2.2.2"
+composeBom = "2023.08.00"
 composeCoil = "2.0.0"
-composeNavigation = "2.7.0"
-daggerHilt = "2.44"
+composeNavigation = "2.5.3"
+daggerHilt = "2.47"
 daggerHiltCompose = "1.0.0"
+gradleApi = "8.1.0"
 gson = "2.9.0"
-kotlinBom = "1.8.0"
-supabase = "1.1.0"
+kotlinBom = "1.8.20"
+ksp = "1.9.0-1.0.11"
+supabaseBom = "1.1.0"
 ktorClientAndroid = "2.3.2"
 junit4 = "4.13.2"
 
 
 [libraries]
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidXActivityCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidXCoreKtx" }
-androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "androidXEspresso" }
+androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidXEspresso" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidXLifecycleRuntimeKtx" }
 androidx-test-ext = { module = "androidx.test.ext:junit", version.ref = "androidXTestExt" }
-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-compose-material = { group = "androidx.compose.material3", name = "material3" }
-compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavigation" }
-compose-ui = { group = "androidx.compose.ui", name = "ui" }
-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4" }
-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "androidXComposeMaterial3" }
+androidx-compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavigation" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name= "graphics" }
+androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "daggerHilt" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "daggerHilt" }
-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "daggerHiltCompose" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "daggerHiltCompose" }
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlinBom" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
+ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktorClientAndroid" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "gson" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson" }
-supabase-gotrue = { group = "io.github.jan-tennert.supabase", name = "gotrue-kt", version.ref = "supabase" }
-supabase-postgres = { group = "io.github.jan-tennert.supabase", name = "postgres-kt", version.ref = "supabase" }
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
+supabase-gotrue = { module = "io.github.jan-tennert.supabase:gotrue-kt" }
+supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 
 
 [plugins]
@@ -47,5 +56,6 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinBom" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinBom" }
 
