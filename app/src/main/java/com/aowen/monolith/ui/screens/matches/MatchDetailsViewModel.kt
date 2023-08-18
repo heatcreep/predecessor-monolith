@@ -21,6 +21,7 @@ data class MatchDetailsUiState(
     val isLoading: Boolean = true,
     val match: MatchDetails = MatchDetails(),
     val items: List<ItemDetails> = emptyList(),
+    val selectedItemDetails: ItemDetails? = null,
 )
 
 @HiltViewModel
@@ -86,7 +87,9 @@ class MatchDetailsViewModel @Inject constructor(
         }
     }
 
-    // return same match details with items populated
+    fun onItemClicked(itemDetails: ItemDetails) {
+        _uiState.update { it.copy(selectedItemDetails = itemDetails) }
+    }
 
 
     fun getCreepScorePerMinute(minionsKilled: Int): String {

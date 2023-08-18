@@ -9,6 +9,7 @@ import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -47,9 +49,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,12 +65,16 @@ import coil.compose.SubcomposeAsyncImageContent
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.aowen.monolith.FullScreenLoadingIndicator
+import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.TeamDetails
 import com.aowen.monolith.data.getKda
+import com.aowen.monolith.ui.components.ItemEffectRow
+import com.aowen.monolith.ui.components.ItemStatRow
 import com.aowen.monolith.ui.components.KDAText
+import com.aowen.monolith.ui.components.TaperedItemTypeRow
 import com.aowen.monolith.ui.theme.DarkGreenHighlight
 import com.aowen.monolith.ui.theme.DarkRedHighlight
 import com.aowen.monolith.ui.theme.GreenHighlight
@@ -85,6 +94,7 @@ fun MatchDetailsRoute(
         modifier = modifier,
         getCreepScorePerMinute = viewModel::getCreepScorePerMinute,
         getGoldEarnedPerMinute = viewModel::getGoldEarnedPerMinute,
+        onItemClicked = viewModel::onItemClicked
     )
 }
 
@@ -95,26 +105,25 @@ fun MatchDetailsScreen(
     uiState: MatchDetailsUiState,
     modifier: Modifier = Modifier,
     getCreepScorePerMinute: (Int) -> String,
-    getGoldEarnedPerMinute: (Int) -> String
+    getGoldEarnedPerMinute: (Int) -> String,
+    onItemClicked: (ItemDetails) -> Unit
 ) {
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val closeBottomSheet = { openBottomSheet = false }
-    var selectedItemDetails by rememberSaveable { mutableStateOf<ItemDetails?>(null) }
-    val skipPartiallyExpanded by remember { mutableStateOf(true) }
     val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = skipPartiallyExpanded
+        skipPartiallyExpanded = true
     )
 
     fun openItemDetailsBottomSheet(itemDetails: ItemDetails) {
-        selectedItemDetails = itemDetails
+        onItemClicked(itemDetails)
         openBottomSheet = true
     }
 
-    if (openBottomSheet && selectedItemDetails != null) {
+    if (openBottomSheet && uiState.selectedItemDetails != null) {
         ItemDetailsBottomSheet(
             closeBottomSheet = closeBottomSheet,
             sheetState = bottomSheetState,
-            itemDetails = selectedItemDetails!!
+            itemDetails = uiState.selectedItemDetails
         )
     }
 
@@ -469,49 +478,96 @@ fun ItemDetailsBottomSheetContent(
     itemDetails: ItemDetails
 ) {
     val context = LocalContext.current
+    val config = LocalConfiguration.current
     Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier
+            .height(
+                config.screenHeightDp.dp - 28.dp
+            )
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         val model = ImageRequest.Builder(context)
             .data(itemDetails.image)
             .crossfade(true)
             .build()
-        Spacer(modifier = Modifier.size(40.dp))
         SubcomposeAsyncImage(
             model = model,
-            contentDescription = null
+            contentDescription = null,
         ) {
             val state = painter.state
             if (state is AsyncImagePainter.State.Success) {
                 SubcomposeAsyncImageContent(
-                    modifier = Modifier.size(128.dp)
+                    modifier = Modifier
+                        .size(160.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape),
                 )
             }
         }
+        Text(
+            text = itemDetails.displayName,
+            modifier = Modifier.padding(horizontal = 16.dp),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.secondary
+        )
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .height(2.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.secondary)
-            ) {}
-            Text(
-                text = itemDetails.name,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Box(
-                modifier = Modifier
-                    .height(2.dp)
-                    .weight(1f)
-                    .background(MaterialTheme.colorScheme.secondary)
-            ) {}
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape),
+                    painter = painterResource(id = R.drawable.gold_per_second),
+                    tint = MaterialTheme.colorScheme.secondary,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = "${itemDetails.totalPrice.toString()} Total Cost",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape),
+                    painter = painterResource(id = R.drawable.gold_per_second),
+                    tint = MaterialTheme.colorScheme.secondary,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = "${itemDetails.price.toString()} Upgrade Cost",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
         }
+        TaperedItemTypeRow(effectType = if (itemDetails.effects.any { it?.active == true }) "Active" else "Passive")
+        itemDetails.stats.forEach { stat ->
+            ItemStatRow(stat = stat)
+        }
+        itemDetails.effects.forEach { effect ->
+            if (effect != null) {
+                ItemEffectRow(effect = effect)
+            }
+        }
+        Spacer(modifier = Modifier.size(16.dp))
     }
 }
 
@@ -561,7 +617,8 @@ fun MatchDetailsScreenPreview() {
                 )
             ),
             getCreepScorePerMinute = { "2.8 CS/min" },
-            getGoldEarnedPerMinute = { "267.8 Gold/min" }
+            getGoldEarnedPerMinute = { "267.8 Gold/min" },
+            onItemClicked = {}
         )
 
     }
@@ -574,12 +631,14 @@ fun MatchDetailsScreenPreview() {
 @Composable
 fun ItemDetailsBottomSheetPreview() {
     MonolithTheme {
-        ItemDetailsBottomSheetContent(
-            itemDetails = ItemDetails(
-                image = "https://omeda.city/images/items/Refillable-Potion.webp",
-                name = "Refillable Potion",
-                displayName = "Refillable Potion",
-            ),
-        )
+        Surface {
+            ItemDetailsBottomSheetContent(
+                itemDetails = ItemDetails(
+                    image = "https://omeda.city/images/items/Refillable-Potion.webp",
+                    name = "Refillable Potion",
+                    displayName = "Malady",
+                ),
+            )
+        }
     }
 }

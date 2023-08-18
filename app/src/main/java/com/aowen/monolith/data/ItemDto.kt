@@ -31,6 +31,7 @@ data class ItemDto(
     val heroClass: String? = null,
     @SerializedName("required_level")
     val requiredLevel: Int? = null,
+    val stats: Map<String, Double>? = null,
     val effects: List<EffectDto?> = emptyList(),
     val requirements: List<String?> = emptyList(),
     @SerializedName("build_path")
