@@ -12,9 +12,9 @@ data class MatchPlayerDetails(
     val role: String = "",
     val performanceScore: String = "",
     val performanceTitle: String = "",
-    val kills: Float = 0f,
-    val deaths: Float = 0f,
-    val assists: Float = 0f,
+    val kills: Int = 0,
+    val deaths: Int = 0,
+    val assists: Int = 0,
     val minionsKilled: Int = 0,
     val goldEarned: Int = 0,
     val itemIds: List<Int> = emptyList(),
@@ -35,9 +35,9 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
         role = this.role ?: "role unknown",
         performanceScore = this.performanceScore,
         performanceTitle = this.performanceTitle,
-        kills = this.kills,
-        deaths = this.deaths,
-        assists = this.assists,
+        kills = this.kills.toInt(),
+        deaths = this.deaths.toInt(),
+        assists = this.assists.toInt(),
         minionsKilled = this.minionsKilled,
         goldEarned = this.goldEarned,
         itemIds = this.inventoryData
@@ -47,8 +47,8 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
 }
 
 fun MatchPlayerDetails.getKda(): String {
-    val kda = (this.kills + this.assists) / this.deaths
-    return if(kda.isNaN()) 0.0.toString() else kda.toDecimal()
+    val kda = (this.kills.toFloat() + this.assists.toFloat()) / this.deaths.toFloat()
+    return if (kda.isNaN()) 0.0.toString() else kda.toDecimal("#.##")
 }
 
 

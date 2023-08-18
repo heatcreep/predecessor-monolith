@@ -25,7 +25,7 @@ fun PlayerDto.create(): PlayerDetails {
 }
 
 fun Float?.toDecimal(pattern: String = "#.#"): String {
-    val float = this ?: 0.0
+    val float = this?.toDouble() ?: 0.0
     val df = DecimalFormat(pattern)
-    return df.format(float)
+    return "${df.format(float).toFloat()}"
 }

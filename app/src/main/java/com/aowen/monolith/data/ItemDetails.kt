@@ -209,7 +209,7 @@ fun ItemDto.create(): ItemDetails {
         name = this.name,
         displayName = this.displayName,
         image = RetrofitHelper.getRankImageUrl(this.image),
-        price = this.price,
+        price = this.price ?: 0,
         totalPrice = this.totalPrice,
         slotType = this.slotType,
         rarity = rarity,

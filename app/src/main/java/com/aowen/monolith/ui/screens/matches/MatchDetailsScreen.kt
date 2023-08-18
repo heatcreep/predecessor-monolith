@@ -419,9 +419,9 @@ fun PlayerRow(
                             KDAText(
                                 style = MaterialTheme.typography.bodySmall,
                                 averageKda = listOf(
-                                    player.kills.roundToInt().toString(),
-                                    player.deaths.roundToInt().toString(),
-                                    player.assists.roundToInt().toString()
+                                    player.kills.toString(),
+                                    player.deaths.toString(),
+                                    player.assists.toString()
                                 )
                             )
                             Text(
@@ -512,50 +512,55 @@ fun ItemDetailsBottomSheetContent(
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.secondary
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+        if (itemDetails.totalPrice > 0
+            && itemDetails.price != null
+            && itemDetails.price > 0
         ) {
             Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape),
-                    painter = painterResource(id = R.drawable.gold_per_second),
-                    tint = MaterialTheme.colorScheme.secondary,
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = "${itemDetails.totalPrice.toString()} Total Cost",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape),
-                    painter = painterResource(id = R.drawable.gold_per_second),
-                    tint = MaterialTheme.colorScheme.secondary,
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = "${itemDetails.price.toString()} Upgrade Cost",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape),
+                        painter = painterResource(id = R.drawable.gold_per_second),
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = "${itemDetails.totalPrice} Total Cost",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape),
+                        painter = painterResource(id = R.drawable.gold_per_second),
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    Text(
+                        text = "${itemDetails.price.toString()} Upgrade Cost",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
             }
         }
         TaperedItemTypeRow(effectType = if (itemDetails.effects.any { it?.active == true }) "Active" else "Passive")
@@ -594,9 +599,9 @@ fun MatchDetailsScreenPreview() {
                                 playerName = "Player 1",
                                 performanceTitle = "Annihilator",
                                 performanceScore = "143.6",
-                                kills = 7f,
-                                deaths = 3f,
-                                assists = 3f,
+                                kills = 7,
+                                deaths = 3,
+                                assists = 3,
                                 minionsKilled = 119,
                                 goldEarned = 15434
                             )

@@ -138,6 +138,7 @@ fun MatchPlayerCard(
                     ) {
                         Text(
                             style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.tertiary,
                             text = if (isWinner) "Victory" else "Defeat",
                         )
                     }
@@ -145,6 +146,7 @@ fun MatchPlayerCard(
                         Text(
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.tertiary,
                             text = "$it MMR"
                         )
                     }
@@ -190,7 +192,8 @@ fun MatchPlayerCard(
                     )
                     Text(
                         text = "${it.getKda()} KDA",
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary,
                     )
                 }
             }
@@ -228,9 +231,9 @@ fun MatchesListPreview() {
                                     playerName = "heatcreep.tv",
                                     hero = "Narbash",
                                     mmrChange = "11.4",
-                                    kills = 7f,
-                                    deaths = 2f,
-                                    assists = 12f,
+                                    kills = 7,
+                                    deaths = 2,
+                                    assists = 12,
 
                                     )
                             )
@@ -255,9 +258,9 @@ fun MatchesListPreview() {
                                     playerName = "heatcreep.tv",
                                     hero = "Phase",
                                     mmrChange = "11.4",
-                                    kills = 7f,
-                                    deaths = 2f,
-                                    assists = 12f,
+                                    kills = 7,
+                                    deaths = 2,
+                                    assists = 12,
 
                                     )
                             )
@@ -282,9 +285,9 @@ fun MatchesListPreview() {
                                     playerName = "heatcreep.tv",
                                     hero = "Morigesh",
                                     mmrChange = "111.4",
-                                    kills = 7f,
-                                    deaths = 2f,
-                                    assists = 12f,
+                                    kills = 7,
+                                    deaths = 2,
+                                    assists = 12,
 
                                     )
                             )
@@ -326,9 +329,9 @@ fun MatchesListPreviewLightMode() {
                                     playerName = "heatcreep.tv",
                                     hero = "Narbash",
                                     mmrChange = "11.4",
-                                    kills = 7f,
-                                    deaths = 2f,
-                                    assists = 12f,
+                                    kills = 7,
+                                    deaths = 2,
+                                    assists = 12,
 
                                     )
                             )
@@ -353,9 +356,9 @@ fun MatchesListPreviewLightMode() {
                                     playerName = "heatcreep.tv",
                                     hero = "Phase",
                                     mmrChange = "11.4",
-                                    kills = 7f,
-                                    deaths = 2f,
-                                    assists = 12f,
+                                    kills = 7,
+                                    deaths = 2,
+                                    assists = 12,
 
                                     )
                             )
@@ -380,9 +383,9 @@ fun MatchesListPreviewLightMode() {
                                     playerName = "heatcreep.tv",
                                     hero = "Morigesh",
                                     mmrChange = "111.4",
-                                    kills = 7f,
-                                    deaths = 2f,
-                                    assists = 12f,
+                                    kills = 7,
+                                    deaths = 2,
+                                    assists = 12,
 
                                     )
                             )
