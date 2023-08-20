@@ -1,5 +1,7 @@
 package com.aowen.monolith.data
 
+import com.aowen.monolith.ui.screens.heroes.HeroRole
+
 data class AbilityDetails(
     val displayName: String,
     val image: String,
@@ -26,7 +28,7 @@ data class HeroDetails(
     val imageId: Int? = null,
     val stats: List<Int> = emptyList(),
     val classes: List<String> = emptyList(),
-    val roles: List<String> = emptyList(),
+    val roles: List<HeroRole?> = emptyList(),
     val abilities: List<AbilityDetails> = emptyList(),
 )
 
@@ -37,9 +39,14 @@ fun HeroDto.create(): HeroDetails =
         displayName = displayName,
         stats = stats,
         classes = classes,
-        roles = roles,
+        roles = roles.toHeroRole(),
         imageId = HeroImage.values().firstOrNull { it.heroName == displayName }?.drawableId,
         abilities = abilities.map {
             it.create()
         },
     )
+
+fun List<String>.toHeroRole(): List<HeroRole?> =
+    map {
+        HeroRole.values().firstOrNull { role -> role.name == it }
+    }

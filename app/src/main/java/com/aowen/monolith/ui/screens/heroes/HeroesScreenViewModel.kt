@@ -1,6 +1,7 @@
 package com.aowen.monolith.ui.screens.heroes
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroDetails
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HeroesScreenUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val heroes: List<HeroDetails> = emptyList()
 )
 
@@ -24,6 +25,21 @@ class HeroesScreenViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(HeroesScreenUiState())
     val uiState: StateFlow<HeroesScreenUiState> = _uiState
+
+    val selectedRoleFilters = mutableStateListOf<HeroRole>()
+
+    fun updateRoleOption(option: HeroRole, isChecked: Boolean) {
+        if (isChecked) {
+            selectedRoleFilters.add(option)
+        } else {
+            selectedRoleFilters.remove(option)
+        }
+    }
+
+    fun getFilteredHeroes(selectedRoleFilters: List<HeroRole>): List<HeroDetails> =
+        if (selectedRoleFilters.isEmpty()) uiState.value.heroes else uiState.value.heroes.filter {
+            it.roles.any { role -> selectedRoleFilters.contains(role) }
+        }
 
     init {
         viewModelScope.launch {
@@ -45,4 +61,12 @@ class HeroesScreenViewModel @Inject constructor(
             }
         }
     }
+}
+
+enum class HeroRole {
+    Midlane,
+    Offlane,
+    Jungle,
+    Carry,
+    Support,
 }

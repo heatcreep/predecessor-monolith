@@ -47,7 +47,8 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
 }
 
 fun MatchPlayerDetails.getKda(): String {
-    val kda = (this.kills.toFloat() + this.assists.toFloat()) / this.deaths.toFloat()
+    val deaths = if (this.deaths == 0) 1 else this.deaths
+    val kda = (this.kills.toFloat() + this.assists.toFloat()) / deaths.toFloat()
     return if (kda.isNaN()) 0.0.toString() else kda.toDecimal("#.##")
 }
 

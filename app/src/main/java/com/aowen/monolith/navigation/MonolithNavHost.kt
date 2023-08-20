@@ -17,9 +17,7 @@ fun MonolithNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        loginScreen(
-            navigateToHomeScreen = navController::navigateToSearch
-        )
+        loginScreen()
         searchScreen(
             navController = navController,
         )

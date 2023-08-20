@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
@@ -64,6 +65,7 @@ fun FullScreenLoadingIndicator(loadingText: String? = null) {
             strokeWidth = 8.dp
         )
         loadingText?.let {
+            Spacer(modifier = Modifier.size(16.dp))
             Text(
                 text = "Loading $it...",
                 color = MaterialTheme.colorScheme.secondary
