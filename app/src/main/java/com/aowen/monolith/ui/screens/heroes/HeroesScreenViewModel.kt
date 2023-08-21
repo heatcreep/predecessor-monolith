@@ -1,7 +1,6 @@
 package com.aowen.monolith.ui.screens.heroes
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroDetails
@@ -15,31 +14,67 @@ import javax.inject.Inject
 
 data class HeroesScreenUiState(
     val isLoading: Boolean = true,
-    val heroes: List<HeroDetails> = emptyList()
+    val allHeroes: List<HeroDetails> = emptyList(),
+    val currentHeroes: List<HeroDetails> = emptyList(),
+    var selectedRoleFilters: List<HeroRole> = emptyList(),
+    val searchFieldValue: String = ""
 )
 
 @HiltViewModel
 class HeroesScreenViewModel @Inject constructor(
     private val repository: OmedaCityRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HeroesScreenUiState())
     val uiState: StateFlow<HeroesScreenUiState> = _uiState
 
-    val selectedRoleFilters = mutableStateListOf<HeroRole>()
 
-    fun updateRoleOption(option: HeroRole, isChecked: Boolean) {
-        if (isChecked) {
-            selectedRoleFilters.add(option)
-        } else {
-            selectedRoleFilters.remove(option)
+    fun setSearchValue(text: String) {
+        _uiState.update {
+            it.copy(
+                searchFieldValue = text.trim()
+            )
         }
     }
 
-    fun getFilteredHeroes(selectedRoleFilters: List<HeroRole>): List<HeroDetails> =
-        if (selectedRoleFilters.isEmpty()) uiState.value.heroes else uiState.value.heroes.filter {
-            it.roles.any { role -> selectedRoleFilters.contains(role) }
+    fun updateRoleOption(option: HeroRole, isChecked: Boolean) {
+        if (isChecked) {
+            _uiState.update { it.copy(selectedRoleFilters = it.selectedRoleFilters + option) }
+        } else {
+            _uiState.update { it.copy(selectedRoleFilters = it.selectedRoleFilters - option) }
         }
+    }
+
+    fun getFilteredHeroes() {
+        // if both role filters and search field are empty, return all heroes
+        val foo =
+            if (uiState.value.selectedRoleFilters.isEmpty() && uiState.value.searchFieldValue.isEmpty()) {
+                uiState.value.allHeroes
+                // if search field is empty, filter by role filters
+            } else if (uiState.value.searchFieldValue.isEmpty()) {
+                uiState.value.allHeroes.filter { hero ->
+                    hero.roles.any { role ->
+                        uiState.value.selectedRoleFilters.contains(role)
+                    }
+                }
+                // if role filters are empty, filter by search field
+            } else if (uiState.value.selectedRoleFilters.isEmpty()) {
+                uiState.value.allHeroes.filter { hero ->
+                    hero.displayName.contains(uiState.value.searchFieldValue, ignoreCase = true)
+                }
+                // if both role filters and search field are not empty, filter by both
+            } else {
+                uiState.value.allHeroes.filter { hero ->
+                    hero.roles.any { role ->
+                        uiState.value.selectedRoleFilters.contains(role)
+                    }
+                }.filter { hero ->
+                    hero.displayName.contains(uiState.value.searchFieldValue, ignoreCase = true)
+                }
+            }
+
+        _uiState.update { it.copy(currentHeroes = foo) }
+    }
 
     init {
         viewModelScope.launch {
@@ -48,7 +83,8 @@ class HeroesScreenViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        heroes = heroesList,
+                        allHeroes = heroesList,
+                        currentHeroes = heroesList
                     )
                 }
             } catch (e: Exception) {

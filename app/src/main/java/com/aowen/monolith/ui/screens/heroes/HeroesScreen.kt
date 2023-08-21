@@ -7,13 +7,13 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,10 +23,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,8 +52,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroImage
+import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.WarmWhite
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -65,9 +68,9 @@ fun HeroesScreenRoute(
 
     HeroesScreen(
         modifier = modifier,
-        selectedRoleFilters = viewModel.selectedRoleFilters,
         onFilterRole = viewModel::updateRoleOption,
-        getFilteredHeroes = viewModel::getFilteredHeroes,
+        setSearchValue = viewModel::setSearchValue,
+        onFilterHeroes = viewModel::getFilteredHeroes,
         uiState = heroesScreenUiState
     )
 
@@ -77,15 +80,14 @@ fun HeroesScreenRoute(
 @Composable
 fun HeroesScreen(
     uiState: HeroesScreenUiState,
-    selectedRoleFilters: List<HeroRole>,
     onFilterRole: (HeroRole, Boolean) -> Unit,
-    getFilteredHeroes: (List<HeroRole>) -> List<HeroDetails>,
-    modifier: Modifier = Modifier
+    setSearchValue: (text: String) -> Unit,
+    onFilterHeroes: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
 
     var expanded by remember { mutableStateOf(false) }
     val rotationAngle = remember { Animatable(0f) }
-    val filteredHeroes = getFilteredHeroes(selectedRoleFilters)
 
     LaunchedEffect(expanded) {
         this.launch {
@@ -95,6 +97,18 @@ fun HeroesScreen(
             )
         }
     }
+
+    LaunchedEffect(uiState.searchFieldValue) {
+        this.launch {
+            delay(500)
+            onFilterHeroes()
+        }
+    }
+
+    LaunchedEffect(uiState.selectedRoleFilters) {
+        onFilterHeroes()
+    }
+
     if (uiState.isLoading) {
         FullScreenLoadingIndicator("Heroes")
     } else {
@@ -109,69 +123,107 @@ fun HeroesScreen(
                     .padding(bottom = 16.dp)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            expanded = !expanded
-                        },
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.KeyboardArrowRight,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .rotate(rotationAngle.value)
-                            .size(36.dp),
-                        tint = MaterialTheme.colorScheme.secondary
+                    SearchBar(
+                        searchLabel = "Hero lookup",
+                        searchValue = uiState.searchFieldValue,
+                        setSearchValue = setSearchValue,
+                        modifier = Modifier.weight(1f)
                     )
-                    Text(
-                        text = "Filters",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                    IconButton(
+                        onClick = {
+                            expanded = !expanded
+                        }) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(28.dp)
+                                .rotate(rotationAngle.value),
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .clickable {
+//                            expanded = !expanded
+//                        },
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Filled.KeyboardArrowRight,
+//                        contentDescription = null,
+//                        modifier = Modifier
+//                            .rotate(rotationAngle.value)
+//                            .size(36.dp),
+//                        tint = MaterialTheme.colorScheme.secondary
+//                    )
+//                    Text(
+//                        text = "Filters",
+//                        style = MaterialTheme.typography.bodyLarge,
+//                        color = MaterialTheme.colorScheme.secondary
+//                    )
+//                }
                 AnimatedVisibility(visible = expanded) {
-                    FlowRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    Column {
+                        Spacer(modifier = Modifier.size(4.dp))
                         Text(
                             text = "Roles",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.padding(start = 16.dp)
                         )
-                        HeroRole.values().forEach { role ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = selectedRoleFilters.contains(role),
-                                    onCheckedChange = { isChecked ->
-                                        onFilterRole(role, isChecked)
-                                    },
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = MaterialTheme.colorScheme.secondary,
+                        Spacer(modifier = Modifier.size(4.dp))
+                        FlowRow(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            HeroRole.values().forEach { role ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(
+                                        checked = uiState.selectedRoleFilters.contains(role),
+                                        onCheckedChange = { isChecked ->
+                                            onFilterRole(role, isChecked)
+                                        },
+                                        colors = CheckboxDefaults.colors(
+                                            checkedColor = MaterialTheme.colorScheme.secondary,
+                                        )
                                     )
-                                )
-                                Text(
-                                    text = role.name,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
+                                    Text(
+                                        text = role.name,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
                             }
                         }
                     }
                 }
 
             }
-            LazyVerticalGrid(
-                modifier = Modifier.fillMaxSize(),
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                items(filteredHeroes) { hero ->
-                    HeroCard(hero = hero)
+            if (uiState.currentHeroes.isEmpty()) {
+                Text(
+                    text = "Results",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+            } else {
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(3),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(uiState.currentHeroes) { hero ->
+                        HeroCard(hero = hero)
+                    }
+
                 }
             }
         }
@@ -245,7 +297,7 @@ fun HeroesScreenPreview() {
         Surface {
             HeroesScreen(
                 uiState = HeroesScreenUiState(
-                    heroes = listOf(
+                    allHeroes = listOf(
                         HeroDetails(
                             imageId = HeroImage.NARBASH.drawableId,
                             displayName = "Narbash"
@@ -272,9 +324,9 @@ fun HeroesScreenPreview() {
                         ),
                     )
                 ),
-                selectedRoleFilters = listOf(HeroRole.Carry, HeroRole.Support),
                 onFilterRole = { _, _ -> },
-                getFilteredHeroes = { emptyList() }
+                setSearchValue = {},
+                onFilterHeroes = {}
             )
         }
     }
@@ -291,7 +343,7 @@ fun HeroesScreenPreviewDark() {
         Surface {
             HeroesScreen(
                 uiState = HeroesScreenUiState(
-                    heroes = listOf(
+                    allHeroes = listOf(
                         HeroDetails(
                             imageId = HeroImage.NARBASH.drawableId,
                             displayName = "Narbash"
@@ -318,9 +370,9 @@ fun HeroesScreenPreviewDark() {
                         ),
                     )
                 ),
-                selectedRoleFilters = listOf(HeroRole.Carry, HeroRole.Support),
                 onFilterRole = { _, _ -> },
-                getFilteredHeroes = { emptyList() }
+                setSearchValue = {},
+                onFilterHeroes = {}
             )
         }
     }

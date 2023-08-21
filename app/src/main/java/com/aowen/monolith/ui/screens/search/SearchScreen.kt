@@ -88,10 +88,11 @@ fun SearchScreen(
         // Search bar
         Column {
             SearchBar(
+                searchLabel = "Player lookup",
                 searchValue = uiState.searchFieldValue,
                 setSearchValue = setSearchValue,
                 handleSubmitSearch = handleSubmitSearch,
-                modifier = modifier
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.size(16.dp))
             Text(
@@ -132,8 +133,9 @@ fun SearchScreen(
 fun SearchBar(
     searchValue: String,
     setSearchValue: (String) -> Unit,
-    handleSubmitSearch: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    searchLabel: String = "",
+    handleSubmitSearch: (() -> Unit)? = null
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -141,20 +143,19 @@ fun SearchBar(
     val buttonColors = ButtonDefaults.buttonColors(
         containerColor = MaterialTheme.colorScheme.secondary
     )
-    Row {
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(intrinsicSize = IntrinsicSize.Min),
-            shape = RoundedCornerShape(24.dp),
-            placeholder = {
-                Text(
-                    text = "Player lookup",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            },
-            trailingIcon = {
+    TextField(
+        modifier = modifier
+            .height(intrinsicSize = IntrinsicSize.Min),
+        shape = RoundedCornerShape(24.dp),
+        placeholder = {
+            Text(
+                text = searchLabel,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        },
+        trailingIcon = {
+            handleSubmitSearch?.let {
                 IconButton(onClick = {
                     keyboardController?.hide()
                     handleSubmitSearch()
@@ -164,23 +165,25 @@ fun SearchBar(
                         contentDescription = null
                     )
                 }
-            },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboardController?.hide()
+            }
+        },
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                keyboardController?.hide()
+                handleSubmitSearch?.let {
                     handleSubmitSearch()
                 }
-            ),
-            value = searchValue,
-            colors = inputFieldDefaults(),
-            singleLine = true,
-            maxLines = 1,
-            onValueChange = setSearchValue
-        )
-    }
+            }
+        ),
+        value = searchValue,
+        colors = inputFieldDefaults(),
+        singleLine = true,
+        maxLines = 1,
+        onValueChange = setSearchValue
+    )
 }
 
 @Composable

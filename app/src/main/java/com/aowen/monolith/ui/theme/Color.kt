@@ -1,7 +1,6 @@
 package com.aowen.monolith.ui.theme
 
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -15,10 +14,6 @@ val NeroGrey = Color(0xFF2C2C2C)
 // Browns
 val DarkKhaki = Color(0xFF645C45)
 val LightKhaki = Color(0xFFE6DEC6)
-
-// Greys
-val WarmGrey = Color(0xFF8B8B8A)
-val CoolGrey = Color(0xFF87858A)
 
 // Whites
 val WarmWhite = Color(0xFFE3E3E1)
@@ -46,8 +41,8 @@ val DiscordBlurple = Color(0xFF8B9CDE)
 fun inputFieldDefaults() = TextFieldDefaults.colors(
     unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
     focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-    unfocusedIndicatorColor = MaterialTheme.colorScheme.primary,
-    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+    unfocusedIndicatorColor = Color.Transparent,
+    focusedIndicatorColor = Color.Transparent,
     cursorColor = MaterialTheme.colorScheme.secondary,
     selectionColors = selectColorDefaults(),
     focusedSupportingTextColor = MaterialTheme.colorScheme.primaryContainer,
