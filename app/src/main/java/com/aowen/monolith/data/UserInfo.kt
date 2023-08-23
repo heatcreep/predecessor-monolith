@@ -1,6 +1,5 @@
 package com.aowen.monolith.data
 
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -8,10 +7,7 @@ import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import java.sql.Timestamp
-import java.util.Date
 import java.util.UUID
-import javax.annotation.Nullable
 
 object UUIDSerializer : KSerializer<UUID> {
     override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
@@ -37,4 +33,6 @@ data class UserInfo(
     val fullName: String = "",
     @SerialName("avatar_url")
     val avatarUrl: String = "",
+    @SerialName("player_id")
+    val playerId: String? = "",
 )

@@ -34,6 +34,7 @@ internal fun PlayerDetailsRoute(
     PlayerDetailScreen(
         uiState = uiState,
         modifier = modifier,
+        handleSavePlayer = viewModel::handleSavePlayer,
         navigateToMatchDetails = navigateToMatchDetails
     )
 }
@@ -42,6 +43,7 @@ internal fun PlayerDetailsRoute(
 fun PlayerDetailScreen(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
+    handleSavePlayer: suspend (Boolean) -> Unit = {},
     navigateToMatchDetails: (String) -> Unit = { _ -> }
 ) {
     Surface(
@@ -56,14 +58,16 @@ fun PlayerDetailScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
-                uiState.player?.let { playerDetails ->
+                uiState.player.let { playerDetails ->
                     PlayerCard(
                         player = playerDetails,
+                        isClaimed = uiState.isClaimed,
+                        handleSavePlayer = handleSavePlayer,
                         stats = uiState.stats
                     )
                     Spacer(modifier = Modifier.size(32.dp))
                     MatchesList(
-                        playerId = uiState.userId,
+                        playerId = uiState.playerId,
                         matches = uiState.matches,
                         navigateToMatchDetails = navigateToMatchDetails
                     )
@@ -82,7 +86,7 @@ fun PlayerDetailScreen(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
-@Composable()
+@Composable
 fun HomeScreenPreview() {
     MonolithTheme {
         PlayerDetailScreen(
@@ -101,7 +105,7 @@ fun HomeScreenPreview() {
     group = "Default",
     showBackground = true
 )
-@Composable()
+@Composable
 fun HomeScreenPreview2() {
     MonolithTheme {
         PlayerDetailScreen(

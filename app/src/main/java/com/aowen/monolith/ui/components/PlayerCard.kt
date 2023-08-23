@@ -1,50 +1,146 @@
 package com.aowen.monolith.ui.components
 
 import android.content.res.Configuration
-import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
-import coil.compose.rememberAsyncImagePainter
-import coil.imageLoader
 import coil.request.ImageRequest
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
-import com.aowen.monolith.ui.theme.BlueHighlight
-import com.aowen.monolith.ui.theme.GreenHighlight
 import com.aowen.monolith.ui.theme.MonolithTheme
-import com.aowen.monolith.ui.theme.RedHighlight
+import kotlinx.coroutines.launch
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UnclaimPlayerDialog(
+    modifier: Modifier = Modifier,
+    handleSavePlayer: () -> Unit = {},
+    onDismissRequest: () -> Unit = { }
+) {
+    AlertDialog(
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp)),
+        onDismissRequest = onDismissRequest,
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(24.dp)
+        ) {
+            Text(
+                text = "Are you sure you want to unclaim this player?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ElevatedButton(
+                    onClick = onDismissRequest,
+                    contentPadding = PaddingValues(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Text(text = "Cancel")
+                }
+                ElevatedButton(
+                    onClick = handleSavePlayer,
+                    contentPadding = PaddingValues(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Text(text = "Yes")
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PlayerCard(
     player: PlayerDetails?,
     stats: PlayerStats?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isClaimed: Boolean = false,
+    handleSavePlayer: suspend (Boolean) -> Unit = {},
 ) {
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    var isDialogOpen by remember { mutableStateOf(false) }
+    val rotationAngle = remember { Animatable(0f) }
+
+    LaunchedEffect(isClaimed) {
+        rotationAngle.animateTo(
+            targetValue = if (isClaimed) 45f else 0f,
+            animationSpec = tween(durationMillis = 200, easing = LinearEasing),
+        )
+    }
+
+    if (isDialogOpen) {
+        UnclaimPlayerDialog(
+            onDismissRequest = { isDialogOpen = false },
+            handleSavePlayer = {
+                coroutineScope.launch {
+                    handleSavePlayer(true)
+                }
+                isDialogOpen = false
+            }
+        )
+    }
 
     Column(
         modifier = modifier
@@ -72,9 +168,6 @@ fun PlayerCard(
                 val state = painter.state
                 if (state is AsyncImagePainter.State.Success) {
                     SubcomposeAsyncImageContent()
-                    LaunchedEffect(Unit) {
-                        Log.d("ANDREWO", state.result.dataSource.toString())
-                    }
                 }
             }
             Text(
@@ -83,6 +176,43 @@ fun PlayerCard(
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.size(16.dp))
+            Row(
+                modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ElevatedButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            if (isClaimed) {
+                                isDialogOpen = true
+                            } else {
+                                handleSavePlayer(false)
+                            }
+                        }
+                    },
+                    contentPadding = PaddingValues(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .rotate(rotationAngle.value),
+                        contentDescription = null,
+                    )
+                    Spacer(modifier = Modifier.size(4.dp))
+                    AnimatedContent(targetState = isClaimed, label = "ClaimPlayer") {
+                        Text(text = if (it) "Unclaim Player" else "Claim Player")
+                    }
+
+
+                }
+            }
             Spacer(modifier = Modifier.size(16.dp))
             // Stat List
             Column(
@@ -160,7 +290,7 @@ fun StatListItem(
     statLabel: String = "",
     statValue: @Composable () -> Unit,
 ) {
-    Column() {
+    Column {
         Row(
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -185,10 +315,10 @@ fun StatListItem(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
-@Composable()
+@Composable
 fun PlayerCardPreview() {
     MonolithTheme {
-        Surface() {
+        Surface {
             PlayerCard(
                 player = PlayerDetails(
                     playerName = "heatcreep.tv",

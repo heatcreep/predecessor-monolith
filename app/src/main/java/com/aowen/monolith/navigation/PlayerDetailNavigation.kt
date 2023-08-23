@@ -18,8 +18,8 @@ fun NavGraphBuilder.playerDetailsScreen(
     navController: NavController
 ) {
     composable(
-        route = "$PlayerDetailRoute/{userId}",
-        arguments = listOf(navArgument("userId") {
+        route = "$PlayerDetailRoute/{playerId}",
+        arguments = listOf(navArgument("playerId") {
             type = NavType.StringType
         })
     ) {

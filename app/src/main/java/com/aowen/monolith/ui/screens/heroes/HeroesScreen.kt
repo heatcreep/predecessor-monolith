@@ -146,28 +146,6 @@ fun HeroesScreen(
                         )
                     }
                 }
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .clickable {
-//                            expanded = !expanded
-//                        },
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Filled.KeyboardArrowRight,
-//                        contentDescription = null,
-//                        modifier = Modifier
-//                            .rotate(rotationAngle.value)
-//                            .size(36.dp),
-//                        tint = MaterialTheme.colorScheme.secondary
-//                    )
-//                    Text(
-//                        text = "Filters",
-//                        style = MaterialTheme.typography.bodyLarge,
-//                        color = MaterialTheme.colorScheme.secondary
-//                    )
-//                }
                 AnimatedVisibility(visible = expanded) {
                     Column {
                         Spacer(modifier = Modifier.size(4.dp))
@@ -204,15 +182,20 @@ fun HeroesScreen(
                         }
                     }
                 }
-
             }
             if (uiState.currentHeroes.isEmpty()) {
-                Text(
-                    text = "Results",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "No heroes matched your search.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
             } else {
                 LazyVerticalGrid(
                     modifier = Modifier.fillMaxSize(),

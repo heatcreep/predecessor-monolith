@@ -22,7 +22,7 @@ fun KDAText(
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             style = style,
-            text = averageKda?.get(0) ?: "0.0",
+            text = averageKda?.getOrNull(0) ?: "0.0",
             fontWeight = FontWeight.Bold,
             color = GreenHighlight
         )
