@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.ui.components.PlayerCard
 import com.aowen.monolith.ui.theme.MonolithTheme
 
@@ -26,7 +27,8 @@ import com.aowen.monolith.ui.theme.MonolithTheme
 internal fun PlayerDetailsRoute(
     modifier: Modifier = Modifier,
     viewModel: PlayerDetailsViewModel = hiltViewModel(),
-    navigateToMatchDetails: (String) -> Unit = { _ -> }
+    navigateToMatchDetails: (String) -> Unit = { _ -> },
+    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _-> }
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -35,6 +37,7 @@ internal fun PlayerDetailsRoute(
         uiState = uiState,
         modifier = modifier,
         handleSavePlayer = viewModel::handleSavePlayer,
+        setClaimedPlayer = setClaimedPlayer,
         navigateToMatchDetails = navigateToMatchDetails
     )
 }
@@ -44,6 +47,7 @@ fun PlayerDetailScreen(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
+    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _ -> },
     navigateToMatchDetails: (String) -> Unit = { _ -> }
 ) {
     Surface(
@@ -62,6 +66,7 @@ fun PlayerDetailScreen(
                     PlayerCard(
                         player = playerDetails,
                         isClaimed = uiState.isClaimed,
+                        setClaimedPlayer = setClaimedPlayer,
                         handleSavePlayer = handleSavePlayer,
                         stats = uiState.stats
                     )

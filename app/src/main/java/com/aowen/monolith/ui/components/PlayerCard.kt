@@ -115,6 +115,7 @@ fun PlayerCard(
     modifier: Modifier = Modifier,
     isClaimed: Boolean = false,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
+    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _ -> }
 ) {
 
     val context = LocalContext.current
@@ -147,8 +148,7 @@ fun PlayerCard(
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (player != null) {
-
+        if (player != null && stats != null) {
             val model = ImageRequest.Builder(context)
                 .data(player.rankImage)
                 .crossfade(true)
@@ -189,6 +189,7 @@ fun PlayerCard(
                                 isDialogOpen = true
                             } else {
                                 handleSavePlayer(false)
+                                setClaimedPlayer(stats, player)
                             }
                         }
                     },
@@ -249,7 +250,7 @@ fun PlayerCard(
                     statLabel = "Matches Played:",
                     statValue = {
                         Text(
-                            text = stats?.matchesPlayed ?: "0",
+                            text = stats.matchesPlayed,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.secondary
                         )
@@ -261,7 +262,7 @@ fun PlayerCard(
                     statLabel = "Favorite Hero:",
                     statValue = {
                         Text(
-                            text = stats?.favoriteHero ?: "No Hero",
+                            text = stats.favoriteHero,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.secondary
                         )
@@ -270,7 +271,7 @@ fun PlayerCard(
                 StatListItem(
                     modifier = modifier,
                     statLabel = "Average KDA:",
-                    statValue = { KDAText(averageKda = stats?.averageKda) }
+                    statValue = { KDAText(averageKda = stats.averageKda) }
                 )
             }
         } else {

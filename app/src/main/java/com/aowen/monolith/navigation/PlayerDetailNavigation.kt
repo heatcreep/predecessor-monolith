@@ -6,6 +6,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.ui.screens.playerdetails.PlayerDetailsRoute
 
 const val PlayerDetailRoute = "player-detail"
@@ -15,7 +17,8 @@ fun NavController.navigateToPlayerDetails(userId: String, navOptions: NavOptions
 }
 
 fun NavGraphBuilder.playerDetailsScreen(
-    navController: NavController
+    navController: NavController,
+    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _ -> }
 ) {
     composable(
         route = "$PlayerDetailRoute/{playerId}",
@@ -24,7 +27,8 @@ fun NavGraphBuilder.playerDetailsScreen(
         })
     ) {
         PlayerDetailsRoute(
-            navigateToMatchDetails = navController::navigateToMatchDetails
+            navigateToMatchDetails = navController::navigateToMatchDetails,
+            setClaimedPlayer = setClaimedPlayer
         )
     }
     matchDetailsScreen()

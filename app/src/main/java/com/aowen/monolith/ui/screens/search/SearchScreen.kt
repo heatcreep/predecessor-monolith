@@ -1,6 +1,8 @@
 package com.aowen.monolith.ui.screens.search
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,15 +17,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,16 +34,20 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
@@ -48,7 +55,9 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.FullScreenLoadingIndicator
+import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.inputFieldDefaults
 
@@ -56,8 +65,20 @@ import com.aowen.monolith.ui.theme.inputFieldDefaults
 internal fun SearchScreenRoute(
     modifier: Modifier = Modifier,
     navigateToPlayerDetails: (String) -> Unit,
+    claimedPlayerStats: PlayerStats? = null,
+    claimedPlayerDetails: PlayerDetails? = null,
     searchScreenViewModel: SearchScreenViewModel = hiltViewModel(),
 ) {
+
+    LaunchedEffect(Unit) {
+        if (claimedPlayerStats != null && claimedPlayerDetails != null) {
+            searchScreenViewModel.initViewModel(
+                claimedPlayerStats = claimedPlayerStats,
+                claimedPlayerDetails = claimedPlayerDetails
+            )
+        }
+
+    }
 
     val searchUiState by searchScreenViewModel.uiState.collectAsState()
 
@@ -96,12 +117,46 @@ fun SearchScreen(
             )
             Spacer(modifier = Modifier.size(16.dp))
             Text(
-                text = "Players",
+                text = "My Player",
+                color = MaterialTheme.colorScheme.secondary,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.size(16.dp))
+            if (uiState.isLoading) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        strokeWidth = 4.dp
+                    )
+                }
+            } else {
+                if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
+                    ClaimedPlayerCard(
+                        playerDetails = uiState.claimedPlayerDetails,
+                        playerStats = uiState.claimedPlayerStats,
+                        navigateToPlayerDetails = navigateToPlayerDetails
+                    )
+                } else {
+                    Text(
+                        text = "No player claimed! Navigate to a player's profile and click the" +
+                                " 'Claim Player' button to claim a player.",
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.size(16.dp))
+            Text(
+                text = "Search Results",
                 color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.size(16.dp))
-            if (uiState.isLoading) {
+            if (uiState.isLoadingSearch) {
                 FullScreenLoadingIndicator()
             } else {
                 if (uiState.initPlayersListText != null) {
@@ -140,9 +195,6 @@ fun SearchBar(
 
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val buttonColors = ButtonDefaults.buttonColors(
-        containerColor = MaterialTheme.colorScheme.secondary
-    )
     TextField(
         modifier = modifier
             .height(intrinsicSize = IntrinsicSize.Min),
@@ -207,7 +259,7 @@ fun PlayerResultCard(
                 navigateToPlayerDetails(playerDetails.playerId)
             }
             .border(
-                Dp.Hairline,
+                1.dp,
                 MaterialTheme.colorScheme.secondary,
                 RoundedCornerShape(4.dp)
             ),
@@ -242,7 +294,7 @@ fun PlayerResultCard(
                     )
                 }
             }
-            Column() {
+            Column {
                 Text(
                     text = playerDetails.playerName,
                     style = MaterialTheme.typography.bodyMedium,
@@ -260,14 +312,137 @@ fun PlayerResultCard(
     }
 }
 
+@Composable
+fun ClaimedPlayerCard(
+    playerDetails: PlayerDetails,
+    playerStats: PlayerStats,
+    navigateToPlayerDetails: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    val heroImage = HeroImage.values().first {
+        it.heroName == playerStats.favoriteHero
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                navigateToPlayerDetails(playerDetails.playerId)
+            }
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.secondary,
+                RoundedCornerShape(4.dp)
+            ),
+        shape = RoundedCornerShape(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Player Favorite Hero
+            Image(
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = CircleShape
+                    ),
+                contentScale = ContentScale.Crop,
+                painter = painterResource(id = heroImage.drawableId),
+                contentDescription = null
+            )
+            Column {
+                Text(
+                    text = playerDetails.playerName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Row {
+                    Text(
+                        text = playerDetails.rank,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = " | ",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = "MMR: ${playerDetails.mmr ?: "Unranked"}",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = " | ",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    playerDetails.region?.let {
+                        Text(
+                            text = playerDetails.region,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ClaimedPlayerCardPreview() {
+    MonolithTheme {
+        Surface(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background)
+                .padding(32.dp)
+
+        ) {
+            ClaimedPlayerCard(
+                playerDetails = PlayerDetails(
+                    playerName = "heatcreep.tv",
+                    region = "naeast",
+                    mmr = "1379",
+                    rank = "Silver III"
+                ),
+                navigateToPlayerDetails = {},
+                playerStats = PlayerStats(
+                    favoriteHero = "Narbash",
+                )
+            )
+        }
+    }
+}
+
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
 fun SearchScreenPreview() {
-    MonolithTheme() {
-        Surface() {
+    MonolithTheme {
+        Surface {
             SearchScreen(
                 uiState = SearchScreenUiState(
                     playersList = listOf(
@@ -276,7 +451,18 @@ fun SearchScreenPreview() {
                             region = "naeast"
                         )
                     ),
-                    initPlayersListText = null
+                    initPlayersListText = null,
+                    isLoadingSearch = false,
+                    isLoading = false,
+                    claimedPlayerDetails = PlayerDetails(
+                        playerName = "heatcreep.tv",
+                        region = "naeast",
+                        mmr = "1379",
+                        rank = "Silver III"
+                    ),
+                    claimedPlayerStats = PlayerStats(
+                        favoriteHero = "Narbash",
+                    )
                 ),
                 setSearchValue = {},
                 handleSubmitSearch = {},
