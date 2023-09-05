@@ -26,6 +26,12 @@ class ProfileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ProfileScreenUiState())
     val uiState: StateFlow<ProfileScreenUiState> = _uiState
 
+    fun handleLogout() {
+        viewModelScope.launch {
+            userRepository.logout()
+        }
+    }
+
     init {
         viewModelScope.launch {
             try {

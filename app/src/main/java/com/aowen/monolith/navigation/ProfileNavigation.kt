@@ -16,10 +16,10 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
     }
 }
 
-fun NavGraphBuilder.profileScreen() {
+fun NavGraphBuilder.profileScreen(navController: NavController) {
     composable(
         route = ProfileRoute
     ) {
-        ProfileScreenRoute()
+        ProfileScreenRoute(navController = navController)
     }
 }

@@ -4,14 +4,16 @@ import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.create
 import javax.inject.Inject
 
 interface OmedaCityRepository {
     suspend fun fetchPlayersByName(playerName: String): List<PlayerDetails>
-    suspend fun fetchPlayerById(playerId: String): PlayerDetails
-    suspend fun fetchPlayerStatsById(playerId: String): PlayerStats
+
+    suspend fun fetchPlayerInfo(playerId: String): PlayerInfo
+
     suspend fun fetchMatchesById(playerId: String): List<MatchDetails>
     suspend fun fetchMatchById(matchId: String): MatchDetails
     suspend fun fetchAllItems(): List<ItemDetails>
@@ -24,11 +26,14 @@ class OmedaCityRepositoryImpl @Inject constructor(
     private val playerApi: OmedaCityApi
 ) : OmedaCityRepository {
 
-    override suspend fun fetchPlayerById(playerId: String): PlayerDetails =
-        playerApi.getPlayerById(playerId).create()
-
-    override suspend fun fetchPlayerStatsById(playerId: String): PlayerStats =
-        playerApi.getPlayerStatsById(playerId).create()
+    override suspend fun fetchPlayerInfo(playerId: String): PlayerInfo {
+        val playerDetails = playerApi.getPlayerById(playerId).create()
+        val playerStats = playerApi.getPlayerStatsById(playerId).create()
+        return PlayerInfo(
+            playerDetails = playerDetails,
+            playerStats = playerStats
+        )
+    }
 
     override suspend fun fetchMatchesById(playerId: String): List<MatchDetails> =
         playerApi.getPlayerMatchesById(playerId).matches.map {

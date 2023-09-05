@@ -18,7 +18,6 @@ fun NavController.navigateToPlayerDetails(userId: String, navOptions: NavOptions
 
 fun NavGraphBuilder.playerDetailsScreen(
     navController: NavController,
-    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _ -> }
 ) {
     composable(
         route = "$PlayerDetailRoute/{playerId}",
@@ -28,7 +27,6 @@ fun NavGraphBuilder.playerDetailsScreen(
     ) {
         PlayerDetailsRoute(
             navigateToMatchDetails = navController::navigateToMatchDetails,
-            setClaimedPlayer = setClaimedPlayer
         )
     }
     matchDetailsScreen()

@@ -29,15 +29,6 @@ class MonolithViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MonolithUiState())
     val uiState: StateFlow<MonolithUiState> = _uiState
 
-    fun setClaimedPlayer(playerStats: PlayerStats, playerDetails: PlayerDetails) {
-        _uiState.update {
-            it.copy(
-                claimedPlayerStats = playerStats,
-                claimedPlayerDetails = playerDetails
-            )
-        }
-    }
-
     init {
         viewModelScope.launch {
             val session = supabaseClient.gotrue.currentSessionOrNull()

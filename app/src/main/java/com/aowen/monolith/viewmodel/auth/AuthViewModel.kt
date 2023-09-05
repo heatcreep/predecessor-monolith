@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class LoginUiState(
+    val isAuthenticated: Boolean = false,
     val pageState: PageState = PageState.LOGIN,
     val isLoading: Boolean = false,
     val emailTextField: String = "",
@@ -43,6 +44,7 @@ class AuthViewModel @Inject constructor(
         try {
             viewModelScope.launch {
                 authRepo.signInWithDiscord()
+
             }
         } catch (e: Exception) {
             Log.d("MONOLITH-DEBUG://", e.toString())

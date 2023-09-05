@@ -10,6 +10,7 @@ import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.RetrofitHelper
+import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,6 @@ data class PlayerDetailsUiState(
     val stats: PlayerStats = PlayerStats(),
     val matches: List<MatchDetails> = emptyList(),
     val playerId: String = "",
-    val userPlayerId: String = "",
     val isClaimed: Boolean = false,
     val playerRankUrl: String = "no image"
 )
@@ -33,7 +33,8 @@ data class PlayerDetailsUiState(
 class PlayerDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: OmedaCityRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PlayerDetailsUiState())
@@ -49,7 +50,12 @@ class PlayerDetailsViewModel @Inject constructor(
                 val userInfo = userInfoDeferred.await()
 
                 if (userInfo.isSuccess) {
-                    _uiState.update { it.copy(userPlayerId = id, isClaimed = !uiState.value.isClaimed) }
+                    userRepository.setClaimedUser(uiState.value.stats, uiState.value.player)
+                    _uiState.update {
+                        it.copy(
+                            isClaimed = !uiState.value.isClaimed
+                        )
+                    }
                     Log.d("MONOLITH_DEBUG: ", "Successfully saved player")
                 } else {
                     Log.d("MONOLITH_DEBUG: ", "Failed to save player")
@@ -65,13 +71,11 @@ class PlayerDetailsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             try {
-                val player = async { repository.fetchPlayerById(playerId) }
-                val stats = async { repository.fetchPlayerStatsById(playerId) }
+                val playerInfoDeferred = async { repository.fetchPlayerInfo(playerId) }
                 val matches = async { repository.fetchMatchesById(playerId) }
                 val playerIdDeferred = async { authRepository.getPlayer() }
 
-                val playerRes = player.await()
-                val statsRes = stats.await()
+                val playerInfo = playerInfoDeferred.await()
                 val matchesRes = matches.await()
                 val playerIdRes = playerIdDeferred.await()
 
@@ -85,12 +89,11 @@ class PlayerDetailsViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         playerId = playerId,
-                        userPlayerId = userPlayerId,
                         isClaimed = isClaimed,
-                        player = playerRes,
-                        stats = statsRes,
+                        player = playerInfo.playerDetails,
+                        stats = playerInfo.playerStats,
                         matches = matchesRes,
-                        playerRankUrl = RetrofitHelper.getRankImageUrl(playerRes.rankImage)
+                        playerRankUrl = RetrofitHelper.getRankImageUrl(playerInfo.playerDetails.rankImage)
                     )
                 }
             } catch (e: Exception) {

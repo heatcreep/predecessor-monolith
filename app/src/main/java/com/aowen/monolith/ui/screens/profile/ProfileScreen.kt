@@ -24,17 +24,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.FullScreenLoadingIndicator
+import com.aowen.monolith.navigation.navigateToLoginFromLogout
 import com.aowen.monolith.ui.theme.DiscordBlurple
 import com.aowen.monolith.ui.theme.DiscordDarkBackground
 import com.aowen.monolith.ui.theme.WarmWhite
 
 @Composable
 fun ProfileScreenRoute(
+    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -43,14 +46,18 @@ fun ProfileScreenRoute(
 
     ProfileScreen(
         uiState = uiState,
-        modifier = modifier
+        modifier = modifier,
+        onLogout = viewModel::handleLogout,
+        navigateToLogin = navController::navigateToLoginFromLogout
     )
 }
 
 @Composable
 fun ProfileScreen(
     uiState: ProfileScreenUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLogout: () -> Unit,
+    navigateToLogin: () -> Unit,
 ) {
 
     val context = LocalContext.current
@@ -67,7 +74,7 @@ fun ProfileScreen(
                     .fillMaxSize()
                     .padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp    )
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Surface(shape = RoundedCornerShape(5.dp)) {
                     Column {
@@ -135,7 +142,10 @@ fun ProfileScreen(
                         }
                     }
                 }
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = {
+                    onLogout()
+                    navigateToLogin()
+                }) {
                     Text(
                         text = "Sign Out",
                         style = MaterialTheme.typography.bodyLarge,

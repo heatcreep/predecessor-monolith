@@ -65,22 +65,15 @@ import com.aowen.monolith.ui.theme.inputFieldDefaults
 internal fun SearchScreenRoute(
     modifier: Modifier = Modifier,
     navigateToPlayerDetails: (String) -> Unit,
-    claimedPlayerStats: PlayerStats? = null,
-    claimedPlayerDetails: PlayerDetails? = null,
     searchScreenViewModel: SearchScreenViewModel = hiltViewModel(),
 ) {
+    val searchUiState by searchScreenViewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
-        if (claimedPlayerStats != null && claimedPlayerDetails != null) {
-            searchScreenViewModel.initViewModel(
-                claimedPlayerStats = claimedPlayerStats,
-                claimedPlayerDetails = claimedPlayerDetails
-            )
-        }
+        searchScreenViewModel.initViewModel()
 
     }
 
-    val searchUiState by searchScreenViewModel.uiState.collectAsState()
 
     SearchScreen(
         uiState = searchUiState,

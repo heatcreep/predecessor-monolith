@@ -12,9 +12,6 @@ fun MonolithNavHost(
     appState: MonolithAppState,
     modifier: Modifier = Modifier,
     startDestination: String = LoginRoute,
-    claimedPlayerStats: PlayerStats? = null,
-    claimedPlayerDetails: PlayerDetails? = null,
-    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = {_ ,_ -> }
 ) {
     val navController = appState.navController
     NavHost(
@@ -25,11 +22,8 @@ fun MonolithNavHost(
         loginScreen()
         searchScreen(
             navController = navController,
-            claimedPlayerStats = claimedPlayerStats,
-            claimedPlayerDetails = claimedPlayerDetails,
-            setClaimedPlayer = setClaimedPlayer
         )
         heroesScreen()
-        profileScreen()
+        profileScreen(navController = navController)
     }
 }

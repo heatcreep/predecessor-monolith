@@ -17,22 +17,16 @@ fun NavController.navigateToSearch(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.searchScreen(
     navController: NavController,
-    claimedPlayerStats: PlayerStats? = null,
-    claimedPlayerDetails: PlayerDetails? = null,
-    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _ -> }
 ) {
     composable(
         route = SearchRoute,
         deepLinks = listOf(navDeepLink { uriPattern = "monolith://login" })
     ) {
         SearchScreenRoute(
-            claimedPlayerStats = claimedPlayerStats,
-            claimedPlayerDetails = claimedPlayerDetails,
             navigateToPlayerDetails = navController::navigateToPlayerDetails,
         )
     }
     playerDetailsScreen(
         navController = navController,
-        setClaimedPlayer = setClaimedPlayer
     )
 }

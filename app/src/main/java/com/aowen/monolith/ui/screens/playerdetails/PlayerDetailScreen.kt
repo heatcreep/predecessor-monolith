@@ -28,7 +28,6 @@ internal fun PlayerDetailsRoute(
     modifier: Modifier = Modifier,
     viewModel: PlayerDetailsViewModel = hiltViewModel(),
     navigateToMatchDetails: (String) -> Unit = { _ -> },
-    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _-> }
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -37,7 +36,6 @@ internal fun PlayerDetailsRoute(
         uiState = uiState,
         modifier = modifier,
         handleSavePlayer = viewModel::handleSavePlayer,
-        setClaimedPlayer = setClaimedPlayer,
         navigateToMatchDetails = navigateToMatchDetails
     )
 }
@@ -47,7 +45,6 @@ fun PlayerDetailScreen(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
-    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _ -> },
     navigateToMatchDetails: (String) -> Unit = { _ -> }
 ) {
     Surface(
@@ -66,7 +63,6 @@ fun PlayerDetailScreen(
                     PlayerCard(
                         player = playerDetails,
                         isClaimed = uiState.isClaimed,
-                        setClaimedPlayer = setClaimedPlayer,
                         handleSavePlayer = handleSavePlayer,
                         stats = uiState.stats
                     )

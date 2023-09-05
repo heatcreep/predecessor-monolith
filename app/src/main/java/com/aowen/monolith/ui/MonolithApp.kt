@@ -28,6 +28,7 @@ fun MonolithApp(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+
     Scaffold(
         bottomBar = {
             if (appState.shouldShowBottomBar) {
@@ -42,9 +43,6 @@ fun MonolithApp(
         MonolithNavHost(
             appState = appState,
             modifier = Modifier.padding(padding),
-            claimedPlayerStats = uiState.claimedPlayerStats,
-            claimedPlayerDetails = uiState.claimedPlayerDetails,
-            setClaimedPlayer = viewModel::setClaimedPlayer,
             startDestination = if (uiState.session != null) SearchRoute else LoginRoute
         )
     }

@@ -9,6 +9,7 @@ import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.PostgrestResult
+import kotlinx.coroutines.delay
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
@@ -55,7 +56,14 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun getPlayer(): Result<UserProfile?> {
         return try {
-            client.gotrue.currentSessionOrNull()?.let {
+            var session = client.gotrue.currentSessionOrNull()
+            var retryCount = 3
+            while(session == null && retryCount > 0) {
+                delay(500)
+                session = client.gotrue.currentSessionOrNull()
+                retryCount--
+            }
+            session?.let {
                 if (it.user?.id != null) {
                     Result.success(
                         client.postgrest.from(TABLE_PROFILES)

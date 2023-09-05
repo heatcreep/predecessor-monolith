@@ -115,7 +115,6 @@ fun PlayerCard(
     modifier: Modifier = Modifier,
     isClaimed: Boolean = false,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
-    setClaimedPlayer: (PlayerStats, PlayerDetails) -> Unit = { _, _ -> }
 ) {
 
     val context = LocalContext.current
@@ -189,7 +188,6 @@ fun PlayerCard(
                                 isDialogOpen = true
                             } else {
                                 handleSavePlayer(false)
-                                setClaimedPlayer(stats, player)
                             }
                         }
                     },

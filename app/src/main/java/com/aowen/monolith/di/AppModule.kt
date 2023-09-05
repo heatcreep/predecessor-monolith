@@ -1,5 +1,6 @@
 package com.aowen.monolith.di
 
+import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.AuthRepositoryImpl
 import com.aowen.monolith.network.OmedaCityApi
@@ -20,10 +21,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-const val SupabaseUrl = "https://maidzolnycrzsszzursm.supabase.co"
-const val SupabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1haWR6b2xueWNyenNzenp1cnNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODg5OTY3MDYsImV4cCI6MjAwNDU3MjcwNn0.pSx1pT3nx0G3Lm03UBhWDSc_iaiBgw1ID6zHbIPZTyA"
-
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -41,8 +38,8 @@ object AppModule {
     @Singleton
     fun provideSupabaseClient(): SupabaseClient {
         val client = createSupabaseClient(
-            supabaseUrl = SupabaseUrl,
-            supabaseKey = SupabaseKey
+            supabaseUrl = BuildConfig.SUPABASE_URL,
+            supabaseKey = BuildConfig.SUPABASE_API_KEY
         ) {
             install(Postgrest)
             install(GoTrue) {
@@ -71,6 +68,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(client: SupabaseClient): UserRepository =
-        UserRepositoryImpl(client)
+    fun provideUserRepository(client: SupabaseClient, repository: OmedaCityRepository): UserRepository =
+        UserRepositoryImpl(client, repository)
 }

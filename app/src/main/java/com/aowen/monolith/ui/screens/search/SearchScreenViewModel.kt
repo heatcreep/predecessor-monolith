@@ -7,6 +7,7 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +30,8 @@ data class SearchScreenUiState(
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
     private val repository: OmedaCityRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchScreenUiState())
@@ -39,56 +41,21 @@ class SearchScreenViewModel @Inject constructor(
         initViewModel()
     }
 
-    fun initViewModel(
-        claimedPlayerStats: PlayerStats? = null,
-        claimedPlayerDetails: PlayerDetails? = null
-    ) {
+    fun initViewModel() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            if (claimedPlayerStats != null && claimedPlayerDetails != null) {
+            try {
+                val claimedUser = userRepository.getClaimedUser()
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        claimedPlayerStats = claimedPlayerStats,
-                        claimedPlayerDetails = claimedPlayerDetails
+                        claimedPlayerStats = claimedUser.playerStats,
+                        claimedPlayerDetails = claimedUser.playerDetails
                     )
                 }
-            } else {
-                try {
-                    val playerId = if (uiState.value.claimedPlayerId != null) {
-                        uiState.value.claimedPlayerId
-                    } else {
-                        val playerIdDeferred = async { authRepository.getPlayer() }
-                        val playerIdRes = playerIdDeferred.await()
-                        if (playerIdRes.isSuccess) {
-                            playerIdRes.getOrNull()?.playerId ?: ""
-                        } else {
-                            null
-                        }
-                    }
-                    if (!playerId.isNullOrEmpty()) {
-                        val playerStatsDeferred =
-                            async { repository.fetchPlayerStatsById(playerId) }
-                        val playerDetailsDeferred = async { repository.fetchPlayerById(playerId) }
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                claimedPlayerStats = playerStatsDeferred.await(),
-                                claimedPlayerDetails = playerDetailsDeferred.await()
-
-                            )
-                        }
-
-                    } else {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.d("MONOLITH_DEBUG: ", e.toString())
-                    _uiState.update { it.copy(isLoading = false) }
-                }
+            } catch (e: Exception) {
+                Log.d("MONOLITH_DEBUG: ", e.toString())
+                _uiState.update { it.copy(isLoading = false) }
             }
 
         }
