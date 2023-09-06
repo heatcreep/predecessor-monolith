@@ -8,7 +8,11 @@ import com.aowen.monolith.ui.screens.auth.LoginRoute
 const val LoginRoute = "login"
 
 fun NavController.navigateToLoginFromLogout() {
-    this.popBackStack(LoginRoute, inclusive = false)
+    this.navigate(LoginRoute) {
+        popUpTo(LoginRoute) {
+            inclusive = false
+        }
+    }
 }
 
 fun NavGraphBuilder.loginScreen() {

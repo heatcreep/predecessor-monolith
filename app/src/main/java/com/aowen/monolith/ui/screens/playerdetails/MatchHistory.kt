@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -33,8 +34,10 @@ import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
+import com.aowen.monolith.data.RoleImage
 import com.aowen.monolith.data.TeamDetails
 import com.aowen.monolith.data.getKda
+import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.KDAText
 import com.aowen.monolith.ui.theme.DarkGreenHighlight
 import com.aowen.monolith.ui.theme.GreenHighlight
@@ -48,7 +51,7 @@ fun MatchesList(
     matches: List<MatchDetails>? = null,
     navigateToMatchDetails: (String) -> Unit = { _ -> }
 ) {
-    Column() {
+    Column {
         Text(
             text = "Match History",
             style = MaterialTheme.typography.titleMedium,
@@ -62,18 +65,15 @@ fun MatchesList(
             ) {
                 it.forEach { match ->
                     val allPlayers = match.dusk.players + match.dawn.players
-                    val playerHero = allPlayers.firstOrNull() { it.playerId == playerId }
-                    val heroImage = HeroImage.values().first {
-                        it.heroName == playerHero?.hero
-                    }
+                    val playerHero = allPlayers.firstOrNull { it.playerId == playerId }
                     val playerTeam = if (match.dusk.players.contains(playerHero)) "Dusk" else "Dawn"
                     val isWinner = playerTeam == match.winningTeam
                     MatchPlayerCard(
-                        modifier.clickable() {
+                        modifier.clickable {
                             navigateToMatchDetails(match.matchId)
                         },
                         isWinner = isWinner,
-                        playerHero = playerHero, heroImage = heroImage
+                        playerHero = playerHero
                     )
                 }
             }
@@ -86,8 +86,13 @@ fun MatchPlayerCard(
     modifier: Modifier = Modifier,
     isWinner: Boolean,
     playerHero: MatchPlayerDetails?,
-    heroImage: HeroImage
 ) {
+    val heroImage = HeroImage.values().first {
+        it.heroName == playerHero?.hero
+    }
+    val roleImage = RoleImage.values().first {
+        it.roleName == playerHero?.role
+    }
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -152,23 +157,30 @@ fun MatchPlayerCard(
                     }
                 }
                 playerHero?.let {
-                    Column() {
+                    Column {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(52.dp)
-                                    .clip(CircleShape)
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                        shape = CircleShape
-                                    ),
-                                contentScale = ContentScale.Crop,
-                                painter = painterResource(id = heroImage.drawableId),
-                                contentDescription = null
-                            )
+                            PlayerIcon(
+                                heroImageId = heroImage.drawableId
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primaryContainer)
+                                        .border(
+                                            width = 1.dp,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            shape = CircleShape
+                                        )
+                                        .align(Alignment.BottomEnd),
+                                    contentScale = ContentScale.Crop,
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                                    painter = painterResource(id = roleImage.drawableId),
+                                    contentDescription = null
+                                )
+                            }
                             Spacer(modifier = Modifier.size(8.dp))
                             Text(
                                 text = it.hero,
@@ -207,7 +219,7 @@ fun MatchPlayerCard(
 )
 @Composable
 fun MatchesListPreview() {
-    MonolithTheme() {
+    MonolithTheme {
         Surface(Modifier.fillMaxSize()) {
             MatchesList(
                 playerId = "foo",
@@ -221,6 +233,7 @@ fun MatchesListPreview() {
                                     playerId = "bar",
                                     playerName = "bean man",
                                     hero = "Muriel",
+                                    role = "support",
                                 )
                             )
                         ),
@@ -230,6 +243,7 @@ fun MatchesListPreview() {
                                     playerId = "foo",
                                     playerName = "heatcreep.tv",
                                     hero = "Narbash",
+                                    role = "offlane",
                                     mmrChange = "11.4",
                                     kills = 7,
                                     deaths = 2,
@@ -248,6 +262,7 @@ fun MatchesListPreview() {
                                     playerId = "bar",
                                     playerName = "bean man",
                                     hero = "Muriel",
+                                    role = "support",
                                 )
                             )
                         ),
@@ -257,6 +272,7 @@ fun MatchesListPreview() {
                                     playerId = "foo",
                                     playerName = "heatcreep.tv",
                                     hero = "Phase",
+                                    role = "jungle",
                                     mmrChange = "11.4",
                                     kills = 7,
                                     deaths = 2,
@@ -275,6 +291,7 @@ fun MatchesListPreview() {
                                     playerId = "bar",
                                     playerName = "bean man",
                                     hero = "Muriel",
+                                    role = "support",
                                 )
                             )
                         ),
@@ -284,12 +301,12 @@ fun MatchesListPreview() {
                                     playerId = "foo",
                                     playerName = "heatcreep.tv",
                                     hero = "Morigesh",
+                                    role = "midlane",
                                     mmrChange = "111.4",
                                     kills = 7,
                                     deaths = 2,
                                     assists = 12,
-
-                                    )
+                                )
                             )
                         )
                     ),
@@ -305,7 +322,7 @@ fun MatchesListPreview() {
 )
 @Composable
 fun MatchesListPreviewLightMode() {
-    MonolithTheme() {
+    MonolithTheme {
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             MatchesList(
                 playerId = "foo",
@@ -328,6 +345,7 @@ fun MatchesListPreviewLightMode() {
                                     playerId = "foo",
                                     playerName = "heatcreep.tv",
                                     hero = "Narbash",
+                                    role = "offlane",
                                     mmrChange = "11.4",
                                     kills = 7,
                                     deaths = 2,
@@ -355,6 +373,7 @@ fun MatchesListPreviewLightMode() {
                                     playerId = "foo",
                                     playerName = "heatcreep.tv",
                                     hero = "Phase",
+                                    role = "support",
                                     mmrChange = "11.4",
                                     kills = 7,
                                     deaths = 2,
@@ -382,6 +401,7 @@ fun MatchesListPreviewLightMode() {
                                     playerId = "foo",
                                     playerName = "heatcreep.tv",
                                     hero = "Morigesh",
+                                    role = "midlane",
                                     mmrChange = "111.4",
                                     kills = 7,
                                     deaths = 2,

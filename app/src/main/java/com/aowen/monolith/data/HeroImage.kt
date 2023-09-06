@@ -2,6 +2,15 @@ package com.aowen.monolith.data
 
 import com.aowen.monolith.R
 
+enum class RoleImage(val roleName: String, val drawableId: Int) {
+    CARRY("carry", R.drawable.carry),
+    SUPPORT("support", R.drawable.support),
+    OFFLANE("offlane", R.drawable.offlane),
+    JUNGLE("jungle", R.drawable.jungle),
+    MID("midlane", R.drawable.midlane),
+    UNKNOWN("unknown", R.drawable.unknown),
+}
+
 enum class HeroImage(val heroName: String, val drawableId: Int) {
     BELICA("Lt. Belica", R.drawable.belica),
     COUNTESS("Countess", R.drawable.countess),
@@ -33,5 +42,4 @@ enum class HeroImage(val heroName: String, val drawableId: Int) {
     TWINBLAST("TwinBlast", R.drawable.twinblast),
     ZARUS("Zarus", R.drawable.zarus),
     UNKNOWN("Unknown", R.drawable.unknown),
-
 }

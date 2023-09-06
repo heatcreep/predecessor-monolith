@@ -1,6 +1,7 @@
 package com.aowen.monolith.ui.screens.profile
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -145,6 +146,11 @@ fun ProfileScreen(
                 TextButton(onClick = {
                     onLogout()
                     navigateToLogin()
+                    Toast.makeText(
+                        context,
+                        "logged out successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }) {
                     Text(
                         text = "Sign Out",
