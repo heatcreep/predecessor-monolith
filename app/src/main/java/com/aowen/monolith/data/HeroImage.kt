@@ -39,6 +39,7 @@ enum class HeroImage(val heroName: String, val drawableId: Int) {
     RAMPAGE("Rampage", R.drawable.rampage),
     REVENANT("Revenant", R.drawable.revenant),
     RIKTOR("Riktor", R.drawable.riktor),
+    SERATH("Serath", R.drawable.serath),
     SEVAROG("Sevarog", R.drawable.sevarog),
     SHINBI("Shinbi", R.drawable.shinbi),
     SPARROW("Sparrow", R.drawable.sparrow),
