@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltipBox
+import androidx.compose.material3.PlainTooltipState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -39,6 +40,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -62,6 +65,7 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.inputFieldDefaults
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun SearchScreenRoute(
@@ -95,6 +99,10 @@ fun SearchScreen(
     navigateToPlayerDetails: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val coroutineScope = rememberCoroutineScope()
+    val tooltipState = remember { PlainTooltipState() }
+
     Surface(
         modifier = modifier
             .fillMaxSize()
@@ -155,10 +163,15 @@ fun SearchScreen(
                 PlainTooltipBox(
                     tooltip = {
                         Text(text = "We hide cheaters and players with MMR disabled from the search results.")
-                    }
+                    },
+                    tooltipState = tooltipState
                 ) {
                     IconButton(
-                        onClick = {  },
+                        onClick = {
+                            coroutineScope.launch {
+                                tooltipState.show()
+                            }
+                        },
                         modifier = Modifier.tooltipAnchor()
                     ) {
                         Icon(
