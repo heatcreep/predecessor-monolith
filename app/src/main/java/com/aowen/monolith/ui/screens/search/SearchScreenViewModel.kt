@@ -9,7 +9,6 @@ import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -75,11 +74,14 @@ class SearchScreenViewModel @Inject constructor(
             try {
                 val fieldValue = uiState.value.searchFieldValue.trim()
                 val playersList = repository.fetchPlayersByName(fieldValue)
+                val filteredList = playersList.filter {
+                    !it.isCheater || !it.isMmrDisabled
+                }
                 _uiState.update {
                     it.copy(
                         isLoadingSearch = false,
-                        playersList = playersList,
-                        initPlayersListText = if (playersList.isEmpty()) {
+                        playersList = filteredList,
+                        initPlayersListText = if (filteredList.isEmpty()) {
                             "Couldn't find any players that match your search"
                         } else null
                     )

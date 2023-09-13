@@ -27,9 +27,11 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -84,6 +86,7 @@ internal fun SearchScreenRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     uiState: SearchScreenUiState,
@@ -143,11 +146,29 @@ fun SearchScreen(
                 }
             }
             Spacer(modifier = Modifier.size(16.dp))
-            Text(
-                text = "Search Results",
-                color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Search Results",
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                PlainTooltipBox(
+                    tooltip = {
+                        Text(text = "We hide cheaters and players with MMR disabled from the search results.")
+                    }
+                ) {
+                    IconButton(
+                        onClick = {  },
+                        modifier = Modifier.tooltipAnchor()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            }
             Spacer(modifier = Modifier.size(16.dp))
             if (uiState.isLoadingSearch) {
                 FullScreenLoadingIndicator()
