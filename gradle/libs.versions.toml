@@ -1,4 +1,5 @@
 [versions]
+accompanist = "0.32.0"
 androidGradlePlugin = "8.0.2"
 androidXActivityCompose = "1.7.2"
 androidXCoreKtx = "1.10.1"
@@ -7,7 +8,7 @@ androidXLifecycleRuntimeKtx = "2.6.1"
 androidXComposeMaterial3 = "1.1.1"
 androidXTestExt = "1.1.5"
 coilCompose = "2.2.2"
-composeBom = "2023.08.00"
+composeBom = "2023.09.00"
 composeCoil = "2.0.0"
 composeNavigation = "2.5.3"
 daggerHilt = "2.47"
@@ -22,6 +23,8 @@ junit4 = "4.13.2"
 
 
 [libraries]
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
+accompanist-page-indictators = { module = "com.google.accompanist:accompanist-pager-indicators", version.ref = "accompanist" }
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidXActivityCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidXCoreKtx" }

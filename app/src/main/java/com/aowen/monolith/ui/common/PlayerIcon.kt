@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.R
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -29,6 +30,7 @@ import com.aowen.monolith.ui.theme.MonolithTheme
 @Composable
 fun PlayerIcon(
     heroImageId: Int,
+    heroIconSize: Dp = 52.dp,
     roleIcon: (@Composable BoxScope.() -> Unit)? = null
 ) {
     Box(
@@ -38,8 +40,8 @@ fun PlayerIcon(
     ) {
         Image(
             modifier = Modifier
-                .padding(bottom = 8.dp)
-                .size(52.dp)
+                .padding(bottom = if (roleIcon != null) 8.dp else 0.dp)
+                .size(heroIconSize)
                 .clip(CircleShape)
                 .border(
                     width = 1.dp,

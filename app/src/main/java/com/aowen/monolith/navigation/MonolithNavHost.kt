@@ -3,8 +3,6 @@ package com.aowen.monolith.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
-import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.ui.MonolithAppState
 
 @Composable
@@ -20,10 +18,8 @@ fun MonolithNavHost(
         modifier = modifier
     ) {
         loginScreen()
-        searchScreen(
-            navController = navController,
-        )
-        heroesScreen()
+        searchScreen(navController = navController)
+        heroesScreen(navController = navController)
         profileScreen(navController = navController)
     }
 }

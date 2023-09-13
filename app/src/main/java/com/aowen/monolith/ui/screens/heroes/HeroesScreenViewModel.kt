@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroDetails
+import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.network.OmedaCityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -97,12 +98,4 @@ class HeroesScreenViewModel @Inject constructor(
             }
         }
     }
-}
-
-enum class HeroRole {
-    Midlane,
-    Offlane,
-    Jungle,
-    Carry,
-    Support,
 }

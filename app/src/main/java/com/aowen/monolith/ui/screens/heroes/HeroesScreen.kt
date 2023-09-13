@@ -7,6 +7,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,9 +50,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroImage
+import com.aowen.monolith.data.HeroRole
+import com.aowen.monolith.navigation.navigateToHeroDetails
 import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.WarmWhite
@@ -60,6 +64,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HeroesScreenRoute(
+    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: HeroesScreenViewModel = hiltViewModel()
 ) {
@@ -67,11 +72,12 @@ fun HeroesScreenRoute(
     val heroesScreenUiState by viewModel.uiState.collectAsState()
 
     HeroesScreen(
-        modifier = modifier,
+        uiState = heroesScreenUiState,
         onFilterRole = viewModel::updateRoleOption,
         setSearchValue = viewModel::setSearchValue,
         onFilterHeroes = viewModel::getFilteredHeroes,
-        uiState = heroesScreenUiState
+        modifier = modifier,
+        navigateToHeroDetails = navController::navigateToHeroDetails
     )
 
 }
@@ -84,6 +90,7 @@ fun HeroesScreen(
     setSearchValue: (text: String) -> Unit,
     onFilterHeroes: () -> Unit,
     modifier: Modifier = Modifier,
+    navigateToHeroDetails: (heroId: String, heroName: String) -> Unit = {_,_ ->},
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -204,7 +211,12 @@ fun HeroesScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     items(uiState.currentHeroes) { hero ->
-                        HeroCard(hero = hero)
+                        HeroCard(
+                            hero = hero,
+                            onClick = {
+                                navigateToHeroDetails(hero.id, hero.name)
+                            }
+                        )
                     }
 
                 }
@@ -217,12 +229,17 @@ fun HeroesScreen(
 @Composable
 fun HeroCard(
     hero: HeroDetails,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
 
     val image = hero.imageId ?: HeroImage.NARBASH.drawableId
     Box(
-        modifier = modifier.clip(RoundedCornerShape(8.dp)),
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .clickable {
+                onClick()
+            },
         contentAlignment = Alignment.BottomCenter,
         propagateMinConstraints = true
     ) {

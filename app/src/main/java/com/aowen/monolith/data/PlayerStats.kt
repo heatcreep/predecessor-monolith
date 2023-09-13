@@ -20,6 +20,6 @@ fun PlayerStatsDto.create(): PlayerStats {
         averageKda = this.averageKda.map { it.toString() },
         averageKdaRatio = this.averageKdaRatio.toString(),
         favoriteHero = this.favoriteHero.name,
-        favoriteRole = this.favoriteRole
+        favoriteRole = this.favoriteRole?.replaceFirstChar { it.uppercase() } ?: "None"
     )
 }

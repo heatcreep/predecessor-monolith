@@ -1,12 +1,12 @@
 package com.aowen.monolith.network
 
-import  com.aowen.monolith.data.HeroDto
+import com.aowen.monolith.data.HeroDto
+import com.aowen.monolith.data.HeroStatisticsResponseDto
 import com.aowen.monolith.data.ItemDto
 import com.aowen.monolith.data.MatchDto
 import com.aowen.monolith.data.MatchesDto
 import com.aowen.monolith.data.PlayerDto
 import com.aowen.monolith.data.PlayerStatsDto
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -33,6 +33,12 @@ interface OmedaCityApi {
 
     @GET("heroes.json")
     suspend fun getAllHeroes() : List<HeroDto>
+
+    @GET("heroes/{hero_name}.json")
+    suspend fun getHeroByName(@Path("hero_name") heroName: String) : HeroDto
+
+    @GET("dashboard/hero_statistics.json")
+    suspend fun getHeroStatisticsById(@Query("hero_ids") heroIds: String) : HeroStatisticsResponseDto
 
     @GET("items.json")
     suspend fun getAllItems(): List<ItemDto>

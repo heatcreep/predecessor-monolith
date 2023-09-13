@@ -266,6 +266,18 @@ fun PlayerCard(
                         )
                     }
                 )
+                // Favorite Role
+                StatListItem(
+                    modifier = modifier,
+                    statLabel = "Favorite Role:",
+                    statValue = {
+                        Text(
+                            text = stats.favoriteRole,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                )
                 StatListItem(
                     modifier = modifier,
                     statLabel = "Average KDA:",

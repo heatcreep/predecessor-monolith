@@ -1,18 +1,23 @@
 package com.aowen.monolith.ui.components
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -20,41 +25,60 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.ui.theme.MonolithTheme
+import com.aowen.monolith.ui.utils.saveables.FloatAnimatableSaveable
+import kotlinx.coroutines.launch
 
 @Composable
 fun SpiderChart(
     modifier: Modifier = Modifier,
+    statPoints: List<Int> = listOf(),
     graphColor: Color = MaterialTheme.colorScheme.tertiary,
     lineColor: Color = MaterialTheme.colorScheme.secondary
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+
+    val graphScale = rememberSaveable(saver = FloatAnimatableSaveable.Saver) { Animatable(0f) }
+
+    LaunchedEffect(graphScale) {
+        launch {
+            graphScale.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = 2000,
+                    easing = EaseInOutCubic
+                )
+            )
+        }
+    }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Basic Attack",
+            text = "Durability",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        Spacer(modifier = Modifier.size(12.dp))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Durability",
+                text = "Basic Attack",
+                textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary
             )
             Canvas(
                 modifier = modifier
-                    .size(144.dp)
-                    .align(Alignment.CenterVertically)
+                    .size(168.dp)
             ) {
 
                 val maxChartLines = 5f
@@ -65,8 +89,6 @@ fun SpiderChart(
 
                 val lineDistance = (canvasWidth / 2) / maxChartLines
                 var currentLineDistance = 0f
-
-                val statPoints = listOf(9, 3, 2, 5)
 
                 // draw AP line (Bottom)
                 drawLine(
@@ -124,6 +146,7 @@ fun SpiderChart(
                     strokeWidth = Stroke.DefaultMiter
                 )
 
+                // draw graph lines from the outermost to the center
                 repeat(5) {
                     drawLine(
                         start = Offset(
@@ -176,43 +199,48 @@ fun SpiderChart(
                     currentLineDistance += lineDistance
                 }
 
-                val graphPath = Path()
-                graphPath.moveTo(
-                    x = canvasWidth / 2,
-                    y = (canvasHeight / 2) + (canvasWidth / 20) * statPoints[0]
-                )
-                graphPath.lineTo(
-                    x = (canvasWidth / 2) - (canvasWidth / 20) * statPoints[1],
-                    y = canvasHeight / 2
-                )
-                graphPath.lineTo(
-                    x = canvasWidth / 2,
-                    y = (canvasHeight / 2) - (canvasHeight / 20) * statPoints[2]
-                )
-                graphPath.lineTo(
-                    x = (canvasWidth / 2) + (canvasWidth / 20) * statPoints[3],
-                    y = canvasHeight / 2
-                )
-                graphPath.lineTo(
-                    x = canvasWidth / 2,
-                    y = (canvasHeight / 2) + (canvasWidth / 20) * statPoints[0],
-                )
-                graphPath.close()
-                drawPath(
-                    path = graphPath,
-                    alpha = 0.9f,
-                    style = Fill,
-                    color = lineColor
-                )
+                // draw values on the graph, animating the graph scale
+                scale(graphScale.value) {
+                    val graphPath = Path()
+                    graphPath.moveTo(
+                        x = canvasWidth / 2,
+                        y = (canvasHeight / 2) + (canvasWidth / 20) * statPoints[0]
+                    )
+                    graphPath.lineTo(
+                        x = (canvasWidth / 2) - (canvasWidth / 20) * statPoints[1],
+                        y = canvasHeight / 2
+                    )
+                    graphPath.lineTo(
+                        x = canvasWidth / 2,
+                        y = (canvasHeight / 2) - (canvasHeight / 20) * statPoints[2]
+                    )
+                    graphPath.lineTo(
+                        x = (canvasWidth / 2) + (canvasWidth / 20) * statPoints[3],
+                        y = canvasHeight / 2
+                    )
+                    graphPath.lineTo(
+                        x = canvasWidth / 2,
+                        y = (canvasHeight / 2) + (canvasWidth / 20) * statPoints[0],
+                    )
+                    graphPath.close()
+
+                    drawPath(
+                        path = graphPath,
+                        alpha = 0.9f,
+                        style = Fill,
+                        color = lineColor
+                    )
+                }
             }
             Text(
-                text = "Mobility",
+                text = "Ability Power",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary
             )
         }
+        Spacer(modifier = Modifier.size(12.dp))
         Text(
-            text = "Ability Power",
+            text = "Mobility",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -226,11 +254,15 @@ fun SpiderChart(
 fun SpiderChartPreview() {
     MonolithTheme {
         Surface(
-            modifier = Modifier.background(
-                MaterialTheme.colorScheme.background
-            )
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.background
+                )
         ) {
-            SpiderChart()
+            SpiderChart(
+                statPoints = listOf(9, 3, 2, 5)
+            )
         }
     }
 }

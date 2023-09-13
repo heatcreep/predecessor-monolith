@@ -21,4 +21,7 @@ object RetrofitHelper {
     fun getRankImageUrl(imagePath: String): String =
         baseUrl + imagePath
 
+    fun getHeroAbilityImageUrl(imagePath: String): String =
+        baseUrl + imagePath
+
 }

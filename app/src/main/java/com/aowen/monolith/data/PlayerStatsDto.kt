@@ -17,7 +17,7 @@ data class PlayerStatsDto(
     @SerializedName("favorite_hero")
     val favoriteHero: HeroDto,
     @SerializedName("favorite_role")
-    val favoriteRole: String,
+    val favoriteRole: String?,
     @SerializedName("win_rate")
     val winRate: Float
 )

@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace 'com.aowen.monolith'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.aowen.monolith"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -72,6 +72,10 @@ dependencies {
 
     // Compose Navigation
     implementation libs.androidx.compose.navigation
+
+    // Accompanist - Pager
+    implementation libs.accompanist.pager
+    implementation libs.accompanist.page.indictators
 
     // Hilt
     implementation(libs.hilt.android)

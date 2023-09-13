@@ -16,10 +16,13 @@ fun NavController.navigateToHeroes(navOptions: NavOptions? = null) {
     }
 }
 
-fun NavGraphBuilder.heroesScreen() {
+fun NavGraphBuilder.heroesScreen(
+    navController: NavController
+) {
     composable(
         route = HeroesRoute
     ) {
-        HeroesScreenRoute()
+        HeroesScreenRoute(navController)
     }
+    heroDetailsScreen()
 }

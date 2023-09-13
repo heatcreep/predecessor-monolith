@@ -31,12 +31,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
-import com.aowen.monolith.data.RoleImage
 import com.aowen.monolith.data.TeamDetails
+import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getKda
+import com.aowen.monolith.data.getRoleImage
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.KDAText
 import com.aowen.monolith.ui.theme.DarkGreenHighlight
@@ -87,12 +87,7 @@ fun MatchPlayerCard(
     isWinner: Boolean,
     playerHero: MatchPlayerDetails?,
 ) {
-    val heroImage = HeroImage.values().first {
-        it.heroName == playerHero?.hero
-    }
-    val roleImage = RoleImage.values().first {
-        it.roleName == playerHero?.role
-    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -162,7 +157,7 @@ fun MatchPlayerCard(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             PlayerIcon(
-                                heroImageId = heroImage.drawableId
+                                heroImageId = getHeroImage(playerHero.hero).drawableId
                             ) {
                                 Image(
                                     modifier = Modifier
@@ -177,7 +172,9 @@ fun MatchPlayerCard(
                                         .align(Alignment.BottomEnd),
                                     contentScale = ContentScale.Crop,
                                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                                    painter = painterResource(id = roleImage.drawableId),
+                                    painter = painterResource(
+                                        id = getRoleImage(playerHero.role).drawableId
+                                    ),
                                     contentDescription = null
                                 )
                             }

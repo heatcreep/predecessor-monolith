@@ -1,25 +1,33 @@
 package com.aowen.monolith.network
 
 import com.aowen.monolith.data.HeroDetails
+import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerInfo
-import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.create
 import javax.inject.Inject
 
 interface OmedaCityRepository {
+    // Players
     suspend fun fetchPlayersByName(playerName: String): List<PlayerDetails>
 
     suspend fun fetchPlayerInfo(playerId: String): PlayerInfo
 
+    // Matches
     suspend fun fetchMatchesById(playerId: String): List<MatchDetails>
     suspend fun fetchMatchById(matchId: String): MatchDetails
+
+    // Items
     suspend fun fetchAllItems(): List<ItemDetails>
 
-    // heroes
+    // Heroes
     suspend fun fetchAllHeroes(): List<HeroDetails>
+
+    suspend fun fetchHeroByName(heroName: String): HeroDetails
+
+    suspend fun fetchHeroStatisticsById(heroIds: String): HeroStatistics
 }
 
 class OmedaCityRepositoryImpl @Inject constructor(
@@ -57,4 +65,13 @@ class OmedaCityRepositoryImpl @Inject constructor(
         playerApi.getAllItems().map {
             it.create()
         }
+
+    override suspend fun fetchHeroByName(heroName: String): HeroDetails =
+        playerApi.getHeroByName(heroName).create()
+
+    override suspend fun fetchHeroStatisticsById(heroIds: String): HeroStatistics =
+        playerApi.getHeroStatisticsById(heroIds).heroStatistics.first().create()
+
+
 }
+
