@@ -22,8 +22,8 @@ android {
             useSupportLibrary true
         }
 
-        buildConfigField("String", "SUPABASE_URL", "${getLocalProperty("SUPABASE_URL")}")
-        buildConfigField("String", "SUPABASE_API_KEY", "${getLocalProperty("SUPABASE_KEY")}")
+        buildConfigField("String", "SUPABASE_URL", "${getEnvironmentVariable("SUPABASE_URL")}")
+        buildConfigField("String", "SUPABASE_API_KEY", "${getEnvironmentVariable("SUPABASE_KEY")}")
     }
 
     buildTypes {
@@ -57,6 +57,15 @@ def getLocalProperty(String key) {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
     return properties.getProperty(key)
+}
+
+def getEnvironmentVariable(String key) {
+    Boolean isCi = System.getenv("CI")?.toBoolean() ?: false
+    if (isCi) {
+        return System.getenv(key)
+    } else {
+        return getLocalProperty(key)
+    }
 }
 
 dependencies {

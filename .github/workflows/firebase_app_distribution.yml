@@ -12,15 +12,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      - name: Access SUPABASE_URL
-        env:
-          SUPABASE_URL: $
-          SUPABASE_KEY: $
-        run: |
-          echo SUPABASE_URL=\"$SUPABASE_URL\" > ./local.properties \
-          echo SUPABASE_KEY=\"$SUPABASE_KEY\" >> ./local.properties
-
       - name: Build Debug APK
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: ./gradlew assembleDebug
       - name: Distribute to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.6.0
