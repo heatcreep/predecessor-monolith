@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace 'com.aowen.monolith'
-    compileSdk 34
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.aowen.monolith"
         minSdk 24
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -22,8 +22,8 @@ android {
             useSupportLibrary true
         }
 
-        buildConfigField("String", "SUPABASE_URL", "${getLocalProperty("supabase_url")}")
-        buildConfigField("String", "SUPABASE_API_KEY", "${getLocalProperty("supabase_key")}")
+        buildConfigField("String", "SUPABASE_URL", "${getLocalProperty("SUPABASE_URL")}")
+        buildConfigField("String", "SUPABASE_API_KEY", "${getLocalProperty("SUPABASE_KEY")}")
     }
 
     buildTypes {
