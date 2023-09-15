@@ -79,67 +79,71 @@ fun ProfileScreen(
             ) {
                 Surface(shape = RoundedCornerShape(5.dp)) {
                     Column {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(DiscordBlurple)
-                                .padding(
-                                    24.dp
-                                ),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "signed in with Discord",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = WarmWhite,
-                                )
-                                Text(
-                                    text = uiState.userInfo.fullName,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = WarmWhite,
-                                )
-                            }
-                            val model = ImageRequest.Builder(context)
-                                .data(uiState.userInfo.avatarUrl)
-                                .crossfade(true)
-                                .build()
-                            SubcomposeAsyncImage(
-                                modifier = Modifier.size(64.dp),
-                                model = model,
-                                contentDescription = null
+                        if (uiState.userInfo != null) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(DiscordBlurple)
+                                    .padding(
+                                        24.dp
+                                    ),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                val state = painter.state
-                                if (state is AsyncImagePainter.State.Success) {
-                                    SubcomposeAsyncImageContent()
-                                    LaunchedEffect(Unit) {
-                                        Log.d("ANDREWO", state.result.dataSource.toString())
+                                Column {
+                                    Text(
+                                        text = "signed in with Discord",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = WarmWhite,
+                                    )
+                                    Text(
+                                        text = uiState.userInfo.fullName,
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = WarmWhite,
+                                    )
+                                }
+                                val model = ImageRequest.Builder(context)
+                                    .data(uiState.userInfo.avatarUrl)
+                                    .crossfade(true)
+                                    .build()
+                                SubcomposeAsyncImage(
+                                    modifier = Modifier.size(64.dp),
+                                    model = model,
+                                    contentDescription = null
+                                ) {
+                                    val state = painter.state
+                                    if (state is AsyncImagePainter.State.Success) {
+                                        SubcomposeAsyncImageContent()
+                                        LaunchedEffect(Unit) {
+                                            Log.d("ANDREWO", state.result.dataSource.toString())
+                                        }
                                     }
                                 }
                             }
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(DiscordDarkBackground)
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Email",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = WarmWhite,
-                                )
-                                Text(
-                                    text = uiState.userInfo.email,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = WarmWhite,
-                                )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(DiscordDarkBackground)
+                                    .padding(24.dp),
+                                horizontalAlignment = Alignment.Start,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Column {
+                                    Text(
+                                        text = "Email",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = WarmWhite,
+                                    )
+                                    Text(
+                                        text = uiState.userInfo.email,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = WarmWhite,
+                                    )
+                                }
                             }
+                        } else {
+                            Text(text = "Sorry, there was an error retrieving your profile. Please try again later.")
                         }
                     }
                 }

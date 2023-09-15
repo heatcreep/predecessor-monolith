@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 data class ProfileScreenUiState(
     val isLoading: Boolean = true,
-    val userInfo: UserInfo = UserInfo(),
+    val userInfo: UserInfo? = null,
 )
 
 @HiltViewModel
@@ -45,6 +45,7 @@ class ProfileViewModel @Inject constructor(
                         userInfo = userInfo
                     )
                 }
+
             } catch (e: Exception) {
                 Log.d("MONOLITH_DEBUG: ", e.toString())
                 _uiState.update { it.copy(isLoading = false) }
