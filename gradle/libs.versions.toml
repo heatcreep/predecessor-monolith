@@ -13,6 +13,9 @@ composeCoil = "2.0.0"
 composeNavigation = "2.5.3"
 daggerHilt = "2.47"
 daggerHiltCompose = "1.0.0"
+firebaseBom = "32.2.3"
+firebasePlugin = "2.9.9"
+googleServices = "4.3.15"
 gradleApi = "8.1.0"
 gson = "2.9.0"
 kotlinBom = "1.8.20"
@@ -39,10 +42,12 @@ androidx-compose-ui-graphics = { group = "androidx.compose.ui", name= "graphics"
 androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "daggerHiltCompose" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "daggerHilt" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "daggerHilt" }
-androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "daggerHiltCompose" }
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlinBom" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
@@ -58,8 +63,10 @@ supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinBom" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebasePlugin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinBom" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinBom" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

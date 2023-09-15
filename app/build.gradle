@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.gms.google-services'
     id 'org.jetbrains.kotlin.plugin.serialization'
 }
 
@@ -69,11 +71,13 @@ def getEnvironmentVariable(String key) {
 }
 
 dependencies {
+    implementation platform(libs.firebase.bom)
+    implementation platform(libs.kotlin.bom)
     compileOnly(libs.android.gradle.plugin)
     compileOnly(libs.kotlin.gradle.plugin)
     compileOnly(libs.ksp.gradle)
     implementation libs.androidx.core.ktx
-    implementation platform(libs.kotlin.bom)
+    implementation libs.firebase.crashlytics
     implementation libs.androidx.lifecycle.runtime.ktx
     implementation libs.androidx.compose.material3
     implementation libs.androidx.compose.ui.tooling.preview
