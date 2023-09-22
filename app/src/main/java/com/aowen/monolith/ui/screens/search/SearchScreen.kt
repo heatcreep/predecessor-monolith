@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -85,6 +86,7 @@ internal fun SearchScreenRoute(
         uiState = searchUiState,
         setSearchValue = searchScreenViewModel::setSearchValue,
         handleSubmitSearch = searchScreenViewModel::handleSubmitSearch,
+        handleClearSearch = searchScreenViewModel::handleClearSearch,
         navigateToPlayerDetails = navigateToPlayerDetails,
         modifier = modifier
     )
@@ -96,6 +98,7 @@ fun SearchScreen(
     uiState: SearchScreenUiState,
     setSearchValue: (String) -> Unit,
     handleSubmitSearch: () -> Unit,
+    handleClearSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -117,6 +120,7 @@ fun SearchScreen(
                 searchValue = uiState.searchFieldValue,
                 setSearchValue = setSearchValue,
                 handleSubmitSearch = handleSubmitSearch,
+                handleClearSearch = handleClearSearch,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.size(16.dp))
@@ -217,7 +221,8 @@ fun SearchBar(
     setSearchValue: (String) -> Unit,
     modifier: Modifier = Modifier,
     searchLabel: String = "",
-    handleSubmitSearch: (() -> Unit)? = null
+    handleSubmitSearch: (() -> Unit)? = null,
+    handleClearSearch: (() -> Unit)? = null
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -234,15 +239,32 @@ fun SearchBar(
             )
         },
         trailingIcon = {
-            handleSubmitSearch?.let {
-                IconButton(onClick = {
-                    keyboardController?.hide()
-                    handleSubmitSearch()
-                }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Search,
-                        contentDescription = null
-                    )
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                handleClearSearch?.let {
+                    if (searchValue.isNotEmpty()) {
+                        IconButton(onClick = {
+                            handleClearSearch()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Outlined.Clear,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+                handleSubmitSearch?.let {
+                    IconButton(onClick = {
+                        keyboardController?.hide()
+                        handleSubmitSearch()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         },
@@ -478,6 +500,7 @@ fun SearchScreenPreview() {
                             region = "naeast"
                         )
                     ),
+                    searchFieldValue = "heatcreep.tv",
                     initPlayersListText = null,
                     isLoadingSearch = false,
                     isLoading = false,
@@ -493,6 +516,7 @@ fun SearchScreenPreview() {
                 ),
                 setSearchValue = {},
                 handleSubmitSearch = {},
+                handleClearSearch = {},
                 navigateToPlayerDetails = {}
             )
         }

@@ -68,6 +68,14 @@ class SearchScreenViewModel @Inject constructor(
         }
     }
 
+    fun handleClearSearch() {
+        _uiState.update {
+            it.copy(
+                searchFieldValue = ""
+            )
+        }
+    }
+
     fun handleSubmitSearch() {
         _uiState.update { it.copy(isLoadingSearch = true) }
         viewModelScope.launch {
