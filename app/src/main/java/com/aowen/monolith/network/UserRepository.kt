@@ -7,7 +7,6 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +23,7 @@ data class ClaimedUser(
 interface UserRepository {
     suspend fun getUser(): UserInfo?
 
-    suspend fun getClaimedUser(): ClaimedUser
+    suspend fun getClaimedUser(): Result<ClaimedUser?>
 
     suspend fun setClaimedUser(playerStats: PlayerStats?, playerDetails: PlayerDetails?)
 
@@ -77,10 +76,10 @@ class UserRepositoryImpl @Inject constructor(
 
     private val claimedPlayer = MutableStateFlow<ClaimedUser?>(null)
 
-    override suspend fun getClaimedUser(): ClaimedUser {
+    override suspend fun getClaimedUser(): Result<ClaimedUser?> {
         val claimedPlayerInfo = claimedPlayer.value
         return if (claimedPlayerInfo != null) {
-            claimedPlayerInfo
+            Result.success(claimedPlayerInfo)
         } else {
             val userProfile = try {
                 var session = client.gotrue.currentSessionOrNull()
@@ -101,17 +100,21 @@ class UserRepositoryImpl @Inject constructor(
             } catch (e: Exception) {
                 null
             }
-            val playerId = userProfile?.playerId
-            if (playerId != null) {
+            if (userProfile?.playerId != null) {
                 coroutineScope {
-                    val playerInfoDeferred = async { omedaCityRepository.fetchPlayerInfo(playerId) }
-                    return@coroutineScope ClaimedUser(
-                        playerStats = playerInfoDeferred.await().playerStats,
-                        playerDetails = playerInfoDeferred.await().playerDetails
-                    )
+                    val playerInfoResponse = omedaCityRepository.fetchPlayerInfo(userProfile.playerId)
+                    if(playerInfoResponse.isSuccess) {
+                        return@coroutineScope Result.success(ClaimedUser(
+                            playerStats = playerInfoResponse.getOrNull()?.playerStats,
+                            playerDetails = playerInfoResponse.getOrNull()?.playerDetails
+                        ))
+                    } else {
+                        return@coroutineScope Result.failure(Exception("Failed to fetch player info."))
+                    }
+
                 }
             } else {
-                return ClaimedUser()
+                return Result.failure(Exception("No Player ID found."))
             }
         }
     }

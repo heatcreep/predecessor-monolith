@@ -143,18 +143,25 @@ fun SearchScreen(
                     )
                 }
             } else {
-                if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
-                    ClaimedPlayerCard(
-                        playerDetails = uiState.claimedPlayerDetails,
-                        playerStats = uiState.claimedPlayerStats,
-                        navigateToPlayerDetails = navigateToPlayerDetails
-                    )
-                } else {
+                if(uiState.error != null) {
                     Text(
-                        text = "No player claimed! Navigate to a player's profile and click the" +
-                                " 'Claim Player' button to claim a player.",
+                        text = uiState.error,
                         color = MaterialTheme.colorScheme.secondary
                     )
+                } else {
+                    if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
+                        ClaimedPlayerCard(
+                            playerDetails = uiState.claimedPlayerDetails,
+                            playerStats = uiState.claimedPlayerStats,
+                            navigateToPlayerDetails = navigateToPlayerDetails
+                        )
+                    } else {
+                        Text(
+                            text = "No player claimed! Navigate to a player's profile and click the" +
+                                    " 'Claim Player' button to claim a player.",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.size(16.dp))
@@ -196,15 +203,22 @@ fun SearchScreen(
                         color = MaterialTheme.colorScheme.secondary
                     )
                 } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(uiState.playersList) { player ->
-                            player?.let {
-                                PlayerResultCard(
-                                    playerDetails = player,
-                                    navigateToPlayerDetails = navigateToPlayerDetails
-                                )
+                    if (uiState.error != null) {
+                        Text(
+                            text = uiState.error,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(uiState.playersList) { player ->
+                                player?.let {
+                                    PlayerResultCard(
+                                        playerDetails = player,
+                                        navigateToPlayerDetails = navigateToPlayerDetails
+                                    )
+                                }
                             }
                         }
                     }

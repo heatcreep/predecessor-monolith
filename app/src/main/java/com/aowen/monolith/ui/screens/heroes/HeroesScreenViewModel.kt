@@ -1,6 +1,5 @@
 package com.aowen.monolith.ui.screens.heroes
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroDetails
@@ -15,6 +14,7 @@ import javax.inject.Inject
 
 data class HeroesScreenUiState(
     val isLoading: Boolean = true,
+    val error: String? = null,
     val allHeroes: List<HeroDetails> = emptyList(),
     val currentHeroes: List<HeroDetails> = emptyList(),
     var selectedRoleFilters: List<HeroRole> = emptyList(),
@@ -78,21 +78,29 @@ class HeroesScreenViewModel @Inject constructor(
     }
 
     init {
+        initViewModel()
+    }
+
+    fun initViewModel() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            try {
-                val heroesList = repository.fetchAllHeroes()
+
+            val heroesResult = repository.fetchAllHeroes()
+            if(heroesResult.isSuccess) {
+                val heroes = heroesResult.getOrNull() ?: emptyList()
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        allHeroes = heroesList,
-                        currentHeroes = heroesList
+                        error = null,
+                        allHeroes = heroes,
+                        currentHeroes = heroes
                     )
                 }
-            } catch (e: Exception) {
-                Log.d("MONOLITH_DEBUG: ", e.toString())
+            } else {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
+                        error = "Failed to fetch heroes."
                     )
                 }
             }

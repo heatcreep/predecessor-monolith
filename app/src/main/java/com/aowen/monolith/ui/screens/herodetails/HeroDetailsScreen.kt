@@ -1,6 +1,7 @@
 package com.aowen.monolith.ui.screens.herodetails
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -68,6 +69,7 @@ import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.getAbilityKey
 import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.ui.common.PlayerIcon
+import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.SpiderChart
 import com.aowen.monolith.ui.theme.LightKhaki
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -76,6 +78,8 @@ import com.aowen.monolith.ui.theme.NeroGrey
 import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+
+const val PAGE_TAG = "HeroDetailsScreen"
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -101,52 +105,70 @@ fun HeroDetailsRoute(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            TabRow(
-                selectedTabIndex = pagerState.currentPage,
-                indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        Modifier.tabIndicatorOffset(
-                            tabPositions[pagerState.currentPage]
-                        )
-                    )
+        if (uiState.isLoading) {
+            FullScreenLoadingIndicator("Hero Details")
+        } else {
+            if (uiState.heroDetailsErrors != null) {
+                val errorMessage = uiState.heroDetailsErrors?.heroErrorMessage
+                    ?: uiState.heroDetailsErrors?.statisticsErrorMessage
+                    ?: "Something went wrong."
+                val errorLog = uiState.heroDetailsErrors?.heroError
+                    ?: uiState.heroDetailsErrors?.statisticsError
+                    ?: "Something went wrong."
+                Log.d(PAGE_TAG, "Error: $errorLog")
+                FullScreenErrorWithRetry(
+                    errorMessage = errorMessage
+                ) {
+                    viewModel.initViewModel()
                 }
-            ) {
-                tabs.forEachIndexed { index, tab ->
-                    Tab(
-                        text = { Text(text = tab) },
-                        unselectedContentColor = MaterialTheme.colorScheme.tertiary,
-                        selectedContentColor = MaterialTheme.colorScheme.secondary,
-                        selected = pagerState.currentPage == index,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
+            } else {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    TabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        indicator = { tabPositions ->
+                            TabRowDefaults.Indicator(
+                                Modifier.tabIndicatorOffset(
+                                    tabPositions[pagerState.currentPage]
+                                )
+                            )
                         }
-                    )
+                    ) {
+                        tabs.forEachIndexed { index, tab ->
+                            Tab(
+                                text = { Text(text = tab) },
+                                unselectedContentColor = MaterialTheme.colorScheme.tertiary,
+                                selectedContentColor = MaterialTheme.colorScheme.secondary,
+                                selected = pagerState.currentPage == index,
+                                onClick = {
+                                    coroutineScope.launch {
+                                        pagerState.animateScrollToPage(index)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                    HorizontalPager(
+                        modifier = Modifier.fillMaxWidth(),
+                        state = pagerState
+                    ) { page ->
+                        when (page) {
+                            0 -> HeroOverviewScreen(
+                                uiState = uiState
+                            )
+
+                            1 -> HeroStatsScreen(
+                                uiState = uiState
+                            )
+
+                            2 -> HeroAbilitiesScreen(
+                                uiState = uiState
+                            )
+                        }
+                    }
+
                 }
             }
-            HorizontalPager(
-                modifier = Modifier.fillMaxWidth(),
-                state = pagerState
-            ) { page ->
-                when (page) {
-                    0 -> HeroOverviewScreen(
-                        uiState = uiState
-                    )
-
-                    1 -> HeroStatsScreen(
-                        uiState = uiState
-                    )
-
-                    2 -> HeroAbilitiesScreen(
-                        uiState = uiState
-                    )
-                }
-            }
-
         }
-
     }
 }
 
@@ -160,54 +182,50 @@ fun HeroOverviewScreen(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (uiState.isLoading) {
-            FullScreenLoadingIndicator("Hero Details")
-        } else {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.size(32.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Spacer(modifier = Modifier.size(32.dp))
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    PlayerIcon(
-                        heroImageId = getHeroImage(uiState.hero.displayName).drawableId,
-                        heroIconSize = 64.dp
-                    )
-                    Spacer(modifier = Modifier.size(16.dp))
-                    Text(
-                        text = uiState.hero.displayName,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-
-                }
-                Spacer(modifier = Modifier.size(16.dp))
-                Row {
-                    HeroRoleChips(uiState.hero.roles)
-                    Spacer(modifier = Modifier.size(4.dp))
-                    HeroClassChips(uiState.hero.classes)
-                }
-
-                Spacer(modifier = Modifier.size(32.dp))
-                SpiderChart(
-                    statPoints = uiState.hero.stats,
-                )
-                Spacer(modifier = Modifier.size(32.dp))
-                HeroStatsRateBar(
-                    title = "Win Rate",
-                    rate = uiState.statistics.winRate
+                PlayerIcon(
+                    heroImageId = getHeroImage(uiState.hero.displayName).drawableId,
+                    heroIconSize = 64.dp
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                HeroStatsRateBar(
-                    title = "Pick Rate",
-                    rate = uiState.statistics.pickRate
+                Text(
+                    text = uiState.hero.displayName,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.secondary
                 )
+
             }
+            Spacer(modifier = Modifier.size(16.dp))
+            Row {
+                HeroRoleChips(uiState.hero.roles)
+                Spacer(modifier = Modifier.size(4.dp))
+                HeroClassChips(uiState.hero.classes)
+            }
+
+            Spacer(modifier = Modifier.size(32.dp))
+            SpiderChart(
+                statPoints = uiState.hero.stats,
+            )
+            Spacer(modifier = Modifier.size(32.dp))
+            HeroStatsRateBar(
+                title = "Win Rate",
+                rate = uiState.statistics.winRate
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            HeroStatsRateBar(
+                title = "Pick Rate",
+                rate = uiState.statistics.pickRate
+            )
         }
     }
 }

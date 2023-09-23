@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -77,30 +78,34 @@ fun MatchDetailsScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         if (uiState.isLoading) {
-            FullScreenLoadingIndicator()
+            FullScreenLoadingIndicator("Match Details")
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 16.dp, bottom = 0.dp, start = 16.dp, end = 16.dp)
-                    .verticalScroll(state = rememberScrollState())
-            ) {
-                ScoreboardPanel(
-                    teamName = "Dusk",
-                    isWinningTeam = uiState.match.winningTeam == "Dusk",
-                    teamDetails = uiState.match.dusk,
-                    openItemDetails = ::openItemDetailsBottomSheet,
-                    getCreepScorePerMinute = getCreepScorePerMinute,
-                    getGoldEarnedPerMinute = getGoldEarnedPerMinute
-                )
-                ScoreboardPanel(
-                    teamName = "Dawn",
-                    isWinningTeam = uiState.match.winningTeam == "Dawn",
-                    teamDetails = uiState.match.dawn,
-                    openItemDetails = ::openItemDetailsBottomSheet,
-                    getCreepScorePerMinute = getCreepScorePerMinute,
-                    getGoldEarnedPerMinute = getGoldEarnedPerMinute
-                )
+            if(uiState.matchDetailsErrors != null) {
+                Text(text = "Error")
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 16.dp, bottom = 0.dp, start = 16.dp, end = 16.dp)
+                        .verticalScroll(state = rememberScrollState())
+                ) {
+                    ScoreboardPanel(
+                        teamName = "Dusk",
+                        isWinningTeam = uiState.match.winningTeam == "Dusk",
+                        teamDetails = uiState.match.dusk,
+                        openItemDetails = ::openItemDetailsBottomSheet,
+                        getCreepScorePerMinute = getCreepScorePerMinute,
+                        getGoldEarnedPerMinute = getGoldEarnedPerMinute
+                    )
+                    ScoreboardPanel(
+                        teamName = "Dawn",
+                        isWinningTeam = uiState.match.winningTeam == "Dawn",
+                        teamDetails = uiState.match.dawn,
+                        openItemDetails = ::openItemDetailsBottomSheet,
+                        getCreepScorePerMinute = getCreepScorePerMinute,
+                        getGoldEarnedPerMinute = getGoldEarnedPerMinute
+                    )
+                }
             }
         }
     }

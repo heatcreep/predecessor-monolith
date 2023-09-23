@@ -1,6 +1,7 @@
 package com.aowen.monolith.ui.screens.playerdetails
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,9 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.PlayerCard
 import com.aowen.monolith.ui.theme.MonolithTheme
+
+const val PAGE_TAG = "PlayerDetailsScreen"
 
 @Composable
 internal fun PlayerDetailsRoute(
@@ -34,6 +37,7 @@ internal fun PlayerDetailsRoute(
 
     PlayerDetailScreen(
         uiState = uiState,
+        handleRetry = viewModel::initViewModel,
         modifier = modifier,
         handleSavePlayer = viewModel::handleSavePlayer,
         navigateToMatchDetails = navigateToMatchDetails
@@ -44,6 +48,7 @@ internal fun PlayerDetailsRoute(
 fun PlayerDetailScreen(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
+    handleRetry: () -> Unit = {},
     handleSavePlayer: suspend (Boolean) -> Unit = {},
     navigateToMatchDetails: (String) -> Unit = { _ -> }
 ) {
@@ -54,25 +59,42 @@ fun PlayerDetailScreen(
         if (uiState.isLoading) {
             FullScreenLoadingIndicator("Player Details")
         } else {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                uiState.player.let { playerDetails ->
-                    PlayerCard(
-                        player = playerDetails,
-                        isClaimed = uiState.isClaimed,
-                        handleSavePlayer = handleSavePlayer,
-                        stats = uiState.stats
-                    )
-                    Spacer(modifier = Modifier.size(32.dp))
-                    MatchesList(
-                        playerId = uiState.playerId,
-                        matches = uiState.matches,
-                        navigateToMatchDetails = navigateToMatchDetails
-                    )
+            if (uiState.playerErrors != null) {
+                val errorMessage = uiState.playerErrors.playerInfoErrorMessage
+                    ?: uiState.playerErrors.matchesErrorMessage
+                    ?: uiState.playerErrors.statsErrorMessage
+                    ?: "Something went wrong."
+                val errorLog = uiState.playerErrors.playerInfoError
+                    ?: uiState.playerErrors.matchesError
+                    ?: uiState.playerErrors.statsError
+                    ?: "No error log available."
+                Log.d(PAGE_TAG, "Error: $errorLog")
+                FullScreenErrorWithRetry(
+                    errorMessage = errorMessage
+                ) {
+                    handleRetry()
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
+                ) {
+                    uiState.player.let { playerDetails ->
+                        PlayerCard(
+                            player = playerDetails,
+                            isClaimed = uiState.isClaimed,
+                            handleSavePlayer = handleSavePlayer,
+                            stats = uiState.stats
+                        )
+                        Spacer(modifier = Modifier.size(32.dp))
+                        MatchesList(
+                            playerId = uiState.playerId,
+                            matches = uiState.matches,
+                            navigateToMatchDetails = navigateToMatchDetails
+                        )
 
+                    }
                 }
             }
         }

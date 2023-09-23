@@ -11,67 +11,144 @@ import javax.inject.Inject
 
 interface OmedaCityRepository {
     // Players
-    suspend fun fetchPlayersByName(playerName: String): List<PlayerDetails>
+    suspend fun fetchPlayersByName(playerName: String): Result<List<PlayerDetails>?>
 
-    suspend fun fetchPlayerInfo(playerId: String): PlayerInfo
+    suspend fun fetchPlayerInfo(playerId: String): Result<PlayerInfo>
 
     // Matches
-    suspend fun fetchMatchesById(playerId: String): List<MatchDetails>
-    suspend fun fetchMatchById(matchId: String): MatchDetails
+    suspend fun fetchMatchesById(playerId: String): Result<List<MatchDetails>?>
+    suspend fun fetchMatchById(matchId: String): Result<MatchDetails?>
 
     // Items
-    suspend fun fetchAllItems(): List<ItemDetails>
+    suspend fun fetchAllItems(): Result<List<ItemDetails>?>
 
     // Heroes
-    suspend fun fetchAllHeroes(): List<HeroDetails>
+    suspend fun fetchAllHeroes(): Result<List<HeroDetails>?>
 
-    suspend fun fetchHeroByName(heroName: String): HeroDetails
+    suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?>
 
-    suspend fun fetchHeroStatisticsById(heroIds: String): HeroStatistics
+    suspend fun fetchHeroStatisticsById(heroIds: String): Result<HeroStatistics?>
 }
 
 class OmedaCityRepositoryImpl @Inject constructor(
-    private val playerApi: OmedaCityApi
+    private val playerApiService: OmedaCityService
 ) : OmedaCityRepository {
 
-    override suspend fun fetchPlayerInfo(playerId: String): PlayerInfo {
-        val playerDetails = playerApi.getPlayerById(playerId).create()
-        val playerStats = playerApi.getPlayerStatsById(playerId).create()
-        return PlayerInfo(
-            playerDetails = playerDetails,
-            playerStats = playerStats
-        )
+    override suspend fun fetchPlayerInfo(playerId: String): Result<PlayerInfo> {
+        return try {
+            val playerDetailsResponse = playerApiService.getPlayerById(playerId)
+            val playerStatsResponse = playerApiService.getPlayerStatsById(playerId)
+            if (playerDetailsResponse.isSuccessful.not()) {
+                Result.failure<Exception>(Exception("Failed to fetch player details"))
+            }
+            if (playerStatsResponse.isSuccessful.not()) {
+                Result.failure(Exception("Failed to fetch player stats"))
+            } else {
+                Result.success(
+                    PlayerInfo(
+                        playerDetails = playerDetailsResponse.body()?.create(),
+                        playerStats = playerStatsResponse.body()?.create()
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
-    override suspend fun fetchMatchesById(playerId: String): List<MatchDetails> =
-        playerApi.getPlayerMatchesById(playerId).matches.map {
-            it.create()
+
+    override suspend fun fetchMatchesById(playerId: String): Result<List<MatchDetails>?> {
+        return try {
+            val matchesResponse = playerApiService.getPlayerMatchesById(playerId)
+            val foo = matchesResponse.body()
+            if (matchesResponse.isSuccessful) {
+                Result.success(matchesResponse.body()?.matches?.map { it.create() })
+            } else {
+                Result.failure(Exception("Failed to fetch matches"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
+    }
 
-    override suspend fun fetchMatchById(matchId: String): MatchDetails =
-        playerApi.getMatchById(matchId).create()
-
-    override suspend fun fetchPlayersByName(playerName: String): List<PlayerDetails> =
-        playerApi.getPlayersByName(playerName).map {
-            it.create()
+    override suspend fun fetchMatchById(matchId: String): Result<MatchDetails?> {
+        return try {
+            val matchResponse = playerApiService.getMatchById(matchId)
+            if (matchResponse.isSuccessful) {
+                Result.success(matchResponse.body()?.create())
+            } else {
+                Result.failure(Exception("Failed to fetch match"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
+    }
 
-    override suspend fun fetchAllHeroes(): List<HeroDetails> =
-        playerApi.getAllHeroes().map {
-            it.create()
+    override suspend fun fetchPlayersByName(playerName: String): Result<List<PlayerDetails>?> {
+        return try {
+            val playersResponse = playerApiService.getPlayersByName(playerName)
+            if (playersResponse.isSuccessful) {
+                Result.success(playersResponse.body()?.map { it.create() })
+            } else {
+                Result.failure(Exception("Failed to fetch players"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
+    }
 
-    override suspend fun fetchAllItems(): List<ItemDetails> =
-        playerApi.getAllItems().map {
-            it.create()
+
+    override suspend fun fetchAllHeroes(): Result<List<HeroDetails>?> {
+        return try {
+            val heroesResponse = playerApiService.getAllHeroes()
+            if (heroesResponse.isSuccessful) {
+                Result.success(heroesResponse.body()?.map { it.create() })
+            } else {
+                Result.failure(Exception("Failed to fetch heroes"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
+    }
 
-    override suspend fun fetchHeroByName(heroName: String): HeroDetails =
-        playerApi.getHeroByName(heroName).create()
+    override suspend fun fetchAllItems(): Result<List<ItemDetails>?> {
+        return try {
+            val itemsResponse = playerApiService.getAllItems()
+            if (itemsResponse.isSuccessful) {
+                Result.success(itemsResponse.body()?.map { it.create() })
+            } else {
+                Result.failure(Exception("Failed to fetch items"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
-    override suspend fun fetchHeroStatisticsById(heroIds: String): HeroStatistics =
-        playerApi.getHeroStatisticsById(heroIds).heroStatistics.first().create()
 
+    override suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?> {
+        return try {
+            val heroResponse = playerApiService.getHeroByName(heroName)
+            if (heroResponse.isSuccessful) {
+                Result.success(heroResponse.body()?.create())
+            } else {
+                Result.failure(Exception("Failed to fetch hero"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
+    override suspend fun fetchHeroStatisticsById(heroIds: String): Result<HeroStatistics?> {
+        return try {
+            val heroStatisticsResponse = playerApiService.getHeroStatisticsById(heroIds)
+            if (heroStatisticsResponse.isSuccessful) {
+                Result.success(heroStatisticsResponse.body()?.heroStatistics?.first()?.create())
+            } else {
+                Result.failure(Exception("Failed to fetch hero statistics"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
 

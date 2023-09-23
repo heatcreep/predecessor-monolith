@@ -33,6 +33,7 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
 import com.aowen.monolith.data.UserInfo
 import com.aowen.monolith.navigation.navigateToLoginFromLogout
+import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.theme.DiscordBlurple
 import com.aowen.monolith.ui.theme.DiscordDarkBackground
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -49,8 +50,9 @@ fun ProfileScreenRoute(
 
     ProfileScreen(
         uiState = uiState,
-        modifier = modifier,
+        handleRetry = viewModel::initViewModel,
         onLogout = viewModel::handleLogout,
+        modifier = modifier,
         navigateToLogin = navController::navigateToLoginFromLogout
     )
 }
@@ -59,6 +61,7 @@ fun ProfileScreenRoute(
 fun ProfileScreen(
     uiState: ProfileScreenUiState,
     modifier: Modifier = Modifier,
+    handleRetry: () -> Unit,
     onLogout: () -> Unit,
     navigateToLogin: () -> Unit,
 ) {
@@ -70,18 +73,26 @@ fun ProfileScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         if (uiState.isLoading) {
-            FullScreenLoadingIndicator()
+            FullScreenLoadingIndicator("Profile")
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Surface(shape = RoundedCornerShape(5.dp)) {
-                    if (uiState.userInfo != null) {
-                        ProfileCard(userInfo = uiState.userInfo)
+            if(uiState.error != null) {
+                FullScreenErrorWithRetry(
+                    errorMessage = uiState.error
+                ) {
+                    handleRetry()
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    if(uiState.userInfo != null) {
+                        Surface(shape = RoundedCornerShape(5.dp)) {
+                            ProfileCard(userInfo = uiState.userInfo)
+                        }
                         TextButton(onClick = {
                             onLogout()
                             navigateToLogin()
@@ -106,8 +117,8 @@ fun ProfileScreen(
                             Text(text = "Sorry, there was an error retrieving your profile. Please try again later.")
                         }
                     }
-                }
 
+                }
             }
         }
     }
