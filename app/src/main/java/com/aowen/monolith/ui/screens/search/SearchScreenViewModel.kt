@@ -17,6 +17,7 @@ import javax.inject.Inject
 
 data class SearchScreenUiState(
     val isLoading: Boolean = true,
+    val error: String? = null,
     val isLoadingSearch: Boolean = false,
     val playersList: List<PlayerDetails?> = emptyList(),
     val initPlayersListText: String? = "Search a user to get started",
@@ -44,17 +45,31 @@ class SearchScreenViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                val claimedUser = userRepository.getClaimedUser()
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        claimedPlayerStats = claimedUser.playerStats,
-                        claimedPlayerDetails = claimedUser.playerDetails
-                    )
+                val claimedUserResult = userRepository.getClaimedUser()
+                if(claimedUserResult.isSuccess) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
+                            claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Failed to fetch claimed user"
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 Log.d("MONOLITH_DEBUG: ", e.toString())
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
 
         }
@@ -68,24 +83,35 @@ class SearchScreenViewModel @Inject constructor(
         }
     }
 
+    fun handleClearSearch() {
+        _uiState.update {
+            it.copy(
+                searchFieldValue = ""
+            )
+        }
+    }
+
     fun handleSubmitSearch() {
         _uiState.update { it.copy(isLoadingSearch = true) }
         viewModelScope.launch {
             try {
                 val fieldValue = uiState.value.searchFieldValue.trim()
                 val playersList = repository.fetchPlayersByName(fieldValue)
-                val filteredList = playersList.filter {
-                    !it.isCheater || !it.isMmrDisabled
+                if(playersList.isSuccess) {
+                    val filteredList = playersList.getOrNull()?.filter {
+                        !it.isCheater || !it.isMmrDisabled
+                    }
+                    _uiState.update {
+                        it.copy(
+                            isLoadingSearch = false,
+                            playersList = filteredList ?: emptyList(),
+                            initPlayersListText = if (filteredList?.isEmpty() == true) {
+                                "Couldn't find any players that match your search"
+                            } else null
+                        )
+                    }
                 }
-                _uiState.update {
-                    it.copy(
-                        isLoadingSearch = false,
-                        playersList = filteredList,
-                        initPlayersListText = if (filteredList.isEmpty()) {
-                            "Couldn't find any players that match your search"
-                        } else null
-                    )
-                }
+
             } catch (e: Exception) {
                 Log.d("MONOLITH_DEBUG: ", e.toString())
                 _uiState.update {

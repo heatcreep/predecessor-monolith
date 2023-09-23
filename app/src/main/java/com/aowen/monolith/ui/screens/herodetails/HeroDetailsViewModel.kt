@@ -1,6 +1,5 @@
 package com.aowen.monolith.ui.screens.herodetails
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,8 +14,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+
+data class HeroDetailsErrors(
+    val heroErrorMessage: String? = null,
+    val heroError: String? = null,
+    val statisticsErrorMessage: String? = null,
+    val statisticsError: String? = null
+)
+
 data class HeroDetailsUiState(
     val isLoading: Boolean = true,
+    val heroDetailsErrors: HeroDetailsErrors? = null,
     val hero: HeroDetails = HeroDetails(),
     val statistics: HeroStatistics = HeroStatistics(),
 )
@@ -34,23 +42,39 @@ class HeroDetailsViewModel @Inject constructor(
     private val heroId: String = checkNotNull(savedStateHandle["heroId"])
 
     init {
+        initViewModel()
+    }
+
+    fun initViewModel() {
+        _uiState.value = HeroDetailsUiState(isLoading = true)
         viewModelScope.launch {
-            try {
-                val hero = async { omedaCityRepository.fetchHeroByName(heroName) }
-                val statistics =
-                    async { omedaCityRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
+            val hero = async { omedaCityRepository.fetchHeroByName(heroName) }
+            val statistics =
+                async { omedaCityRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
+            val heroResult = hero.await()
+            val statisticsResult = statistics.await()
+            if(heroResult.isSuccess && statisticsResult.isSuccess) {
                 _uiState.update {
                     it.copy(
-                        hero = hero.await(),
-                        statistics = statistics.await(),
+                        hero = heroResult.getOrNull() ?: HeroDetails(),
+                        statistics = statisticsResult.getOrNull() ?: HeroStatistics(),
+                        isLoading = false,
+                        heroDetailsErrors = null
+                    )
+                }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        heroDetailsErrors = HeroDetailsErrors(
+                            heroErrorMessage = "Failed to fetch hero details.",
+                            heroError = heroResult.exceptionOrNull()?.message,
+                            statisticsErrorMessage = "Failed to fetch hero statistics.",
+                            statisticsError = statisticsResult.exceptionOrNull()?.message
+                        ),
                         isLoading = false
                     )
                 }
-            } catch (e: Exception) {
-                Log.d("MONOLITH_DEBUG: ", e.toString())
-                _uiState.update { it.copy(isLoading = false) }
             }
         }
-
     }
 }

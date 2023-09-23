@@ -3,9 +3,9 @@ package com.aowen.monolith.di
 import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.AuthRepositoryImpl
-import com.aowen.monolith.network.OmedaCityApi
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.OmedaCityRepositoryImpl
+import com.aowen.monolith.network.OmedaCityService
 import com.aowen.monolith.network.RetrofitHelper
 import com.aowen.monolith.network.UserRepository
 import com.aowen.monolith.network.UserRepositoryImpl
@@ -52,13 +52,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideOmedaCityApi(retrofit: Retrofit): OmedaCityApi {
-        return retrofit.create(OmedaCityApi::class.java)
+    fun provideOmedaCityApi(retrofit: Retrofit): OmedaCityService {
+        return retrofit.create(OmedaCityService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideOmedaCityRepository(api: OmedaCityApi): OmedaCityRepository =
+    fun provideOmedaCityRepository(api: OmedaCityService): OmedaCityRepository =
         OmedaCityRepositoryImpl(api)
 
     @Provides

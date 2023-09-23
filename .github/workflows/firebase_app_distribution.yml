@@ -22,5 +22,9 @@ jobs:
         with:
           appId: 1:325875259106:android:a41924af78a6fed3de70bb
           token: ${{ secrets.FIREBASE_TOKEN }}
-          groups: close-friends # or whatever tester group you have defined
+          groups: close-friends
+          releaseNotes: "${{ steps.release_notes.outputs.notes }}"
           file: app/build/outputs/apk/debug/app-debug.apk
+      - name: Get release notes
+        id: release_notes
+        run: echo "::set-output name=notes::$(release-notes.md)"

@@ -1,6 +1,5 @@
 package com.aowen.monolith.ui.screens.matches
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,8 +16,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class MatchDetailsErrors(
+    val matchError: String? = null,
+    val itemsError: String? = null
+)
+
 data class MatchDetailsUiState(
     val isLoading: Boolean = true,
+    val matchDetailsErrors: MatchDetailsErrors? = null,
     val match: MatchDetails = MatchDetails(),
     val items: List<ItemDetails> = emptyList(),
     val selectedItemDetails: ItemDetails? = null,
@@ -37,52 +42,60 @@ class MatchDetailsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            try {
-                val matchDeferred = async { repository.fetchMatchById(matchId) }
-                val itemsDeferred = async { repository.fetchAllItems() }
 
-                val match = matchDeferred.await()
-                val items = itemsDeferred.await()
+            val matchDeferred = async { repository.fetchMatchById(matchId) }
+            val itemsDeferred = async { repository.fetchAllItems() }
 
-                fun getPlayerItems(itemIds: List<Int>): List<ItemDetails> {
-                    return items.filter { item ->
-                        item.id in itemIds
-                    }
-                }
+            val matchResult = matchDeferred.await()
+            val itemsResult = itemsDeferred.await()
 
-                fun MatchPlayerDetails.getDetailsWithItems(): MatchPlayerDetails {
-                    val playerItems = getPlayerItems(this.itemIds)
-                    return this.copy(playerItems = playerItems)
-                }
+            fun getPlayerItems(
+                itemIds: List<Int>,
+                allItems: List<ItemDetails>?
+            ): List<ItemDetails> {
+                return allItems?.filter { item ->
+                    item.id in itemIds
+                } ?: emptyList()
+            }
 
-                val newMatch = match.copy(
+            fun MatchPlayerDetails.getDetailsWithItems(allItems: List<ItemDetails>?): MatchPlayerDetails {
+                val playerItems = getPlayerItems(this.itemIds, allItems)
+                return this.copy(playerItems = playerItems)
+            }
+
+            if (matchResult.isSuccess && itemsResult.isSuccess) {
+                val match = matchResult.getOrNull()
+                val allItems = itemsResult.getOrNull()
+                val newMatch = match?.copy(
                     dusk = match.dusk.copy(
                         players = match.dusk.players.map { player ->
-                            player.getDetailsWithItems()
+                            player.getDetailsWithItems(allItems)
                         }
                     ),
                     dawn = match.dawn.copy(
                         players = match.dawn.players.map { player ->
-                            player.getDetailsWithItems()
+                            player.getDetailsWithItems(allItems)
                         }
                     )
                 )
 
-
-
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        match = newMatch,
-                        items = items
-
+                        match = newMatch ?: MatchDetails(),
+                        items = itemsResult.getOrNull() ?: emptyList()
                     )
                 }
-
-
-            } catch (e: Exception) {
-                Log.d("MONOLITH_DEBUG: ", e.toString())
-                _uiState.update { it.copy(isLoading = false) }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        matchDetailsErrors = MatchDetailsErrors(
+                            matchError = matchResult.exceptionOrNull()?.message,
+                            itemsError = itemsResult.exceptionOrNull()?.message
+                        )
+                    )
+                }
             }
         }
     }

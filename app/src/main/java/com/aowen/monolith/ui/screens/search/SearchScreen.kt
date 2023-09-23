@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -85,6 +86,7 @@ internal fun SearchScreenRoute(
         uiState = searchUiState,
         setSearchValue = searchScreenViewModel::setSearchValue,
         handleSubmitSearch = searchScreenViewModel::handleSubmitSearch,
+        handleClearSearch = searchScreenViewModel::handleClearSearch,
         navigateToPlayerDetails = navigateToPlayerDetails,
         modifier = modifier
     )
@@ -96,6 +98,7 @@ fun SearchScreen(
     uiState: SearchScreenUiState,
     setSearchValue: (String) -> Unit,
     handleSubmitSearch: () -> Unit,
+    handleClearSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -117,6 +120,7 @@ fun SearchScreen(
                 searchValue = uiState.searchFieldValue,
                 setSearchValue = setSearchValue,
                 handleSubmitSearch = handleSubmitSearch,
+                handleClearSearch = handleClearSearch,
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.size(16.dp))
@@ -139,18 +143,25 @@ fun SearchScreen(
                     )
                 }
             } else {
-                if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
-                    ClaimedPlayerCard(
-                        playerDetails = uiState.claimedPlayerDetails,
-                        playerStats = uiState.claimedPlayerStats,
-                        navigateToPlayerDetails = navigateToPlayerDetails
-                    )
-                } else {
+                if(uiState.error != null) {
                     Text(
-                        text = "No player claimed! Navigate to a player's profile and click the" +
-                                " 'Claim Player' button to claim a player.",
+                        text = uiState.error,
                         color = MaterialTheme.colorScheme.secondary
                     )
+                } else {
+                    if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
+                        ClaimedPlayerCard(
+                            playerDetails = uiState.claimedPlayerDetails,
+                            playerStats = uiState.claimedPlayerStats,
+                            navigateToPlayerDetails = navigateToPlayerDetails
+                        )
+                    } else {
+                        Text(
+                            text = "No player claimed! Navigate to a player's profile and click the" +
+                                    " 'Claim Player' button to claim a player.",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.size(16.dp))
@@ -192,15 +203,22 @@ fun SearchScreen(
                         color = MaterialTheme.colorScheme.secondary
                     )
                 } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(uiState.playersList) { player ->
-                            player?.let {
-                                PlayerResultCard(
-                                    playerDetails = player,
-                                    navigateToPlayerDetails = navigateToPlayerDetails
-                                )
+                    if (uiState.error != null) {
+                        Text(
+                            text = uiState.error,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(uiState.playersList) { player ->
+                                player?.let {
+                                    PlayerResultCard(
+                                        playerDetails = player,
+                                        navigateToPlayerDetails = navigateToPlayerDetails
+                                    )
+                                }
                             }
                         }
                     }
@@ -217,7 +235,8 @@ fun SearchBar(
     setSearchValue: (String) -> Unit,
     modifier: Modifier = Modifier,
     searchLabel: String = "",
-    handleSubmitSearch: (() -> Unit)? = null
+    handleSubmitSearch: (() -> Unit)? = null,
+    handleClearSearch: (() -> Unit)? = null
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -234,15 +253,32 @@ fun SearchBar(
             )
         },
         trailingIcon = {
-            handleSubmitSearch?.let {
-                IconButton(onClick = {
-                    keyboardController?.hide()
-                    handleSubmitSearch()
-                }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Search,
-                        contentDescription = null
-                    )
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                handleClearSearch?.let {
+                    if (searchValue.isNotEmpty()) {
+                        IconButton(onClick = {
+                            handleClearSearch()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Outlined.Clear,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+                handleSubmitSearch?.let {
+                    IconButton(onClick = {
+                        keyboardController?.hide()
+                        handleSubmitSearch()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         },
@@ -478,6 +514,7 @@ fun SearchScreenPreview() {
                             region = "naeast"
                         )
                     ),
+                    searchFieldValue = "heatcreep.tv",
                     initPlayersListText = null,
                     isLoadingSearch = false,
                     isLoading = false,
@@ -493,6 +530,7 @@ fun SearchScreenPreview() {
                 ),
                 setSearchValue = {},
                 handleSubmitSearch = {},
+                handleClearSearch = {},
                 navigateToPlayerDetails = {}
             )
         }

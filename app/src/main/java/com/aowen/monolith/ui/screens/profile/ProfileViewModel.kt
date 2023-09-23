@@ -1,6 +1,5 @@
 package com.aowen.monolith.ui.screens.profile
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.UserInfo
@@ -15,6 +14,7 @@ import javax.inject.Inject
 
 data class ProfileScreenUiState(
     val isLoading: Boolean = true,
+    val error: String? = null,
     val userInfo: UserInfo? = null,
 )
 
@@ -33,22 +33,31 @@ class ProfileViewModel @Inject constructor(
     }
 
     init {
+        initViewModel()
+    }
+
+    fun initViewModel() {
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            try {
-                val userInfoDeferred = async { userRepository.getUser() }
+            val userInfoDeferred = async { userRepository.getUser() }
 
-                val userInfo = userInfoDeferred.await()
+            val userInfo = userInfoDeferred.await()
 
+            if (userInfo != null) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
+                        error = null,
                         userInfo = userInfo
                     )
                 }
-
-            } catch (e: Exception) {
-                Log.d("MONOLITH_DEBUG: ", e.toString())
-                _uiState.update { it.copy(isLoading = false) }
+            } else {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Error getting user info.",
+                    )
+                }
             }
         }
     }
