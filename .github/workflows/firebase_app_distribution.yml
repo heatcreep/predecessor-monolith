@@ -16,15 +16,10 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleRelease
       - name: Distribute to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.6.0
         with:
-          appId: 1:325875259106:android:a41924af78a6fed3de70bb
-          token: ${{ secrets.FIREBASE_TOKEN }}
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.SERVICE_FILE_CONTENTS }}
           groups: close-friends
-          releaseNotes: "${{ steps.release_notes.outputs.notes }}"
-          file: app/build/outputs/apk/debug/app-debug.apk
-      - name: Get release notes
-        id: release_notes
-        run: echo "::set-output name=notes::$(release-notes.md)"
