@@ -18,7 +18,7 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: ./gradlew assembleRelease
       - name: Distribute to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1.6.0
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.SERVICE_FILE_CONTENTS }}
