@@ -28,7 +28,6 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,6 +54,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
@@ -64,6 +64,9 @@ import coil.request.ImageRequest
 import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.ui.components.ShimmerCircle
+import com.aowen.monolith.ui.components.ShimmerLongText
+import com.aowen.monolith.ui.components.ShimmerShortText
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.inputFieldDefaults
 import kotlinx.coroutines.launch
@@ -108,7 +111,7 @@ fun SearchScreen(
     val tooltipState = remember { PlainTooltipState() }
 
     LaunchedEffect(Unit) {
-        if(uiState.searchFieldValue.isNotEmpty()) {
+        if (uiState.searchFieldValue.isNotEmpty()) {
             handleClearSearch()
         }
     }
@@ -138,39 +141,43 @@ fun SearchScreen(
             )
 
             Spacer(modifier = Modifier.size(16.dp))
-            if (uiState.isLoading) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        strokeWidth = 4.dp
-                    )
-                }
-            } else {
-                if (uiState.error != null) {
-                    Text(
-                        text = uiState.error,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                } else {
-                    if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
-                        ClaimedPlayerCard(
-                            playerDetails = uiState.claimedPlayerDetails,
-                            playerStats = uiState.claimedPlayerStats,
-                            navigateToPlayerDetails = {
-                                handleAddToRecentSearch(uiState.claimedPlayerDetails)
-                                navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
-                            }
+            AnimatedContent(targetState = uiState.isLoading, label = "") {
+                if (it) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        PlayerLoadingCard(
+                            avatarSize = 64.dp,
+                            titleHeight = 16.dp,
+                            subtitleHeight = 12.dp,
+                            titleWidth = 100.dp,
+                            subtitleWidth = 200.dp,
                         )
-                    } else {
+                    }
+                } else {
+                    if (uiState.error != null) {
                         Text(
-                            text = "No player claimed! Navigate to a player's profile and click the" +
-                                    " 'Claim Player' button to claim a player.",
+                            text = uiState.error,
                             color = MaterialTheme.colorScheme.secondary
                         )
+                    } else {
+                        if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
+                            ClaimedPlayerCard(
+                                playerDetails = uiState.claimedPlayerDetails,
+                                playerStats = uiState.claimedPlayerStats,
+                                navigateToPlayerDetails = {
+                                    handleAddToRecentSearch(uiState.claimedPlayerDetails)
+                                    navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
+                                }
+                            )
+                        } else {
+                            Text(
+                                text = "No player claimed! Navigate to a player's profile and click the" +
+                                        " 'Claim Player' button to claim a player.",
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
                 }
             }
@@ -210,60 +217,72 @@ fun SearchScreen(
                 }
             }
             Spacer(modifier = Modifier.size(16.dp))
-            if (uiState.isLoadingSearch || uiState.isLoading) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.tertiary,
-                        strokeWidth = 4.dp
-                    )
-                }
-            } else {
-                if (uiState.error != null) {
-                    Text(
-                        text = uiState.error,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                } else if (uiState.playersList.isNotEmpty()) {
-                    LazyColumn(
+            AnimatedContent(
+                targetState = (uiState.isLoading || uiState.isLoadingSearch),
+                label = ""
+            ) {
+                if (it) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(uiState.playersList) { player ->
-                            player?.let {
-                                PlayerResultCard(
-                                    playerDetails = player,
-                                    navigateToPlayerDetails = {
-                                        handleAddToRecentSearch(player)
-                                        navigateToPlayerDetails(player.playerId)
-                                    }
-                                )
-                            }
+                        repeat(7) {
+                            PlayerLoadingCard(
+                                titleWidth = 100.dp,
+                                subtitleWidth = 75.dp
+                            )
                         }
-                    }
-                } else if (uiState.recentSearchesList.isNotEmpty()) {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(uiState.recentSearchesList) { player ->
-                            player?.let {
-                                PlayerResultCard(
-                                    playerDetails = player,
-                                    navigateToPlayerDetails = {
-                                        handleAddToRecentSearch(player)
-                                        navigateToPlayerDetails(player.playerId)
-                                    }
-                                )
-                            }
-                        }
+
                     }
                 } else {
-                    Text(
-                        text = "No recent searches",
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                    if (uiState.error != null) {
+                        Text(
+                            text = uiState.error,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else if (uiState.playersList.isNotEmpty()) {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(
+                                uiState.playersList,
+                                key = { player -> player?.playerId ?: "" }
+                            ) { player ->
+
+                                player?.let {
+                                    PlayerResultCard(
+                                        playerDetails = player,
+                                        navigateToPlayerDetails = {
+                                            handleAddToRecentSearch(player)
+                                            navigateToPlayerDetails(player.playerId)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    } else if (uiState.recentSearchesList.isNotEmpty()) {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(uiState.recentSearchesList) { player ->
+                                player?.let {
+                                    PlayerResultCard(
+                                        playerDetails = player,
+                                        navigateToPlayerDetails = {
+                                            handleAddToRecentSearch(player)
+                                            navigateToPlayerDetails(player.playerId)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        Text(
+                            text = "No recent searches",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
             }
         }
@@ -412,6 +431,60 @@ fun PlayerResultCard(
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun PlayerLoadingCard(
+    modifier: Modifier = Modifier,
+    avatarSize: Dp = 32.dp,
+    titleHeight: Dp = 12.dp,
+    titleWidth: Dp = 100.dp,
+    subtitleHeight: Dp = 8.dp,
+    subtitleWidth: Dp = 200.dp,
+    clipRadius: Dp = 4.dp
+
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.secondary,
+                RoundedCornerShape(4.dp)
+            ),
+        shape = RoundedCornerShape(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Player Rank
+            ShimmerCircle(
+                size = avatarSize
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ShimmerShortText(
+                    height = titleHeight,
+                    width = titleWidth,
+                    clipRadius = clipRadius
+                )
+                ShimmerLongText(
+                    height = subtitleHeight,
+                    width = subtitleWidth,
+                    clipRadius = clipRadius
+                )
             }
         }
     }
