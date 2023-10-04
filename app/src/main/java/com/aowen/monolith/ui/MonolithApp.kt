@@ -23,6 +23,7 @@ import com.aowen.monolith.ui.navigation.NavBarItem
 
 @Composable
 fun MonolithApp(
+    userId: String = "",
     appState: MonolithAppState = rememberMonolithAppState(),
     viewModel: MonolithViewModel = hiltViewModel()
 ) {
@@ -43,7 +44,7 @@ fun MonolithApp(
         MonolithNavHost(
             appState = appState,
             modifier = Modifier.padding(padding),
-            startDestination = if (uiState.session != null) SearchRoute else LoginRoute
+            startDestination = if (userId.isNotEmpty() || uiState.session != null) SearchRoute else LoginRoute
         )
     }
 }

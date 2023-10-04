@@ -20,7 +20,11 @@ fun NavGraphBuilder.searchScreen(
     composable(
         route = SearchRoute,
         enterTransition = {
-            slideIntoContainer(SlideDirection.End)
+            if (this.initialState.destination.route != SearchRoute) {
+                slideIntoContainer(SlideDirection.End)
+            } else {
+                null
+            }
         },
         exitTransition = {
             slideOutOfContainer(SlideDirection.Start)
