@@ -21,5 +21,5 @@ data class PlayerDto(
     @SerializedName("is_ranked")
     val isRanked: Boolean,
     val mmr: Float?,
-    val flags: List<PlayerFlagDto?>
+    val flags: List<PlayerFlagDto?>? = null
 )

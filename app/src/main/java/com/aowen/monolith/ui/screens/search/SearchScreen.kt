@@ -1,6 +1,7 @@
 package com.aowen.monolith.ui.screens.search
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -60,7 +61,6 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
-import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
@@ -78,7 +78,6 @@ internal fun SearchScreenRoute(
 
     LaunchedEffect(Unit) {
         searchScreenViewModel.initViewModel()
-
     }
 
 
@@ -88,6 +87,7 @@ internal fun SearchScreenRoute(
         handleSubmitSearch = searchScreenViewModel::handleSubmitSearch,
         handleClearSearch = searchScreenViewModel::handleClearSearch,
         navigateToPlayerDetails = navigateToPlayerDetails,
+        handleAddToRecentSearch = searchScreenViewModel::handleAddToRecentSearch,
         modifier = modifier
     )
 }
@@ -100,11 +100,18 @@ fun SearchScreen(
     handleSubmitSearch: () -> Unit,
     handleClearSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
+    handleAddToRecentSearch: (PlayerDetails) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     val coroutineScope = rememberCoroutineScope()
     val tooltipState = remember { PlainTooltipState() }
+
+    LaunchedEffect(Unit) {
+        if(uiState.searchFieldValue.isNotEmpty()) {
+            handleClearSearch()
+        }
+    }
 
     Surface(
         modifier = modifier
@@ -143,7 +150,7 @@ fun SearchScreen(
                     )
                 }
             } else {
-                if(uiState.error != null) {
+                if (uiState.error != null) {
                     Text(
                         text = uiState.error,
                         color = MaterialTheme.colorScheme.secondary
@@ -153,7 +160,10 @@ fun SearchScreen(
                         ClaimedPlayerCard(
                             playerDetails = uiState.claimedPlayerDetails,
                             playerStats = uiState.claimedPlayerStats,
-                            navigateToPlayerDetails = navigateToPlayerDetails
+                            navigateToPlayerDetails = {
+                                handleAddToRecentSearch(uiState.claimedPlayerDetails)
+                                navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
+                            }
                         )
                     } else {
                         Text(
@@ -166,11 +176,17 @@ fun SearchScreen(
             }
             Spacer(modifier = Modifier.size(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Search Results",
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleMedium
-                )
+                AnimatedContent(targetState = uiState.playersList.isNotEmpty(), label = "") {
+                    Text(
+                        text = if (it) {
+                            "Search Results"
+                        } else {
+                            "Recent Searches"
+                        },
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
                 PlainTooltipBox(
                     tooltip = {
                         Text(text = "We hide cheaters and players with MMR disabled from the search results.")
@@ -194,34 +210,60 @@ fun SearchScreen(
                 }
             }
             Spacer(modifier = Modifier.size(16.dp))
-            if (uiState.isLoadingSearch) {
-                FullScreenLoadingIndicator()
+            if (uiState.isLoadingSearch || uiState.isLoading) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.tertiary,
+                        strokeWidth = 4.dp
+                    )
+                }
             } else {
-                if (uiState.initPlayersListText != null) {
+                if (uiState.error != null) {
                     Text(
-                        text = uiState.initPlayersListText,
+                        text = uiState.error,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                } else {
-                    if (uiState.error != null) {
-                        Text(
-                            text = uiState.error,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    } else {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(uiState.playersList) { player ->
-                                player?.let {
-                                    PlayerResultCard(
-                                        playerDetails = player,
-                                        navigateToPlayerDetails = navigateToPlayerDetails
-                                    )
-                                }
+                } else if (uiState.playersList.isNotEmpty()) {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.playersList) { player ->
+                            player?.let {
+                                PlayerResultCard(
+                                    playerDetails = player,
+                                    navigateToPlayerDetails = {
+                                        handleAddToRecentSearch(player)
+                                        navigateToPlayerDetails(player.playerId)
+                                    }
+                                )
                             }
                         }
                     }
+                } else if (uiState.recentSearchesList.isNotEmpty()) {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(uiState.recentSearchesList) { player ->
+                            player?.let {
+                                PlayerResultCard(
+                                    playerDetails = player,
+                                    navigateToPlayerDetails = {
+                                        handleAddToRecentSearch(player)
+                                        navigateToPlayerDetails(player.playerId)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Text(
+                        text = "No recent searches",
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 }
             }
         }
@@ -342,7 +384,7 @@ fun PlayerResultCard(
             // Player Rank
             SubcomposeAsyncImage(
                 model = model,
-                contentDescription = playerDetails.rank
+                contentDescription = playerDetails.rankTitle
             ) {
                 val state = painter.state
                 if (state is AsyncImagePainter.State.Success) {
@@ -433,7 +475,7 @@ fun ClaimedPlayerCard(
                 )
                 Row {
                     Text(
-                        text = playerDetails.rank,
+                        text = playerDetails.rankTitle,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.secondary
@@ -487,7 +529,7 @@ fun ClaimedPlayerCardPreview() {
                     playerName = "heatcreep.tv",
                     region = "naeast",
                     mmr = "1379",
-                    rank = "Silver III"
+                    rankTitle = "Silver III"
                 ),
                 navigateToPlayerDetails = {},
                 playerStats = PlayerStats(
@@ -522,7 +564,7 @@ fun SearchScreenPreview() {
                         playerName = "heatcreep.tv",
                         region = "naeast",
                         mmr = "1379",
-                        rank = "Silver III"
+                        rankTitle = "Silver III"
                     ),
                     claimedPlayerStats = PlayerStats(
                         favoriteHero = "Narbash",
@@ -531,7 +573,8 @@ fun SearchScreenPreview() {
                 setSearchValue = {},
                 handleSubmitSearch = {},
                 handleClearSearch = {},
-                navigateToPlayerDetails = {}
+                navigateToPlayerDetails = {},
+                handleAddToRecentSearch = {}
             )
         }
     }

@@ -1,12 +1,11 @@
 package com.aowen.monolith.network
 
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.providers.Discord
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
-import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.PostgrestResult
 import kotlinx.coroutines.delay
@@ -33,40 +32,41 @@ interface AuthRepository {
 
 
 class AuthRepositoryImpl @Inject constructor(
-    private val client: SupabaseClient
+    private val goTrue: GoTrue,
+    private val postgrest: Postgrest
 ) : AuthRepository {
 
     override suspend fun signUpUser(
         emailFromState: String,
         passwordFromState: String
     ): Email.Result? {
-        return client.gotrue.signUpWith(Email) {
+        return goTrue.signUpWith(Email) {
             email = emailFromState
             password = passwordFromState
         }
     }
 
     override suspend fun signInWithDiscord() {
-        return client.gotrue.loginWith(Discord)
+        return goTrue.loginWith(Discord)
     }
 
     override suspend fun getCurrentSession(): UserSession? {
-        return client.gotrue.currentSessionOrNull()
+        return goTrue.currentSessionOrNull()
     }
 
     override suspend fun getPlayer(): Result<UserProfile?> {
         return try {
-            var session = client.gotrue.currentSessionOrNull()
+            var session = goTrue.currentSessionOrNull()
             var retryCount = 3
-            while(session == null && retryCount > 0) {
+            while (session == null && retryCount > 0) {
                 delay(500)
-                session = client.gotrue.currentSessionOrNull()
+                session = goTrue.currentSessionOrNull()
                 retryCount--
             }
             session?.let {
                 if (it.user?.id != null) {
                     Result.success(
-                        client.postgrest.from(TABLE_PROFILES)
+                        postgrest.from(TABLE_PROFILES)
                             .select(columns = Columns.raw("player_id")) {
                                 eq("id", it.user?.id!!)
                             }.decodeList<UserProfile>().firstOrNull()
@@ -79,15 +79,15 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCurrentUser(): UserInfo {
-        return client.gotrue.retrieveUserForCurrentSession(true)
+        return goTrue.retrieveUserForCurrentSession(true)
     }
 
 
     override suspend fun handleSavePlayer(playerId: String): Result<PostgrestResult> {
         return try {
-            client.gotrue.currentSessionOrNull()?.let {
+            goTrue.currentSessionOrNull()?.let {
                 if (it.user?.id != null) {
-                    Result.success(client.postgrest[TABLE_PROFILES].update({
+                    Result.success(postgrest[TABLE_PROFILES].update({
                         set("player_id", playerId)
                     }) {
 
@@ -101,6 +101,6 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
-        return client.gotrue.logout()
+        return goTrue.logout()
     }
 }

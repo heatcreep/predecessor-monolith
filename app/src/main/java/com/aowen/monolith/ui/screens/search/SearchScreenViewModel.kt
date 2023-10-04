@@ -1,14 +1,15 @@
 package com.aowen.monolith.ui.screens.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
-import com.aowen.monolith.network.AuthRepository
+import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.UserRecentSearchRepository
 import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -20,6 +21,7 @@ data class SearchScreenUiState(
     val error: String? = null,
     val isLoadingSearch: Boolean = false,
     val playersList: List<PlayerDetails?> = emptyList(),
+    val recentSearchesList: List<PlayerDetails?> = emptyList(),
     val initPlayersListText: String? = "Search a user to get started",
     val claimedPlayerId: String? = null,
     val claimedPlayerStats: PlayerStats? = null,
@@ -30,28 +32,28 @@ data class SearchScreenUiState(
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
     private val repository: OmedaCityRepository,
-    private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val userRecentSearchesRepository: UserRecentSearchRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchScreenUiState())
     val uiState: StateFlow<SearchScreenUiState> = _uiState
-
-    init {
-        initViewModel()
-    }
-
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                val claimedUserResult = userRepository.getClaimedUser()
-                if(claimedUserResult.isSuccess) {
+                val claimedUserDeferredResult = async { userRepository.getClaimedUser() }
+                val recentSearchesDeferredResult =
+                    async { userRecentSearchesRepository.getRecentSearches() }
+                val claimedUserResult = claimedUserDeferredResult.await()
+                val recentSearchesResult = recentSearchesDeferredResult.await()
+                if (claimedUserResult.isSuccess) {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
-                            claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails
+                            claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
+                            recentSearchesList = recentSearchesResult
                         )
                     }
                 } else {
@@ -63,7 +65,7 @@ class SearchScreenViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                Log.d("MONOLITH_DEBUG: ", e.toString())
+                logDebug(e.toString())
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -86,8 +88,19 @@ class SearchScreenViewModel @Inject constructor(
     fun handleClearSearch() {
         _uiState.update {
             it.copy(
-                searchFieldValue = ""
+                searchFieldValue = "",
+                playersList = emptyList()
             )
+        }
+    }
+
+    fun handleAddToRecentSearch(playerDetails: PlayerDetails) {
+        viewModelScope.launch {
+            try {
+                userRecentSearchesRepository.addRecentSearch(playerDetails)
+            } catch (e: Exception) {
+                logDebug(e.toString())
+            }
         }
     }
 
@@ -97,7 +110,7 @@ class SearchScreenViewModel @Inject constructor(
             try {
                 val fieldValue = uiState.value.searchFieldValue.trim()
                 val playersList = repository.fetchPlayersByName(fieldValue)
-                if(playersList.isSuccess) {
+                if (playersList.isSuccess) {
                     val filteredList = playersList.getOrNull()?.filter {
                         !it.isCheater || !it.isMmrDisabled
                     }
@@ -113,7 +126,7 @@ class SearchScreenViewModel @Inject constructor(
                 }
 
             } catch (e: Exception) {
-                Log.d("MONOLITH_DEBUG: ", e.toString())
+                logDebug(e.toString())
                 _uiState.update {
                     it.copy(
                         isLoadingSearch = false,

@@ -7,6 +7,8 @@ import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.OmedaCityRepositoryImpl
 import com.aowen.monolith.network.OmedaCityService
 import com.aowen.monolith.network.RetrofitHelper
+import com.aowen.monolith.network.UserRecentSearchRepository
+import com.aowen.monolith.network.UserRecentSearchRepositoryImpl
 import com.aowen.monolith.network.UserRepository
 import com.aowen.monolith.network.UserRepositoryImpl
 import dagger.Module
@@ -16,7 +18,9 @@ import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.postgrest
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -52,6 +56,18 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSupabaseDatabase(client: SupabaseClient): Postgrest {
+        return client.postgrest
+    }
+
+    @Provides
+    @Singleton
+    fun provideSupabaseGoTrue(client: SupabaseClient): GoTrue {
+        return client.gotrue
+    }
+
+    @Provides
+    @Singleton
     fun provideOmedaCityApi(retrofit: Retrofit): OmedaCityService {
         return retrofit.create(OmedaCityService::class.java)
     }
@@ -63,11 +79,22 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(client: SupabaseClient): AuthRepository =
-        AuthRepositoryImpl(client)
+    fun provideAuthRepository(goTrue: GoTrue, postgrest: Postgrest): AuthRepository =
+        AuthRepositoryImpl(goTrue, postgrest)
 
     @Provides
     @Singleton
-    fun provideUserRepository(client: SupabaseClient, repository: OmedaCityRepository): UserRepository =
+    fun provideUserRepository(
+        client: SupabaseClient,
+        repository: OmedaCityRepository
+    ): UserRepository =
         UserRepositoryImpl(client, repository)
+
+    @Provides
+    @Singleton
+    fun provideUserRecentSearchRepository(
+        postgrest: Postgrest,
+        repository: UserRepository
+    ): UserRecentSearchRepository =
+        UserRecentSearchRepositoryImpl(postgrest, repository)
 }

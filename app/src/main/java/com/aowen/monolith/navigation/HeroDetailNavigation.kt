@@ -1,5 +1,6 @@
 package com.aowen.monolith.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -21,6 +22,12 @@ fun NavController.navigateToHeroDetails(
 fun NavGraphBuilder.heroDetailsScreen() {
     composable(
         route = "$HeroDetailRoute/{heroId}/{heroName}",
+        enterTransition = {
+            slideIntoContainer(SlideDirection.Start)
+        },
+        exitTransition = {
+            slideOutOfContainer(SlideDirection.End)
+        },
         arguments = listOf(
             navArgument("heroId") {
                 type = NavType.StringType

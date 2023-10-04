@@ -1,12 +1,12 @@
 package com.aowen.monolith.ui.screens.playerdetails
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserRepository
@@ -65,14 +65,14 @@ class PlayerDetailsViewModel @Inject constructor(
                             isClaimed = !uiState.value.isClaimed
                         )
                     }
-                    Log.d("MONOLITH_DEBUG: ", "Successfully saved player")
+                    logDebug("Successfully saved player")
                 } else {
-                    Log.d("MONOLITH_DEBUG: ", "Failed to save player")
+                    logDebug("Failed to save player")
                 }
 
 
             } catch (e: Exception) {
-                Log.d("MONOLITH_DEBUG: ", e.toString())
+                logDebug(e.toString())
             }
         }
     }

@@ -13,24 +13,28 @@ data class PlayerDetails(
     val playerId: String = "",
     val playerName: String = "",
     val region: String? = null,
-    val rank: String = "",
+    val isRanked: Boolean = false,
+    val rank: Int = 0,
+    val rankTitle: String = "",
     val rankImage: String = "",
     val mmr: String? = null,
     val isMmrDisabled: Boolean = false,
     val isCheater: Boolean = false,
 
-)
+    )
 
 fun PlayerDto.create(): PlayerDetails {
     return PlayerDetails(
         playerId = this.id,
         playerName = this.displayName,
         region = this.region,
-        rank = this.rankTitle,
+        isRanked = this.isRanked,
+        rank = this.rank,
+        rankTitle = this.rankTitle,
         rankImage = RetrofitHelper.getRankImageUrl(this.rankImage),
         mmr = this.mmr?.toDecimal(),
-        isMmrDisabled = this.flags.any { it?.identifier == "mmr_disabled" },
-        isCheater = this.flags.any { it?.identifier == "cheater" }
+        isMmrDisabled = this.flags?.any { it?.identifier == "mmr_disabled" } ?: false,
+        isCheater = this.flags?.any { it?.identifier == "cheater" } ?: false
     )
 }
 

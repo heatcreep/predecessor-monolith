@@ -212,7 +212,7 @@ fun PlayerCard(
             Spacer(modifier = Modifier.size(16.dp))
             SubcomposeAsyncImage(
                 model = model,
-                contentDescription = player.rank
+                contentDescription = player.rankTitle
             ) {
                 val state = painter.state
                 if (state is AsyncImagePainter.State.Success) {
@@ -224,7 +224,7 @@ fun PlayerCard(
             ) {
 
                 Text(
-                    text = player.rank,
+                    text = player.rankTitle,
                     color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
@@ -290,7 +290,7 @@ fun PlayerCard(
                     statLabel = "Rank:",
                     statValue = {
                         Text(
-                            text = player.rank,
+                            text = player.rankTitle,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.secondary
                         )
@@ -399,7 +399,7 @@ fun PlayerCardPreview() {
             PlayerCard(
                 player = PlayerDetails(
                     playerName = "heatcreep.tv",
-                    rank = "Gold IV",
+                    rankTitle = "Gold IV",
                 ),
                 stats = PlayerStats(
                     favoriteHero = "Narbash",
