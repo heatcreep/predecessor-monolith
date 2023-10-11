@@ -3,6 +3,7 @@ package com.aowen.monolith.ui.screens.playerdetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
@@ -24,7 +25,9 @@ data class PlayerErrors(
     val matchesErrorMessage: String? = null,
     val matchesError: String? = null,
     val statsErrorMessage: String? = null,
-    val statsError: String? = null
+    val statsError: String? = null,
+    val heroesError: String? = null,
+    val heroesErrorMessage: String? = null
 )
 
 data class PlayerDetailsUiState(
@@ -33,6 +36,7 @@ data class PlayerDetailsUiState(
     val player: PlayerDetails = PlayerDetails(),
     val stats: PlayerStats = PlayerStats(),
     val matches: List<MatchDetails> = emptyList(),
+    val heroes: List<HeroDetails> = emptyList(),
     val playerId: String = "",
     val isClaimed: Boolean = false,
     val playerRankUrl: String? = "no image"
@@ -85,11 +89,13 @@ class PlayerDetailsViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val playerInfoDeferred = async { repository.fetchPlayerInfo(playerId) }
-            val matches = async { repository.fetchMatchesById(playerId) }
+            val matchesDeferred = async { repository.fetchMatchesById(playerId) }
+            val heroesDeferred = async { repository.fetchAllHeroes() }
             val playerIdDeferred = async { authRepository.getPlayer() }
 
             val playerInfoResult = playerInfoDeferred.await()
-            val matchesResult = matches.await()
+            val matchesResult = matchesDeferred.await()
+            val heroesResult = heroesDeferred.await()
             val playerIdResult = playerIdDeferred.await()
 
             if (playerInfoResult.isSuccess &&
@@ -97,6 +103,7 @@ class PlayerDetailsViewModel @Inject constructor(
                 playerIdResult.isSuccess
             ) {
                 val playerInfo = playerInfoResult.getOrNull()
+                val heroes = heroesResult.getOrNull() ?: emptyList()
                 val userPlayerId = playerIdResult.getOrNull()?.playerId ?: ""
                 val isClaimed = userPlayerId == playerId
                 _uiState.update {
@@ -108,6 +115,7 @@ class PlayerDetailsViewModel @Inject constructor(
                         player = playerInfo?.playerDetails ?: PlayerDetails(),
                         stats = playerInfo?.playerStats ?: PlayerStats(),
                         matches = matchesResult.getOrNull() ?: listOf(),
+                        heroes = heroes,
                         playerRankUrl = playerInfo?.playerDetails?.rankImage ?: "no image"
                     )
                 }
@@ -121,7 +129,9 @@ class PlayerDetailsViewModel @Inject constructor(
                             matchesErrorMessage = "Unable to fetch player matches.",
                             matchesError = matchesResult.exceptionOrNull()?.message,
                             statsErrorMessage = "Unable to fetch player stats.",
-                            statsError = playerInfoResult.exceptionOrNull()?.message
+                            statsError = playerInfoResult.exceptionOrNull()?.message,
+                            heroesErrorMessage = "Unable to fetch heroes.",
+
                         )
                     )
                 }

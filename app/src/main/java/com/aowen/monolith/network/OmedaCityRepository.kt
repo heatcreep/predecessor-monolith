@@ -60,11 +60,10 @@ class OmedaCityRepositoryImpl @Inject constructor(
     override suspend fun fetchMatchesById(playerId: String): Result<List<MatchDetails>?> {
         return try {
             val matchesResponse = playerApiService.getPlayerMatchesById(playerId)
-            val foo = matchesResponse.body()
             if (matchesResponse.isSuccessful) {
                 Result.success(matchesResponse.body()?.matches?.map { it.create() })
             } else {
-                Result.failure(Exception("Failed to fetch matches"))
+                Result.failure(Exception("Failed to fetch matches: Code ${matchesResponse.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

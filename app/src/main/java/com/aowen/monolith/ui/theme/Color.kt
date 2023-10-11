@@ -2,6 +2,7 @@ package com.aowen.monolith.ui.theme
 
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -53,6 +54,11 @@ fun inputFieldDefaults() = TextFieldDefaults.colors(
     unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimaryContainer,
     focusedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
     unfocusedTrailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+)
+
+@Composable
+fun dropDownDefaults() = MenuDefaults.itemColors(
+    textColor = MaterialTheme.colorScheme.onPrimaryContainer,
 )
 
 @Composable

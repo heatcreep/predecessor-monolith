@@ -1,7 +1,6 @@
 package com.aowen.monolith.ui.screens.herodetails
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -68,6 +67,7 @@ import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.getAbilityKey
 import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.SpiderChart
@@ -79,7 +79,6 @@ import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-const val PAGE_TAG = "HeroDetailsScreen"
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -115,7 +114,7 @@ fun HeroDetailsRoute(
                 val errorLog = uiState.heroDetailsErrors?.heroError
                     ?: uiState.heroDetailsErrors?.statisticsError
                     ?: "Something went wrong."
-                Log.d(PAGE_TAG, "Error: $errorLog")
+                logDebug(errorLog)
                 FullScreenErrorWithRetry(
                     errorMessage = errorMessage
                 ) {
