@@ -50,6 +50,7 @@ fun MatchesList(
     modifier: Modifier = Modifier,
     playerId: String? = "",
     matches: List<MatchDetails>? = null,
+    timeSinceMatch: (String) -> String = { _ -> "" },
     navigateToMatchDetails: (String) -> Unit = { _ -> }
 ) {
     Column {
@@ -74,6 +75,7 @@ fun MatchesList(
                             navigateToMatchDetails(match.matchId)
                         },
                         isWinner = isWinner,
+                        timeSinceMatch = timeSinceMatch(match.endTime),
                         playerHero = playerHero
                     )
                 }
@@ -86,6 +88,7 @@ fun MatchesList(
 fun MatchPlayerCard(
     modifier: Modifier = Modifier,
     isWinner: Boolean,
+    timeSinceMatch: String,
     playerHero: MatchPlayerDetails?,
 ) {
 
@@ -151,6 +154,12 @@ fun MatchPlayerCard(
                             text = "${if (isWinner) "+${it}" else it}MMR"
                         )
                     }
+                    Text(
+                        textAlign = TextAlign.Start,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        text = timeSinceMatch
+                    )
                 }
                 playerHero?.let {
                     Column {

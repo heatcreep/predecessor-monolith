@@ -1,6 +1,8 @@
 package com.aowen.monolith.ui.screens.playerdetails
 
 import android.content.res.Configuration
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -70,6 +72,7 @@ import com.aowen.monolith.ui.theme.MonolithTheme
 import kotlinx.coroutines.launch
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 internal fun PlayerDetailsRoute(
     modifier: Modifier = Modifier,
@@ -83,6 +86,7 @@ internal fun PlayerDetailsRoute(
         uiState = uiState,
         handleRetry = viewModel::initViewModel,
         modifier = modifier,
+        timeSinceMatch = viewModel::handleTimeSinceMatch,
         handleSavePlayer = viewModel::handleSavePlayer,
         handlePlayerHeroStatsSelect = viewModel::handlePlayerHeroStatsSelect,
         navigateToMatchDetails = navigateToMatchDetails
@@ -95,6 +99,7 @@ fun PlayerDetailScreen(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
+    timeSinceMatch: (String) -> String = { _ -> "" },
     handleSavePlayer: suspend (Boolean) -> Unit = {},
     handlePlayerHeroStatsSelect: (Int) -> Unit = { },
     navigateToMatchDetails: (String) -> Unit = { _ -> }
@@ -175,6 +180,7 @@ fun PlayerDetailScreen(
                             0 -> PlayerStatsTab(
                                 uiState = uiState,
                                 handleSavePlayer = handleSavePlayer,
+                                timeSinceMatch = timeSinceMatch,
                                 navigateToMatchDetails = navigateToMatchDetails
                             )
 
@@ -198,6 +204,7 @@ fun PlayerStatsTab(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
+    timeSinceMatch: (String) -> String = { _ -> "" },
     navigateToMatchDetails: (String) -> Unit = { _ -> }
 ) {
     if (uiState.isLoading) {
@@ -219,6 +226,7 @@ fun PlayerStatsTab(
                 MatchesList(
                     playerId = uiState.playerId,
                     matches = uiState.matches,
+                    timeSinceMatch = timeSinceMatch,
                     navigateToMatchDetails = navigateToMatchDetails
                 )
 
@@ -244,7 +252,7 @@ fun PlayerHeroStatsTab(
     LaunchedEffect(selectedHero) {
         handlePlayerHeroStatsSelect(selectedHero.id)
     }
-    if(uiState.isLoading) {
+    if (uiState.isLoading) {
         FullScreenLoadingIndicator("Hero Stats")
     } else {
         Column(

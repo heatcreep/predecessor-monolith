@@ -1,5 +1,7 @@
 package com.aowen.monolith.ui.screens.playerdetails
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +20,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 data class PlayerErrors(
@@ -69,6 +73,17 @@ class PlayerDetailsViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun handleTimeSinceMatch(endTime: String): String {
+        val zonedDateTime = ZonedDateTime.parse(endTime)
+        val startOfDay = zonedDateTime.toLocalDate().atStartOfDay(zonedDateTime.zone)
+        val now = ZonedDateTime.now(zonedDateTime.zone)
+        val duration = Duration.between(startOfDay, now).toHours()
+        val durationDays = Duration.between(startOfDay, now).toDays()
+        val daysText = if (durationDays == 1L) "day ago" else "days ago"
+        return if (duration < 24) "${duration}h ago" else "$durationDays $daysText"
     }
 
     suspend fun handleSavePlayer(isRemoving: Boolean = false) {
