@@ -33,7 +33,7 @@ fun KDAText(
         )
         Text(
             style = style,
-            text = averageKda?.get(1) ?: "0.0",
+            text = averageKda?.getOrNull(1) ?: "0.0",
             fontWeight = FontWeight.Bold,
             color = RedHighlight
         )
@@ -44,7 +44,7 @@ fun KDAText(
         )
         Text(
             style = style,
-            text = averageKda?.get(2) ?: "0.0",
+            text = averageKda?.getOrNull(2) ?: "0.0",
             fontWeight = FontWeight.Bold,
             color = BlueHighlight
         )

@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -124,7 +125,7 @@ fun MatchPlayerCard(
                 // Win/Loss + MMR Change
                 Column(
                     modifier = Modifier
-                        .width(68.dp),
+                        .width(72.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
@@ -147,7 +148,7 @@ fun MatchPlayerCard(
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.tertiary,
-                            text = "$it MMR"
+                            text = "${if (isWinner) "+${it}" else it}MMR"
                         )
                     }
                 }
@@ -179,11 +180,20 @@ fun MatchPlayerCard(
                                 )
                             }
                             Spacer(modifier = Modifier.size(8.dp))
-                            Text(
-                                text = it.hero,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+                            Column {
+                                Text(
+                                    text = it.hero,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                                Text(
+                                    text = "${it.performanceScore} PS",
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
                         }
                     }
                 }
@@ -241,6 +251,7 @@ fun MatchesListPreview() {
                                     playerName = "heatcreep.tv",
                                     hero = "Narbash",
                                     role = "offlane",
+                                    performanceScore = "94.6",
                                     mmrChange = "11.4",
                                     kills = 7,
                                     deaths = 2,
@@ -270,6 +281,7 @@ fun MatchesListPreview() {
                                     playerName = "heatcreep.tv",
                                     hero = "Phase",
                                     role = "jungle",
+                                    performanceScore = "140.8",
                                     mmrChange = "11.4",
                                     kills = 7,
                                     deaths = 2,
@@ -299,6 +311,7 @@ fun MatchesListPreview() {
                                     playerName = "heatcreep.tv",
                                     hero = "Morigesh",
                                     role = "midlane",
+                                    performanceScore = "78.2",
                                     mmrChange = "111.4",
                                     kills = 7,
                                     deaths = 2,
@@ -344,6 +357,7 @@ fun MatchesListPreviewLightMode() {
                                     hero = "Narbash",
                                     role = "offlane",
                                     mmrChange = "11.4",
+                                    performanceScore = "94.6",
                                     kills = 7,
                                     deaths = 2,
                                     assists = 12,
@@ -372,6 +386,7 @@ fun MatchesListPreviewLightMode() {
                                     hero = "Phase",
                                     role = "support",
                                     mmrChange = "11.4",
+                                    performanceScore = "140.8",
                                     kills = 7,
                                     deaths = 2,
                                     assists = 12,
@@ -400,6 +415,7 @@ fun MatchesListPreviewLightMode() {
                                     hero = "Morigesh",
                                     role = "midlane",
                                     mmrChange = "111.4",
+                                    performanceScore = "78.2",
                                     kills = 7,
                                     deaths = 2,
                                     assists = 12,

@@ -33,7 +33,7 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
         rankedImage = RetrofitHelper.getRankImageUrl(this.rankImage),
         hero = this.hero,
         role = this.role ?: "role unknown",
-        performanceScore = this.performanceScore,
+        performanceScore = this.performanceScore.toString(),
         performanceTitle = this.performanceTitle,
         kills = this.kills.toInt(),
         deaths = this.deaths.toInt(),

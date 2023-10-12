@@ -15,7 +15,7 @@ data class MatchPlayerDto(
     val hero: String,
     val role: String?,
     @SerializedName("performance_score")
-    val performanceScore: String,
+    val performanceScore: Double,
     @SerializedName("performance_title")
     val performanceTitle: String,
     val kills: Float,

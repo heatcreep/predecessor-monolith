@@ -60,6 +60,7 @@ import com.aowen.monolith.R
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
+import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.HeroSelectDropdown
@@ -535,8 +536,12 @@ fun HomeScreenPreview() {
             uiState = PlayerDetailsUiState(
                 isLoading = false,
                 player = PlayerDetails(
-                    playerName = "heatcreep.tv"
-                )
+                    playerName = "heatcreep.tv",
+                    rankTitle = "Platinum I"
+                ),
+                stats = PlayerStats(
+                    favoriteHero = "Narbash"
+                ),
             )
         )
     }
