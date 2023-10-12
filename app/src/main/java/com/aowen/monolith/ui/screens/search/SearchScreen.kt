@@ -11,21 +11,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -64,6 +68,7 @@ import coil.request.ImageRequest
 import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.ui.components.RefreshableContainer
 import com.aowen.monolith.ui.components.ShimmerCircle
 import com.aowen.monolith.ui.components.ShimmerLongText
 import com.aowen.monolith.ui.components.ShimmerShortText
@@ -90,12 +95,13 @@ internal fun SearchScreenRoute(
         handleSubmitSearch = searchScreenViewModel::handleSubmitSearch,
         handleClearSearch = searchScreenViewModel::handleClearSearch,
         navigateToPlayerDetails = navigateToPlayerDetails,
+        handlePullRefresh = searchScreenViewModel::initViewModel,
         handleAddToRecentSearch = searchScreenViewModel::handleAddToRecentSearch,
         modifier = modifier
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun SearchScreen(
     uiState: SearchScreenUiState,
@@ -103,185 +109,197 @@ fun SearchScreen(
     handleSubmitSearch: () -> Unit,
     handleClearSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
+    handlePullRefresh: () -> Unit,
     handleAddToRecentSearch: (PlayerDetails) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     val coroutineScope = rememberCoroutineScope()
     val tooltipState = remember { PlainTooltipState() }
+    val isRefreshing by remember { mutableStateOf(false) }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = handlePullRefresh
+    )
 
     LaunchedEffect(Unit) {
         if (uiState.searchFieldValue.isNotEmpty()) {
             handleClearSearch()
         }
     }
-
-    Surface(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        color = MaterialTheme.colorScheme.background
+    RefreshableContainer(
+        isRefreshing = isRefreshing,
+        pullRefreshState = pullRefreshState
     ) {
+        Surface(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            color = MaterialTheme.colorScheme.background
+        ) {
 
-        // Search bar
-        Column {
-            SearchBar(
-                searchLabel = "Player lookup",
-                searchValue = uiState.searchFieldValue,
-                setSearchValue = setSearchValue,
-                handleSubmitSearch = handleSubmitSearch,
-                handleClearSearch = handleClearSearch,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.size(16.dp))
-            Text(
-                text = "My Player",
-                color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .pullRefresh(pullRefreshState)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                SearchBar(
+                    searchLabel = "Player lookup",
+                    searchValue = uiState.searchFieldValue,
+                    setSearchValue = setSearchValue,
+                    handleSubmitSearch = handleSubmitSearch,
+                    handleClearSearch = handleClearSearch,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.size(16.dp))
+                Text(
+                    text = "My Player",
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.titleMedium
+                )
 
-            Spacer(modifier = Modifier.size(16.dp))
-            AnimatedContent(targetState = uiState.isLoading, label = "") {
-                if (it) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        PlayerLoadingCard(
-                            avatarSize = 64.dp,
-                            titleHeight = 16.dp,
-                            subtitleHeight = 12.dp,
-                            titleWidth = 100.dp,
-                            subtitleWidth = 200.dp,
-                        )
-                    }
-                } else {
-                    if (uiState.error != null) {
-                        Text(
-                            text = uiState.error,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                Spacer(modifier = Modifier.size(16.dp))
+                AnimatedContent(targetState = uiState.isLoading, label = "") {
+                    if (it) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            PlayerLoadingCard(
+                                avatarSize = 64.dp,
+                                titleHeight = 16.dp,
+                                subtitleHeight = 12.dp,
+                                titleWidth = 100.dp,
+                                subtitleWidth = 200.dp,
+                            )
+                        }
                     } else {
-                        if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
-                            ClaimedPlayerCard(
-                                playerDetails = uiState.claimedPlayerDetails,
-                                playerStats = uiState.claimedPlayerStats,
-                                navigateToPlayerDetails = {
-                                    handleAddToRecentSearch(uiState.claimedPlayerDetails)
-                                    navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
-                                }
+                        if (uiState.error != null) {
+                            Text(
+                                text = uiState.error,
+                                color = MaterialTheme.colorScheme.secondary
                             )
                         } else {
+                            if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
+                                ClaimedPlayerCard(
+                                    playerDetails = uiState.claimedPlayerDetails,
+                                    playerStats = uiState.claimedPlayerStats,
+                                    navigateToPlayerDetails = {
+                                        handleAddToRecentSearch(uiState.claimedPlayerDetails)
+                                        navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
+                                    }
+                                )
+                            } else {
+                                Text(
+                                    text = "No player claimed! Navigate to a player's profile and click the" +
+                                            " 'Claim Player' button to claim a player.",
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AnimatedContent(targetState = uiState.playersList.isNotEmpty(), label = "") {
+                        Text(
+                            text = if (it) {
+                                "Search Results"
+                            } else {
+                                "Recent Searches"
+                            },
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                    PlainTooltipBox(
+                        tooltip = {
+                            Text(text = "We hide cheaters and players with MMR disabled from the search results.")
+                        },
+                        tooltipState = tooltipState
+                    ) {
+                        IconButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    tooltipState.show()
+                                }
+                            },
+                            modifier = Modifier.tooltipAnchor()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                AnimatedContent(
+                    targetState = (uiState.isLoading || uiState.isLoadingSearch),
+                    label = ""
+                ) {
+                    if (it) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            repeat(7) {
+                                PlayerLoadingCard(
+                                    titleWidth = 100.dp,
+                                    subtitleWidth = 75.dp
+                                )
+                            }
+
+                        }
+                    } else {
+                        if (uiState.error != null) {
                             Text(
-                                text = "No player claimed! Navigate to a player's profile and click the" +
-                                        " 'Claim Player' button to claim a player.",
+                                text = uiState.error,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        } else if (uiState.playersList.isNotEmpty()) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                uiState.playersList.forEach { player ->
+
+                                    player?.let {
+                                        PlayerResultCard(
+                                            playerDetails = player,
+                                            navigateToPlayerDetails = {
+                                                handleAddToRecentSearch(player)
+                                                navigateToPlayerDetails(player.playerId)
+                                            }
+                                        )
+                                    }
+                                }
+
+                            }
+                        } else if (uiState.recentSearchesList.isNotEmpty()) {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                uiState.recentSearchesList.forEach { player ->
+                                    player?.let {
+                                        PlayerResultCard(
+                                            playerDetails = player,
+                                            navigateToPlayerDetails = {
+                                                handleAddToRecentSearch(player)
+                                                navigateToPlayerDetails(player.playerId)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            Text(
+                                text = "No recent searches",
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.size(16.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AnimatedContent(targetState = uiState.playersList.isNotEmpty(), label = "") {
-                    Text(
-                        text = if (it) {
-                            "Search Results"
-                        } else {
-                            "Recent Searches"
-                        },
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-                PlainTooltipBox(
-                    tooltip = {
-                        Text(text = "We hide cheaters and players with MMR disabled from the search results.")
-                    },
-                    tooltipState = tooltipState
-                ) {
-                    IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                tooltipState.show()
-                            }
-                        },
-                        modifier = Modifier.tooltipAnchor()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.size(16.dp))
-            AnimatedContent(
-                targetState = (uiState.isLoading || uiState.isLoadingSearch),
-                label = ""
-            ) {
-                if (it) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        repeat(7) {
-                            PlayerLoadingCard(
-                                titleWidth = 100.dp,
-                                subtitleWidth = 75.dp
-                            )
-                        }
-
-                    }
-                } else {
-                    if (uiState.error != null) {
-                        Text(
-                            text = uiState.error,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    } else if (uiState.playersList.isNotEmpty()) {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(
-                                uiState.playersList,
-                                key = { player -> player?.playerId ?: "" }
-                            ) { player ->
-
-                                player?.let {
-                                    PlayerResultCard(
-                                        playerDetails = player,
-                                        navigateToPlayerDetails = {
-                                            handleAddToRecentSearch(player)
-                                            navigateToPlayerDetails(player.playerId)
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    } else if (uiState.recentSearchesList.isNotEmpty()) {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(uiState.recentSearchesList) { player ->
-                                player?.let {
-                                    PlayerResultCard(
-                                        playerDetails = player,
-                                        navigateToPlayerDetails = {
-                                            handleAddToRecentSearch(player)
-                                            navigateToPlayerDetails(player.playerId)
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        Text(
-                            text = "No recent searches",
-                            color = MaterialTheme.colorScheme.secondary
-                        )
                     }
                 }
             }
@@ -647,7 +665,8 @@ fun SearchScreenPreview() {
                 handleSubmitSearch = {},
                 handleClearSearch = {},
                 navigateToPlayerDetails = {},
-                handleAddToRecentSearch = {}
+                handleAddToRecentSearch = {},
+                handlePullRefresh = {}
             )
         }
     }

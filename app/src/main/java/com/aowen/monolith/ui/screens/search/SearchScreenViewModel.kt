@@ -51,6 +51,7 @@ class SearchScreenViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
+                            error = null,
                             claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
                             claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
                             recentSearchesList = recentSearchesResult
