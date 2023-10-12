@@ -19,6 +19,7 @@ import javax.inject.Inject
 data class SearchScreenUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
+    val searchError: String? = null,
     val isLoadingSearch: Boolean = false,
     val playersList: List<PlayerDetails?> = emptyList(),
     val recentSearchesList: List<PlayerDetails?> = emptyList(),
@@ -90,7 +91,9 @@ class SearchScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 searchFieldValue = "",
-                playersList = emptyList()
+                playersList = emptyList(),
+                error = null,
+                searchError = null
             )
         }
     }
@@ -119,9 +122,7 @@ class SearchScreenViewModel @Inject constructor(
                         it.copy(
                             isLoadingSearch = false,
                             playersList = filteredList ?: emptyList(),
-                            initPlayersListText = if (filteredList?.isEmpty() == true) {
-                                "Couldn't find any players that match your search"
-                            } else null
+                            searchError = if(filteredList.isNullOrEmpty()) "No results found" else null
                         )
                     }
                 }

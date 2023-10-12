@@ -202,7 +202,10 @@ fun SearchScreen(
                 }
                 Spacer(modifier = Modifier.size(16.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    AnimatedContent(targetState = uiState.playersList.isNotEmpty(), label = "") {
+                    AnimatedContent(
+                        targetState = (uiState.playersList.isNotEmpty() || uiState.searchError != null),
+                        label = ""
+                    ) {
                         Text(
                             text = if (it) {
                                 "Search Results"
@@ -217,7 +220,8 @@ fun SearchScreen(
                         tooltip = {
                             Text(text = "We hide cheaters and players with MMR disabled from the search results.")
                         },
-                        tooltipState = tooltipState
+                        tooltipState = tooltipState,
+                        modifier = Modifier.align(Alignment.CenterVertically)
                     ) {
                         IconButton(
                             onClick = {
@@ -260,12 +264,16 @@ fun SearchScreen(
                                 text = uiState.error,
                                 color = MaterialTheme.colorScheme.secondary
                             )
+                        } else if (uiState.searchError != null) {
+                            Text(
+                                text = uiState.searchError,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
                         } else if (uiState.playersList.isNotEmpty()) {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 uiState.playersList.forEach { player ->
-
                                     player?.let {
                                         PlayerResultCard(
                                             playerDetails = player,
