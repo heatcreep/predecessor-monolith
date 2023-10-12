@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
@@ -22,6 +23,9 @@ import javax.inject.Inject
 data class PlayerErrors(
     val playerInfoErrorMessage: String? = null,
     val playerInfoError: String? = null,
+    val heroStatsErrorMessage: String? = null,
+    val heroStatsError: String? = null,
+    val heroStatsErrorMessages: String? = null,
     val matchesErrorMessage: String? = null,
     val matchesError: String? = null,
     val statsErrorMessage: String? = null,
@@ -34,6 +38,8 @@ data class PlayerDetailsUiState(
     val isLoading: Boolean = true,
     val playerErrors: PlayerErrors? = null,
     val player: PlayerDetails = PlayerDetails(),
+    val heroStats: List<PlayerHeroStats> = emptyList(),
+    val selectedHeroStats: PlayerHeroStats? = null,
     val stats: PlayerStats = PlayerStats(),
     val matches: List<MatchDetails> = emptyList(),
     val heroes: List<HeroDetails> = emptyList(),
@@ -54,6 +60,16 @@ class PlayerDetailsViewModel @Inject constructor(
     val uiState: StateFlow<PlayerDetailsUiState> = _uiState
 
     private val playerId: String = checkNotNull(savedStateHandle["playerId"])
+
+    fun handlePlayerHeroStatsSelect(heroId: Int) {
+        _uiState.update {
+            it.copy(
+                selectedHeroStats = uiState.value.heroStats.find { stat ->
+                    stat.heroId == heroId
+                }
+            )
+        }
+    }
 
     suspend fun handleSavePlayer(isRemoving: Boolean = false) {
         val id = if (isRemoving) "" else playerId
@@ -88,21 +104,25 @@ class PlayerDetailsViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
+            val playerIdDeferred = async { authRepository.getPlayer() }
             val playerInfoDeferred = async { repository.fetchPlayerInfo(playerId) }
+            val playerHeroStatsDeferred = async { repository.fetchAllPlayerHeroStats(playerId) }
             val matchesDeferred = async { repository.fetchMatchesById(playerId) }
             val heroesDeferred = async { repository.fetchAllHeroes() }
-            val playerIdDeferred = async { authRepository.getPlayer() }
 
+            val playerIdResult = playerIdDeferred.await()
             val playerInfoResult = playerInfoDeferred.await()
+            val playerHeroStatsResult = playerHeroStatsDeferred.await()
             val matchesResult = matchesDeferred.await()
             val heroesResult = heroesDeferred.await()
-            val playerIdResult = playerIdDeferred.await()
 
             if (playerInfoResult.isSuccess &&
+                playerHeroStatsResult.isSuccess &&
                 matchesResult.isSuccess &&
                 playerIdResult.isSuccess
             ) {
                 val playerInfo = playerInfoResult.getOrNull()
+                val playerHeroStats = playerHeroStatsResult.getOrNull() ?: emptyList()
                 val heroes = heroesResult.getOrNull() ?: emptyList()
                 val userPlayerId = playerIdResult.getOrNull()?.playerId ?: ""
                 val isClaimed = userPlayerId == playerId
@@ -113,6 +133,7 @@ class PlayerDetailsViewModel @Inject constructor(
                         playerId = playerId,
                         isClaimed = isClaimed,
                         player = playerInfo?.playerDetails ?: PlayerDetails(),
+                        heroStats = playerHeroStats,
                         stats = playerInfo?.playerStats ?: PlayerStats(),
                         matches = matchesResult.getOrNull() ?: listOf(),
                         heroes = heroes,
@@ -126,12 +147,13 @@ class PlayerDetailsViewModel @Inject constructor(
                         playerErrors = PlayerErrors(
                             playerInfoErrorMessage = "Unable to fetch player info.",
                             playerInfoError = playerInfoResult.exceptionOrNull()?.message,
+                            heroStatsErrorMessage = "Unable to fetch player hero stats.",
+                            heroStatsError = playerHeroStatsResult.exceptionOrNull()?.message,
                             matchesErrorMessage = "Unable to fetch player matches.",
                             matchesError = matchesResult.exceptionOrNull()?.message,
                             statsErrorMessage = "Unable to fetch player stats.",
                             statsError = playerInfoResult.exceptionOrNull()?.message,
                             heroesErrorMessage = "Unable to fetch heroes.",
-
                         )
                     )
                 }

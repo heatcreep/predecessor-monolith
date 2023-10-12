@@ -39,7 +39,7 @@ data class AbilityDto(
 )
 
 data class HeroDto(
-    val id: String,
+    val id: Int,
     val name: String,
     @SerializedName("display_name")
     val displayName: String,

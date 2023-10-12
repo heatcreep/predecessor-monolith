@@ -93,7 +93,7 @@ fun HeroesScreen(
     onFilterHeroes: () -> Unit,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
-    navigateToHeroDetails: (heroId: String, heroName: String) -> Unit = { _, _ -> },
+    navigateToHeroDetails: (heroId: Int, heroName: String) -> Unit = { _, _ -> },
 ) {
 
     var expanded by remember { mutableStateOf(false) }

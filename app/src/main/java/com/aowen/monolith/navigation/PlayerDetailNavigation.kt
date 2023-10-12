@@ -6,8 +6,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.ui.screens.playerdetails.PlayerDetailsRoute
 
 const val PlayerDetailRoute = "player-detail"

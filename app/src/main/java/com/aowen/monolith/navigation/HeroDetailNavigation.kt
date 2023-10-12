@@ -12,7 +12,7 @@ import com.aowen.monolith.ui.screens.herodetails.HeroDetailsRoute
 const val HeroDetailRoute = "hero-detail"
 
 fun NavController.navigateToHeroDetails(
-    heroId: String,
+    heroId: Int,
     heroName: String,
     navOptions: NavOptions? = null
 ) {

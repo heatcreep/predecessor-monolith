@@ -29,7 +29,7 @@ import com.aowen.monolith.ui.theme.MonolithTheme
 
 @Composable
 fun PlayerIcon(
-    heroImageId: Int,
+    heroImageId: Int? = null,
     heroIconSize: Dp = 52.dp,
     roleIcon: (@Composable BoxScope.() -> Unit)? = null
 ) {
@@ -49,7 +49,7 @@ fun PlayerIcon(
                     shape = CircleShape
                 ),
             contentScale = ContentScale.Crop,
-            painter = painterResource(id = heroImageId),
+            painter = painterResource(id = heroImageId ?: R.drawable.unknown),
             contentDescription = null
         )
         if (roleIcon != null) {

@@ -3,7 +3,7 @@ package com.aowen.monolith.ui.components
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,39 +35,40 @@ import com.aowen.monolith.ui.theme.inputFieldDefaults
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HeroSelectDropdown(
-    heroes: List<HeroDetails>
+    selectedHero: HeroDetails,
+    onSelect: (HeroDetails) -> Unit,
+    heroes: List<HeroDetails>,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
-    var selectedHero by remember { mutableStateOf<HeroDetails?>(null) }
 
-    val heroImage = selectedHero?.imageId ?: HeroImage.UNKNOWN.drawableId
+    val heroImage = selectedHero.imageId ?: HeroImage.UNKNOWN.drawableId
 
-    Column(
-        modifier = Modifier
+    Box(
+        modifier = modifier
             .fillMaxWidth()
     ) {
         ExposedDropdownMenuBox(
-            modifier = Modifier.fillMaxWidth(),
             expanded = expanded,
             onExpandedChange = {
                 expanded = !expanded
             }
         ) {
             TextField(
-                value = selectedHero?.displayName ?: "All",
+                value = selectedHero.displayName,
                 onValueChange = {},
                 readOnly = true,
                 textStyle = MaterialTheme.typography.bodyMedium,
                 colors = inputFieldDefaults(),
-                leadingIcon = if (selectedHero?.imageId != null) {
+                leadingIcon = if (selectedHero.imageId != null) {
                     {
                         Image(
                             painter = painterResource(id = heroImage),
                             modifier = Modifier
                                 .clip(CircleShape)
                                 .size(36.dp),
-                            contentDescription = selectedHero?.displayName ?: "All heroes"
+                            contentDescription = selectedHero.displayName
                         )
                     }
                 } else null,
@@ -86,7 +87,6 @@ internal fun HeroSelectDropdown(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                DropdownMenuItem(text = { Text(text = "All") }, onClick = { selectedHero = null })
                 heroes.forEach { hero ->
                     val image = hero.imageId ?: HeroImage.UNKNOWN.drawableId
                     DropdownMenuItem(
@@ -106,7 +106,7 @@ internal fun HeroSelectDropdown(
                         },
                         colors = dropDownDefaults(),
                         onClick = {
-                            selectedHero = hero
+                            onSelect(hero)
 
                             expanded = false
                             Toast.makeText(

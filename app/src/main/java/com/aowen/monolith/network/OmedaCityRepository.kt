@@ -5,8 +5,10 @@ import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
+import com.aowen.monolith.logDebug
 import javax.inject.Inject
 
 interface OmedaCityRepository {
@@ -14,6 +16,8 @@ interface OmedaCityRepository {
     suspend fun fetchPlayersByName(playerName: String): Result<List<PlayerDetails>?>
 
     suspend fun fetchPlayerInfo(playerId: String): Result<PlayerInfo>
+
+    suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>?>
 
     // Matches
     suspend fun fetchMatchesById(playerId: String): Result<List<MatchDetails>?>
@@ -50,6 +54,20 @@ class OmedaCityRepositoryImpl @Inject constructor(
                         playerStats = playerStatsResponse.body()?.create()
                     )
                 )
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>?> {
+        return try {
+            val playerHeroStatsResponse = playerApiService.getPlayerHeroStatsById(playerId)
+            if (playerHeroStatsResponse.isSuccessful) {
+                Result.success(playerHeroStatsResponse.body()?.heroStatistics?.map { it.create() })
+            } else {
+                logDebug(playerHeroStatsResponse.errorBody()?.string() ?: "No error body")
+                Result.failure(Exception("Failed to fetch player hero stats"))
             }
         } catch (e: Exception) {
             Result.failure(e)
