@@ -48,7 +48,7 @@ class HeroesScreenViewModel @Inject constructor(
 
     fun getFilteredHeroes() {
         // if both role filters and search field are empty, return all heroes
-        val foo =
+        val currentHeroes =
             if (uiState.value.selectedRoleFilters.isEmpty() && uiState.value.searchFieldValue.isEmpty()) {
                 uiState.value.allHeroes
                 // if search field is empty, filter by role filters
@@ -74,7 +74,7 @@ class HeroesScreenViewModel @Inject constructor(
                 }
             }
 
-        _uiState.update { it.copy(currentHeroes = foo) }
+        _uiState.update { it.copy(currentHeroes = currentHeroes) }
     }
 
     init {

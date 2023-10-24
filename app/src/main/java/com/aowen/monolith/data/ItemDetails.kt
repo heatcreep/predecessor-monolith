@@ -182,7 +182,7 @@ data class ItemDetails(
     val image: String = "",
     val price: Int? = 0,
     val totalPrice: Int = 0,
-    val slotType: String? = "",
+    val slotType: SlotType = SlotType.PASSIVE,
     val rarity: Rarity = Rarity.COMMON,
     val aggressionType: String? = null,
     val heroClass: String? = null,
@@ -203,6 +203,13 @@ fun ItemDto.create(): ItemDetails {
         "Legendary" -> Rarity.LEGENDARY
         else -> Rarity.COMMON
     }
+
+    val slotType = when (this.slotType) {
+        "Trinket" -> SlotType.TRINKET
+        "Crest" -> SlotType.CREST
+        "Active" -> SlotType.ACTIVE
+        else -> SlotType.PASSIVE
+    }
     return ItemDetails(
         id = this.id,
         gameId = this.gameId,
@@ -211,7 +218,7 @@ fun ItemDto.create(): ItemDetails {
         image = RetrofitHelper.getRankImageUrl(this.image),
         price = this.price ?: 0,
         totalPrice = this.totalPrice,
-        slotType = this.slotType,
+        slotType = slotType,
         rarity = rarity,
         aggressionType = this.aggressionType,
         heroClass = this.heroClass,
@@ -229,9 +236,16 @@ fun Float.toPercentageString(): String {
 
 
 enum class Rarity(val value: String) {
-    COMMON("Common"),
-    UNCOMMON("Uncommon"),
-    RARE("Rare"),
-    EPIC("Epic"),
-    LEGENDARY("Legendary"),
+    COMMON("Tier I"),
+    UNCOMMON("Tier I"),
+    RARE("Tier II"),
+    EPIC("Tier III"),
+    LEGENDARY("Tier III"),
+}
+
+enum class SlotType(val value: String) {
+    TRINKET("Trinket"),
+    CREST("Crest"),
+    ACTIVE("Active"),
+    PASSIVE("Passive")
 }

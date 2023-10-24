@@ -8,7 +8,7 @@ androidXLifecycleRuntimeKtx = "2.6.1"
 androidXComposeMaterial3 = "1.1.1"
 androidXTestExt = "1.1.5"
 coilCompose = "2.2.2"
-composeBom = "2023.09.02"
+composeBom = "2023.10.00"
 composeCoil = "2.0.0"
 composeNavigation = "2.7.3"
 daggerHilt = "2.47"
@@ -35,6 +35,7 @@ androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espres
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidXLifecycleRuntimeKtx" }
 androidx-test-ext = { module = "androidx.test.ext:junit", version.ref = "androidXTestExt" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "androidXComposeMaterial3" }
 androidx-compose-navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavigation" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
