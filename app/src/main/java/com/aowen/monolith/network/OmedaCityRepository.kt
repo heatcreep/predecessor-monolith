@@ -26,6 +26,8 @@ interface OmedaCityRepository {
     // Items
     suspend fun fetchAllItems(): Result<List<ItemDetails>?>
 
+    suspend fun fetchItemByName(itemName: String): Result<ItemDetails?>
+
     // Heroes
     suspend fun fetchAllHeroes(): Result<List<HeroDetails>?>
 
@@ -135,6 +137,19 @@ class OmedaCityRepositoryImpl @Inject constructor(
                 Result.success(itemsResponse.body()?.map { it.create() })
             } else {
                 Result.failure(Exception("Failed to fetch items"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun fetchItemByName(itemName: String): Result<ItemDetails?> {
+        return try {
+            val itemResponse = playerApiService.getItemByName(itemName)
+            if (itemResponse.isSuccessful) {
+                Result.success(itemResponse.body()?.create())
+            } else {
+                Result.failure(Exception("Failed to fetch item"))
             }
         } catch (e: Exception) {
             Result.failure(e)

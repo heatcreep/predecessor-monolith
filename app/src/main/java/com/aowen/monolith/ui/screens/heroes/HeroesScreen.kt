@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
+import com.aowen.monolith.R
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.HeroRole
@@ -245,7 +246,7 @@ fun HeroCard(
     onClick: () -> Unit = {}
 ) {
 
-    val image = hero.imageId ?: HeroImage.NARBASH.drawableId
+    val image = hero.imageId ?: R.drawable.unknown
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))

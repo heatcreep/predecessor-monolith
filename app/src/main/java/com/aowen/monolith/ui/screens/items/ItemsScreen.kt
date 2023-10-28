@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,6 +56,7 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.StatDetails
+import com.aowen.monolith.navigation.navigateToItemDetails
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
@@ -68,6 +70,7 @@ fun ItemsScreenRoute(
     val uiState by viewModel.uiState.collectAsState()
     ItemsScreen(
         uiState = uiState,
+        navigateToItemDetails = navController::navigateToItemDetails,
         onSelectTier = viewModel::onSelectTier,
         onClearTierFilter = viewModel::onClearTier,
         onSelectStat = viewModel::onSelectStat,
@@ -79,6 +82,7 @@ fun ItemsScreenRoute(
 @Composable
 fun ItemsScreen(
     uiState: ItemsUiState,
+    navigateToItemDetails: (String) -> Unit = {},
     onSelectTier: (String) -> Unit = {},
     onClearTierFilter: () -> Unit = {},
     onSelectStat: (String) -> Unit = {},
@@ -149,7 +153,10 @@ fun ItemsScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(uiState.filteredItems) { item ->
-                            ItemCard(itemDetails = item)
+                            ItemCard(
+                                itemDetails = item,
+                                navigateToItemDetails = { navigateToItemDetails(item.name) }
+                            )
                         }
                     }
                 }
@@ -294,7 +301,8 @@ fun RowScope.StatFilterDropdown(
 @Composable
 fun ItemCard(
     itemDetails: ItemDetails,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToItemDetails: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val model = ImageRequest.Builder(context)
@@ -305,7 +313,11 @@ fun ItemCard(
         .crossfade(true)
         .build()
 
-    Card {
+    Card(
+        modifier = Modifier.clickable {
+            navigateToItemDetails()
+        }
+    ) {
         Column(
             modifier = modifier
                 .fillMaxWidth()

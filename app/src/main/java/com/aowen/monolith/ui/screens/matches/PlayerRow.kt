@@ -49,10 +49,10 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.RoleImage
+import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getKda
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.KDAText
@@ -68,10 +68,6 @@ fun PlayerRow(
 ) {
 
     var expanded by rememberSaveable { mutableStateOf(false) }
-
-    val heroImage = HeroImage.values().first {
-        it.heroName == player.hero
-    }
 
     val roleImage = RoleImage.values().first {
         it.roleName == player.role
@@ -132,7 +128,7 @@ fun PlayerRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     PlayerIcon(
-                        heroImageId = heroImage.drawableId,
+                        heroImageId = getHeroImage(player.hero).drawableId,
                     ) {
                         Image(
                             modifier = Modifier

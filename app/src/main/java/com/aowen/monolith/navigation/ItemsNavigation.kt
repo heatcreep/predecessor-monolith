@@ -39,4 +39,5 @@ fun NavGraphBuilder.itemsScreen(
     ) {
         ItemsScreenRoute(navController)
     }
+    itemDetailsScreen()
 }

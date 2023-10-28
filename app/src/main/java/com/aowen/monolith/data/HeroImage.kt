@@ -45,10 +45,11 @@ enum class HeroImage(val heroName: String, val drawableId: Int) {
     SPARROW("Sparrow", R.drawable.sparrow),
     STEEL("Steel", R.drawable.steel),
     TWINBLAST("TwinBlast", R.drawable.twinblast),
+    WRAITH("Wraith", R.drawable.wraith),
     ZARUS("Zarus", R.drawable.zarus),
     UNKNOWN("Unknown", R.drawable.unknown),
 }
 
-fun getHeroImage(heroName: String?) = HeroImage.values().first {
+fun getHeroImage(heroName: String?) = HeroImage.values().firstOrNull {
     it.heroName == heroName
-}
+} ?: HeroImage.UNKNOWN

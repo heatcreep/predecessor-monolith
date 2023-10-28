@@ -52,7 +52,7 @@ fun ItemDetailsBottomSheet(
         onDismissRequest = closeBottomSheet,
         sheetState = sheetState,
     ) {
-        ItemDetailsBottomSheetContent(
+        ItemDetailsContent(
             modifier = modifier,
             itemDetails = itemDetails
         )
@@ -60,7 +60,7 @@ fun ItemDetailsBottomSheet(
 }
 
 @Composable
-fun ItemDetailsBottomSheetContent(
+fun ItemDetailsContent(
     modifier: Modifier = Modifier,
     itemDetails: ItemDetails
 ) {
@@ -171,7 +171,7 @@ fun ItemDetailsBottomSheetContent(
 fun ItemDetailsBottomSheetPreview() {
     MonolithTheme {
         Surface {
-            ItemDetailsBottomSheetContent(
+            ItemDetailsContent(
                 itemDetails = ItemDetails(
                     image = "https://omeda.city/images/items/Refillable-Potion.webp",
                     name = "Refillable Potion",

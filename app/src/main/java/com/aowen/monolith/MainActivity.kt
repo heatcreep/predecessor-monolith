@@ -3,6 +3,7 @@ package com.aowen.monolith
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,16 +14,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.ui.MonolithApp
 import com.aowen.monolith.ui.theme.MonolithTheme
+import com.aowen.monolith.viewmodel.auth.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.handleDeeplinks
@@ -34,24 +31,18 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var supabaseClient: SupabaseClient
 
-    private lateinit var callback: (String) -> Unit
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supabaseClient.handleDeeplinks(intent = intent,
             onSessionSuccess = { userSession ->
                 userSession.user?.apply {
-                    callback(this.id)
+                    viewModel.callback(this.id)
                 }
             }
         )
         setContent {
-            var userIdState by remember { mutableStateOf("") }
-            LaunchedEffect(Unit) {
-                callback = { userId ->
-                    userIdState = userId
-                }
-            }
             MonolithTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -59,7 +50,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MonolithApp(
-                        userId = userIdState
+                        userId = viewModel.uiState.value.userId ?: ""
                     )
                 }
             }

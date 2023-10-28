@@ -42,6 +42,7 @@ fun ItemEffectRow(effect: EffectDetails) {
         Text(
             text = AnnotatedString(combinedEffect, spanStyles),
             style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.secondary,
             overflow = TextOverflow.Visible
         )
     }

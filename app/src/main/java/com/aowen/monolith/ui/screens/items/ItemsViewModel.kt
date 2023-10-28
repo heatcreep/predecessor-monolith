@@ -72,7 +72,7 @@ class ItemsViewModel @Inject constructor(
                 }
             } else {
                 val sortedItems = allItems.sortedBy {
-                    it.id
+                    it.displayName
                 }
                 _uiState.update {
                     it.copy(

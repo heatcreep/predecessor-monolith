@@ -47,4 +47,7 @@ interface OmedaCityService {
 
     @GET("items.json")
     suspend fun getAllItems(): Response<List<ItemDto>>
+
+    @GET("items/{item_name}.json")
+    suspend fun getItemByName(@Path("item_name") itemName: String): Response<ItemDto>
 }
