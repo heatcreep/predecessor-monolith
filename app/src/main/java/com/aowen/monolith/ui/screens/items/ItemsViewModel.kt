@@ -36,6 +36,7 @@ val defaultStats = listOf(
 
 data class ItemsUiState(
     val isLoading: Boolean = true,
+    val searchFieldValue: String = "",
     val selectedTierFilter: String? = null,
     val allItems: List<ItemDetails> = emptyList(),
     val filteredItems: List<ItemDetails> = emptyList(),
@@ -92,6 +93,12 @@ class ItemsViewModel @Inject constructor(
         }
     }
 
+    fun onSetSearchValue(value: String) {
+        _uiState.update {
+            it.copy(searchFieldValue = value)
+        }
+    }
+
     fun onSelectTier(tier: String) {
         _uiState.update {
             it.copy(selectedTierFilter = tier)
@@ -120,6 +127,12 @@ class ItemsViewModel @Inject constructor(
         }
     }
 
+    fun onClearSearch() {
+        _uiState.update {
+            it.copy(searchFieldValue = "")
+        }
+    }
+
     fun getFilteredItems() {
         val itemsByTier =
             uiState.value.allItems.filterOrOriginal {
@@ -133,8 +146,12 @@ class ItemsViewModel @Inject constructor(
             }
         }
 
+        val itemsBySearch = itemsByStats.filter { item ->
+            item.displayName.contains(uiState.value.searchFieldValue, ignoreCase = true)
+        }
+
         _uiState.update {
-            it.copy(filteredItems = itemsByStats)
+            it.copy(filteredItems = itemsBySearch)
         }
     }
 }

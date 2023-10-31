@@ -57,6 +57,7 @@ import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.StatDetails
 import com.aowen.monolith.navigation.navigateToItemDetails
+import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
@@ -71,6 +72,8 @@ fun ItemsScreenRoute(
     ItemsScreen(
         uiState = uiState,
         navigateToItemDetails = navController::navigateToItemDetails,
+        onSetSearchValue = viewModel::onSetSearchValue,
+        onClearSearch = viewModel::onClearSearch,
         onSelectTier = viewModel::onSelectTier,
         onClearTierFilter = viewModel::onClearTier,
         onSelectStat = viewModel::onSelectStat,
@@ -83,6 +86,8 @@ fun ItemsScreenRoute(
 fun ItemsScreen(
     uiState: ItemsUiState,
     navigateToItemDetails: (String) -> Unit = {},
+    onSetSearchValue: (String) -> Unit = {},
+    onClearSearch: () -> Unit = {},
     onSelectTier: (String) -> Unit = {},
     onClearTierFilter: () -> Unit = {},
     onSelectStat: (String) -> Unit = {},
@@ -90,7 +95,11 @@ fun ItemsScreen(
     onFilterItems: () -> Unit = {}
 ) {
 
-    LaunchedEffect(key1 = uiState.selectedTierFilter, key2 = uiState.selectedStatFilters) {
+    LaunchedEffect(
+        key1 = uiState.selectedTierFilter,
+        key2 = uiState.selectedStatFilters,
+        key3 = uiState.searchFieldValue
+    ) {
         onFilterItems()
     }
 
@@ -117,6 +126,13 @@ fun ItemsScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
+                    SearchBar(
+                        searchLabel = "Item lookup",
+                        searchValue = uiState.searchFieldValue,
+                        setSearchValue = onSetSearchValue,
+                        modifier = Modifier.fillMaxWidth(),
+                        handleClearSearch = onClearSearch
+                    )
                     Text(text = "Filters:", style = MaterialTheme.typography.bodyMedium)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
