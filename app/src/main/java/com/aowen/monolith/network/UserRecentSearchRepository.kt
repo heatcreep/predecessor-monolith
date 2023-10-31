@@ -22,6 +22,9 @@ interface UserRecentSearchRepository {
 
     suspend fun getRecentSearches(): List<PlayerDetails>
     suspend fun addRecentSearch(playerDetails: PlayerDetails): Boolean
+    suspend fun removeRecentSearch(playerId: String)
+
+    suspend fun removeAllRecentSearches()
 }
 
 class UserRecentSearchRepositoryImpl @Inject constructor(
@@ -81,7 +84,9 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                             }
                             postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
                         } else {
-                            postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
+                            if(playerSearchDto.playerId != UUID.fromString(user.playerId)) {
+                                postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
+                            }
                         }
                     } else {
                         postgrest[TABLE_RECENT_PROFILES].update(playerSearchDto) {
@@ -97,6 +102,41 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             logDebug(e.toString())
             false
+        }
+    }
+
+    override suspend fun removeRecentSearch(playerId: String) {
+        val user = userRepository.getUser()
+        try {
+            if (user?.id == null) {
+                return
+            } else {
+                withContext(Dispatchers.IO) {
+                    postgrest[TABLE_RECENT_PROFILES].delete {
+                        eq(TABLE_USER_ID, user.id)
+                        eq(TABLE_PLAYER_ID, UUID.fromString(playerId))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            logDebug(e.toString())
+        }
+    }
+
+    override suspend fun removeAllRecentSearches() {
+        val user = userRepository.getUser()
+        try {
+            if (user?.id == null) {
+                return
+            } else {
+                withContext(Dispatchers.IO) {
+                    postgrest[TABLE_RECENT_PROFILES].delete {
+                        eq(TABLE_USER_ID, user.id)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            logDebug(e.toString())
         }
     }
 }

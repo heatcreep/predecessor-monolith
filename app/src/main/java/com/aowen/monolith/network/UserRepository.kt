@@ -53,7 +53,8 @@ class UserRepositoryImpl @Inject constructor(
                                 "full_name",
                                 "avatar_url",
                                 "id",
-                                "updated_at"
+                                "updated_at",
+                                "player_id"
                             )
                         ) {
                             eq("email", it.user?.email!!)
@@ -69,7 +70,8 @@ class UserRepositoryImpl @Inject constructor(
                 updatedAt = user.updatedAt,
                 email = user.email,
                 fullName = user.fullName,
-                avatarUrl = user.avatarUrl
+                avatarUrl = user.avatarUrl,
+                playerId = user.playerId
             )
         } else null
     }

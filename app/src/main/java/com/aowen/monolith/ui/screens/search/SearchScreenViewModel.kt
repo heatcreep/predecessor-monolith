@@ -98,6 +98,42 @@ class SearchScreenViewModel @Inject constructor(
         }
     }
 
+    fun handleClearSingleSearch(playerId: String) {
+        viewModelScope.launch {
+            try {
+                userRecentSearchesRepository.removeRecentSearch(playerId)
+                _uiState.update {
+                    it.copy(
+                        recentSearchesList = it.recentSearchesList.filter { player ->
+                            player?.playerId != playerId
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                logDebug(e.toString())
+            }
+        }
+    }
+
+    fun handleClearAllRecentSearches() {
+        _uiState.update { it.copy(isLoadingSearch = true) }
+        viewModelScope.launch {
+            try {
+                val removeAllResult =
+                    async { userRecentSearchesRepository.removeAllRecentSearches() }
+                removeAllResult.await()
+                _uiState.update {
+                    it.copy(
+                        recentSearchesList = emptyList()
+                    )
+                }
+            } catch (e: Exception) {
+                logDebug(e.toString())
+            }
+            _uiState.update { it.copy(isLoadingSearch = false) }
+        }
+    }
+
     fun handleAddToRecentSearch(playerDetails: PlayerDetails) {
         viewModelScope.launch {
             try {
@@ -122,7 +158,7 @@ class SearchScreenViewModel @Inject constructor(
                         it.copy(
                             isLoadingSearch = false,
                             playersList = filteredList ?: emptyList(),
-                            searchError = if(filteredList.isNullOrEmpty()) "No results found" else null
+                            searchError = if (filteredList.isNullOrEmpty()) "No results found" else null
                         )
                     }
                 }

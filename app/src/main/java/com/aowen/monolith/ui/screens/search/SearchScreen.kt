@@ -29,6 +29,7 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +40,7 @@ import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.PlainTooltipState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -97,6 +100,8 @@ internal fun SearchScreenRoute(
         navigateToPlayerDetails = navigateToPlayerDetails,
         handlePullRefresh = searchScreenViewModel::initViewModel,
         handleAddToRecentSearch = searchScreenViewModel::handleAddToRecentSearch,
+        handleClearSingleSearch = searchScreenViewModel::handleClearSingleSearch,
+        handleClearAllRecentSearches = searchScreenViewModel::handleClearAllRecentSearches,
         modifier = modifier
     )
 }
@@ -111,11 +116,14 @@ fun SearchScreen(
     navigateToPlayerDetails: (String) -> Unit,
     handlePullRefresh: () -> Unit,
     handleAddToRecentSearch: (PlayerDetails) -> Unit,
+    handleClearSingleSearch: (String) -> Unit,
+    handleClearAllRecentSearches: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     val coroutineScope = rememberCoroutineScope()
     val tooltipState = remember { PlainTooltipState() }
+    var alertDialogIsOpen by remember { mutableStateOf(false) }
     val isRefreshing by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
@@ -125,6 +133,31 @@ fun SearchScreen(
     LaunchedEffect(Unit) {
         if (uiState.searchFieldValue.isNotEmpty()) {
             handleClearSearch()
+        }
+    }
+    if (alertDialogIsOpen) {
+        AlertDialog(onDismissRequest = { alertDialogIsOpen = false }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(16.dp)
+            ) {
+                Text("Are you sure you want to clear all recent searches? This action cannot be undone.")
+                Spacer(modifier = Modifier.size(16.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    TextButton(onClick = { alertDialogIsOpen = false }) {
+                        Text("Cancel", color = MaterialTheme.colorScheme.secondary)
+                    }
+                    TextButton(onClick = {
+                        handleClearAllRecentSearches()
+                        alertDialogIsOpen = false
+                    }) {
+                        Text("Clear All", color = MaterialTheme.colorScheme.secondary)
+                    }
+                }
+            }
         }
     }
     RefreshableContainer(
@@ -201,43 +234,61 @@ fun SearchScreen(
                     }
                 }
                 Spacer(modifier = Modifier.size(16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    AnimatedContent(
-                        targetState = (uiState.playersList.isNotEmpty() || uiState.searchError != null),
-                        label = ""
-                    ) {
-                        Text(
-                            text = if (it) {
-                                "Search Results"
-                            } else {
-                                "Recent Searches"
-                            },
-                            color = MaterialTheme.colorScheme.secondary,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
-                    PlainTooltipBox(
-                        tooltip = {
-                            Text(text = "We hide cheaters and players with MMR disabled from the search results.")
-                        },
-                        tooltipState = tooltipState,
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    ) {
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    tooltipState.show()
-                                }
-                            },
-                            modifier = Modifier.tooltipAnchor()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AnimatedContent(
+                            targetState = (uiState.playersList.isNotEmpty() || uiState.searchError != null),
+                            label = ""
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.secondary
+                            Text(
+                                text = if (it) {
+                                    "Search Results"
+                                } else {
+                                    "Recent Searches"
+                                },
+                                color = MaterialTheme.colorScheme.secondary,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                        PlainTooltipBox(
+                            tooltip = {
+                                Text(text = "We hide cheaters and players with MMR disabled from the search results.")
+                            },
+                            tooltipState = tooltipState,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        tooltipState.show()
+                                    }
+                                },
+                                modifier = Modifier.tooltipAnchor()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                        }
+                    }
+                    if (uiState.playersList.isEmpty()) {
+                        TextButton(onClick = { alertDialogIsOpen = true }) {
+                            Text(
+                                text = "Clear All",
+                                color = MaterialTheme.colorScheme.secondary,
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.ExtraBold
+                                )
                             )
                         }
                     }
+
                 }
                 Spacer(modifier = Modifier.size(16.dp))
                 AnimatedContent(
@@ -294,11 +345,15 @@ fun SearchScreen(
                                     player?.let {
                                         PlayerResultCard(
                                             playerDetails = player,
+                                            handleClearSingleSearch = {
+                                                handleClearSingleSearch(player.playerId)
+                                            },
                                             navigateToPlayerDetails = {
                                                 handleAddToRecentSearch(player)
                                                 navigateToPlayerDetails(player.playerId)
                                             }
                                         )
+
                                     }
                                 }
                             }
@@ -391,8 +446,9 @@ fun SearchBar(
 @Composable
 fun PlayerResultCard(
     playerDetails: PlayerDetails,
+    modifier: Modifier = Modifier,
     navigateToPlayerDetails: (String) -> Unit,
-    modifier: Modifier = Modifier
+    handleClearSingleSearch: (() -> Unit)? = null
 ) {
 
     val context = LocalContext.current
@@ -401,6 +457,7 @@ fun PlayerResultCard(
         .data(playerDetails.rankImage)
         .crossfade(true)
         .build()
+
 
     Card(
         modifier = modifier
@@ -423,43 +480,60 @@ fun PlayerResultCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Player Rank
-            SubcomposeAsyncImage(
-                model = model,
-                contentDescription = playerDetails.rankTitle
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                val state = painter.state
-                if (state is AsyncImagePainter.State.Success) {
-                    SubcomposeAsyncImageContent(
-                        modifier = Modifier.size(32.dp)
+                // Player Rank
+                SubcomposeAsyncImage(
+                    model = model,
+                    contentDescription = playerDetails.rankTitle
+                ) {
+                    val state = painter.state
+                    if (state is AsyncImagePainter.State.Success) {
+                        SubcomposeAsyncImageContent(
+                            modifier = Modifier.size(32.dp)
+                        )
+                    } else {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null
+                        )
+                    }
+                }
+                Column {
+                    Text(
+                        text = playerDetails.playerName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
-                } else {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null
-                    )
+                    playerDetails.region?.let {
+                        Text(
+                            text = playerDetails.region,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 }
             }
-            Column {
-                Text(
-                    text = playerDetails.playerName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-                playerDetails.region?.let {
-                    Text(
-                        text = playerDetails.region,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
+            handleClearSingleSearch?.let {
+                IconButton(onClick = {
+                    handleClearSingleSearch()
+                }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Clear,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentDescription = null
                     )
                 }
             }
         }
     }
+
 }
 
 @Composable
@@ -657,6 +731,14 @@ fun SearchScreenPreview() {
                     ),
                     searchFieldValue = "heatcreep.tv",
                     initPlayersListText = null,
+                    recentSearchesList = listOf(
+                        PlayerDetails(
+                            playerName = "heatcreep.tv",
+                            region = "naeast",
+                            mmr = "1379",
+                            rankTitle = "Silver III"
+                        )
+                    ),
                     isLoadingSearch = false,
                     isLoading = false,
                     claimedPlayerDetails = PlayerDetails(
@@ -674,6 +756,54 @@ fun SearchScreenPreview() {
                 handleClearSearch = {},
                 navigateToPlayerDetails = {},
                 handleAddToRecentSearch = {},
+                handleClearSingleSearch = {},
+                handlePullRefresh = {},
+                handleClearAllRecentSearches = {}
+            )
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun SearchScreenRecentSearchPreview() {
+    MonolithTheme {
+        Surface {
+            SearchScreen(
+                uiState = SearchScreenUiState(
+                    playersList = emptyList(),
+                    searchFieldValue = "heatcreep.tv",
+                    initPlayersListText = null,
+                    recentSearchesList = listOf(
+                        PlayerDetails(
+                            playerName = "heatcreep.tv",
+                            region = "naeast",
+                            mmr = "1379",
+                            rankTitle = "Silver III"
+                        )
+                    ),
+                    isLoadingSearch = false,
+                    isLoading = false,
+                    claimedPlayerDetails = PlayerDetails(
+                        playerName = "heatcreep.tv",
+                        region = "naeast",
+                        mmr = "1379",
+                        rankTitle = "Silver III"
+                    ),
+                    claimedPlayerStats = PlayerStats(
+                        favoriteHero = "Narbash",
+                    )
+                ),
+                setSearchValue = {},
+                handleSubmitSearch = {},
+                handleClearSearch = {},
+                navigateToPlayerDetails = {},
+                handleAddToRecentSearch = {},
+                handleClearSingleSearch = {},
+                handleClearAllRecentSearches = {},
                 handlePullRefresh = {}
             )
         }
