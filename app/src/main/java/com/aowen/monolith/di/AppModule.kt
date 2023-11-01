@@ -39,23 +39,31 @@ object AppModule {
     fun provideRetrofit(@ApplicationContext appContext: Context): Retrofit {
 
         val cacheSize = 10 * 1024 * 1024L // 10 MB
-        val maxCacheLifeSize = 60 * 60 * 24 * 7 // 7 days
-        val maxAge = 5 // 5 seconds
+        val maxRequestStale = 60 * 60 * 24 * 7 // 7 days
+        val maxRequestAge = 5 // 5 seconds
+        val maxResponseAge = 60 // 1 minute
         val cache = Cache(appContext.cacheDir, cacheSize)
 
         val okHttpClient = OkHttpClient.Builder()
             .cache(cache)
+            .addNetworkInterceptor { chain ->
+                val response = chain.proceed(chain.request())
+                response.newBuilder()
+                    .header("Cache-Control", "public, max-age=$maxResponseAge")
+                    .removeHeader("Pragma")
+                    .build()
+            }
             .addInterceptor { chain ->
                 var request = chain.request()
                 request = if (NetworkUtil.isNetworkAvailable(appContext))
                     request.newBuilder().header(
                         name = "Cache-Control",
-                        value = "public, max-age=$maxAge"
+                        value = "public, max-age=$maxRequestAge"
                     ).build()
                 else
                     request.newBuilder().header(
                         "Cache-Control",
-                        "public, only-if-cached, max-stale=$maxCacheLifeSize"
+                        "public, only-if-cached, max-stale=$maxRequestStale"
                     ).build()
                 chain.proceed(request)
             }
