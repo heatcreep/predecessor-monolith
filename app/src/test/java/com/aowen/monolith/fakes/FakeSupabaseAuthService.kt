@@ -25,6 +25,7 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
                     providers = listOf("fakeRole")
                 ),
                 aud = "fakeAud",
+                email = "fakeEmail",
             ),
             type = "fakeType",
             expiresAt = Instant.DISTANT_FUTURE,
@@ -44,5 +45,9 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
             200 -> fakeUserSession
             else -> null
         }
+    }
+
+    override suspend fun logout() {
+        TODO("Not yet implemented")
     }
 }

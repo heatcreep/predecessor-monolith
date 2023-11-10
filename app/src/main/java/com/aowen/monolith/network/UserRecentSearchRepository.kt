@@ -4,10 +4,6 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerSearchDto
 import com.aowen.monolith.data.create
 import com.aowen.monolith.logDebug
-import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.Order
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.Inject
@@ -21,14 +17,14 @@ const val TABLE_MAX_ROWS = 10
 interface UserRecentSearchRepository {
 
     suspend fun getRecentSearches(): List<PlayerDetails>
-    suspend fun addRecentSearch(playerDetails: PlayerDetails): Boolean
+    suspend fun addRecentSearch(playerDetails: PlayerDetails)
     suspend fun removeRecentSearch(playerId: String)
 
     suspend fun removeAllRecentSearches()
 }
 
 class UserRecentSearchRepositoryImpl @Inject constructor(
-    private val postgrest: Postgrest,
+    private val postgrestService: SupabasePostgrestService,
     private val userRepository: UserRepository
 ) : UserRecentSearchRepository {
 
@@ -38,70 +34,51 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
             if (user?.id == null) {
                 return emptyList()
             } else {
-                withContext(Dispatchers.IO) {
-                    postgrest[TABLE_RECENT_PROFILES].select {
-                        eq(TABLE_USER_ID, user.id)
-                        order(TABLE_CREATED_AT, Order.DESCENDING)
-                    }.decodeList<PlayerSearchDto>()
-                        .map { it.create() }
-                }
+                postgrestService.fetchRecentSearches(user.id)
+                    .map { it.create() }
+
             }
         } catch (e: Exception) {
             emptyList()
         }
     }
 
-    override suspend fun addRecentSearch(playerDetails: PlayerDetails): Boolean {
+    override suspend fun addRecentSearch(playerDetails: PlayerDetails) {
         val user = userRepository.getUser()
         return try {
             if (user?.id == null) {
-                return false
+                return
             } else {
-                withContext(Dispatchers.IO) {
-                    val playerSearchDto = PlayerSearchDto(
-                        createdAt = Timestamp(System.currentTimeMillis()).toString(),
-                        id = user.id,
-                        playerId = UUID.fromString(playerDetails.playerId),
-                        displayName = playerDetails.playerName,
-                        isRanked = playerDetails.isRanked,
-                        region = playerDetails.region,
-                        rank = playerDetails.rank,
-                        rankTitle = playerDetails.rankTitle,
-                        rankImage = playerDetails.rankImage,
-                        mmr = playerDetails.mmr?.toFloat(),
-                    )
-                    val recentSearches =
-                        postgrest[TABLE_RECENT_PROFILES].select {
-                            eq(TABLE_USER_ID, user.id)
-                            order(TABLE_CREATED_AT, Order.ASCENDING)
-                        }.decodeList<PlayerSearchDto>()
+                val playerSearchDto = PlayerSearchDto(
+                    createdAt = Timestamp(System.currentTimeMillis()).toString(),
+                    id = user.id,
+                    playerId = UUID.fromString(playerDetails.playerId),
+                    displayName = playerDetails.playerName,
+                    isRanked = playerDetails.isRanked,
+                    region = playerDetails.region,
+                    rank = playerDetails.rank,
+                    rankTitle = playerDetails.rankTitle,
+                    rankImage = playerDetails.rankImage,
+                    mmr = playerDetails.mmr?.toFloat(),
+                )
+                val recentSearches = postgrestService.fetchRecentSearches(user.id)
 
-                    if (recentSearches.any { it.playerId == playerSearchDto.playerId }.not()) {
-                        if (recentSearches.size >= TABLE_MAX_ROWS) {
-                            postgrest[TABLE_RECENT_PROFILES].delete {
-                                eq(TABLE_USER_ID, user.id)
-                                eq(TABLE_PLAYER_ID, recentSearches.first().playerId)
-                            }
-                            postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
-                        } else {
-                            if(playerSearchDto.playerId != UUID.fromString(user.playerId)) {
-                                postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
-                            }
-                        }
-                    } else {
-                        postgrest[TABLE_RECENT_PROFILES].update(playerSearchDto) {
-                            eq(TABLE_USER_ID, user.id)
-                            eq(TABLE_PLAYER_ID, playerSearchDto.playerId)
-                        }
+                if (recentSearches.any { it.playerId == playerSearchDto.playerId }.not()) {
+                    if (recentSearches.size >= TABLE_MAX_ROWS) {
+                        postgrestService.updateRecentSearch(
+                            user.id,
+                            recentSearches.first().playerId
+                        )
                     }
-                    true
-                }
-            }
+                    postgrestService.insertRecentSearch(playerSearchDto)
 
-            true
+                } else {
+                    postgrestService.updateRecentSearch(user.id, playerSearchDto.playerId)
+                }
+
+            }
         } catch (e: Exception) {
             logDebug(e.toString())
-            false
         }
     }
 
@@ -111,12 +88,8 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
             if (user?.id == null) {
                 return
             } else {
-                withContext(Dispatchers.IO) {
-                    postgrest[TABLE_RECENT_PROFILES].delete {
-                        eq(TABLE_USER_ID, user.id)
-                        eq(TABLE_PLAYER_ID, UUID.fromString(playerId))
-                    }
-                }
+                postgrestService.deleteRecentSearch(user.id, UUID.fromString(playerId))
+
             }
         } catch (e: Exception) {
             logDebug(e.toString())
@@ -129,11 +102,7 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
             if (user?.id == null) {
                 return
             } else {
-                withContext(Dispatchers.IO) {
-                    postgrest[TABLE_RECENT_PROFILES].delete {
-                        eq(TABLE_USER_ID, user.id)
-                    }
-                }
+                postgrestService.deleteAllRecentSearches(user.id)
             }
         } catch (e: Exception) {
             logDebug(e.toString())

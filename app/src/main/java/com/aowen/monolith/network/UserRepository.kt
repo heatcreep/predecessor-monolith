@@ -3,14 +3,10 @@ package com.aowen.monolith.network
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.UserInfo
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.gotrue
-import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 const val TABLE_PROFILES = "profiles"
@@ -25,45 +21,34 @@ interface UserRepository {
 
     suspend fun getClaimedUser(): Result<ClaimedUser?>
 
-    suspend fun setClaimedUser(playerStats: PlayerStats?, playerDetails: PlayerDetails?)
+    fun setClaimedUser(playerStats: PlayerStats?, playerDetails: PlayerDetails?)
 
     suspend fun logout()
 }
 
 class UserRepositoryImpl @Inject constructor(
-    private val client: SupabaseClient,
-    private val omedaCityRepository: OmedaCityRepository
+    private val authService: SupabaseAuthService,
+    private val postgrestService: SupabasePostgrestService,
+    private val omedaCityRepository: OmedaCityRepository,
 
 ) : UserRepository {
+
+    private val _claimedPlayer: MutableStateFlow<ClaimedUser?> = MutableStateFlow(null)
+    val claimedPlayer: StateFlow<ClaimedUser?> = _claimedPlayer
     override suspend fun getUser(): UserInfo? {
-        val user = try {
-            var session = client.gotrue.currentSessionOrNull()
-            var retryCount = 3
-            while (session == null && retryCount > 0) {
-                delay(500)
-                session = client.gotrue.currentSessionOrNull()
-                retryCount--
-            }
-            session?.let {
-                if (it.user?.id != null) {
-                    client.postgrest.from(TABLE_PROFILES)
-                        .select(
-                            columns = Columns.list(
-                                "email",
-                                "full_name",
-                                "avatar_url",
-                                "id",
-                                "updated_at",
-                                "player_id"
-                            )
-                        ) {
-                            eq("email", it.user?.email!!)
-                        }.decodeList<UserInfo>().firstOrNull()
-                } else null
-            }
-        } catch (e: Exception) {
-            null
+        var session = authService.currentSession()
+        var retryCount = 3
+        while (session == null && retryCount > 0) {
+            delay(500)
+            session = authService.currentSession()
+            retryCount--
         }
+        val user = session?.let {
+            if (it.user?.id != null) {
+                postgrestService.fetchUserInfo(it.user?.email!!)
+            } else null
+        }
+
         return if (user != null) {
             UserInfo(
                 id = user.id,
@@ -76,40 +61,36 @@ class UserRepositoryImpl @Inject constructor(
         } else null
     }
 
-    private val claimedPlayer = MutableStateFlow<ClaimedUser?>(null)
-
     override suspend fun getClaimedUser(): Result<ClaimedUser?> {
         val claimedPlayerInfo = claimedPlayer.value
         return if (claimedPlayerInfo != null) {
             Result.success(claimedPlayerInfo)
         } else {
-            val userProfile = try {
-                var session = client.gotrue.currentSessionOrNull()
-                var retryCount = 3
-                while (session == null && retryCount > 0) {
-                    delay(500)
-                    session = client.gotrue.currentSessionOrNull()
-                    retryCount--
-                }
-                session?.let {
-                    if (it.user?.id != null) {
-                        client.postgrest.from(TABLE_PROFILES)
-                            .select(columns = Columns.raw("player_id")) {
-                                eq("id", it.user?.id!!)
-                            }.decodeList<UserProfile>().firstOrNull()
-                    } else null
-                }
-            } catch (e: Exception) {
-                null
+
+            var session = authService.currentSession()
+            var retryCount = 3
+            while (session == null && retryCount > 0) {
+                delay(500)
+                session = authService.currentSession()
+                retryCount--
             }
+            val userProfile = session?.let {
+                if (it.user?.id != null) {
+                    postgrestService.fetchPlayer(it.user?.id!!)
+                } else null
+            }
+
             if (userProfile?.playerId != null) {
                 coroutineScope {
-                    val playerInfoResponse = omedaCityRepository.fetchPlayerInfo(userProfile.playerId)
-                    if(playerInfoResponse.isSuccess) {
-                        return@coroutineScope Result.success(ClaimedUser(
-                            playerStats = playerInfoResponse.getOrNull()?.playerStats,
-                            playerDetails = playerInfoResponse.getOrNull()?.playerDetails
-                        ))
+                    val playerInfoResponse =
+                        omedaCityRepository.fetchPlayerInfo(userProfile.playerId)
+                    if (playerInfoResponse.isSuccess) {
+                        return@coroutineScope Result.success(
+                            ClaimedUser(
+                                playerStats = playerInfoResponse.getOrNull()?.playerStats,
+                                playerDetails = playerInfoResponse.getOrNull()?.playerDetails
+                            )
+                        )
                     } else {
                         return@coroutineScope Result.failure(Exception("Failed to fetch player info."))
                     }
@@ -121,16 +102,14 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setClaimedUser(playerStats: PlayerStats?, playerDetails: PlayerDetails?) {
-        claimedPlayer.update {
-            it?.copy(
-                playerStats = playerStats,
-                playerDetails = playerDetails
-            )
-        }
+    override fun setClaimedUser(playerStats: PlayerStats?, playerDetails: PlayerDetails?) {
+        _claimedPlayer.value = ClaimedUser(
+            playerStats = playerStats,
+            playerDetails = playerDetails
+        )
     }
 
     override suspend fun logout() {
-        client.gotrue.logout()
+        authService.logout()
     }
 }

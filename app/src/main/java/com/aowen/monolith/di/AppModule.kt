@@ -117,16 +117,17 @@ object AppModule {
     @Provides
     @Singleton
     fun provideUserRepository(
-        client: SupabaseClient,
+        authService: SupabaseAuthService,
+        postgrest: SupabasePostgrestService,
         repository: OmedaCityRepository
     ): UserRepository =
-        UserRepositoryImpl(client, repository)
+        UserRepositoryImpl(authService, postgrest, repository)
 
     @Provides
     @Singleton
     fun provideUserRecentSearchRepository(
-        postgrest: Postgrest,
+        postgrestService: SupabasePostgrestService,
         repository: UserRepository
     ): UserRecentSearchRepository =
-        UserRecentSearchRepositoryImpl(postgrest, repository)
+        UserRecentSearchRepositoryImpl(postgrestService, repository)
 }

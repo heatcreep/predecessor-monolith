@@ -14,6 +14,8 @@ interface SupabaseAuthService {
     suspend fun loginWithDiscord(): Response<Unit>
 
     suspend fun currentSession(): UserSession?
+
+    suspend fun logout()
 }
 
 class SupabaseAuthServiceImpl @Inject constructor(
@@ -34,5 +36,8 @@ class SupabaseAuthServiceImpl @Inject constructor(
 
     override suspend fun currentSession(): UserSession? =
         goTrue.currentSessionOrNull()
+
+    override suspend fun logout() =
+        goTrue.logout()
 
 }
