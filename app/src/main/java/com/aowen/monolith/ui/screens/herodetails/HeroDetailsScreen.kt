@@ -627,7 +627,7 @@ fun HeroStatsScreenPreview() {
                             attackSpeed = listOf(BigDecimal.TEN),
                             physicalArmor = listOf(BigDecimal.TEN),
                             magicalArmor = listOf(BigDecimal.TEN),
-                            physicalPower = 1f,
+                            physicalPower = listOf(BigDecimal.TEN),
                             movementSpeed = 11f,
                             cleave = 1f,
                             attackRange = 1f

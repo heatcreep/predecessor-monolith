@@ -8,7 +8,6 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
-import com.aowen.monolith.logDebug
 import javax.inject.Inject
 
 interface OmedaCityRepository {
@@ -44,11 +43,8 @@ class OmedaCityRepositoryImpl @Inject constructor(
         return try {
             val playerDetailsResponse = playerApiService.getPlayerById(playerId)
             val playerStatsResponse = playerApiService.getPlayerStatsById(playerId)
-            if (playerDetailsResponse.isSuccessful.not()) {
-                Result.failure<Exception>(Exception("Failed to fetch player details"))
-            }
-            if (playerStatsResponse.isSuccessful.not()) {
-                Result.failure(Exception("Failed to fetch player stats"))
+            if (playerDetailsResponse.isSuccessful.not() || playerStatsResponse.isSuccessful.not()) {
+                Result.failure(Exception("Failed to fetch player info"))
             } else {
                 Result.success(
                     PlayerInfo(
@@ -68,7 +64,6 @@ class OmedaCityRepositoryImpl @Inject constructor(
             if (playerHeroStatsResponse.isSuccessful) {
                 Result.success(playerHeroStatsResponse.body()?.heroStatistics?.map { it.create() })
             } else {
-                logDebug(playerHeroStatsResponse.errorBody()?.string() ?: "No error body")
                 Result.failure(Exception("Failed to fetch player hero stats"))
             }
         } catch (e: Exception) {

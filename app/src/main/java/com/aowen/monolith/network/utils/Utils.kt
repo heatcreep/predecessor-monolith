@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 
 fun String.trimExtraNewLine() = this
     .replace("\n\n", "")
@@ -11,9 +13,10 @@ fun String.trimExtraNewLine() = this
 
 object NetworkUtil {
     fun isNetworkAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val nw      = connectivityManager.activeNetwork ?: return false
+            val nw = connectivityManager.activeNetwork ?: return false
             val actNw = connectivityManager.getNetworkCapabilities(nw) ?: return false
             return when {
                 actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
@@ -27,5 +30,38 @@ object NetworkUtil {
         } else {
             return connectivityManager.activeNetworkInfo?.isConnected ?: false
         }
+    }
+
+    fun getOkHttpClientWithCache(appContext: Context): OkHttpClient {
+        val cacheSize = 10 * 1024 * 1024L // 10 MB
+        val maxRequestStale = 60 * 60 * 24 * 7 // 7 days
+        val maxRequestAge = 5 // 5 seconds
+        val maxResponseAge = 60 // 1 minute
+        val cache = Cache(appContext.cacheDir, cacheSize)
+
+        return OkHttpClient.Builder()
+            .cache(cache)
+            .addNetworkInterceptor { chain ->
+                val response = chain.proceed(chain.request())
+                response.newBuilder()
+                    .header("Cache-Control", "public, max-age=$maxResponseAge")
+                    .removeHeader("Pragma")
+                    .build()
+            }
+            .addInterceptor { chain ->
+                var request = chain.request()
+                request = if (NetworkUtil.isNetworkAvailable(appContext))
+                    request.newBuilder().header(
+                        name = "Cache-Control",
+                        value = "public, max-age=$maxRequestAge"
+                    ).build()
+                else
+                    request.newBuilder().header(
+                        "Cache-Control",
+                        "public, only-if-cached, max-stale=$maxRequestStale"
+                    ).build()
+                chain.proceed(request)
+            }
+            .build()
     }
 }

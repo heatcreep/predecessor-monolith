@@ -34,5 +34,4 @@ data class HeroStatisticsDto(
     val averageDamageTakenFromHeroes: Float,
     @SerializedName("avg_game_duration")
     val averageGameDuration: Float,
-
 )

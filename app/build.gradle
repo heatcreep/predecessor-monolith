@@ -111,6 +111,7 @@ dependencies {
     implementation platform(libs.supabase.bom)
     implementation libs.supabase.postgres
     implementation libs.ktor.client.android
+    implementation libs.ktor.client.okhttp
 
     testImplementation libs.junit4
     androidTestImplementation libs.androidx.test.ext

@@ -8,11 +8,15 @@ import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.OmedaCityRepositoryImpl
 import com.aowen.monolith.network.OmedaCityService
 import com.aowen.monolith.network.RetrofitHelper
+import com.aowen.monolith.network.SupabaseAuthService
+import com.aowen.monolith.network.SupabaseAuthServiceImpl
+import com.aowen.monolith.network.SupabasePostgrestService
+import com.aowen.monolith.network.SupabasePostgrestServiceImpl
 import com.aowen.monolith.network.UserRecentSearchRepository
 import com.aowen.monolith.network.UserRecentSearchRepositoryImpl
 import com.aowen.monolith.network.UserRepository
 import com.aowen.monolith.network.UserRepositoryImpl
-import com.aowen.monolith.network.utils.NetworkUtil
+import com.aowen.monolith.network.utils.NetworkUtil.getOkHttpClientWithCache
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,8 +28,8 @@ import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
-import okhttp3.Cache
-import okhttp3.OkHttpClient
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -38,51 +42,26 @@ object AppModule {
     @Singleton
     fun provideRetrofit(@ApplicationContext appContext: Context): Retrofit {
 
-        val cacheSize = 10 * 1024 * 1024L // 10 MB
-        val maxRequestStale = 60 * 60 * 24 * 7 // 7 days
-        val maxRequestAge = 5 // 5 seconds
-        val maxResponseAge = 60 // 1 minute
-        val cache = Cache(appContext.cacheDir, cacheSize)
-
-        val okHttpClient = OkHttpClient.Builder()
-            .cache(cache)
-            .addNetworkInterceptor { chain ->
-                val response = chain.proceed(chain.request())
-                response.newBuilder()
-                    .header("Cache-Control", "public, max-age=$maxResponseAge")
-                    .removeHeader("Pragma")
-                    .build()
-            }
-            .addInterceptor { chain ->
-                var request = chain.request()
-                request = if (NetworkUtil.isNetworkAvailable(appContext))
-                    request.newBuilder().header(
-                        name = "Cache-Control",
-                        value = "public, max-age=$maxRequestAge"
-                    ).build()
-                else
-                    request.newBuilder().header(
-                        "Cache-Control",
-                        "public, only-if-cached, max-stale=$maxRequestStale"
-                    ).build()
-                chain.proceed(request)
-            }
-            .build()
-
         return Retrofit.Builder()
             .baseUrl(RetrofitHelper.baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
+            .client(getOkHttpClientWithCache(appContext))
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideSupabaseClient(): SupabaseClient {
+    fun provideSupabaseClient(@ApplicationContext appContext: Context): SupabaseClient {
+        val httpClient = HttpClient(OkHttp) {
+            engine {
+                preconfigured = getOkHttpClientWithCache(appContext)
+            }
+        }
         val client = createSupabaseClient(
             supabaseUrl = BuildConfig.SUPABASE_URL,
             supabaseKey = BuildConfig.SUPABASE_API_KEY
         ) {
+            httpEngine = httpClient.engine
             install(Postgrest)
             install(GoTrue) {
                 scheme = "monolith"
@@ -106,6 +85,18 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSupabaseAuthService(goTrue: GoTrue): SupabaseAuthService {
+        return SupabaseAuthServiceImpl(goTrue)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSupabasePostgrestService(postgrest: Postgrest): SupabasePostgrestService {
+        return SupabasePostgrestServiceImpl(postgrest)
+    }
+
+    @Provides
+    @Singleton
     fun provideOmedaCityApi(retrofit: Retrofit): OmedaCityService {
         return retrofit.create(OmedaCityService::class.java)
     }
@@ -117,8 +108,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(goTrue: GoTrue, postgrest: Postgrest): AuthRepository =
-        AuthRepositoryImpl(goTrue, postgrest)
+    fun provideAuthRepository(
+        authService: SupabaseAuthService,
+        postgrestService: SupabasePostgrestService
+    ): AuthRepository =
+        AuthRepositoryImpl(authService, postgrestService)
 
     @Provides
     @Singleton
