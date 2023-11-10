@@ -29,7 +29,7 @@ class UserRepositoryTest {
 
         val actual = userRepository.getUser()
         val expected = UserInfo(
-            id = UUID.fromString("addc8bb3-20ad-462a-a9f8-8b32bbf57515"),
+            id = UUID.fromString("addc8bb3-20ad-462a-a9f8-8b32bbf57514"),
             updatedAt = null,
             email = "",
             fullName = "",
