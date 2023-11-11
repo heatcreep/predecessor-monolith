@@ -114,6 +114,7 @@ dependencies {
     implementation libs.ktor.client.okhttp
 
     testImplementation libs.junit4
+    testImplementation libs.kotlinx.coroutines.test
     androidTestImplementation libs.androidx.test.ext
     androidTestImplementation libs.androidx.test.espresso.core
     androidTestImplementation platform(libs.androidx.compose.bom)

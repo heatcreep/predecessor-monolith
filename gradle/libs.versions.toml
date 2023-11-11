@@ -19,6 +19,7 @@ googleServices = "4.3.15"
 gradleApi = "8.1.0"
 gson = "2.9.0"
 kotlinBom = "1.8.20"
+kotlinTest = "1.7.3"
 ksp = "1.9.0-1.0.11"
 supabaseBom = "1.1.0"
 ktorClientAndroid = "2.3.2"
@@ -52,6 +53,7 @@ hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-comp
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlinBom" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinTest" }
 ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktorClientAndroid" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktorClientAndroid" }
