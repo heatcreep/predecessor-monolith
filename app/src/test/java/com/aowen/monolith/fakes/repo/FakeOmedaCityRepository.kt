@@ -9,6 +9,7 @@ import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.data.fakeHeroDto
+import com.aowen.monolith.fakes.data.fakeHeroDto2
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
 import com.aowen.monolith.fakes.data.fakeItemDto
 import com.aowen.monolith.fakes.data.fakeMatchDto
@@ -78,7 +79,10 @@ class FakeOmedaCityRepository(
     override suspend fun fetchAllHeroes(): Result<List<HeroDetails>?> {
         return when (hasHeroDetailsErrors) {
             true -> Result.failure(Exception("Failed to fetch heroes"))
-            false -> Result.success(listOf(fakeHeroDto.create()))
+            false -> Result.success(listOf(
+                fakeHeroDto.create(),
+                fakeHeroDto2.create()
+            ))
         }
     }
 

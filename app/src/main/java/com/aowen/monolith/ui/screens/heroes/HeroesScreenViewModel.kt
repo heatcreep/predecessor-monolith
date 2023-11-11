@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.ui.utils.filterOrOriginal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -47,34 +48,23 @@ class HeroesScreenViewModel @Inject constructor(
     }
 
     fun getFilteredHeroes() {
-        // if both role filters and search field are empty, return all heroes
-        val currentHeroes =
-            if (uiState.value.selectedRoleFilters.isEmpty() && uiState.value.searchFieldValue.isEmpty()) {
-                uiState.value.allHeroes
-                // if search field is empty, filter by role filters
-            } else if (uiState.value.searchFieldValue.isEmpty()) {
-                uiState.value.allHeroes.filter { hero ->
-                    hero.roles.any { role ->
-                        uiState.value.selectedRoleFilters.contains(role)
-                    }
-                }
-                // if role filters are empty, filter by search field
-            } else if (uiState.value.selectedRoleFilters.isEmpty()) {
-                uiState.value.allHeroes.filter { hero ->
-                    hero.displayName.contains(uiState.value.searchFieldValue, ignoreCase = true)
-                }
-                // if both role filters and search field are not empty, filter by both
-            } else {
-                uiState.value.allHeroes.filter { hero ->
-                    hero.roles.any { role ->
-                        uiState.value.selectedRoleFilters.contains(role)
-                    }
-                }.filter { hero ->
-                    hero.displayName.contains(uiState.value.searchFieldValue, ignoreCase = true)
+        // get heroes by role and return the original list if no roles are selected
+        val heroesByRole =
+            uiState.value.allHeroes.filterOrOriginal { heroDetails ->
+                heroDetails.roles.any { role ->
+                    uiState.value.selectedRoleFilters.contains(role)
+
                 }
             }
 
-        _uiState.update { it.copy(currentHeroes = currentHeroes) }
+        // get heroes by search
+        val heroesBySearch = heroesByRole.filter { heroDetails ->
+            heroDetails.displayName.contains(uiState.value.searchFieldValue, ignoreCase = true)
+        }
+
+        _uiState.update {
+            it.copy(currentHeroes = heroesBySearch)
+        }
     }
 
     init {
@@ -86,7 +76,7 @@ class HeroesScreenViewModel @Inject constructor(
         viewModelScope.launch {
 
             val heroesResult = repository.fetchAllHeroes()
-            if(heroesResult.isSuccess) {
+            if (heroesResult.isSuccess) {
                 val heroes = heroesResult.getOrNull() ?: emptyList()
                 _uiState.update {
                     it.copy(
