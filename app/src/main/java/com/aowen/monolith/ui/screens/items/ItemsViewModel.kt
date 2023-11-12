@@ -66,23 +66,19 @@ class ItemsViewModel @Inject constructor(
 
         if (allItemsResponse.isSuccess) {
 
-            val allItems = allItemsResponse.getOrNull()
-            if (allItems.isNullOrEmpty()) {
-                _uiState.update {
-                    it.copy(isLoading = false, itemsError = "Items list is empty")
-                }
-            } else {
-                val sortedItems = allItems.sortedBy {
-                    it.displayName
-                }
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        allItems = sortedItems,
-                        filteredItems = sortedItems,
-                    )
-                }
+            val allItems = allItemsResponse.getOrNull() ?: emptyList()
+
+            val sortedItems = allItems.sortedBy {
+                it.displayName
             }
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    allItems = sortedItems,
+                    filteredItems = sortedItems,
+                )
+            }
+
         } else {
             _uiState.update {
                 it.copy(

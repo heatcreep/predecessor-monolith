@@ -120,59 +120,69 @@ fun ItemsScreen(
                     Text(text = uiState.itemsError)
                 }
             } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    SearchBar(
-                        searchLabel = "Item lookup",
-                        searchValue = uiState.searchFieldValue,
-                        setSearchValue = onSetSearchValue,
-                        modifier = Modifier.fillMaxWidth(),
-                        handleClearSearch = onClearSearch
-                    )
-                    Text(text = "Filters:", style = MaterialTheme.typography.bodyMedium)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                if(uiState.filteredItems.isEmpty()){
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        TierFilterDropdown(
-                            selectedTierFilter = uiState.selectedTierFilter,
-                            onSelectTier = onSelectTier,
-                            onClearTierFilter = onClearTierFilter
-                        )
-                        StatFilterDropdown(
-                            allStats = uiState.allStats,
-                            selectedStatFilters = uiState.selectedStatFilters,
-                            onSelectStat = onSelectStat,
-                            onClearStatsFilters = onClearStats
-                        )
+                        Text(text = "Items list is empty")
                     }
-                    if (uiState.filteredItems.isEmpty()) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        SearchBar(
+                            searchLabel = "Item lookup",
+                            searchValue = uiState.searchFieldValue,
+                            setSearchValue = onSetSearchValue,
+                            modifier = Modifier.fillMaxWidth(),
+                            handleClearSearch = onClearSearch
+                        )
+                        Text(text = "Filters:", style = MaterialTheme.typography.bodyMedium)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(
-                                text = "No items match the set filters.",
-                                style = MaterialTheme.typography.bodyMedium
+                            TierFilterDropdown(
+                                selectedTierFilter = uiState.selectedTierFilter,
+                                onSelectTier = onSelectTier,
+                                onClearTierFilter = onClearTierFilter
+                            )
+                            StatFilterDropdown(
+                                allStats = uiState.allStats,
+                                selectedStatFilters = uiState.selectedStatFilters,
+                                onSelectStat = onSelectStat,
+                                onClearStatsFilters = onClearStats
                             )
                         }
-                    }
-                    LazyVerticalGrid(
-                        modifier = Modifier.fillMaxSize(),
-                        columns = GridCells.Fixed(3),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(uiState.filteredItems) { item ->
-                            ItemCard(
-                                itemDetails = item,
-                                navigateToItemDetails = { navigateToItemDetails(item.name) }
-                            )
+                        if (uiState.filteredItems.isEmpty()) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+
+                            ) {
+                                Text(
+                                    text = "No items match the set filters.",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                        LazyVerticalGrid(
+                            modifier = Modifier.fillMaxSize(),
+                            columns = GridCells.Fixed(3),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(uiState.filteredItems) { item ->
+                                ItemCard(
+                                    itemDetails = item,
+                                    navigateToItemDetails = { navigateToItemDetails(item.name) }
+                                )
+                            }
                         }
                     }
                 }

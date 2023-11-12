@@ -12,6 +12,9 @@ import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroDto2
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
 import com.aowen.monolith.fakes.data.fakeItemDto
+import com.aowen.monolith.fakes.data.fakeItemDto2
+import com.aowen.monolith.fakes.data.fakeItemDto3
+import com.aowen.monolith.fakes.data.fakeItemDto4
 import com.aowen.monolith.fakes.data.fakeMatchDto
 import com.aowen.monolith.fakes.data.fakePlayerDetails
 import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
@@ -24,6 +27,7 @@ class FakeOmedaCityRepository(
     private val hasPlayerHeroStatsError: Boolean = false,
     private val hasMatchDetailsError: Boolean = false,
     private val hasItemDetailsErrors: Boolean = false,
+    private val hasEmptyItemDetails: Boolean = false,
     private val hasHeroDetailsErrors: Boolean = false,
     private val hasHeroStatisticsErrors: Boolean = false
 ): OmedaCityRepository {
@@ -63,9 +67,15 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchAllItems(): Result<List<ItemDetails>?> {
-        return when (hasItemDetailsErrors) {
-            true -> Result.failure(Exception("Failed to fetch items"))
-            false -> Result.success(listOf(fakeItemDto.create()))
+        return when {
+            hasItemDetailsErrors -> Result.failure(Exception("Failed to fetch items"))
+            hasEmptyItemDetails -> Result.success(emptyList())
+            else -> Result.success(listOf(
+                fakeItemDto.create(),
+                fakeItemDto2.create(),
+                fakeItemDto3.create(),
+                fakeItemDto4.create()
+            ))
         }
     }
 
