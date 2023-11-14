@@ -80,9 +80,10 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchItemByName(itemName: String): Result<ItemDetails?> {
-        return when (hasItemDetailsErrors) {
-            true -> Result.failure(Exception("Failed to fetch item"))
-            false -> Result.success(fakeItemDto.create())
+        return when (itemName) {
+            "Error" -> Result.failure(Exception("Failed to fetch item"))
+            "Empty" -> Result.success(null)
+            else -> Result.success(fakeItemDto.create())
         }
     }
 
