@@ -38,11 +38,15 @@ class ItemsViewModelTest {
             isLoading = false,
             allItems = listOf(
                 fakeItemDto2.create(),
-                fakeItemDto.create()
+                fakeItemDto.create(),
+                fakeItemDto3.create(),
+                fakeItemDto4.create()
             ),
             filteredItems = listOf(
                 fakeItemDto2.create(),
-                fakeItemDto.create()
+                fakeItemDto.create(),
+                fakeItemDto3.create(),
+                fakeItemDto4.create()
             ),
         )
         val actual = viewModel.uiState.value

@@ -1,7 +1,5 @@
 package com.aowen.monolith.ui.screens.playerdetails
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,22 +18,31 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.Duration
-import java.time.ZonedDateTime
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 data class PlayerErrors(
-    val playerInfoErrorMessage: String? = null,
+    val playerIdErrorMessage: String? =
+        PlayerDetailsViewModel.FetchPlayerIdErrorMessage,
+    val playerIdError: String? = null,
+    val playerInfoErrorMessage: String? =
+        PlayerDetailsViewModel.FetchPlayerInfoErrorMessage,
     val playerInfoError: String? = null,
-    val heroStatsErrorMessage: String? = null,
+    val heroStatsErrorMessage: String? =
+        PlayerDetailsViewModel.FetchPlayerHeroStatsErrorMessage,
     val heroStatsError: String? = null,
-    val heroStatsErrorMessages: String? = null,
-    val matchesErrorMessage: String? = null,
+    val matchesErrorMessage: String? =
+        PlayerDetailsViewModel.FetchMatchesErrorMessage,
     val matchesError: String? = null,
-    val statsErrorMessage: String? = null,
+    val statsErrorMessage: String? =
+        PlayerDetailsViewModel.FetchPlayerHeroStatsErrorMessage,
     val statsError: String? = null,
+    val heroesErrorMessage: String? =
+        PlayerDetailsViewModel.FetchHeroesErrorMessage,
     val heroesError: String? = null,
-    val heroesErrorMessage: String? = null
 )
 
 data class PlayerDetailsUiState(
@@ -60,6 +67,14 @@ class PlayerDetailsViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
+    companion object {
+        const val FetchPlayerIdErrorMessage = "Unable to fetch player id."
+        const val FetchPlayerInfoErrorMessage = "Unable to fetch player info."
+        const val FetchPlayerHeroStatsErrorMessage = "Unable to fetch player hero stats."
+        const val FetchMatchesErrorMessage = "Unable to fetch player matches."
+        const val FetchHeroesErrorMessage = "Unable to fetch heroes."
+    }
+
     private val _uiState = MutableStateFlow(PlayerDetailsUiState())
     val uiState: StateFlow<PlayerDetailsUiState> = _uiState
 
@@ -75,13 +90,12 @@ class PlayerDetailsViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun handleTimeSinceMatch(endTime: String): String {
-        val zonedDateTime = ZonedDateTime.parse(endTime)
-        val startOfDay = zonedDateTime.toLocalDate().atStartOfDay(zonedDateTime.zone)
-        val now = ZonedDateTime.now(zonedDateTime.zone)
-        val duration = Duration.between(startOfDay, now).toHours()
-        val durationDays = Duration.between(startOfDay, now).toDays()
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.getDefault())
+        val endDate = sdf.parse(endTime)
+        val now = Calendar.getInstance().time
+        val duration = TimeUnit.MILLISECONDS.toHours(now.time - (endDate?.time ?: 0))
+        val durationDays = TimeUnit.MILLISECONDS.toDays(now.time - (endDate?.time ?: 0))
         val daysText = if (durationDays == 1L) "day ago" else "days ago"
         return if (duration < 24) "${duration}h ago" else "$durationDays $daysText"
     }
@@ -100,11 +114,7 @@ class PlayerDetailsViewModel @Inject constructor(
                             isClaimed = !uiState.value.isClaimed
                         )
                     }
-                    logDebug("Successfully saved player")
-                } else {
-                    logDebug("Failed to save player")
                 }
-
 
             } catch (e: Exception) {
                 logDebug(e.toString())
@@ -134,11 +144,12 @@ class PlayerDetailsViewModel @Inject constructor(
             if (playerInfoResult.isSuccess &&
                 playerHeroStatsResult.isSuccess &&
                 matchesResult.isSuccess &&
-                playerIdResult.isSuccess
+                playerIdResult.isSuccess &&
+                heroesResult.isSuccess
             ) {
                 val playerInfo = playerInfoResult.getOrNull()
-                val playerHeroStats = playerHeroStatsResult.getOrNull() ?: emptyList()
-                val heroes = heroesResult.getOrNull() ?: emptyList()
+                val playerHeroStats = playerHeroStatsResult.getOrNull()
+                val heroes = heroesResult.getOrNull()
                 val userPlayerId = playerIdResult.getOrNull()?.playerId ?: ""
                 val isClaimed = userPlayerId == playerId
                 _uiState.update {
@@ -148,10 +159,10 @@ class PlayerDetailsViewModel @Inject constructor(
                         playerId = playerId,
                         isClaimed = isClaimed,
                         player = playerInfo?.playerDetails ?: PlayerDetails(),
-                        heroStats = playerHeroStats,
+                        heroStats = playerHeroStats ?: emptyList(),
                         stats = playerInfo?.playerStats ?: PlayerStats(),
-                        matches = matchesResult.getOrNull() ?: listOf(),
-                        heroes = heroes,
+                        matches = matchesResult.getOrNull() ?: emptyList(),
+                        heroes = heroes ?: emptyList(),
                         playerRankUrl = playerInfo?.playerDetails?.rankImage ?: "no image"
                     )
                 }
@@ -160,15 +171,12 @@ class PlayerDetailsViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         playerErrors = PlayerErrors(
-                            playerInfoErrorMessage = "Unable to fetch player info.",
+                            playerIdError = playerIdResult.exceptionOrNull()?.message,
                             playerInfoError = playerInfoResult.exceptionOrNull()?.message,
-                            heroStatsErrorMessage = "Unable to fetch player hero stats.",
                             heroStatsError = playerHeroStatsResult.exceptionOrNull()?.message,
-                            matchesErrorMessage = "Unable to fetch player matches.",
                             matchesError = matchesResult.exceptionOrNull()?.message,
-                            statsErrorMessage = "Unable to fetch player stats.",
                             statsError = playerInfoResult.exceptionOrNull()?.message,
-                            heroesErrorMessage = "Unable to fetch heroes.",
+                            heroesError = heroesResult.exceptionOrNull()?.message
                         )
                     )
                 }

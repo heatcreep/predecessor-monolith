@@ -32,7 +32,7 @@ interface OmedaCityRepository {
 
     suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?>
 
-    suspend fun fetchHeroStatisticsById(heroIds: String): Result<HeroStatistics?>
+    suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?>
 }
 
 class OmedaCityRepositoryImpl @Inject constructor(

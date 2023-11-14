@@ -5,9 +5,16 @@ import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.UserInfo
 import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.network.UserRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import java.util.UUID
 
 class FakeUserRepository(private val error: Boolean = false) : UserRepository {
+
+    private val _claimedPlayer: MutableStateFlow<ClaimedUser?> = MutableStateFlow(null)
+    val claimedPlayer: StateFlow<ClaimedUser?> = _claimedPlayer
+
     override suspend fun getUser(): UserInfo? {
         return if (error) {
             null
@@ -19,7 +26,7 @@ class FakeUserRepository(private val error: Boolean = false) : UserRepository {
     }
 
     override fun setClaimedUser(playerStats: PlayerStats?, playerDetails: PlayerDetails?) {
-        TODO("Not yet implemented")
+        _claimedPlayer.update { ClaimedUser(playerStats, playerDetails) }
     }
 
     override suspend fun logout() {

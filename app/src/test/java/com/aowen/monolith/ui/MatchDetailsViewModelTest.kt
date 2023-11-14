@@ -5,6 +5,7 @@ import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.fakes.data.fakeAllItems
 import com.aowen.monolith.fakes.data.fakeMatchDetailsWithItems
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
+import com.aowen.monolith.fakes.repo.ResponseType
 import com.aowen.monolith.ui.screens.matches.MatchDetailsErrors
 import com.aowen.monolith.ui.screens.matches.MatchDetailsUiState
 import com.aowen.monolith.ui.screens.matches.MatchDetailsViewModel
@@ -57,7 +58,7 @@ class MatchDetailsViewModelTest {
 
             ),
             repository = FakeOmedaCityRepository(
-                hasEmptyItemDetails = true
+                itemDetailsResponse = ResponseType.Empty
             )
         )
         viewModel.initViewModel()
@@ -81,7 +82,7 @@ class MatchDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository()
+            repository = FakeOmedaCityRepository(hasMatchDetailsError = true)
         )
         viewModel.initViewModel()
 

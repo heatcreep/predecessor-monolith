@@ -21,56 +21,84 @@ import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
 import com.aowen.monolith.fakes.data.fakePlayerInfo
 import com.aowen.monolith.network.OmedaCityRepository
 
+
+enum class ResponseType {
+    Empty,
+    Success,
+}
 class FakeOmedaCityRepository(
     private val hasPlayerDetailsError: Boolean = false,
     private val hasPlayerInfoError: Boolean = false,
     private val hasPlayerHeroStatsError: Boolean = false,
     private val hasMatchDetailsError: Boolean = false,
     private val hasItemDetailsErrors: Boolean = false,
-    private val hasEmptyItemDetails: Boolean = false,
+    private val itemDetailsResponse: ResponseType = ResponseType.Success,
     private val hasHeroDetailsErrors: Boolean = false,
+    private val heroDetailsResponse: ResponseType = ResponseType.Success,
     private val hasHeroStatisticsErrors: Boolean = false
 ) : OmedaCityRepository {
+
+    companion object {
+        const val FetchPlayersError = "Failed to fetch players"
+        const val FetchPlayerInfoError = "Failed to fetch player info"
+        const val FetchPlayerHeroStatsError = "Failed to fetch player hero stats"
+        const val FetchMatchesError = "Failed to fetch matches"
+        const val FetchMatchError = "Failed to fetch match"
+        const val FetchItemsError = "Failed to fetch items"
+        const val FetchItemError = "Failed to fetch item"
+        const val FetchHeroesError = "Failed to fetch heroes"
+        const val FetchHeroError = "Failed to fetch hero"
+        const val FetchHeroStatsError = "Failed to fetch hero statistics"
+    }
+
     override suspend fun fetchPlayersByName(playerName: String): Result<List<PlayerDetails>?> {
         return when (hasPlayerDetailsError) {
-            true -> Result.failure(Exception("Failed to fetch players"))
+            true -> Result.failure(Exception(FetchPlayersError))
             false -> Result.success(listOf(fakePlayerDetails))
         }
     }
 
     override suspend fun fetchPlayerInfo(playerId: String): Result<PlayerInfo> {
-        return when (hasPlayerInfoError) {
-            true -> Result.failure(Exception("Failed to fetch player info"))
-            false -> Result.success(fakePlayerInfo)
+        return if (hasPlayerInfoError) {
+            Result.failure(Exception(FetchPlayerInfoError))
+        } else when (playerId) {
+            "Empty" -> Result.success(PlayerInfo(null, null))
+            else -> Result.success(fakePlayerInfo)
         }
     }
 
     override suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>?> {
-        return when (hasPlayerHeroStatsError) {
-            true -> Result.failure(Exception("Failed to fetch player hero stats"))
-            false -> Result.success(listOf(fakePlayerHeroStatsDto.create()))
+        return if(hasPlayerHeroStatsError) {
+            Result.failure(Exception(FetchPlayerHeroStatsError))
+        } else when (playerId) {
+            "Empty" -> Result.success(null)
+            else -> Result.success(listOf(fakePlayerHeroStatsDto.create()))
         }
     }
 
     override suspend fun fetchMatchesById(playerId: String): Result<List<MatchDetails>?> {
-        return when (hasMatchDetailsError) {
-            true -> Result.failure(Exception("Failed to fetch matches"))
-            false -> Result.success(listOf(fakeMatchDto.create()))
+        return if (hasMatchDetailsError) {
+            Result.failure(Exception(FetchMatchesError))
+        } else when (playerId) {
+            "Empty" -> Result.success(null)
+            else -> Result.success(listOf(fakeMatchDto.create()))
         }
     }
 
     override suspend fun fetchMatchById(matchId: String): Result<MatchDetails?> {
-        return when (matchId) {
-            "Error" -> Result.failure(Exception("Failed to fetch match"))
+        return if(hasMatchDetailsError) {
+            Result.failure(Exception(FetchMatchError))
+        } else when (matchId) {
             "No Match" -> Result.success(null)
             else -> Result.success(fakeMatchDto.create())
         }
     }
 
     override suspend fun fetchAllItems(): Result<List<ItemDetails>?> {
-        return when {
-            hasItemDetailsErrors -> Result.failure(Exception("Failed to fetch items"))
-            hasEmptyItemDetails -> Result.success(emptyList())
+        return if(hasItemDetailsErrors) {
+            Result.failure(Exception(FetchItemsError))
+        } else when (itemDetailsResponse) {
+            ResponseType.Empty -> Result.success(emptyList())
             else -> Result.success(
                 listOf(
                     fakeItemDto.create(),
@@ -83,17 +111,20 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchItemByName(itemName: String): Result<ItemDetails?> {
-        return when (itemName) {
-            "Error" -> Result.failure(Exception("Failed to fetch item"))
+        return if(hasItemDetailsErrors) {
+            Result.failure(Exception(FetchItemError))
+        } else when (itemName) {
             "Empty" -> Result.success(null)
             else -> Result.success(fakeItemDto.create())
         }
     }
 
     override suspend fun fetchAllHeroes(): Result<List<HeroDetails>?> {
-        return when (hasHeroDetailsErrors) {
-            true -> Result.failure(Exception("Failed to fetch heroes"))
-            false -> Result.success(
+        return if (hasHeroDetailsErrors) {
+            Result.failure(Exception(FetchHeroesError))
+        } else when (heroDetailsResponse) {
+            ResponseType.Empty -> Result.success(null)
+            else -> Result.success(
                 listOf(
                     fakeHeroDto.create(),
                     fakeHeroDto2.create()
@@ -103,16 +134,20 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?> {
-        return when (hasHeroDetailsErrors) {
-            true -> Result.failure(Exception("Failed to fetch hero"))
-            false -> Result.success(fakeHeroDto.create())
+        return if (hasHeroDetailsErrors) {
+            Result.failure(Exception(FetchHeroError))
+        } else when (heroName) {
+            "Empty" -> Result.success(null)
+            else -> Result.success(fakeHeroDto.create())
         }
     }
 
-    override suspend fun fetchHeroStatisticsById(heroIds: String): Result<HeroStatistics?> {
-        return when (hasHeroStatisticsErrors) {
-            true -> Result.failure(Exception("Failed to fetch hero statistics"))
-            false -> Result.success(fakeHeroStatisticsDto.create())
+    override suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?> {
+        return if (hasHeroStatisticsErrors) {
+            Result.failure(Exception(FetchHeroStatsError))
+        } else when (heroId) {
+            "Empty" -> Result.success(null)
+            else -> Result.success(fakeHeroStatisticsDto.create())
         }
     }
 }
