@@ -15,6 +15,9 @@ class FakeUserRepository(private val error: Boolean = false) : UserRepository {
     private val _claimedPlayer: MutableStateFlow<ClaimedUser?> = MutableStateFlow(null)
     val claimedPlayer: StateFlow<ClaimedUser?> = _claimedPlayer
 
+    private val _logoutCounter: MutableStateFlow<Int> = MutableStateFlow(0)
+    val logoutCounter: StateFlow<Int> = _logoutCounter
+
     override suspend fun getUser(): UserInfo? {
         return if (error) {
             null
@@ -30,6 +33,6 @@ class FakeUserRepository(private val error: Boolean = false) : UserRepository {
     }
 
     override suspend fun logout() {
-        TODO("Not yet implemented")
+        _logoutCounter.update { it + 1 }
     }
 }
