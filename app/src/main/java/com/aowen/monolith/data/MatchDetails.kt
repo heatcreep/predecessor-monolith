@@ -52,6 +52,20 @@ fun MatchPlayerDetails.getKda(): String {
     return if (kda.isNaN()) 0.0.toString() else kda.toDecimal("#.##")
 }
 
+private fun getPlayerItems(
+    itemIds: List<Int>,
+    allItems: List<ItemDetails>?
+): List<ItemDetails> {
+    return allItems?.filter { item ->
+        item.id in itemIds
+    } ?: emptyList()
+}
+
+fun MatchPlayerDetails.getDetailsWithItems(allItems: List<ItemDetails>?): MatchPlayerDetails {
+    val playerItems = getPlayerItems(this.itemIds, allItems)
+    return this.copy(playerItems = playerItems)
+}
+
 
 data class TeamDetails(
     val averageMmr: String = "",
@@ -91,3 +105,5 @@ fun MatchDto.create(): MatchDetails {
 
     )
 }
+
+

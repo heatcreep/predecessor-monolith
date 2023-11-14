@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
-import com.aowen.monolith.data.MatchPlayerDetails
+import com.aowen.monolith.data.getDetailsWithItems
 import com.aowen.monolith.data.toDecimal
 import com.aowen.monolith.network.OmedaCityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,27 +41,17 @@ class MatchDetailsViewModel @Inject constructor(
     private val matchId: String = checkNotNull(savedStateHandle["matchId"])
 
     init {
-        viewModelScope.launch {
+        initViewModel()
+    }
 
+
+    fun initViewModel() {
+        viewModelScope.launch {
             val matchDeferred = async { repository.fetchMatchById(matchId) }
             val itemsDeferred = async { repository.fetchAllItems() }
 
             val matchResult = matchDeferred.await()
             val itemsResult = itemsDeferred.await()
-
-            fun getPlayerItems(
-                itemIds: List<Int>,
-                allItems: List<ItemDetails>?
-            ): List<ItemDetails> {
-                return allItems?.filter { item ->
-                    item.id in itemIds
-                } ?: emptyList()
-            }
-
-            fun MatchPlayerDetails.getDetailsWithItems(allItems: List<ItemDetails>?): MatchPlayerDetails {
-                val playerItems = getPlayerItems(this.itemIds, allItems)
-                return this.copy(playerItems = playerItems)
-            }
 
             if (matchResult.isSuccess && itemsResult.isSuccess) {
                 val match = matchResult.getOrNull()
@@ -83,7 +73,7 @@ class MatchDetailsViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         match = newMatch ?: MatchDetails(),
-                        items = itemsResult.getOrNull() ?: emptyList()
+                        items = allItems ?: emptyList()
                     )
                 }
             } else {

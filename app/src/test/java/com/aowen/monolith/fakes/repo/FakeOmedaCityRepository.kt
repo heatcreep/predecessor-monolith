@@ -30,7 +30,7 @@ class FakeOmedaCityRepository(
     private val hasEmptyItemDetails: Boolean = false,
     private val hasHeroDetailsErrors: Boolean = false,
     private val hasHeroStatisticsErrors: Boolean = false
-): OmedaCityRepository {
+) : OmedaCityRepository {
     override suspend fun fetchPlayersByName(playerName: String): Result<List<PlayerDetails>?> {
         return when (hasPlayerDetailsError) {
             true -> Result.failure(Exception("Failed to fetch players"))
@@ -60,9 +60,10 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchMatchById(matchId: String): Result<MatchDetails?> {
-        return when (hasMatchDetailsError) {
-            true -> Result.failure(Exception("Failed to fetch match"))
-            false -> Result.success(fakeMatchDto.create())
+        return when (matchId) {
+            "Error" -> Result.failure(Exception("Failed to fetch match"))
+            "No Match" -> Result.success(null)
+            else -> Result.success(fakeMatchDto.create())
         }
     }
 
@@ -70,12 +71,14 @@ class FakeOmedaCityRepository(
         return when {
             hasItemDetailsErrors -> Result.failure(Exception("Failed to fetch items"))
             hasEmptyItemDetails -> Result.success(emptyList())
-            else -> Result.success(listOf(
-                fakeItemDto.create(),
-                fakeItemDto2.create(),
-                fakeItemDto3.create(),
-                fakeItemDto4.create()
-            ))
+            else -> Result.success(
+                listOf(
+                    fakeItemDto.create(),
+                    fakeItemDto2.create(),
+                    fakeItemDto3.create(),
+                    fakeItemDto4.create()
+                )
+            )
         }
     }
 
@@ -90,10 +93,12 @@ class FakeOmedaCityRepository(
     override suspend fun fetchAllHeroes(): Result<List<HeroDetails>?> {
         return when (hasHeroDetailsErrors) {
             true -> Result.failure(Exception("Failed to fetch heroes"))
-            false -> Result.success(listOf(
-                fakeHeroDto.create(),
-                fakeHeroDto2.create()
-            ))
+            false -> Result.success(
+                listOf(
+                    fakeHeroDto.create(),
+                    fakeHeroDto2.create()
+                )
+            )
         }
     }
 

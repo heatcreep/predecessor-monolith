@@ -145,7 +145,7 @@ class OmedaCityRepositoryTest {
         omedaCityRepository = OmedaCityRepositoryImpl(
             playerApiService = FakeOmedaCityService(404)
         )
-        val actual = omedaCityRepository.fetchMatchById("123").exceptionOrNull()
+        val actual = omedaCityRepository.fetchMatchById("Error").exceptionOrNull()
         val expected = "Failed to fetch match"
         assertTrue(actual is Exception)
         assertEquals(expected, actual?.message)
