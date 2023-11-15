@@ -22,7 +22,7 @@ jobs:
       - name: Setup service account
         run: |
           echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > serviceAccountKey.json
-          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/serviceAccountKey.json
+          export GOOGLE_APPLICATION_CREDENTIALS=serviceAccountKey.json
           echo $GOOGLE_APPLICATION_CREDENTIALS
       - name: Check environment variable
         run: echo $GOOGLE_APPLICATION_CREDENTIALS
