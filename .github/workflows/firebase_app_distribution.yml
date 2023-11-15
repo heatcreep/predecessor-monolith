@@ -23,9 +23,10 @@ jobs:
         run: echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > $HOME/serviceAccountKey.json
         env:
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/serviceAccountKey.json
+
       - name: Deploy to Firebase App Distribution
         run: |
-          firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }}
-          --app ${{ secrets.FIREBASE_APP_ID }}
-          --groups close-friends
+          firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} \
+          --app ${{ secrets.FIREBASE_APP_ID }} \
+          --groups close-friends \
           --release-notes-file RELEASENOTES.md
