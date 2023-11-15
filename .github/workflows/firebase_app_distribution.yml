@@ -20,10 +20,11 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
       - name: Setup service account
-        run: echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > $HOME/serviceAccountKey.json
+        run: |
+          echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > $HOME/serviceAccountKey.json
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/serviceAccountKey.json
       - name: Deploy to Firebase App Distribution
         run: |
-          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/serviceAccountKey.json
           echo $GOOGLE_APPLICATION_CREDENTIALS
           firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} \
           --app ${{ secrets.FIREBASE_APP_ID }} \
