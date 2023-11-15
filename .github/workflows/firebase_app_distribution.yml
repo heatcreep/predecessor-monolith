@@ -30,3 +30,5 @@ jobs:
           --app ${{ secrets.FIREBASE_APP_ID }} \
           --groups close-friends \
           --release-notes-file RELEASENOTES.md
+        env:
+          GOOGLE_HOME_CREDENTIALS: $GOOGLE_HOME_CREDENTIALS
