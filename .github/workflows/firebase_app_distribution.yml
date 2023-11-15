@@ -22,7 +22,7 @@ jobs:
       - name: Setup service account
         run: echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > $HOME/serviceAccountKey.json
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: serviceAccountKey.json
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/serviceAccountKey.json
       - name: Deploy to Firebase App Distribution
         run: |
           firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }}
