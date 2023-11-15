@@ -26,6 +26,8 @@ jobs:
           echo $GOOGLE_APPLICATION_CREDENTIALS
       - name: Check environment variable
         run: echo $GOOGLE_APPLICATION_CREDENTIALS
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: serviceAccountKey.json
       # - name: Deploy to Firebase App Distribution
       #   run: |
       #     echo $GOOGLE_APPLICATION_CREDENTIALS
