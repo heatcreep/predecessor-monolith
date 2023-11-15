@@ -259,7 +259,7 @@ class PlayerDetailsViewModelTest {
             playerStats = fakePlayerStatsDto.create(),
             playerDetails = fakePlayerDto.create()
         )
-        val actual = fakeUserRepository.claimedPlayer.value
+        val actual = fakeUserRepository.claimedUser.value
         assertEquals(expected, actual)
     }
 

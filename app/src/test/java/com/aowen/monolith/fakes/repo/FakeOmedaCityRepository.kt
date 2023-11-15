@@ -17,6 +17,7 @@ import com.aowen.monolith.fakes.data.fakeItemDto3
 import com.aowen.monolith.fakes.data.fakeItemDto4
 import com.aowen.monolith.fakes.data.fakeMatchDto
 import com.aowen.monolith.fakes.data.fakePlayerDetails
+import com.aowen.monolith.fakes.data.fakePlayerDetails2
 import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
 import com.aowen.monolith.fakes.data.fakePlayerInfo
 import com.aowen.monolith.network.OmedaCityRepository
@@ -26,6 +27,7 @@ enum class ResponseType {
     Empty,
     Success,
 }
+
 class FakeOmedaCityRepository(
     private val hasPlayerDetailsError: Boolean = false,
     private val hasPlayerInfoError: Boolean = false,
@@ -52,9 +54,27 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchPlayersByName(playerName: String): Result<List<PlayerDetails>?> {
-        return when (hasPlayerDetailsError) {
-            true -> Result.failure(Exception(FetchPlayersError))
-            false -> Result.success(listOf(fakePlayerDetails))
+        return if (hasPlayerDetailsError) {
+            Result.failure(Exception(FetchPlayersError))
+        } else when (playerName) {
+            "Cheater" -> Result.success(
+                listOf(
+                    fakePlayerDetails,
+                    fakePlayerDetails2.copy(isCheater = true)
+                )
+            )
+
+            "MMR Disabled" -> Result.success(
+                listOf(
+                    fakePlayerDetails,
+                    fakePlayerDetails2.copy(isMmrDisabled = true)
+
+                )
+            )
+
+            "Empty" -> Result.success(emptyList())
+
+            else -> Result.success(listOf(fakePlayerDetails, fakePlayerDetails2))
         }
     }
 
@@ -68,7 +88,7 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>?> {
-        return if(hasPlayerHeroStatsError) {
+        return if (hasPlayerHeroStatsError) {
             Result.failure(Exception(FetchPlayerHeroStatsError))
         } else when (playerId) {
             "Empty" -> Result.success(null)
@@ -86,7 +106,7 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchMatchById(matchId: String): Result<MatchDetails?> {
-        return if(hasMatchDetailsError) {
+        return if (hasMatchDetailsError) {
             Result.failure(Exception(FetchMatchError))
         } else when (matchId) {
             "No Match" -> Result.success(null)
@@ -95,7 +115,7 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchAllItems(): Result<List<ItemDetails>?> {
-        return if(hasItemDetailsErrors) {
+        return if (hasItemDetailsErrors) {
             Result.failure(Exception(FetchItemsError))
         } else when (itemDetailsResponse) {
             ResponseType.Empty -> Result.success(emptyList())
@@ -111,7 +131,7 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchItemByName(itemName: String): Result<ItemDetails?> {
-        return if(hasItemDetailsErrors) {
+        return if (hasItemDetailsErrors) {
             Result.failure(Exception(FetchItemError))
         } else when (itemName) {
             "Empty" -> Result.success(null)

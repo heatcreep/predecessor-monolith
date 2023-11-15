@@ -10,10 +10,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import java.util.UUID
 
-class FakeUserRepository(private val error: Boolean = false) : UserRepository {
+class FakeUserRepository(
+    private val error: Boolean = false,
+    fakeClaimedUser: ClaimedUser? = null
+) : UserRepository {
 
-    private val _claimedPlayer: MutableStateFlow<ClaimedUser?> = MutableStateFlow(null)
-    val claimedPlayer: StateFlow<ClaimedUser?> = _claimedPlayer
+    private val _claimedUser: MutableStateFlow<ClaimedUser?> = MutableStateFlow(fakeClaimedUser)
+    val claimedUser: StateFlow<ClaimedUser?> = _claimedUser
 
     private val _logoutCounter: MutableStateFlow<Int> = MutableStateFlow(0)
     val logoutCounter: StateFlow<Int> = _logoutCounter
@@ -25,11 +28,18 @@ class FakeUserRepository(private val error: Boolean = false) : UserRepository {
     }
 
     override suspend fun getClaimedUser(): Result<ClaimedUser?> {
-        TODO("Not yet implemented")
+        return if (error) {
+            Result.failure(Exception("Error getting claimed user."))
+        } else {
+            when (_claimedUser.value) {
+                null -> Result.success(null)
+                else -> Result.success(claimedUser.value)
+            }
+        }
     }
 
     override fun setClaimedUser(playerStats: PlayerStats?, playerDetails: PlayerDetails?) {
-        _claimedPlayer.update { ClaimedUser(playerStats, playerDetails) }
+        _claimedUser.update { ClaimedUser(playerStats, playerDetails) }
     }
 
     override suspend fun logout() {

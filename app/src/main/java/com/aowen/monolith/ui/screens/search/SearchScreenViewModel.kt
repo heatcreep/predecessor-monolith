@@ -147,24 +147,20 @@ class SearchScreenViewModel @Inject constructor(
     fun handleSubmitSearch() {
         _uiState.update { it.copy(isLoadingSearch = true) }
         viewModelScope.launch {
-            try {
-                val fieldValue = uiState.value.searchFieldValue.trim()
-                val playersList = repository.fetchPlayersByName(fieldValue)
-                if (playersList.isSuccess) {
-                    val filteredList = playersList.getOrNull()?.filter {
-                        !it.isCheater || !it.isMmrDisabled
-                    }
-                    _uiState.update {
-                        it.copy(
-                            isLoadingSearch = false,
-                            playersList = filteredList ?: emptyList(),
-                            searchError = if (filteredList.isNullOrEmpty()) "No results found" else null
-                        )
-                    }
+            val fieldValue = uiState.value.searchFieldValue.trim()
+            val playersList = repository.fetchPlayersByName(fieldValue)
+            if (playersList.isSuccess) {
+                val filteredList = playersList.getOrNull()?.filter {
+                    !it.isCheater && !it.isMmrDisabled
                 }
-
-            } catch (e: Exception) {
-                logDebug(e.toString())
+                _uiState.update {
+                    it.copy(
+                        isLoadingSearch = false,
+                        playersList = filteredList ?: emptyList(),
+                        searchError = if (filteredList.isNullOrEmpty()) "No results found" else null
+                    )
+                }
+            } else {
                 _uiState.update {
                     it.copy(
                         isLoadingSearch = false,
