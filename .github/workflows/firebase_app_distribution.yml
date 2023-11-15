@@ -27,9 +27,9 @@ jobs:
       - name: Deploy to Firebase App Distribution
         env:
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/serviceAccountKey.json
+          FIREBASE_TOKEN: $HOME/serviceAccountKey.json
         run: |
           firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} \
-          --token ${{ secrets.FIREBASE_TOKEN }} \
           --app ${{ secrets.FIREBASE_APP_ID }} \
           --groups close-friends \
           --release-notes-file RELEASENOTES.md
