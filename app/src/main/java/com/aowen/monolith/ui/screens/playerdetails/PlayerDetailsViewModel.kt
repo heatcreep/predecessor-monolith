@@ -91,13 +91,24 @@ class PlayerDetailsViewModel @Inject constructor(
     }
 
     fun handleTimeSinceMatch(endTime: String): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
         val endDate = sdf.parse(endTime)
         val now = Calendar.getInstance().time
-        val duration = TimeUnit.MILLISECONDS.toHours(now.time - (endDate?.time ?: 0))
-        val durationDays = TimeUnit.MILLISECONDS.toDays(now.time - (endDate?.time ?: 0))
-        val daysText = if (durationDays == 1L) "day ago" else "days ago"
-        return if (duration < 24) "${duration}h ago" else "$durationDays $daysText"
+        val diff = now.time - (endDate?.time ?: 0)
+
+        val days = TimeUnit.MILLISECONDS.toDays(diff)
+        val hours = TimeUnit.MILLISECONDS.toHours(diff)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(diff) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(diff))
+
+        return when {
+            days > 1 -> "$days days ago"
+            days.toInt() == 1 -> "$days day ago"
+            hours >= 2 -> "${hours}hrs ago"
+            hours == 1L -> "${hours}h ago"
+            minutes >= 2 -> "$minutes mins ago"
+            minutes == 1L -> "$minutes min ago"
+            else -> "Just now"
+        }
     }
 
     suspend fun handleSavePlayer(isRemoving: Boolean = false) {

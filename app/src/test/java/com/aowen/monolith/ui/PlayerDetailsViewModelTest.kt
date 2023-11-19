@@ -320,9 +320,41 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
+    fun `handleTimeSinceMatch() should return correct time for 2 hours ago`() {
+        val fakeTime = ZonedDateTime.now().minusHours(2)
+        val expected = "2hrs ago"
+        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun `handleTimeSinceMatch() should return correct time for 1 hour ago`() {
         val fakeTime = ZonedDateTime.now().minusHours(1)
         val expected = "1h ago"
+        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `handleTimeSinceMatch() should return correct time for less than 1 hour ago`() {
+        val fakeTime = ZonedDateTime.now().minusMinutes(59)
+        val expected = "59 mins ago"
+        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `handleTimeSinceMatch() should return correct time for 1 minute ago`() {
+        val fakeTime = ZonedDateTime.now().minusMinutes(1)
+        val expected = "1 min ago"
+        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `handleTimeSinceMatch() should return correct time for less than 1 minute ago`() {
+        val fakeTime = ZonedDateTime.now().minusSeconds(59)
+        val expected = "Just now"
         val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
