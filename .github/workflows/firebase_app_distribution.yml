@@ -22,14 +22,12 @@ jobs:
       - name: Setup service account
         run: |
           echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > /opt/serviceAccountKey.json
-          export GOOGLE_APPLICATION_CREDENTIALS=/opt/serviceAccountKey.json
       - name: Check environment variable
         run: echo $GOOGLE_APPLICATION_CREDENTIALS
         env:
           GOOGLE_APPLICATION_CREDENTIALS: serviceAccountKey.json
       - name: Deploy to Firebase App Distribution
         run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=/opt/serviceAccountKey.json
           echo $GOOGLE_APPLICATION_CREDENTIALS
           # firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups close-friends --release-notes-file RELEASENOTES.md
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS
