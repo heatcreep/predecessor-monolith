@@ -67,13 +67,18 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                     if (recentSearches.size >= TABLE_MAX_ROWS) {
                         postgrestService.updateRecentSearch(
                             user.id,
-                            recentSearches.first().playerId
+                            recentSearches.first().playerId,
+                            playerSearchDto
                         )
                     }
                     postgrestService.insertRecentSearch(playerSearchDto)
 
                 } else {
-                    postgrestService.updateRecentSearch(user.id, playerSearchDto.playerId)
+                    postgrestService.updateRecentSearch(
+                        user.id,
+                        playerSearchDto.playerId,
+                        playerSearchDto
+                    )
                 }
 
             }

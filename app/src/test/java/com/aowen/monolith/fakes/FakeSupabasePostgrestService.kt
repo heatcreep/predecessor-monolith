@@ -21,7 +21,7 @@ class FakeSupabasePostgrestService(private val recentSearchStatus: RecentSearchS
         // no-op
     }
 
-    override suspend fun fetchUserInfo(email: String): UserInfo? {
+    override suspend fun fetchUserInfo(email: String): UserInfo {
         return UserInfo(
             UUID.fromString("addc8bb3-20ad-462a-a9f8-8b32bbf57514")
         )
@@ -40,7 +40,7 @@ class FakeSupabasePostgrestService(private val recentSearchStatus: RecentSearchS
         }
     }
 
-    override suspend fun deleteAllRecentSearches(userId: UUID): Unit {
+    override suspend fun deleteAllRecentSearches(userId: UUID) {
         searchCount.value = 0
     }
 
@@ -52,7 +52,11 @@ class FakeSupabasePostgrestService(private val recentSearchStatus: RecentSearchS
         searchCount.value = searchCount.value + 1
     }
 
-    override suspend fun updateRecentSearch(userId: UUID, recentPlayerId: UUID) {
+    override suspend fun updateRecentSearch(
+        userId: UUID,
+        recentPlayerId: UUID,
+        playerSearchDto: PlayerSearchDto
+    ) {
         searchCount.value = searchCount.value + 2
     }
 }

@@ -7,8 +7,16 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
+import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.Inject
+
+const val COLUMN_RANK = "rank"
+const val COLUMN_RANK_TITLE = "rank_title"
+const val COLUMN_RANK_IMAGE = "rank_image"
+const val COLUMN_IS_RANKED = "is_ranked"
+const val COLUMN_MMR = "mmr"
+
 
 interface SupabasePostgrestService {
 
@@ -26,7 +34,11 @@ interface SupabasePostgrestService {
 
     suspend fun insertRecentSearch(playerSearchDto: PlayerSearchDto)
 
-    suspend fun updateRecentSearch(userId: UUID, recentPlayerId: UUID)
+    suspend fun updateRecentSearch(
+        userId: UUID,
+        recentPlayerId: UUID,
+        playerSearchDto: PlayerSearchDto
+    )
 }
 
 class SupabasePostgrestServiceImpl @Inject constructor(
@@ -48,7 +60,7 @@ class SupabasePostgrestServiceImpl @Inject constructor(
                 eq("id", userId)
             }
         } catch (e: RestException) {
-            logDebug(e.localizedMessage)
+            logDebug(e.localizedMessage ?: "Error saving player")
         }
     }
 
@@ -82,7 +94,7 @@ class SupabasePostgrestServiceImpl @Inject constructor(
                 eq(TABLE_USER_ID, userId)
             }
         } catch (e: Exception) {
-            logDebug(e.localizedMessage)
+            logDebug(e.localizedMessage ?: "Error deleting all recent searches")
         }
     }
 
@@ -97,8 +109,19 @@ class SupabasePostgrestServiceImpl @Inject constructor(
         postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
     }
 
-    override suspend fun updateRecentSearch(userId: UUID, recentPlayerId: UUID) {
-        postgrest[TABLE_RECENT_PROFILES].update {
+    override suspend fun updateRecentSearch(
+        userId: UUID,
+        recentPlayerId: UUID,
+        playerSearchDto: PlayerSearchDto
+    ) {
+        postgrest[TABLE_RECENT_PROFILES].update(update = {
+            set(TABLE_CREATED_AT, Timestamp(System.currentTimeMillis()).toString())
+            set(COLUMN_RANK, playerSearchDto.rank)
+            set(COLUMN_RANK_TITLE, playerSearchDto.rankTitle)
+            set(COLUMN_RANK_IMAGE, playerSearchDto.rankImage)
+            set(COLUMN_IS_RANKED, playerSearchDto.isRanked)
+            set(COLUMN_MMR, playerSearchDto.mmr)
+        }) {
             eq(TABLE_USER_ID, userId)
             eq(TABLE_PLAYER_ID, recentPlayerId)
         }
