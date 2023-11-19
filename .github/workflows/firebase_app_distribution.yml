@@ -30,4 +30,4 @@ jobs:
         run: |
           export GOOGLE_APPLICATION_CREDENTIALS=/opt/serviceAccountKey.json
           echo $GOOGLE_APPLICATION_CREDENTIALS
-          # firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups close-friends --release-notes-file RELEASENOTES.md
+          firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups close-friends --release-notes-file RELEASENOTES.md
