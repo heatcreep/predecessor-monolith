@@ -24,5 +24,6 @@ jobs:
           echo ${{ secrets.CREDENTIAL_FILE_CONTENT }} > serviceAccountKey.json
           export GOOGLE_APPLICATION_CREDENTIALS=serviceAccountKey.json
           echo 'Test divider'
+          pwd
           cat serviceAccountKey.json
           # firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups close-friends --release-notes-file RELEASENOTES.md
