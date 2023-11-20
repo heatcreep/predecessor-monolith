@@ -25,5 +25,5 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=serviceAccountKey.json
           echo 'Test divider'
           pwd
-          cat serviceAccountKey.json
+          cat /home/runner/work/predecessor-monolith/predecessor-monolith/serviceAccountKey.json
           # firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups close-friends --release-notes-file RELEASENOTES.md
