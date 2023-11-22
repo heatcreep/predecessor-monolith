@@ -28,7 +28,7 @@ jobs:
       - name: Install Firebase CLI
         run: |
           curl -sL https://firebase.tools | bash
-          firebase apps:list
+          firebase apps:list --project monolith-aowen
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
 
