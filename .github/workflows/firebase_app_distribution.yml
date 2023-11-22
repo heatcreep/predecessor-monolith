@@ -12,18 +12,15 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 17
-      # - name: Build Debug APK
-      #   env:
-      #     SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      #     SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      #   run: ./gradlew assembleRelease
+      - name: Build Debug APK
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: ./gradlew assembleRelease
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
       - name: Deploy to Firebase App Distribution
         run: |
           echo ${{ secrets.GOOGLE_SA_KEY }} > serviceAccountKey.json
           export GOOGLE_APPLICATION_CREDENTIALS=serviceAccountKey.json
-          echo 'Test divider'
-          pwd
-          cat /home/runner/work/predecessor-monolith/predecessor-monolith/serviceAccountKey.json
-          # firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups close-friends --release-notes-file RELEASENOTES.md
+          firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups close-friends --release-notes-file RELEASENOTES.md
