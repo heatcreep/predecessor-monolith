@@ -16,9 +16,10 @@ android {
         applicationId "com.aowen.monolith"
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName "0.1"
-
+        // 1 was the last versionCode used on Play Store before implementing CI with github actions
+        //versionCode is now auto-incremented by using github actions build number plus the original value
+        versionCode Integer.valueOf(System.getenv("VERSION_CODE") ?: 1) + 1
+        versionName System.getenv("VERSION_NAME") ?: "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
