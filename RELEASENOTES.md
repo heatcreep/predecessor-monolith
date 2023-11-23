@@ -1,5 +1,19 @@
 # Release Notes
 
+
+## 0.5.5 - Latest
+
+#### New Features
+
+- Added buttons to clear individual and all recent searches
+- Added caching to some endpoints to allow for offline browsing
+- adds some unit tests to add to the CI pipeline (TBD)
+
+#### Improvements & Bug Fixes
+- updates stats and rank icon on recent search entries
+- fixes the relative timestamps on match history
+
+
 ## 0.5.0 - Latest
 
 #### New Features

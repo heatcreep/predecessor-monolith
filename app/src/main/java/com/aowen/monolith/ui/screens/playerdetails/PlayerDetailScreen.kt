@@ -148,46 +148,50 @@ fun PlayerDetailScreen(
                 }
             } else {
                 Column(modifier = Modifier.fillMaxHeight()) {
-                    TabRow(
-                        selectedTabIndex = pagerState.currentPage,
-                        indicator = { tabPositions ->
-                            TabRowDefaults.Indicator(
-                                Modifier.tabIndicatorOffset(
-                                    tabPositions[pagerState.currentPage]
+                    if (uiState.isLoading) {
+                        FullScreenLoadingIndicator("Player Details")
+                    } else {
+                        TabRow(
+                            selectedTabIndex = pagerState.currentPage,
+                            indicator = { tabPositions ->
+                                TabRowDefaults.Indicator(
+                                    Modifier.tabIndicatorOffset(
+                                        tabPositions[pagerState.currentPage]
+                                    )
                                 )
-                            )
-                        }
-                    ) {
-                        tabs.forEachIndexed { index, tab ->
-                            Tab(
-                                text = { Text(text = tab) },
-                                unselectedContentColor = MaterialTheme.colorScheme.tertiary,
-                                selectedContentColor = MaterialTheme.colorScheme.secondary,
-                                selected = pagerState.currentPage == index,
-                                onClick = {
-                                    coroutineScope.launch {
-                                        pagerState.animateScrollToPage(index)
+                            }
+                        ) {
+                            tabs.forEachIndexed { index, tab ->
+                                Tab(
+                                    text = { Text(text = tab) },
+                                    unselectedContentColor = MaterialTheme.colorScheme.tertiary,
+                                    selectedContentColor = MaterialTheme.colorScheme.secondary,
+                                    selected = pagerState.currentPage == index,
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            pagerState.animateScrollToPage(index)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
-                    }
-                    HorizontalPager(
-                        modifier = Modifier.fillMaxWidth(),
-                        state = pagerState
-                    ) { page ->
-                        when (page) {
-                            0 -> PlayerStatsTab(
-                                uiState = uiState,
-                                handleSavePlayer = handleSavePlayer,
-                                timeSinceMatch = timeSinceMatch,
-                                navigateToMatchDetails = navigateToMatchDetails
-                            )
+                        HorizontalPager(
+                            modifier = Modifier.fillMaxWidth(),
+                            state = pagerState
+                        ) { page ->
+                            when (page) {
+                                0 -> PlayerStatsTab(
+                                    uiState = uiState,
+                                    handleSavePlayer = handleSavePlayer,
+                                    timeSinceMatch = timeSinceMatch,
+                                    navigateToMatchDetails = navigateToMatchDetails
+                                )
 
-                            1 -> PlayerHeroStatsTab(
-                                uiState = uiState,
-                                handlePlayerHeroStatsSelect = handlePlayerHeroStatsSelect
-                            )
+                                1 -> PlayerHeroStatsTab(
+                                    uiState = uiState,
+                                    handlePlayerHeroStatsSelect = handlePlayerHeroStatsSelect
+                                )
+                            }
                         }
                     }
 
@@ -207,30 +211,27 @@ fun PlayerStatsTab(
     timeSinceMatch: (String) -> String = { _ -> "" },
     navigateToMatchDetails: (String) -> Unit = { _ -> }
 ) {
-    if (uiState.isLoading) {
-        FullScreenLoadingIndicator("Player Details")
-    } else {
-        Column(
-            modifier = modifier
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            uiState.player.let { playerDetails ->
-                PlayerCard(
-                    player = playerDetails,
-                    isClaimed = uiState.isClaimed,
-                    handleSavePlayer = handleSavePlayer,
-                    stats = uiState.stats
-                )
-                Spacer(modifier = Modifier.size(32.dp))
-                MatchesList(
-                    playerId = uiState.playerId,
-                    matches = uiState.matches,
-                    timeSinceMatch = timeSinceMatch,
-                    navigateToMatchDetails = navigateToMatchDetails
-                )
 
-            }
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        uiState.player.let { playerDetails ->
+            PlayerCard(
+                player = playerDetails,
+                isClaimed = uiState.isClaimed,
+                handleSavePlayer = handleSavePlayer,
+                stats = uiState.stats
+            )
+            Spacer(modifier = Modifier.size(32.dp))
+            MatchesList(
+                playerId = uiState.playerId,
+                matches = uiState.matches,
+                timeSinceMatch = timeSinceMatch,
+                navigateToMatchDetails = navigateToMatchDetails
+            )
+
         }
     }
 }
@@ -252,154 +253,151 @@ fun PlayerHeroStatsTab(
     LaunchedEffect(selectedHero) {
         handlePlayerHeroStatsSelect(selectedHero.id)
     }
-    if (uiState.isLoading) {
-        FullScreenLoadingIndicator("Hero Stats")
-    } else {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        HeroSelectDropdown(
+            selectedHero = selectedHero,
+            onSelect = { selectedHero = it },
+            heroes = uiState.heroes
+        )
+        Spacer(modifier = Modifier.size(32.dp))
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            maxItemsInEachRow = 2
         ) {
-            HeroSelectDropdown(
-                selectedHero = selectedHero,
-                onSelect = { selectedHero = it },
-                heroes = uiState.heroes
+            // Matches Played
+            HeroStatCard(
+                statLabel = "Matches Played:",
+                statValue = uiState.selectedHeroStats?.matchCount.toString()
             )
-            Spacer(modifier = Modifier.size(32.dp))
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                maxItemsInEachRow = 2
-            ) {
-                // Matches Played
-                HeroStatCard(
-                    statLabel = "Matches Played:",
-                    statValue = uiState.selectedHeroStats?.matchCount.toString()
-                )
-                HeroStatCard(
-                    statLabel = "Win Rate:",
-                    statValue = "${uiState.selectedHeroStats?.winRate.toString()}%"
-                )
-                HeroStatCard(
-                    statLabel = "Average CS/min:",
-                    statValue = uiState.selectedHeroStats?.csMin.toString()
-                )
-                HeroStatCard(
-                    statLabel = "Average Gold/min:",
-                    statValue = uiState.selectedHeroStats?.goldMin.toString()
-                )
-                LongHeroStatCard(
-                    statTitle = "Performance Score:",
-                    statValue = uiState.selectedHeroStats?.avgPerformanceScore.toString(),
-                    subStats = listOf(
-                        StatPair(
-                            "Total:",
-                            uiState.selectedHeroStats?.totalPerformanceScore.toString()
-                        ),
-                        StatPair(
-                            "Average:",
-                            uiState.selectedHeroStats?.avgPerformanceScore.toString()
-                        ),
-                        StatPair(
-                            "Highest:",
-                            uiState.selectedHeroStats?.maxPerformanceScore.toString()
-                        )
+            HeroStatCard(
+                statLabel = "Win Rate:",
+                statValue = "${uiState.selectedHeroStats?.winRate.toString()}%"
+            )
+            HeroStatCard(
+                statLabel = "Average CS/min:",
+                statValue = uiState.selectedHeroStats?.csMin.toString()
+            )
+            HeroStatCard(
+                statLabel = "Average Gold/min:",
+                statValue = uiState.selectedHeroStats?.goldMin.toString()
+            )
+            LongHeroStatCard(
+                statTitle = "Performance Score:",
+                statValue = uiState.selectedHeroStats?.avgPerformanceScore.toString(),
+                subStats = listOf(
+                    StatPair(
+                        "Total:",
+                        uiState.selectedHeroStats?.totalPerformanceScore.toString()
+                    ),
+                    StatPair(
+                        "Average:",
+                        uiState.selectedHeroStats?.avgPerformanceScore.toString()
+                    ),
+                    StatPair(
+                        "Highest:",
+                        uiState.selectedHeroStats?.maxPerformanceScore.toString()
                     )
                 )
-                LongHeroStatCard(
-                    statTitle = "Damage dealt to heroes:",
-                    statValue = uiState.selectedHeroStats?.avgDamageDealtToHeroes.toString(),
-                    subStats = listOf(
-                        StatPair(
-                            "Total:",
-                            uiState.selectedHeroStats?.totalDamageDealtToHeroes.toString()
-                        ),
-                        StatPair(
-                            "Average:",
-                            uiState.selectedHeroStats?.avgDamageDealtToHeroes.toString()
-                        ),
-                        StatPair(
-                            "Highest:",
-                            uiState.selectedHeroStats?.maxDamageDealtToHeroes.toString()
-                        )
+            )
+            LongHeroStatCard(
+                statTitle = "Damage dealt to heroes:",
+                statValue = uiState.selectedHeroStats?.avgDamageDealtToHeroes.toString(),
+                subStats = listOf(
+                    StatPair(
+                        "Total:",
+                        uiState.selectedHeroStats?.totalDamageDealtToHeroes.toString()
+                    ),
+                    StatPair(
+                        "Average:",
+                        uiState.selectedHeroStats?.avgDamageDealtToHeroes.toString()
+                    ),
+                    StatPair(
+                        "Highest:",
+                        uiState.selectedHeroStats?.maxDamageDealtToHeroes.toString()
                     )
                 )
-                LongHeroStatCard(
-                    statTitle = "Damage dealt to structures:",
-                    statValue = uiState.selectedHeroStats?.avgDamageDealtToStructures.toString(),
-                    subStats = listOf(
-                        StatPair(
-                            "Total:",
-                            uiState.selectedHeroStats?.totalDamageDealtToStructures.toString()
-                        ),
-                        StatPair(
-                            "Average:",
-                            uiState.selectedHeroStats?.maxDamageDealtToStructures.toString()
-                        ),
-                        StatPair(
-                            "Highest:",
-                            uiState.selectedHeroStats?.maxDamageDealtToStructures.toString()
-                        )
+            )
+            LongHeroStatCard(
+                statTitle = "Damage dealt to structures:",
+                statValue = uiState.selectedHeroStats?.avgDamageDealtToStructures.toString(),
+                subStats = listOf(
+                    StatPair(
+                        "Total:",
+                        uiState.selectedHeroStats?.totalDamageDealtToStructures.toString()
+                    ),
+                    StatPair(
+                        "Average:",
+                        uiState.selectedHeroStats?.maxDamageDealtToStructures.toString()
+                    ),
+                    StatPair(
+                        "Highest:",
+                        uiState.selectedHeroStats?.maxDamageDealtToStructures.toString()
                     )
                 )
-                LongHeroStatCard(
-                    statTitle = "Damage dealt to objectives:",
-                    statValue = uiState.selectedHeroStats?.avgDamageDealtToObjectives.toString(),
-                    subStats = listOf(
-                        StatPair(
-                            "Total:",
-                            uiState.selectedHeroStats?.totalDamageDealtToObjectives.toString()
-                        ),
-                        StatPair(
-                            "Average:",
-                            uiState.selectedHeroStats?.avgDamageDealtToObjectives.toString()
-                        ),
-                        StatPair(
-                            "Highest:",
-                            uiState.selectedHeroStats?.maxDamageDealtToObjectives.toString()
-                        )
+            )
+            LongHeroStatCard(
+                statTitle = "Damage dealt to objectives:",
+                statValue = uiState.selectedHeroStats?.avgDamageDealtToObjectives.toString(),
+                subStats = listOf(
+                    StatPair(
+                        "Total:",
+                        uiState.selectedHeroStats?.totalDamageDealtToObjectives.toString()
+                    ),
+                    StatPair(
+                        "Average:",
+                        uiState.selectedHeroStats?.avgDamageDealtToObjectives.toString()
+                    ),
+                    StatPair(
+                        "Highest:",
+                        uiState.selectedHeroStats?.maxDamageDealtToObjectives.toString()
                     )
                 )
-                LongHeroStatCard(
-                    statTitle = "Healing done:",
-                    statValue = uiState.selectedHeroStats?.avgHealingDone.toString(),
-                    subStats = listOf(
-                        StatPair(
-                            "Total:",
-                            uiState.selectedHeroStats?.totalHealingDone.toString()
-                        ),
-                        StatPair(
-                            "Average:",
-                            uiState.selectedHeroStats?.avgHealingDone.toString()
-                        ),
-                        StatPair(
-                            "Highest:",
-                            uiState.selectedHeroStats?.maxHealingDone.toString()
-                        )
+            )
+            LongHeroStatCard(
+                statTitle = "Healing done:",
+                statValue = uiState.selectedHeroStats?.avgHealingDone.toString(),
+                subStats = listOf(
+                    StatPair(
+                        "Total:",
+                        uiState.selectedHeroStats?.totalHealingDone.toString()
+                    ),
+                    StatPair(
+                        "Average:",
+                        uiState.selectedHeroStats?.avgHealingDone.toString()
+                    ),
+                    StatPair(
+                        "Highest:",
+                        uiState.selectedHeroStats?.maxHealingDone.toString()
                     )
                 )
-                LongHeroStatCard(
-                    statTitle = "Wards placed:",
-                    statValue = uiState.selectedHeroStats?.avgWardsPlaced.toString(),
-                    subStats = listOf(
-                        StatPair(
-                            "Total:",
-                            uiState.selectedHeroStats?.wardsPlaced.toString()
-                        ),
-                        StatPair(
-                            "Average:",
-                            uiState.selectedHeroStats?.avgWardsPlaced.toString()
-                        ),
-                        StatPair(
-                            "Highest:",
-                            uiState.selectedHeroStats?.maxWardsPlaced.toString()
-                        )
+            )
+            LongHeroStatCard(
+                statTitle = "Wards placed:",
+                statValue = uiState.selectedHeroStats?.avgWardsPlaced.toString(),
+                subStats = listOf(
+                    StatPair(
+                        "Total:",
+                        uiState.selectedHeroStats?.wardsPlaced.toString()
+                    ),
+                    StatPair(
+                        "Average:",
+                        uiState.selectedHeroStats?.avgWardsPlaced.toString()
+                    ),
+                    StatPair(
+                        "Highest:",
+                        uiState.selectedHeroStats?.maxWardsPlaced.toString()
                     )
                 )
-            }
+            )
         }
     }
 }
