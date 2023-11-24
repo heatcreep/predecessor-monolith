@@ -4,4 +4,6 @@
     <string name="icon_heroes">Heroes</string>
     <string name="icon_items">Items</string>
     <string name="icon_profile">Profile</string>
+    <string name="additionalFormText">This feedback is only used to help fix bugs and make improvements to the app. We do not collect or store personal information with this tool.</string>
+    <string name="feedback_deny_toast">No worries! Any feedback is appreciated</string>
 </resources>

@@ -47,7 +47,7 @@ jobs:
           VERSION_NAME: ${{ env.version_name }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleFirebaseDistribution
 
       - name: Decode Firebase service account
         run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > ./serviceAccountKey.json
@@ -71,4 +71,4 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           files: |
-            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/apk/firebaseDistribution/app-firebaseDistribution.apk

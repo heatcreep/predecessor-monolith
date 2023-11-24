@@ -30,6 +30,12 @@ android {
     }
 
     buildTypes {
+
+        firebaseDistribution {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -86,12 +92,19 @@ dependencies {
     implementation libs.androidx.compose.ui.tooling
     implementation libs.androidx.compose.ui.tooling.preview
 
+    // Firebase API
+    implementation libs.firebase.app.distribution.api
+    firebaseDistributionImplementation libs.firebase.app.distribution
+
     // Compose Navigation
     implementation libs.androidx.compose.navigation
 
     // Accompanist - Pager
     implementation libs.accompanist.pager
     implementation libs.accompanist.page.indictators
+
+    // Accompanist - Permissions
+    firebaseDistributionImplementation libs.accompanist.permissions
 
     // Hilt
     implementation libs.hilt.android

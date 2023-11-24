@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.aowen.monolith.ui.MonolithApp
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.viewmodel.auth.AuthViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.handleDeeplinks
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: AuthViewModel by viewModels()
 
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supabaseClient.handleDeeplinks(intent = intent,
