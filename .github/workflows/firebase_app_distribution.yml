@@ -20,7 +20,7 @@ jobs:
           cache: gradle
 
       - name: Run Unit Tests
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew testFirebaseDistributionUnitTest
 
   distribute:
     needs: build
