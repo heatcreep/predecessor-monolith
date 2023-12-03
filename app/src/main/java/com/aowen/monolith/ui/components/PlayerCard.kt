@@ -308,6 +308,18 @@ fun PlayerCard(
                         )
                     }
                 )
+                // Winrate
+                StatListItem(
+                    modifier = modifier,
+                    statLabel = "Winrate:",
+                    statValue = {
+                        Text(
+                            text = stats.winRate,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                )
                 // Matches Played
                 StatListItem(
                     modifier = modifier,
@@ -348,6 +360,18 @@ fun PlayerCard(
                     modifier = modifier,
                     statLabel = "Average KDA:",
                     statValue = { KDAText(averageKda = stats.averageKda) }
+                )
+                // Average Performance Score
+                StatListItem(
+                    modifier = modifier,
+                    statLabel = "Average PS:",
+                    statValue = {
+                        Text(
+                            text = stats.averagePerformanceScore,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
                 )
             }
         } else {
@@ -413,7 +437,7 @@ fun PlayerCardPreview() {
                     hoursPlayed = "175.97",
                     matchesPlayed = "359",
                     averagePerformanceScore = "86.21",
-                    winRate = "0.5"
+                    winRate = "50%"
 
                 )
             )
