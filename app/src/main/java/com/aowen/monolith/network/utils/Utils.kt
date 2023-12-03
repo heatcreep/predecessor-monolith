@@ -12,7 +12,8 @@ fun String.trimExtraNewLine() = this
     .replace("\r\n\r\n", "\n")
 
 object NetworkUtil {
-    fun isNetworkAvailable(context: Context): Boolean {
+    @Suppress("DEPRECATION")
+    private fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -50,7 +51,7 @@ object NetworkUtil {
             }
             .addInterceptor { chain ->
                 var request = chain.request()
-                request = if (NetworkUtil.isNetworkAvailable(appContext))
+                request = if (isNetworkAvailable(appContext))
                     request.newBuilder().header(
                         name = "Cache-Control",
                         value = "public, max-age=$maxRequestAge"

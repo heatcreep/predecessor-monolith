@@ -3,6 +3,7 @@ package com.aowen.monolith.ui.screens.search
 import android.Manifest
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -107,7 +108,11 @@ internal fun SearchScreenRoute(
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     val permissionsState =
-        rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+        rememberPermissionState(
+            permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.POST_NOTIFICATIONS
+            } else ""
+        )
     val rejectedPermission = rememberSaveable {
         mutableStateOf(sharedPreferences.getBoolean("rejected_permission", false))
     }
@@ -153,7 +158,8 @@ internal fun SearchScreenRoute(
                         showDialog.value = false
                         rejectedPermission.value = true
                         sharedPreferences.edit().putBoolean("rejected_permission", true).apply()
-                        Toast.makeText(context, R.string.feedback_deny_toast, Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, R.string.feedback_deny_toast, Toast.LENGTH_LONG)
+                            .show()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -171,12 +177,15 @@ internal fun SearchScreenRoute(
             // Text providing notice to your testers about collection and processing of their feedback data
             R.string.additionalFormText,
             // The level of interruption for the notification
-            InterruptionLevel.HIGH
+            InterruptionLevel.DEFAULT
         )
     }
 
     LaunchedEffect(Unit) {
-        if (!permissionsState.status.isGranted && !rejectedPermission.value) {
+        if (!permissionsState.status.isGranted
+            && !rejectedPermission.value
+            && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        ) {
             showDialog.value = true
         }
         searchScreenViewModel.initViewModel()

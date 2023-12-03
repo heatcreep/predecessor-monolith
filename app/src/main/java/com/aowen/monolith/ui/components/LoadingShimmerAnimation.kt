@@ -17,8 +17,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.TileMode
 
 fun Modifier.loadingShimmerAnimation(
-    widthOfShadowBrush: Int = 500,
-    angleOfAxisY: Float = 270f,
     durationMillis: Int = 2000,
 ): Modifier = composed {
     val shimmerColors = listOf(

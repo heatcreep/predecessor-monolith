@@ -165,9 +165,9 @@ class OmedaCityRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchHeroStatisticsById(heroIds: String): Result<HeroStatistics?> {
+    override suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?> {
         return try {
-            val heroStatisticsResponse = playerApiService.getHeroStatisticsById(heroIds)
+            val heroStatisticsResponse = playerApiService.getHeroStatisticsById(heroId)
             if (heroStatisticsResponse.isSuccessful) {
                 Result.success(heroStatisticsResponse.body()?.heroStatistics?.first()?.create())
             } else {
