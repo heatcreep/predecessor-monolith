@@ -14,27 +14,36 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.aowen.monolith.network.firebase.DummyUserFeedback
+import com.aowen.monolith.network.firebase.UserFeedback
 import com.aowen.monolith.ui.MonolithApp
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.viewmodel.auth.AuthViewModel
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.handleDeeplinks
 import javax.inject.Inject
 
+
+val LocalUserFeedback = staticCompositionLocalOf<UserFeedback> { DummyUserFeedback() }
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var supabaseClient: SupabaseClient
 
+    @Inject
+    lateinit var userFeedback: UserFeedback
+
+
+
     private val viewModel: AuthViewModel by viewModels()
 
-    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supabaseClient.handleDeeplinks(intent = intent,
@@ -46,14 +55,16 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             MonolithTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MonolithApp(
-                        userId = viewModel.uiState.value.userId ?: ""
-                    )
+                CompositionLocalProvider(LocalUserFeedback provides userFeedback) {
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MonolithApp(
+                            userId = viewModel.uiState.value.userId ?: ""
+                        )
+                    }
                 }
             }
         }
