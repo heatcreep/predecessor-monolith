@@ -68,20 +68,18 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
-import com.aowen.monolith.LocalUserFeedback
 import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.network.firebase.Feedback
 import com.aowen.monolith.ui.components.RefreshableContainer
 import com.aowen.monolith.ui.components.ShimmerCircle
 import com.aowen.monolith.ui.components.ShimmerLongText
 import com.aowen.monolith.ui.components.ShimmerShortText
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.inputFieldDefaults
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun SearchScreenRoute(
     modifier: Modifier = Modifier,
@@ -90,7 +88,7 @@ internal fun SearchScreenRoute(
 ) {
     val searchUiState by searchScreenViewModel.uiState.collectAsState()
 
-    LocalUserFeedback.current.Feedback()
+    Feedback()
 
 
     LaunchedEffect(Unit) {

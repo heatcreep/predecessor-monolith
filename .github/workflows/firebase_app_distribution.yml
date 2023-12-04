@@ -62,7 +62,7 @@ jobs:
 
       - name: Distribute to Firebase
         run: |
-          firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups "close-friends, beta testers" --release-notes-file RELEASENOTES.md
+          firebase appdistribution:distribute ${{ secrets.APP_FILE_PATH }} --app ${{ secrets.FIREBASE_APP_ID }} --groups "close-friends, beta-testers" --release-notes-file RELEASENOTES.md
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
 
