@@ -22,7 +22,7 @@ enum class HeroImage(val heroName: String, val drawableId: Int) {
     DEKKER("Dekker", R.drawable.dekker),
     DRONGO("Drongo", R.drawable.drongo),
     FENGMAO("Feng Mao", R.drawable.fengmao),
-    FEY("The Fey", R.drawable.fey),
+    FEY("Fey", R.drawable.fey),
     GADGET("Gadget", R.drawable.gadget),
     GIDEON("Gideon", R.drawable.gideon),
     GREYSTONE("Greystone", R.drawable.greystone),

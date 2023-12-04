@@ -119,7 +119,11 @@ class PlayerDetailsViewModel @Inject constructor(
                 val userInfo = userInfoDeferred.await()
 
                 if (userInfo.isSuccess) {
-                    userRepository.setClaimedUser(uiState.value.stats, uiState.value.player)
+                    if(isRemoving) {
+                        userRepository.setClaimedUser(null, null)
+                    } else {
+                        userRepository.setClaimedUser(uiState.value.stats, uiState.value.player)
+                    }
                     _uiState.update {
                         it.copy(
                             isClaimed = !uiState.value.isClaimed

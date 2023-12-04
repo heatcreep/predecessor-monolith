@@ -602,9 +602,9 @@ fun ClaimedPlayerCard(
     modifier: Modifier = Modifier
 ) {
 
-    val heroImage = HeroImage.values().first {
+    val heroImage = HeroImage.values().firstOrNull {
         it.heroName == playerStats.favoriteHero
-    }
+    } ?: HeroImage.UNKNOWN
 
     Card(
         modifier = modifier

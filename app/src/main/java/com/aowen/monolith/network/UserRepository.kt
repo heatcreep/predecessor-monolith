@@ -80,21 +80,25 @@ class UserRepositoryImpl @Inject constructor(
                 } else null
             }
 
-            if (userProfile?.playerId != null) {
-                coroutineScope {
-                    val playerInfoResponse =
-                        omedaCityRepository.fetchPlayerInfo(userProfile.playerId)
-                    if (playerInfoResponse.isSuccess) {
-                        return@coroutineScope Result.success(
-                            ClaimedUser(
-                                playerStats = playerInfoResponse.getOrNull()?.playerStats,
-                                playerDetails = playerInfoResponse.getOrNull()?.playerDetails
+            if (userProfile != null) {
+                if (userProfile.playerId?.isNotBlank() == true) {
+                    coroutineScope {
+                        val playerInfoResponse =
+                            omedaCityRepository.fetchPlayerInfo(userProfile.playerId)
+                        if (playerInfoResponse.isSuccess) {
+                            return@coroutineScope Result.success(
+                                ClaimedUser(
+                                    playerStats = playerInfoResponse.getOrNull()?.playerStats,
+                                    playerDetails = playerInfoResponse.getOrNull()?.playerDetails
+                                )
                             )
-                        )
-                    } else {
-                        return@coroutineScope Result.failure(Exception("Failed to fetch player info."))
-                    }
+                        } else {
+                            return@coroutineScope Result.failure(Exception("Failed to fetch player info."))
+                        }
 
+                    }
+                } else {
+                    return Result.success(null)
                 }
             } else {
                 return Result.failure(Exception("No Player ID found."))

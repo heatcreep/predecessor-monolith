@@ -304,6 +304,27 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
+    fun `handleSavePlayer() should clear claimedUser if isRemoving is true`() = runBlocking {
+        val fakeUserRepository = FakeUserRepository()
+        viewModel = PlayerDetailsViewModel(
+            savedStateHandle = SavedStateHandle(
+                mapOf(
+                    "playerId" to "validPlayerId"
+                )
+
+            ),
+            repository = FakeOmedaCityRepository(),
+            authRepository = FakeAuthRepository(),
+            userRepository = fakeUserRepository
+        )
+        viewModel.handleSavePlayer(isRemoving = true)
+
+        val expected = ClaimedUser(null, null)
+        val actual = fakeUserRepository.claimedUser.value
+        assertEquals(expected, actual)
+    }
+
+    @Test
     fun `handleTimeSinceMatch() should return correct time for 1 day ago`() {
         val fakeTime = ZonedDateTime.now().minusDays(1)
         val expected = "1 day ago"
