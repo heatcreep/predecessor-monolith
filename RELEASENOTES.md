@@ -1,7 +1,34 @@
 # Release Notes
 
+## 0.6.5 - Latest
 
-## 0.5.5 - Latest
+#### New Features
+
+- Adds image for Iggy & Scorch
+
+#### Improvements & Bug Fixes
+
+- Fixes a bug where images wouldn't load on the hero details screen
+- Fixes ability text that had HTML tags in it
+- Fixes physical power text on the hero details - stats screen
+
+## 0.6.4
+
+- Fix Fetch Logic for Search Screen
+
+## 0.6.3
+
+- Minor improvements to deployment process
+
+## 0.6.2
+
+#### New Features
+
+- Overall win rate and Average Player Score have been added to the Player Details screen
+- Made Firebase Feedback quieter
+
+
+## 0.5.5
 
 #### New Features
 

@@ -1,6 +1,7 @@
 package com.aowen.monolith.ui.screens.herodetails
 
 import android.content.res.Configuration
+import android.widget.TextView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -47,11 +48,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
@@ -247,7 +251,7 @@ fun HeroStatsRateBar(
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.secondary
     )
-    Spacer(modifier = Modifier.size(4.dp))
+    Spacer(modifier = modifier.size(4.dp))
     LinearProgressIndicator(
         modifier = Modifier
             .height(16.dp)
@@ -350,7 +354,7 @@ fun HeroStatsScreen(
         StatRow(
             statName = "Physical Power",
             painterId = R.drawable.physical_power,
-            statValue = uiState.hero.baseStats.physicalPower.toString()
+            statValue = uiState.hero.baseStats.physicalPower[sliderValue.toInt()].toString()
         )
         // Movement Speed
         StatRow(
@@ -474,11 +478,25 @@ fun HeroAbilitiesScreen(
                             color = MaterialTheme.colorScheme.tertiary
                         )
                         ability.menuDescription?.let {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.secondary
+                            val imgRegex = "<img[^>]*>".toRegex()
+                            val resultString = it.replace(imgRegex, "")
+                            val textColor = MaterialTheme.colorScheme.secondary
+                            AndroidView(
+                                factory = { context ->
+                                    TextView(context).apply {
+                                        textSize = 14f
+                                    }
+                                },
+                                update = { tv ->
+                                    tv.text = HtmlCompat.fromHtml(resultString, 0)
+                                    tv.setTextColor(textColor.toArgb())
+                                }
                             )
+//                            Text(
+//                                text = HtmlCompat.fromHtml(it, 0),
+//                                style = MaterialTheme.typography.bodySmall,
+//                                color = MaterialTheme.colorScheme.secondary
+//                            )
                         }
                     }
                 }
