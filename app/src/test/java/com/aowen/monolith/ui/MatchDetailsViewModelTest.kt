@@ -89,7 +89,7 @@ class MatchDetailsViewModelTest {
         val expected = MatchDetailsUiState(
             isLoading = false,
             matchDetailsErrors = MatchDetailsErrors(
-                matchError = "Failed to fetch match"
+                errorMessage = "Failed to fetch match"
             )
         )
         val actual = viewModel.uiState.value
@@ -115,7 +115,7 @@ class MatchDetailsViewModelTest {
             match = MatchDetails(),
             items = emptyList(),
             matchDetailsErrors = MatchDetailsErrors(
-                itemsError = "Failed to fetch items"
+                errorMessage = "Failed to fetch items"
             )
         )
         val actual = viewModel.uiState.value

@@ -9,7 +9,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,6 +25,7 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.TeamDetails
+import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.theme.MonolithTheme
 
 @Composable
@@ -38,6 +38,7 @@ fun MatchDetailsRoute(
     MatchDetailsScreen(
         uiState = uiState,
         modifier = modifier,
+        handleRetry = viewModel::initViewModel,
         getCreepScorePerMinute = viewModel::getCreepScorePerMinute,
         getGoldEarnedPerMinute = viewModel::getGoldEarnedPerMinute,
         onItemClicked = viewModel::onItemClicked
@@ -50,6 +51,7 @@ fun MatchDetailsRoute(
 fun MatchDetailsScreen(
     uiState: MatchDetailsUiState,
     modifier: Modifier = Modifier,
+    handleRetry: () -> Unit,
     getCreepScorePerMinute: (Int) -> String,
     getGoldEarnedPerMinute: (Int) -> String,
     onItemClicked: (ItemDetails) -> Unit
@@ -81,7 +83,11 @@ fun MatchDetailsScreen(
             FullScreenLoadingIndicator("Match Details")
         } else {
             if(uiState.matchDetailsErrors != null) {
-                Text(text = "Error")
+                FullScreenErrorWithRetry(
+                    errorMessage = uiState.matchDetailsErrors.errorMessage,
+                ) {
+                    handleRetry()
+                }
             } else {
                 Column(
                     modifier = Modifier
@@ -159,6 +165,7 @@ fun MatchDetailsScreenPreview() {
                     )
                 )
             ),
+            handleRetry = {},
             getCreepScorePerMinute = { "2.8 CS/min" },
             getGoldEarnedPerMinute = { "267.8 Gold/min" },
             onItemClicked = {}

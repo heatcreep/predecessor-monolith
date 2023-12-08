@@ -17,8 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class MatchDetailsErrors(
-    val matchError: String? = null,
-    val itemsError: String? = null
+    val errorMessage: String? = "Failed to fetch match details.",
 )
 
 data class MatchDetailsUiState(
@@ -46,6 +45,7 @@ class MatchDetailsViewModel @Inject constructor(
 
 
     fun initViewModel() {
+        _uiState.value = MatchDetailsUiState(isLoading = true)
         viewModelScope.launch {
             val matchDeferred = async { repository.fetchMatchById(matchId) }
             val itemsDeferred = async { repository.fetchAllItems() }
@@ -53,7 +53,25 @@ class MatchDetailsViewModel @Inject constructor(
             val matchResult = matchDeferred.await()
             val itemsResult = itemsDeferred.await()
 
-            if (matchResult.isSuccess && itemsResult.isSuccess) {
+            if (matchResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        matchDetailsErrors = MatchDetailsErrors(
+                            errorMessage = matchResult.exceptionOrNull()?.message,
+                        )
+                    )
+                }
+            } else if (itemsResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        matchDetailsErrors = MatchDetailsErrors(
+                            errorMessage = itemsResult.exceptionOrNull()?.message
+                        )
+                    )
+                }
+            } else {
                 val match = matchResult.getOrNull()
                 val allItems = itemsResult.getOrNull()
                 val newMatch = match?.copy(
@@ -74,16 +92,6 @@ class MatchDetailsViewModel @Inject constructor(
                         isLoading = false,
                         match = newMatch ?: MatchDetails(),
                         items = allItems ?: emptyList()
-                    )
-                }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        matchDetailsErrors = MatchDetailsErrors(
-                            matchError = matchResult.exceptionOrNull()?.message,
-                            itemsError = itemsResult.exceptionOrNull()?.message
-                        )
                     )
                 }
             }

@@ -108,6 +108,8 @@ class FakeOmedaCityRepository(
     override suspend fun fetchMatchById(matchId: String): Result<MatchDetails?> {
         return if (hasMatchDetailsError) {
             Result.failure(Exception(FetchMatchError))
+        } else if( hasItemDetailsErrors) {
+            Result.failure(Exception(FetchItemsError))
         } else when (matchId) {
             "No Match" -> Result.success(null)
             else -> Result.success(fakeMatchDto.create())
