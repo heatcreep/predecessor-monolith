@@ -62,8 +62,6 @@ import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
-import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
-import com.aowen.monolith.ui.tooling.previews.TargetDevicesPreview
 
 @Composable
 fun ItemsScreenRoute(
@@ -441,7 +439,6 @@ fun ItemsScreenNoItemsPreview() {
     }
 }
 
-@TargetDevicesPreview
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
@@ -608,7 +605,6 @@ fun ItemsScreenScreenSizePreview() {
     }
 }
 
-@LightDarkPreview
 @Preview(showBackground = true)
 @Composable
 fun ItemsScreenPreview() {

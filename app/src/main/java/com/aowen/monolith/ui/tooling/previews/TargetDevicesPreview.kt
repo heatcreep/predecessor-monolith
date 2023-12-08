@@ -9,18 +9,6 @@ import androidx.compose.ui.tooling.preview.Preview
     device = Devices.NEXUS_5
 )
 @Preview(
-    name = "Pixel 5",
-    group = "Device Sizes",
-    device = Devices.PIXEL_5
-
-)
-@Preview(
-    name = "Pixel 7 Pro",
-    group = "Device Sizes",
-    device = Devices.PIXEL_7_PRO
-
-)
-@Preview(
     name = "Pixel Fold",
     group = "Device Sizes",
     apiLevel = 34,

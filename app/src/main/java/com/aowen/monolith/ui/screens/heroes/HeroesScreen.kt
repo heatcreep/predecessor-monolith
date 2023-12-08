@@ -61,8 +61,6 @@ import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.WarmWhite
-import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
-import com.aowen.monolith.ui.tooling.previews.TargetDevicesPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -310,7 +308,6 @@ fun HeroCardPreview() {
     }
 }
 
-@LightDarkPreview
 @Preview(
     showBackground = true,
 )
@@ -320,7 +317,7 @@ fun HeroesScreenPreview() {
         Surface {
             HeroesScreen(
                 uiState = HeroesScreenUiState(
-                    isLoading = false,
+                    isLoading = true,
                     allHeroes = listOf(
                         HeroDetails(
                             imageId = HeroImage.NARBASH.drawableId,
@@ -382,7 +379,6 @@ fun HeroesScreenPreview() {
     }
 }
 
-@TargetDevicesPreview
 @Preview(showBackground = true)
 @Composable
 fun HeroesScreenPreviewDeviceSizes() {
