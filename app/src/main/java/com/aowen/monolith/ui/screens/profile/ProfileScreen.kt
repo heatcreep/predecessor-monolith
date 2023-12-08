@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
+import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
 import com.aowen.monolith.data.UserInfo
@@ -75,7 +76,7 @@ fun ProfileScreen(
         if (uiState.isLoading) {
             FullScreenLoadingIndicator("Profile")
         } else {
-            if(uiState.error != null) {
+            if (uiState.error != null) {
                 FullScreenErrorWithRetry(
                     errorMessage = uiState.error
                 ) {
@@ -87,27 +88,44 @@ fun ProfileScreen(
                         .fillMaxSize()
                         .padding(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    if(uiState.userInfo != null) {
-                        Surface(shape = RoundedCornerShape(5.dp)) {
-                            ProfileCard(userInfo = uiState.userInfo)
+                    if (uiState.userInfo != null) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Surface(shape = RoundedCornerShape(5.dp)) {
+                                ProfileCard(userInfo = uiState.userInfo)
+                            }
+                            TextButton(onClick = {
+                                onLogout()
+                                navigateToLogin()
+                                Toast.makeText(
+                                    context,
+                                    "logged out successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }) {
+                                Text(
+                                    text = "Sign Out",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
                         }
-                        TextButton(onClick = {
-                            onLogout()
-                            navigateToLogin()
-                            Toast.makeText(
-                                context,
-                                "logged out successfully",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
                             Text(
-                                text = "Sign Out",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.secondary
+                                text = "App Version: ${BuildConfig.VERSION_NAME}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         }
+
                     } else {
                         Column(
                             modifier = Modifier
@@ -130,6 +148,8 @@ fun ProfileCard(
 ) {
 
     val context = LocalContext.current
+
+    val appVersion = BuildConfig.VERSION_NAME
 
     Column {
         Row(
@@ -176,7 +196,7 @@ fun ProfileCard(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column {
+            Column{
                 Text(
                     text = "Email",
                     style = MaterialTheme.typography.bodySmall,
