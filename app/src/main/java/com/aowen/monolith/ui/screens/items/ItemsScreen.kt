@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,6 +62,8 @@ import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
+import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
+import com.aowen.monolith.ui.tooling.previews.TargetDevicesPreview
 
 @Composable
 fun ItemsScreenRoute(
@@ -95,6 +98,11 @@ fun ItemsScreen(
     onFilterItems: () -> Unit = {}
 ) {
 
+    val config = LocalConfiguration.current
+    val screenWidthDp = config.screenWidthDp
+
+    val isTablet = screenWidthDp >= 600
+
     LaunchedEffect(
         key1 = uiState.selectedTierFilter,
         key2 = uiState.selectedStatFilters,
@@ -120,60 +128,48 @@ fun ItemsScreen(
                     Text(text = uiState.itemsError)
                 }
             } else {
-                if(uiState.filteredItems.isEmpty()){
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    SearchBar(
+                        searchLabel = "Item lookup",
+                        searchValue = uiState.searchFieldValue,
+                        setSearchValue = onSetSearchValue,
+                        modifier = Modifier.fillMaxWidth(),
+                        handleClearSearch = onClearSearch
+                    )
+                    Text(text = "Filters:", style = MaterialTheme.typography.bodyMedium)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(text = "Items list is empty")
-                    }
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        SearchBar(
-                            searchLabel = "Item lookup",
-                            searchValue = uiState.searchFieldValue,
-                            setSearchValue = onSetSearchValue,
-                            modifier = Modifier.fillMaxWidth(),
-                            handleClearSearch = onClearSearch
+                        TierFilterDropdown(
+                            selectedTierFilter = uiState.selectedTierFilter,
+                            onSelectTier = onSelectTier,
+                            onClearTierFilter = onClearTierFilter
                         )
-                        Text(text = "Filters:", style = MaterialTheme.typography.bodyMedium)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        StatFilterDropdown(
+                            allStats = uiState.allStats,
+                            selectedStatFilters = uiState.selectedStatFilters,
+                            onSelectStat = onSelectStat,
+                            onClearStatsFilters = onClearStats
+                        )
+                    }
+                    if (uiState.filteredItems.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            TierFilterDropdown(
-                                selectedTierFilter = uiState.selectedTierFilter,
-                                onSelectTier = onSelectTier,
-                                onClearTierFilter = onClearTierFilter
-                            )
-                            StatFilterDropdown(
-                                allStats = uiState.allStats,
-                                selectedStatFilters = uiState.selectedStatFilters,
-                                onSelectStat = onSelectStat,
-                                onClearStatsFilters = onClearStats
-                            )
+                            Text(text = "Items list is empty")
                         }
-                        if (uiState.filteredItems.isEmpty()) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-
-                            ) {
-                                Text(
-                                    text = "No items match the set filters.",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
+                    } else {
                         LazyVerticalGrid(
                             modifier = Modifier.fillMaxSize(),
-                            columns = GridCells.Fixed(3),
+                            columns = GridCells.Fixed(if (isTablet) 5 else 3),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
@@ -185,7 +181,9 @@ fun ItemsScreen(
                             }
                         }
                     }
+
                 }
+
             }
         }
     }
@@ -378,8 +376,240 @@ fun ItemCard(
 
 @Preview(
     showBackground = true,
+    name = "Loading",
+    group = "No Items/Loading/Error",
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
+@Composable
+fun ItemsScreenLoadingPreview() {
+    MonolithTheme {
+        ItemsScreen(
+            uiState = ItemsUiState(
+                isLoading = true,
+                selectedTierFilter = "Tier 1",
+                allStats = listOf("Max Health", "Max Mana", "Health Regen", "Mana Regen"),
+                allItems = listOf(
+                    ItemDetails(
+                        id = 1,
+                        displayName = "Ashbringer",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    )
+                ),
+            )
+        )
+    }
+}
+
+
+@Preview(
+    showBackground = true,
+    name = "No Items",
+    group = "No Items/Loading/Error",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ItemsScreenNoItemsPreview() {
+    MonolithTheme {
+        ItemsScreen(
+            uiState = ItemsUiState(
+                isLoading = false,
+                selectedTierFilter = "Tier 1",
+                allStats = listOf("Max Health", "Max Mana", "Health Regen", "Mana Regen"),
+                allItems = listOf(
+                    ItemDetails(
+                        id = 1,
+                        displayName = "Ashbringer",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    )
+                ),
+            )
+        )
+    }
+}
+
+@TargetDevicesPreview
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ItemsScreenScreenSizePreview() {
+    MonolithTheme {
+        ItemsScreen(
+            uiState = ItemsUiState(
+                isLoading = false,
+                selectedTierFilter = "Tier 1",
+                allStats = listOf("Max Health", "Max Mana", "Health Regen", "Mana Regen"),
+                allItems = listOf(
+                    ItemDetails(
+                        id = 1,
+                        displayName = "Ashbringer",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 2,
+                        displayName = "Item 2",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 3,
+                        displayName = "Item 3",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 4,
+                        displayName = "Item 4",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 5,
+                        displayName = "Item 5",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 6,
+                        displayName = "Item 6",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    )
+                ),
+                filteredItems = listOf(
+                    ItemDetails(
+                        id = 1,
+                        displayName = "Ashbringer",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 2,
+                        displayName = "Item 2",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 3,
+                        displayName = "Item 3",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 4,
+                        displayName = "Item 4",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 5,
+                        displayName = "Item 5",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    ),
+                    ItemDetails(
+                        id = 6,
+                        displayName = "Item 6",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    )
+                ),
+            )
+
+        )
+    }
+}
+
+@LightDarkPreview
+@Preview(showBackground = true)
 @Composable
 fun ItemsScreenPreview() {
     MonolithTheme {
@@ -389,6 +619,20 @@ fun ItemsScreenPreview() {
                 selectedTierFilter = "Tier 1",
                 allStats = listOf("Max Health", "Max Mana", "Health Regen", "Mana Regen"),
                 allItems = listOf(
+                    ItemDetails(
+                        id = 1,
+                        displayName = "Ashbringer",
+
+                        stats = listOf(
+                            StatDetails(
+                                name = "Max Health",
+                                value = "400",
+                                iconId = R.drawable.max_health
+                            ),
+                        )
+                    )
+                ),
+                filteredItems = listOf(
                     ItemDetails(
                         id = 1,
                         displayName = "Ashbringer",

@@ -1,6 +1,5 @@
 package com.aowen.monolith.ui.screens.heroes
 
-import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -46,6 +45,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +61,8 @@ import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.WarmWhite
+import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
+import com.aowen.monolith.ui.tooling.previews.TargetDevicesPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -96,6 +98,11 @@ fun HeroesScreen(
     handleRetry: () -> Unit = {},
     navigateToHeroDetails: (heroId: Int, heroName: String) -> Unit = { _, _ -> },
 ) {
+
+    val config = LocalConfiguration.current
+    val screenWidthDp = config.screenWidthDp
+
+    val isTablet = screenWidthDp >= 600
 
     var expanded by remember { mutableStateOf(false) }
     val rotationAngle = remember { Animatable(0f) }
@@ -179,7 +186,7 @@ fun HeroesScreen(
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                HeroRole.values().forEach { role ->
+                                HeroRole.entries.forEach { role ->
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Checkbox(
                                             checked = uiState.selectedRoleFilters.contains(role),
@@ -217,7 +224,7 @@ fun HeroesScreen(
                 } else {
                     LazyVerticalGrid(
                         modifier = Modifier.fillMaxSize(),
-                        columns = GridCells.Fixed(3),
+                        columns = GridCells.Fixed(if (isTablet) 6 else 3),
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
@@ -286,7 +293,10 @@ fun HeroCard(
 }
 
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+    group = "Hero Card"
+)
 @Composable
 fun HeroCardPreview() {
     MonolithTheme {
@@ -300,9 +310,9 @@ fun HeroCardPreview() {
     }
 }
 
+@LightDarkPreview
 @Preview(
     showBackground = true,
-    group = "HeroesScreen"
 )
 @Composable
 fun HeroesScreenPreview() {
@@ -310,7 +320,34 @@ fun HeroesScreenPreview() {
         Surface {
             HeroesScreen(
                 uiState = HeroesScreenUiState(
+                    isLoading = false,
                     allHeroes = listOf(
+                        HeroDetails(
+                            imageId = HeroImage.NARBASH.drawableId,
+                            displayName = "Narbash"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.BELICA.drawableId,
+                            displayName = " Lt. Belica"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.MORIGESH.drawableId,
+                            displayName = "Morigesh"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.TWINBLAST.drawableId,
+                            displayName = "TwinBlast"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.GREYSTONE.drawableId,
+                            displayName = "Greystone"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.GRUX.drawableId,
+                            displayName = "Grux"
+                        ),
+                    ),
+                    currentHeroes = listOf(
                         HeroDetails(
                             imageId = HeroImage.NARBASH.drawableId,
                             displayName = "Narbash"
@@ -345,18 +382,42 @@ fun HeroesScreenPreview() {
     }
 }
 
-@Preview(
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    group = "HeroesScreen"
-)
+@TargetDevicesPreview
+@Preview(showBackground = true)
 @Composable
-fun HeroesScreenPreviewDark() {
+fun HeroesScreenPreviewDeviceSizes() {
     MonolithTheme {
         Surface {
             HeroesScreen(
                 uiState = HeroesScreenUiState(
+                    isLoading = false,
                     allHeroes = listOf(
+                        HeroDetails(
+                            imageId = HeroImage.NARBASH.drawableId,
+                            displayName = "Narbash"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.BELICA.drawableId,
+                            displayName = " Lt. Belica"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.MORIGESH.drawableId,
+                            displayName = "Morigesh"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.TWINBLAST.drawableId,
+                            displayName = "TwinBlast"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.GREYSTONE.drawableId,
+                            displayName = "Greystone"
+                        ),
+                        HeroDetails(
+                            imageId = HeroImage.GRUX.drawableId,
+                            displayName = "Grux"
+                        ),
+                    ),
+                    currentHeroes = listOf(
                         HeroDetails(
                             imageId = HeroImage.NARBASH.drawableId,
                             displayName = "Narbash"
@@ -390,3 +451,4 @@ fun HeroesScreenPreviewDark() {
         }
     }
 }
+
