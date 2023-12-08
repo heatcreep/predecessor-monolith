@@ -1,6 +1,14 @@
 # Release Notes
 
-## 0.6.5 - Latest
+## 0.6.6 - Latest
+
+#### Improvements & Bug Fixes
+
+- [Larger Screens] Changes the Heroes and Items screen to have more entries in each row for larger screens
+- App Version is now displayed on the Profile Screen
+- Adds better error messaging when the API returns bad data for match details
+
+## 0.6.5
 
 #### New Features
 
