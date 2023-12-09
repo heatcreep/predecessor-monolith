@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -58,6 +59,7 @@ import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.StatDetails
 import com.aowen.monolith.navigation.navigateToItemDetails
+import com.aowen.monolith.ui.common.MonolithCollapsableColumn
 import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
@@ -101,6 +103,8 @@ fun ItemsScreen(
 
     val isTablet = screenWidthDp >= 600
 
+    val listState = rememberLazyGridState()
+
     LaunchedEffect(
         key1 = uiState.selectedTierFilter,
         key2 = uiState.selectedStatFilters,
@@ -129,32 +133,35 @@ fun ItemsScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    SearchBar(
-                        searchLabel = "Item lookup",
-                        searchValue = uiState.searchFieldValue,
-                        setSearchValue = onSetSearchValue,
-                        modifier = Modifier.fillMaxWidth(),
-                        handleClearSearch = onClearSearch
-                    )
-                    Text(text = "Filters:", style = MaterialTheme.typography.bodyMedium)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        TierFilterDropdown(
-                            selectedTierFilter = uiState.selectedTierFilter,
-                            onSelectTier = onSelectTier,
-                            onClearTierFilter = onClearTierFilter
+                    MonolithCollapsableColumn(listState = listState) {
+                        SearchBar(
+                            searchLabel = "Item lookup",
+                            searchValue = uiState.searchFieldValue,
+                            setSearchValue = onSetSearchValue,
+                            modifier = Modifier.fillMaxWidth(),
+                            handleClearSearch = onClearSearch
                         )
-                        StatFilterDropdown(
-                            allStats = uiState.allStats,
-                            selectedStatFilters = uiState.selectedStatFilters,
-                            onSelectStat = onSelectStat,
-                            onClearStatsFilters = onClearStats
-                        )
+                        Text(text = "Filters:", style = MaterialTheme.typography.bodyMedium)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            TierFilterDropdown(
+                                selectedTierFilter = uiState.selectedTierFilter,
+                                onSelectTier = onSelectTier,
+                                onClearTierFilter = onClearTierFilter
+                            )
+                            StatFilterDropdown(
+                                allStats = uiState.allStats,
+                                selectedStatFilters = uiState.selectedStatFilters,
+                                onSelectStat = onSelectStat,
+                                onClearStatsFilters = onClearStats
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(16.dp))
                     }
                     if (uiState.filteredItems.isEmpty()) {
                         Column(
@@ -166,6 +173,7 @@ fun ItemsScreen(
                         }
                     } else {
                         LazyVerticalGrid(
+                            state = listState,
                             modifier = Modifier.fillMaxSize(),
                             columns = GridCells.Fixed(if (isTablet) 5 else 3),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),

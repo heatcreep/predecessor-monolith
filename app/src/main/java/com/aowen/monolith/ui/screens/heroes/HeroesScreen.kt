@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -57,6 +58,7 @@ import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.navigation.navigateToHeroDetails
+import com.aowen.monolith.ui.common.MonolithCollapsableColumn
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -105,6 +107,10 @@ fun HeroesScreen(
     var expanded by remember { mutableStateOf(false) }
     val rotationAngle = remember { Animatable(0f) }
 
+    val listState = rememberLazyGridState()
+
+
+
     LaunchedEffect(expanded) {
         this.launch {
             rotationAngle.animateTo(
@@ -140,15 +146,15 @@ fun HeroesScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                ) {
+                MonolithCollapsableColumn(listState = listState) {
+
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+
                         SearchBar(
                             searchLabel = "Hero lookup",
                             searchValue = uiState.searchFieldValue,
@@ -168,6 +174,7 @@ fun HeroesScreen(
                                 tint = MaterialTheme.colorScheme.secondary
                             )
                         }
+
                     }
                     AnimatedVisibility(visible = expanded) {
                         Column {
@@ -187,7 +194,9 @@ fun HeroesScreen(
                                 HeroRole.entries.forEach { role ->
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Checkbox(
-                                            checked = uiState.selectedRoleFilters.contains(role),
+                                            checked = uiState.selectedRoleFilters.contains(
+                                                role
+                                            ),
                                             onCheckedChange = { isChecked ->
                                                 onFilterRole(role, isChecked)
                                             },
@@ -205,6 +214,7 @@ fun HeroesScreen(
                             }
                         }
                     }
+
                 }
                 if (uiState.currentHeroes.isEmpty()) {
                     Column(
@@ -222,6 +232,7 @@ fun HeroesScreen(
                 } else {
                     LazyVerticalGrid(
                         modifier = Modifier.fillMaxSize(),
+                        state = listState,
                         columns = GridCells.Fixed(if (isTablet) 6 else 3),
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
