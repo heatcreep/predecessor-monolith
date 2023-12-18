@@ -57,7 +57,7 @@ private fun getPlayerItems(
     allItems: List<ItemDetails>?
 ): List<ItemDetails> {
     return allItems?.filter { item ->
-        item.id in itemIds
+        item.gameId in itemIds
     } ?: emptyList()
 }
 
