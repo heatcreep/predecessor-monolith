@@ -6,14 +6,10 @@ import com.aowen.monolith.data.getDetailsWithItems
 val fakeMatchDetails = fakeMatchDto.create()
 
 val fakeMatchDetailsWithItems = fakeMatchDetails.copy(
-    dusk = fakeMatchDetails.dusk.copy(
-        players = fakeMatchDetails.dusk.players.map { player ->
-            player.getDetailsWithItems(fakeAllItems)
-        }
-    ),
-    dawn = fakeMatchDetails.dawn.copy(
-        players = fakeMatchDetails.dawn.players.map { player ->
-            player.getDetailsWithItems(fakeAllItems)
-        }
-    )
+    dusk = fakeMatchDetails.dusk.map {
+        it.getDetailsWithItems(fakeAllItems)
+    },
+    dawn = fakeMatchDetails.dawn.map {
+        it.getDetailsWithItems(fakeAllItems)
+    }
 )

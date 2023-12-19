@@ -37,6 +37,7 @@ class MatchDetailsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(MatchDetailsUiState())
     val uiState: StateFlow<MatchDetailsUiState> = _uiState
 
+    private val playerId: String = checkNotNull(savedStateHandle["playerId"])
     private val matchId: String = checkNotNull(savedStateHandle["matchId"])
 
     init {
@@ -47,7 +48,7 @@ class MatchDetailsViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.value = MatchDetailsUiState(isLoading = true)
         viewModelScope.launch {
-            val matchDeferred = async { repository.fetchMatchById(matchId) }
+            val matchDeferred = async { repository.fetchMatchesById(playerId) }
             val itemsDeferred = async { repository.fetchAllItems() }
 
             val matchResult = matchDeferred.await()
@@ -72,19 +73,15 @@ class MatchDetailsViewModel @Inject constructor(
                     )
                 }
             } else {
-                val match = matchResult.getOrNull()
+                val match = matchResult.getOrNull()?.firstOrNull { it.matchId == matchId }
                 val allItems = itemsResult.getOrNull()
                 val newMatch = match?.copy(
-                    dusk = match.dusk.copy(
-                        players = match.dusk.players.map { player ->
-                            player.getDetailsWithItems(allItems)
-                        }
-                    ),
-                    dawn = match.dawn.copy(
-                        players = match.dawn.players.map { player ->
-                            player.getDetailsWithItems(allItems)
-                        }
-                    )
+                    dusk = match.dusk.map {
+                        player -> player.getDetailsWithItems(allItems)
+                    },
+                    dawn = match.dawn.map {
+                        player -> player.getDetailsWithItems(allItems)
+                    }
                 )
 
                 _uiState.update {

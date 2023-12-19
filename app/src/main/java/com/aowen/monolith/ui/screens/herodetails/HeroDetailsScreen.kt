@@ -197,7 +197,7 @@ fun HeroOverviewScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 PlayerIcon(
-                    heroImageId = getHeroImage(uiState.hero.displayName).drawableId,
+                    heroImageId = getHeroImage(uiState.hero.id).drawableId,
                     heroIconSize = 64.dp
                 )
                 Spacer(modifier = Modifier.size(16.dp))

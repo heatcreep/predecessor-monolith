@@ -7,18 +7,23 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.aowen.monolith.ui.screens.matches.MatchDetailsRoute
-import com.aowen.monolith.ui.screens.playerdetails.PlayerDetailsRoute
 
 const val MatchDetailRoute = "match-detail"
 
-fun NavController.navigateToMatchDetails(matchId: String, navOptions: NavOptions? = null) {
-    this.navigate("$MatchDetailRoute/$matchId", navOptions)
+fun NavController.navigateToMatchDetails(
+    playerId: String,
+    matchId: String,
+    navOptions: NavOptions? = null
+) {
+    this.navigate("$MatchDetailRoute/$playerId/$matchId", navOptions)
 }
 
 fun NavGraphBuilder.matchDetailsScreen() {
     composable(
-        route = "$MatchDetailRoute/{matchId}",
+        route = "$MatchDetailRoute/{playerId}/{matchId}",
         arguments = listOf(navArgument("matchId") {
+            type = NavType.StringType
+        }, navArgument("playerId") {
             type = NavType.StringType
         })
     ) {

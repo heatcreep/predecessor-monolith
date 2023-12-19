@@ -34,7 +34,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
-import com.aowen.monolith.data.TeamDetails
 import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getKda
 import com.aowen.monolith.data.getRoleImage
@@ -51,7 +50,7 @@ fun MatchesList(
     playerId: String? = "",
     matches: List<MatchDetails>? = null,
     timeSinceMatch: (String) -> String = { _ -> "" },
-    navigateToMatchDetails: (String) -> Unit = { _ -> }
+    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> }
 ) {
     Column {
         Text(
@@ -66,13 +65,13 @@ fun MatchesList(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 it.forEach { match ->
-                    val allPlayers = match.dusk.players + match.dawn.players
+                    val allPlayers = match.dusk + match.dawn
                     val playerHero = allPlayers.firstOrNull { it.playerId == playerId }
-                    val playerTeam = if (match.dusk.players.contains(playerHero)) "Dusk" else "Dawn"
+                    val playerTeam = if (match.dusk.contains(playerHero)) "Dusk" else "Dawn"
                     val isWinner = playerTeam == match.winningTeam
                     MatchPlayerCard(
                         modifier.clickable {
-                            navigateToMatchDetails(match.matchId)
+                            navigateToMatchDetails(playerHero?.playerId!!, match.matchId)
                         },
                         isWinner = isWinner,
                         timeSinceMatch = timeSinceMatch(match.endTime),
@@ -167,7 +166,7 @@ fun MatchPlayerCard(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             PlayerIcon(
-                                heroImageId = getHeroImage(playerHero.hero).drawableId
+                                heroImageId = getHeroImage(playerHero.heroId).drawableId
                             ) {
                                 Image(
                                     modifier = Modifier
@@ -191,7 +190,7 @@ fun MatchPlayerCard(
                             Spacer(modifier = Modifier.size(8.dp))
                             Column {
                                 Text(
-                                    text = it.hero,
+                                    text = getHeroImage(it.heroId).heroName,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.secondary
                                 )
@@ -243,91 +242,81 @@ fun MatchesListPreview() {
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dusk",
-                        dawn = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "bar",
-                                    playerName = "bean man",
-                                    hero = "Muriel",
-                                    role = "support",
-                                )
+                        dawn = listOf(
+                            MatchPlayerDetails(
+                                playerId = "bar",
+                                playerName = "bean man",
+                                heroId = 12,
+                                role = "support",
                             )
-                        ),
-                        dusk = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "foo",
-                                    playerName = "heatcreep.tv",
-                                    hero = "Narbash",
-                                    role = "offlane",
-                                    performanceScore = "94.6",
-                                    mmrChange = "11.4",
-                                    kills = 7,
-                                    deaths = 2,
-                                    assists = 12,
 
-                                    )
+                        ),
+                        dusk = listOf(
+                            MatchPlayerDetails(
+                                playerId = "foo",
+                                playerName = "heatcreep.tv",
+                                heroId = 14,
+                                role = "offlane",
+                                performanceScore = "94.6",
+                                mmrChange = "11.4",
+                                kills = 7,
+                                deaths = 2,
+                                assists = 12,
                             )
                         )
+
                     ),
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dusk",
-                        dawn = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "bar",
-                                    playerName = "bean man",
-                                    hero = "Muriel",
-                                    role = "support",
-                                )
+                        dawn = listOf(
+                            MatchPlayerDetails(
+                                playerId = "bar",
+                                playerName = "bean man",
+                                heroId = 12,
+                                role = "support",
                             )
                         ),
-                        dusk = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "foo",
-                                    playerName = "heatcreep.tv",
-                                    hero = "Phase",
-                                    role = "jungle",
-                                    performanceScore = "140.8",
-                                    mmrChange = "11.4",
-                                    kills = 7,
-                                    deaths = 2,
-                                    assists = 12,
+                        dusk = listOf(
+                            MatchPlayerDetails(
+                                playerId = "foo",
+                                playerName = "heatcreep.tv",
+                                heroId = 13,
+                                role = "jungle",
+                                performanceScore = "140.8",
+                                mmrChange = "11.4",
+                                kills = 7,
+                                deaths = 2,
+                                assists = 12,
 
-                                    )
-                            )
+                                )
                         )
                     ),
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dawn",
-                        dawn = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "bar",
-                                    playerName = "bean man",
-                                    hero = "Muriel",
-                                    role = "support",
-                                )
+                        dawn = listOf(
+                            MatchPlayerDetails(
+                                playerId = "bar",
+                                playerName = "bean man",
+                                heroId = 12,
+                                role = "support",
                             )
                         ),
-                        dusk = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "foo",
-                                    playerName = "heatcreep.tv",
-                                    hero = "Morigesh",
-                                    role = "midlane",
-                                    performanceScore = "78.2",
-                                    mmrChange = "111.4",
-                                    kills = 7,
-                                    deaths = 2,
-                                    assists = 12,
-                                )
+                        dusk = listOf(
+                            MatchPlayerDetails(
+                                playerId = "foo",
+                                playerName = "heatcreep.tv",
+                                heroId = 15,
+                                role = "midlane",
+                                performanceScore = "78.2",
+                                mmrChange = "111.4",
+                                kills = 7,
+                                deaths = 2,
+                                assists = 12,
                             )
                         )
+
                     ),
                 )
             )
@@ -349,87 +338,72 @@ fun MatchesListPreviewLightMode() {
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dusk",
-                        dawn = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "bar",
-                                    playerName = "bean man",
-                                    hero = "Muriel",
-                                )
+                        dawn = listOf(
+                            MatchPlayerDetails(
+                                playerId = "bar",
+                                playerName = "bean man",
+                                heroId = 11,
                             )
                         ),
-                        dusk = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "foo",
-                                    playerName = "heatcreep.tv",
-                                    hero = "Narbash",
-                                    role = "offlane",
-                                    mmrChange = "11.4",
-                                    performanceScore = "94.6",
-                                    kills = 7,
-                                    deaths = 2,
-                                    assists = 12,
-
-                                    )
+                        dusk = listOf(
+                            MatchPlayerDetails(
+                                playerId = "foo",
+                                playerName = "heatcreep.tv",
+                                heroId = 16,
+                                role = "offlane",
+                                mmrChange = "11.4",
+                                performanceScore = "94.6",
+                                kills = 7,
+                                deaths = 2,
+                                assists = 12,
                             )
                         )
                     ),
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dusk",
-                        dawn = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "bar",
-                                    playerName = "bean man",
-                                    hero = "Muriel",
-                                )
+                        dawn = listOf(
+                            MatchPlayerDetails(
+                                playerId = "bar",
+                                playerName = "bean man",
+                                heroId = 11,
                             )
                         ),
-                        dusk = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "foo",
-                                    playerName = "heatcreep.tv",
-                                    hero = "Phase",
-                                    role = "support",
-                                    mmrChange = "11.4",
-                                    performanceScore = "140.8",
-                                    kills = 7,
-                                    deaths = 2,
-                                    assists = 12,
-
-                                    )
+                        dusk = listOf(
+                            MatchPlayerDetails(
+                                playerId = "foo",
+                                playerName = "heatcreep.tv",
+                                heroId = 14,
+                                role = "support",
+                                mmrChange = "11.4",
+                                performanceScore = "140.8",
+                                kills = 7,
+                                deaths = 2,
+                                assists = 12,
                             )
                         )
                     ),
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dawn",
-                        dawn = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "bar",
-                                    playerName = "bean man",
-                                    hero = "Muriel",
-                                )
+                        dawn = listOf(
+                            MatchPlayerDetails(
+                                playerId = "bar",
+                                playerName = "bean man",
+                                heroId = 11,
                             )
                         ),
-                        dusk = TeamDetails(
-                            players = listOf(
-                                MatchPlayerDetails(
-                                    playerId = "foo",
-                                    playerName = "heatcreep.tv",
-                                    hero = "Morigesh",
-                                    role = "midlane",
-                                    mmrChange = "111.4",
-                                    performanceScore = "78.2",
-                                    kills = 7,
-                                    deaths = 2,
-                                    assists = 12,
-
-                                    )
+                        dusk = listOf(
+                            MatchPlayerDetails(
+                                playerId = "foo",
+                                playerName = "heatcreep.tv",
+                                heroId = 14,
+                                role = "midlane",
+                                mmrChange = "111.4",
+                                performanceScore = "78.2",
+                                kills = 7,
+                                deaths = 2,
+                                assists = 12,
                             )
                         )
                     ),

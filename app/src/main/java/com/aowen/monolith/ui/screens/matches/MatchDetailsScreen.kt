@@ -24,7 +24,6 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
-import com.aowen.monolith.data.TeamDetails
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.theme.MonolithTheme
 
@@ -82,7 +81,7 @@ fun MatchDetailsScreen(
         if (uiState.isLoading) {
             FullScreenLoadingIndicator("Match Details")
         } else {
-            if(uiState.matchDetailsErrors != null) {
+            if (uiState.matchDetailsErrors != null) {
                 FullScreenErrorWithRetry(
                     errorMessage = uiState.matchDetailsErrors.errorMessage,
                 ) {
@@ -130,37 +129,31 @@ fun MatchDetailsScreenPreview() {
                 match = MatchDetails(
                     winningTeam = "Dusk",
                     gameDuration = 2135,
-                    dusk = TeamDetails(
-                        averageMmr = "1234.5",
-                        players = listOf(
-                            MatchPlayerDetails(
-                                mmr = "1234.5",
-                                mmrChange = "+11.1",
-                                playerName = "Player 1",
-                                hero = "Narbash",
-                                role = "support",
-                                performanceTitle = "Annihilator",
-                                performanceScore = "143.6",
-                                kills = 7,
-                                deaths = 3,
-                                assists = 3,
-                                minionsKilled = 119,
-                                goldEarned = 15434
-                            )
+                    dusk = listOf(
+                        MatchPlayerDetails(
+                            mmr = "1234.5",
+                            mmrChange = "+11.1",
+                            playerName = "Player 1",
+                            heroId = 14,
+                            role = "support",
+                            performanceTitle = "Annihilator",
+                            performanceScore = "143.6",
+                            kills = 7,
+                            deaths = 3,
+                            assists = 3,
+                            minionsKilled = 119,
+                            goldEarned = 15434
                         )
                     ),
-                    dawn = TeamDetails(
-                        averageMmr = "1234.5",
-                        players = listOf(
-                            MatchPlayerDetails(
-                                mmr = "1234.5",
-                                mmrChange = "-11.1",
-                                playerName = "Player 2",
-                                hero = "Kira",
-                                role = "carry",
-                                performanceTitle = "Sentinel",
-                                performanceScore = "104.6",
-                            )
+                    dawn = listOf(
+                        MatchPlayerDetails(
+                            mmr = "1234.5",
+                            mmrChange = "-11.1",
+                            playerName = "Player 2",
+                            heroId = 13,
+                            role = "carry",
+                            performanceTitle = "Sentinel",
+                            performanceScore = "104.6",
                         )
                     )
                 )

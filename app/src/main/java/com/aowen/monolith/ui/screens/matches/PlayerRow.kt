@@ -69,7 +69,7 @@ fun PlayerRow(
 
     var expanded by rememberSaveable { mutableStateOf(false) }
 
-    val roleImage = RoleImage.values().first {
+    val roleImage = RoleImage.entries.first {
         it.roleName == player.role
     }
 
@@ -128,7 +128,7 @@ fun PlayerRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     PlayerIcon(
-                        heroImageId = getHeroImage(player.hero).drawableId,
+                        heroImageId = getHeroImage(player.heroId).drawableId,
                     ) {
                         Image(
                             modifier = Modifier

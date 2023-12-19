@@ -77,7 +77,7 @@ import kotlinx.coroutines.launch
 internal fun PlayerDetailsRoute(
     modifier: Modifier = Modifier,
     viewModel: PlayerDetailsViewModel = hiltViewModel(),
-    navigateToMatchDetails: (String) -> Unit = { _ -> },
+    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -102,7 +102,7 @@ fun PlayerDetailScreen(
     timeSinceMatch: (String) -> String = { _ -> "" },
     handleSavePlayer: suspend (Boolean) -> Unit = {},
     handlePlayerHeroStatsSelect: (Int) -> Unit = { },
-    navigateToMatchDetails: (String) -> Unit = { _ -> }
+    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> }
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -209,7 +209,7 @@ fun PlayerStatsTab(
     modifier: Modifier = Modifier,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
     timeSinceMatch: (String) -> String = { _ -> "" },
-    navigateToMatchDetails: (String) -> Unit = { _ -> }
+    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> }
 ) {
 
     Column(

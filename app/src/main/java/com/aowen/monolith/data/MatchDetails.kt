@@ -8,7 +8,7 @@ data class MatchPlayerDetails(
     val mmr: String = "",
     val mmrChange: String = "",
     val rankedImage: String = "",
-    val hero: String = "",
+    val heroId: Int = 0,
     val role: String = "",
     val performanceScore: String = "",
     val performanceTitle: String = "",
@@ -27,13 +27,14 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
         playerName = this.displayName,
         mmr = when (this.mmr) {
             is Float -> this.mmr.toDecimal()
+            is Double -> this.mmr.toFloat().toDecimal()
             else -> this.mmr.toString()
         },
         mmrChange = this.mmrChange.toDecimal(),
         rankedImage = RetrofitHelper.getRankImageUrl(this.rankImage),
-        hero = this.hero,
+        heroId = this.heroId,
         role = this.role ?: "role unknown",
-        performanceScore = this.performanceScore.toString(),
+        performanceScore = this.performanceScore.toFloat().toDecimal(),
         performanceTitle = this.performanceTitle,
         kills = this.kills.toInt(),
         deaths = this.deaths.toInt(),
@@ -68,18 +69,8 @@ fun MatchPlayerDetails.getDetailsWithItems(allItems: List<ItemDetails>?): MatchP
 
 
 data class TeamDetails(
-    val averageMmr: String = "",
     val players: List<MatchPlayerDetails> = emptyList()
 )
-
-fun TeamDto.create(): TeamDetails {
-    return TeamDetails(
-        averageMmr = this.averageMmr ?: "N/A",
-        players = this.players.map { player ->
-            player.create()
-        }
-    )
-}
 
 data class MatchDetails(
     val matchId: String = "",
@@ -88,8 +79,8 @@ data class MatchDetails(
     val gameDuration: Int = 0,
     val region: String = "",
     val winningTeam: String = "",
-    val dawn: TeamDetails = TeamDetails(),
-    val dusk: TeamDetails = TeamDetails()
+    val dawn: List<MatchPlayerDetails> = emptyList(),
+    val dusk: List<MatchPlayerDetails> = emptyList()
 )
 
 fun MatchDto.create(): MatchDetails {
@@ -100,8 +91,16 @@ fun MatchDto.create(): MatchDetails {
         gameDuration = this.gameDuration,
         region = this.region,
         winningTeam = this.winningTeam.replaceFirstChar { it.uppercase() },
-        dawn = this.dawn.create(),
-        dusk = this.dusk.create()
+        dawn = this.players.filter { player ->
+            player.team == "dawn"
+        }.map { player ->
+            player.create()
+        },
+        dusk = this.players.filter { player ->
+            player.team == "dusk"
+        }.map { player ->
+            player.create()
+        }
 
     )
 }

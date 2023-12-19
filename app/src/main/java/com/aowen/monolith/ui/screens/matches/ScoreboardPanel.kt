@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchPlayerDetails
-import com.aowen.monolith.data.TeamDetails
 import com.aowen.monolith.ui.theme.DarkGreenHighlight
 import com.aowen.monolith.ui.theme.DarkRedHighlight
 import com.aowen.monolith.ui.theme.GreenHighlight
@@ -34,7 +33,7 @@ import com.aowen.monolith.ui.theme.RedHighlight
 fun ScoreboardPanel(
     teamName: String,
     isWinningTeam: Boolean,
-    teamDetails: TeamDetails,
+    teamDetails: List<MatchPlayerDetails>,
     openItemDetails: (ItemDetails) -> Unit,
     getCreepScorePerMinute: (Int) -> String,
     getGoldEarnedPerMinute: (Int) -> String
@@ -79,19 +78,19 @@ fun ScoreboardPanel(
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.ExtraBold
                 )
-                Text(
-                    text = "Average MMR: ${teamDetails.averageMmr}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.ExtraBold
-                )
+//                Text(
+//                    text = "Average MMR: ${teamDetails.averageMmr}",
+//                    style = MaterialTheme.typography.bodySmall,
+//                    color = MaterialTheme.colorScheme.secondary,
+//                    fontWeight = FontWeight.ExtraBold
+//                )
             }
         }
         // Players
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            teamDetails.players.forEach { player ->
+            teamDetails.forEach { player ->
                 PlayerRow(
                     player = player,
                     playerItems = player.playerItems,
@@ -116,28 +115,26 @@ fun ScoreboardPanelPreview() {
             ScoreboardPanel(
                 teamName = "Dusk",
                 isWinningTeam = true,
-                teamDetails =  TeamDetails(
-                    averageMmr = "1234.5",
-                    players = listOf(
-                        MatchPlayerDetails(
-                            mmr = "1234.5",
-                            mmrChange = "+11.1",
-                            playerName = "Player 1",
-                            hero = "Narbash",
-                            role = "support",
-                            performanceTitle = "Annihilator",
-                            performanceScore = "143.6",
-                            kills = 7,
-                            deaths = 3,
-                            assists = 3,
-                            minionsKilled = 119,
-                            goldEarned = 15434
-                        )
+                teamDetails = listOf(
+                    MatchPlayerDetails(
+                        mmr = "1234.5",
+                        mmrChange = "+11.1",
+                        playerName = "Player 1",
+                        heroId = 14,
+                        role = "support",
+                        performanceTitle = "Annihilator",
+                        performanceScore = "143.6",
+                        kills = 7,
+                        deaths = 3,
+                        assists = 3,
+                        minionsKilled = 119,
+                        goldEarned = 15434
                     )
+
                 ),
                 openItemDetails = {},
-                getCreepScorePerMinute = { "1.2" } ,
-                getGoldEarnedPerMinute = { "1.2"}
+                getCreepScorePerMinute = { "1.2" },
+                getGoldEarnedPerMinute = { "1.2" }
             )
         }
     }

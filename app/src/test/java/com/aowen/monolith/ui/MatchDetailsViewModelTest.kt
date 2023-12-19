@@ -27,6 +27,7 @@ class MatchDetailsViewModelTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
+                    "playerId" to "validPlayerId",
                     "matchId" to "validMatchId"
                 )
 
@@ -53,6 +54,7 @@ class MatchDetailsViewModelTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
+                    "playerId" to "validPlayerId",
                     "matchId" to "No Match"
                 )
 
@@ -78,6 +80,7 @@ class MatchDetailsViewModelTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
+                    "playerId" to "validPlayerId",
                     "matchId" to "Error"
                 )
 
@@ -89,7 +92,7 @@ class MatchDetailsViewModelTest {
         val expected = MatchDetailsUiState(
             isLoading = false,
             matchDetailsErrors = MatchDetailsErrors(
-                errorMessage = "Failed to fetch match"
+                errorMessage = "Failed to fetch matches"
             )
         )
         val actual = viewModel.uiState.value
@@ -101,6 +104,7 @@ class MatchDetailsViewModelTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
+                    "playerId" to "validPlayerId",
                     "matchId" to "validMatchId"
                 )
             ),
