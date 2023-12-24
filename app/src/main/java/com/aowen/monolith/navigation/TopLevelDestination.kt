@@ -2,10 +2,12 @@ package com.aowen.monolith.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Hardware
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Hardware
+import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Star
@@ -35,6 +37,12 @@ enum class TopLevelDestination(
         unselectedIcon = Icons.Outlined.Hardware,
         iconTextId = R.string.icon_items,
         titleTextId = R.string.icon_items
+    ),
+    BUILDS(
+        selectedIcon = Icons.Filled.MenuBook,
+        unselectedIcon = Icons.Outlined.MenuBook,
+        iconTextId = R.string.icon_builds,
+        titleTextId = R.string.icon_builds
     ),
     PROFILE(
         selectedIcon = Icons.Filled.Person,

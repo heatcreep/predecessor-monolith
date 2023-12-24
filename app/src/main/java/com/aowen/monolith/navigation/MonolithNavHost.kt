@@ -21,6 +21,7 @@ fun MonolithNavHost(
         searchScreen(navController = navController)
         heroesScreen(navController = navController)
         itemsScreen(navController = navController)
+        buildsScreen(navController = navController)
         profileScreen(navController = navController)
     }
 }

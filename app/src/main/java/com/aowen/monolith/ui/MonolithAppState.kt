@@ -9,11 +9,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import com.aowen.monolith.navigation.BuildsRoute
 import com.aowen.monolith.navigation.HeroesRoute
 import com.aowen.monolith.navigation.ItemsRoute
 import com.aowen.monolith.navigation.ProfileRoute
 import com.aowen.monolith.navigation.SearchRoute
 import com.aowen.monolith.navigation.TopLevelDestination
+import com.aowen.monolith.navigation.navigateToBuilds
 import com.aowen.monolith.navigation.navigateToHeroes
 import com.aowen.monolith.navigation.navigateToItems
 import com.aowen.monolith.navigation.navigateToProfile
@@ -43,10 +45,11 @@ class MonolithAppState(
         SearchRoute,
         HeroesRoute,
         ItemsRoute,
+        BuildsRoute,
         ProfileRoute
     )
 
-    val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.values().asList()
+    val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.entries
 
     val shouldShowBottomBar: Boolean
         @Composable get() = navController
@@ -66,6 +69,7 @@ class MonolithAppState(
             TopLevelDestination.SEARCH -> navController.navigateToSearch(topLevelNavOptions)
             TopLevelDestination.HEROES -> navController.navigateToHeroes(topLevelNavOptions)
             TopLevelDestination.ITEMS -> navController.navigateToItems(topLevelNavOptions)
+            TopLevelDestination.BUILDS -> navController.navigateToBuilds(topLevelNavOptions)
             TopLevelDestination.PROFILE -> navController.navigateToProfile(topLevelNavOptions)
         }
     }
