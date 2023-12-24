@@ -29,7 +29,6 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,6 +71,7 @@ import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.network.firebase.Feedback
+import com.aowen.monolith.ui.components.MonolithAlertDialog
 import com.aowen.monolith.ui.components.RefreshableContainer
 import com.aowen.monolith.ui.components.ShimmerCircle
 import com.aowen.monolith.ui.components.ShimmerLongText
@@ -140,29 +140,14 @@ fun SearchScreen(
         }
     }
     if (alertDialogIsOpen) {
-        AlertDialog(onDismissRequest = { alertDialogIsOpen = false }) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(16.dp)
-            ) {
-                Text("Are you sure you want to clear all recent searches? This action cannot be undone.")
-                Spacer(modifier = Modifier.size(16.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    TextButton(onClick = { alertDialogIsOpen = false }) {
-                        Text("Cancel", color = MaterialTheme.colorScheme.secondary)
-                    }
-                    TextButton(onClick = {
-                        handleClearAllRecentSearches()
-                        alertDialogIsOpen = false
-                    }) {
-                        Text("Clear All", color = MaterialTheme.colorScheme.secondary)
-                    }
-                }
+        MonolithAlertDialog(
+            bodyText = "Are you sure you want to clear all recent searches? This action cannot be undone.",
+            onDismissRequest = { alertDialogIsOpen = false },
+            onConfirm = {
+                handleClearAllRecentSearches()
+                alertDialogIsOpen = false
             }
-        }
+        )
     }
     RefreshableContainer(
         isRefreshing = isRefreshing,
@@ -602,7 +587,7 @@ fun ClaimedPlayerCard(
     modifier: Modifier = Modifier
 ) {
 
-    val heroImage = HeroImage.values().firstOrNull {
+    val heroImage = HeroImage.entries.firstOrNull {
         it.heroName == playerStats.favoriteHero
     } ?: HeroImage.UNKNOWN
 
