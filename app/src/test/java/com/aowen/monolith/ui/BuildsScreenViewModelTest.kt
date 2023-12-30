@@ -27,7 +27,7 @@ class BuildsScreenViewModelTest {
     }
 
     @Test
-fun `initViewModel should set isLoading to false`() {
+    fun `initViewModel should update uiState with builds`() {
         viewModel = BuildsScreenViewModel()
         viewModel.initViewModel()
         val actual = viewModel.uiState.value
@@ -38,5 +38,3 @@ fun `initViewModel should set isLoading to false`() {
         )
         assertEquals(expected, actual)
     }
-
-}

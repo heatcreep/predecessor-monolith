@@ -1,5 +1,6 @@
 package com.aowen.monolith.network
 
+import com.aowen.monolith.data.BuildDto
 import com.aowen.monolith.data.HeroDto
 import com.aowen.monolith.data.HeroStatisticsResponseDto
 import com.aowen.monolith.data.ItemDto
@@ -12,6 +13,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface OmedaCityService {
     // Player Details
@@ -50,4 +52,10 @@ interface OmedaCityService {
 
     @GET("items/{item_name}.json")
     suspend fun getItemByName(@Path("item_name") itemName: String): Response<ItemDto>
+
+
+    // https://omeda.city/builds?q%5Bname%5D=&q%5Brole%5D=offlane&q%5Border%5D=popular&q%5Bskill_order%5D=1&q%5Bmodules%5D=1
+    // Builds
+    @GET("builds.json")
+    suspend fun getBuilds(@QueryMap params: Map<String, String>): Response<List<BuildDto>>
 }

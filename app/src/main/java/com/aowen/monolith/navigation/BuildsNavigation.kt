@@ -39,5 +39,4 @@ fun NavGraphBuilder.buildsScreen(
     ) {
         BuildsScreenRoute(navController)
     }
-    itemDetailsScreen()
 }
