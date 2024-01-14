@@ -1,6 +1,23 @@
 # Release Notes
 
-## 0.6.6 - Latest
+## 0.7.0 - Latest
+
+#### New Features
+
+- Builds! The app now contains a builds section for you to lookup builds for your favorite heroes. You can filter by all the same filters available on the website
+
+#### Improvements & Bug Fixes
+
+- Fixed the text color for the "Delete all recent searches" button
+
+#### Coming Soon
+- Up/Down Vote on builds
+- Hero Stats on Build Details Screen
+- Build Creation
+
+
+
+## 0.6.6
 
 #### Improvements & Bug Fixes
 

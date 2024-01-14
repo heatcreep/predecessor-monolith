@@ -37,7 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.aowen.monolith.data.HeroImage
+import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildState
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
@@ -118,7 +118,7 @@ fun HeroAndRoleSelectionScreen(
                             onExpandedChange = { isHeroDropdownOpen = !isHeroDropdownOpen }
                         ) {
                             TextField(
-                                value = HeroImage.entries.firstOrNull {
+                                value = Hero.entries.firstOrNull {
                                     it.heroId == uiState.selectedHero
                                 }?.heroName ?: "Select a hero",
                                 onValueChange = {},
@@ -143,7 +143,7 @@ fun HeroAndRoleSelectionScreen(
                                     isHeroDropdownOpen = false
                                 }
                             ) {
-                                HeroImage.entries.forEach { hero ->
+                                Hero.entries.forEach { hero ->
                                     DropdownMenuItem(
                                         modifier = Modifier.fillMaxWidth(),
                                         text = {

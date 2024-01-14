@@ -1,24 +1,26 @@
 package com.aowen.monolith.data
 
+
 data class BuildListItem(
-    val id: Int,
-    val title: String,
-    val author: String,
-    val role: String,
-    val description: String?,
-    val heroId: Int,
-    val crest: Int,
+    val id: Int = 0,
+    val title: String = "",
+    val author: String = "",
+    val role: String = "unknown",
+    val description: String? = "",
+    val heroId: Int = 999,
+    val crest: Int = 0,
     val buildItems: List<Int> = emptyList(),
     val skillOrder: List<Int>? = null,
     val upvotes: Int = 0,
     val downvotes: Int = 0,
-    val createdAt: String?,
-    val updatedAt: String?,
+    val modules: List<ItemModule> = emptyList(),
+    val createdAt: String? = "",
+    val updatedAt: String? = "",
 )
 
 data class ItemModule(
     val title: String = "",
-    val items: List<Int?> = emptyList(),
+    val items: List<Int> = emptyList(),
 )
 
 fun BuildDto.create(): BuildListItem {
@@ -36,6 +38,7 @@ fun BuildDto.create(): BuildListItem {
         downvotes = downvotesCount,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        modules = modules.map { it.create() }
     )
 }
 

@@ -1,5 +1,6 @@
 package com.aowen.monolith.network
 
+import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
@@ -33,6 +34,21 @@ interface OmedaCityRepository {
     suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?>
 
     suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?>
+
+    suspend fun fetchAllBuilds(
+        name: String? = null,
+        role: String? = null,
+        order: String? = null,
+        heroId: Int? = null,
+        skillOrder: Int? = null,
+        modules: Int? = null,
+        page: Int? = 1,
+
+    ): Result<List<BuildListItem>?>
+
+    suspend fun fetchBuildById(
+        buildId: String
+    ): Result<BuildListItem?>
 }
 
 class OmedaCityRepositoryImpl @Inject constructor(
@@ -172,6 +188,51 @@ class OmedaCityRepositoryImpl @Inject constructor(
                 Result.success(heroStatisticsResponse.body()?.heroStatistics?.first()?.create())
             } else {
                 Result.failure(Exception("Failed to fetch hero statistics"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun fetchAllBuilds(
+        name: String?,
+        role: String?,
+        order: String?,
+        heroId: Int?,
+        skillOrder: Int?,
+        modules: Int?,
+        page: Int?
+    ): Result<List<BuildListItem>?> {
+        return try {
+            val response = playerApiService.getBuilds(
+                name = name,
+                role = role,
+                order = order,
+                heroId = heroId,
+                skillOrder = skillOrder,
+                modules = modules,
+                page = page
+            )
+            if (response.isSuccessful) {
+                val result = Result.success(response.body()?.map {
+                    it.create()
+                })
+                return result
+            } else {
+                return Result.failure(Exception("Failed to fetch builds"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun fetchBuildById(buildId: String): Result<BuildListItem?> {
+        return try {
+            val response = playerApiService.getBuildById(buildId)
+            if (response.isSuccessful) {
+                return Result.success(response.body()?.create())
+            } else {
+                return Result.failure(Exception("Failed to fetch build"))
             }
         } catch (e: Exception) {
             Result.failure(e)

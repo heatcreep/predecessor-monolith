@@ -1,5 +1,6 @@
 package com.aowen.monolith.fakes.repo
 
+import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
@@ -8,6 +9,7 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
+import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroDto2
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
@@ -26,6 +28,7 @@ import com.aowen.monolith.network.OmedaCityRepository
 enum class ResponseType {
     Empty,
     Success,
+    SuccessNull,
 }
 
 class FakeOmedaCityRepository(
@@ -37,7 +40,9 @@ class FakeOmedaCityRepository(
     private val itemDetailsResponse: ResponseType = ResponseType.Success,
     private val hasHeroDetailsErrors: Boolean = false,
     private val heroDetailsResponse: ResponseType = ResponseType.Success,
-    private val hasHeroStatisticsErrors: Boolean = false
+    private val hasHeroStatisticsErrors: Boolean = false,
+    private val hasBuildsError: Boolean = false,
+    private val buildsResponse: ResponseType = ResponseType.Success,
 ) : OmedaCityRepository {
 
     companion object {
@@ -121,6 +126,7 @@ class FakeOmedaCityRepository(
             Result.failure(Exception(FetchItemsError))
         } else when (itemDetailsResponse) {
             ResponseType.Empty -> Result.success(emptyList())
+            ResponseType.SuccessNull -> Result.success(null)
             else -> Result.success(
                 listOf(
                     fakeItemDto.create(),
@@ -170,6 +176,36 @@ class FakeOmedaCityRepository(
         } else when (heroId) {
             "Empty" -> Result.success(null)
             else -> Result.success(fakeHeroStatisticsDto.create())
+        }
+    }
+
+    override suspend fun fetchAllBuilds(
+        name: String?,
+        role: String?,
+        order: String?,
+        heroId: Int?,
+        skillOrder: Int?,
+        modules: Int?,
+        page: Int?
+    ): Result<List<BuildListItem>?> {
+        return if(hasBuildsError) {
+            Result.failure(Exception("Failed to fetch builds"))
+        } else when(buildsResponse) {
+            ResponseType.Empty -> Result.success(emptyList())
+            else -> Result.success(
+                listOf(fakeBuildDto.create())
+            )
+        }
+    }
+
+    override suspend fun fetchBuildById(buildId: String): Result<BuildListItem?> {
+        return if(hasBuildsError) {
+            Result.failure(Exception("Failed to fetch build details."))
+        } else when(buildsResponse) {
+            ResponseType.SuccessNull -> Result.success(null)
+            else -> Result.success(
+                fakeBuildDto.create()
+            )
         }
     }
 }

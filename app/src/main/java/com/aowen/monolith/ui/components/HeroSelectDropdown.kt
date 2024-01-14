@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.HeroDetails
-import com.aowen.monolith.data.HeroImage
+import com.aowen.monolith.data.Hero
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
 
@@ -43,7 +43,7 @@ internal fun HeroSelectDropdown(
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
-    val heroImage = selectedHero.imageId ?: HeroImage.UNKNOWN.drawableId
+    val heroImage = selectedHero.imageId ?: Hero.UNKNOWN.drawableId
 
     Box(
         modifier = modifier
@@ -88,7 +88,7 @@ internal fun HeroSelectDropdown(
                 onDismissRequest = { expanded = false }
             ) {
                 heroes.forEach { hero ->
-                    val image = hero.imageId ?: HeroImage.UNKNOWN.drawableId
+                    val image = hero.imageId ?: Hero.UNKNOWN.drawableId
                     DropdownMenuItem(
                         modifier = Modifier.fillMaxWidth(),
                         text = {

@@ -67,7 +67,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
-import com.aowen.monolith.data.HeroImage
+import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.network.firebase.Feedback
@@ -587,9 +587,9 @@ fun ClaimedPlayerCard(
     modifier: Modifier = Modifier
 ) {
 
-    val heroImage = HeroImage.entries.firstOrNull {
+    val heroImage = Hero.entries.firstOrNull {
         it.heroName == playerStats.favoriteHero
-    } ?: HeroImage.UNKNOWN
+    } ?: Hero.UNKNOWN
 
     Card(
         modifier = modifier

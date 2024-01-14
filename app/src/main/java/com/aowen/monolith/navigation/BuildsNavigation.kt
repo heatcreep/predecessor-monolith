@@ -37,6 +37,7 @@ fun NavGraphBuilder.buildsScreen(
             )
         }
     ) {
-        BuildsScreenRoute(navController)
+        BuildsScreenRoute(navController::navigateToBuildDetails)
     }
+    buildDetailsScreen()
 }

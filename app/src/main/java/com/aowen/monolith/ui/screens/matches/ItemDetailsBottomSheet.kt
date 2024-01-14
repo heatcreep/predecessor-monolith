@@ -1,6 +1,7 @@
 package com.aowen.monolith.ui.screens.matches
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,16 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImagePainter
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
-import coil.request.ImageRequest
 import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.ui.components.ItemEffectRow
 import com.aowen.monolith.ui.components.ItemStatRow
 import com.aowen.monolith.ui.components.TaperedItemTypeRow
@@ -64,7 +61,6 @@ fun ItemDetailsContent(
     modifier: Modifier = Modifier,
     itemDetails: ItemDetails
 ) {
-    val context = LocalContext.current
     val config = LocalConfiguration.current
     Column(
         modifier = modifier
@@ -75,24 +71,14 @@ fun ItemDetailsContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        val model = ImageRequest.Builder(context)
-            .data(itemDetails.image)
-            .crossfade(true)
-            .build()
-        SubcomposeAsyncImage(
-            model = model,
-            contentDescription = null,
-        ) {
-            val state = painter.state
-            if (state is AsyncImagePainter.State.Success) {
-                SubcomposeAsyncImageContent(
-                    modifier = Modifier
-                        .size(160.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape),
-                )
-            }
-        }
+        Image(
+            modifier = Modifier
+                .size(160.dp)
+                .clip(CircleShape)
+                .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape),
+            painter = painterResource(id = getItemImage(itemDetails.id)),
+            contentDescription = null
+        )
         Text(
             text = itemDetails.displayName,
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -143,7 +129,7 @@ fun ItemDetailsContent(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = "${itemDetails.price.toString()} Upgrade Cost",
+                        text = "${itemDetails.price} Upgrade Cost",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )

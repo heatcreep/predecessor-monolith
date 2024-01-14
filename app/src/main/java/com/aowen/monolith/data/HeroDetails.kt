@@ -42,7 +42,7 @@ fun HeroDto.create(): HeroDetails =
         stats = stats,
         classes = classes.toHeroClass(),
         roles = roles.toHeroRole(),
-        imageId = HeroImage.values().firstOrNull { it.heroName == displayName }?.drawableId,
+        imageId = Hero.values().firstOrNull { it.heroName == displayName }?.drawableId,
         abilities = abilities.map {
             it.create()
         },

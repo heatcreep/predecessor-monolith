@@ -111,6 +111,9 @@ dependencies {
     kapt libs.hilt.android.compiler
     implementation libs.androidx.hilt.navigation.compose
 
+    // RichText
+    implementation libs.meetup.markdown
+
     // Retrofit
     implementation libs.retrofit.gson
 

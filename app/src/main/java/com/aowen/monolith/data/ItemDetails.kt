@@ -151,7 +151,7 @@ fun Map<String, Double>?.createStatDetails(): List<StatDetails> {
             )
 
             else -> StatDetails(
-                iconId = coil.singleton.R.drawable.ic_100tb,
+                iconId = R.drawable.unknown,
                 name = "Unknown",
                 value = value.toStatValue()
             )

@@ -1,5 +1,6 @@
 package com.aowen.monolith.fakes
 
+import com.aowen.monolith.data.BuildDto
 import com.aowen.monolith.data.HeroDto
 import com.aowen.monolith.data.HeroStatisticsResponseDto
 import com.aowen.monolith.data.ItemDto
@@ -8,6 +9,7 @@ import com.aowen.monolith.data.MatchesDto
 import com.aowen.monolith.data.PlayerDto
 import com.aowen.monolith.data.PlayerHeroStatsResponseDto
 import com.aowen.monolith.data.PlayerStatsDto
+import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
 import com.aowen.monolith.fakes.data.fakeItemDto
@@ -124,6 +126,30 @@ class FakeOmedaCityService(private val resCode: Int? = null) : OmedaCityService 
         return when (resCode) {
             404 -> Response.error(404, "Not Found".toResponseBody(null))
             200 -> Response.success(fakeItemDto)
+            else -> throw Exception("Something went wrong")
+        }
+    }
+
+    override suspend fun getBuilds(
+        name: String?,
+        role: String?,
+        order: String?,
+        heroId: Int?,
+        skillOrder: Int?,
+        modules: Int?,
+        page: Int?
+    ): Response<List<BuildDto>> {
+        return when (resCode) {
+            404 -> Response.error(404, "Not Found".toResponseBody(null))
+            200 -> Response.success(listOf(fakeBuildDto))
+            else -> throw Exception("Something went wrong")
+        }
+    }
+
+    override suspend fun getBuildById(buildId: String): Response<BuildDto> {
+        return when (resCode) {
+            404 -> Response.error(404, "Not Found".toResponseBody(null))
+            200 -> Response.success(fakeBuildDto)
             else -> throw Exception("Something went wrong")
         }
     }

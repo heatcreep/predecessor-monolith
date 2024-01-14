@@ -34,7 +34,7 @@ data class BuildDto(
     @SerializedName("updated_at")
     val updatedAt: String?,
     val author: String,
-    val modules: List<ModuleDto>?
+    val modules: List<ModuleDto> = emptyList()
 )
 
 @Serializable

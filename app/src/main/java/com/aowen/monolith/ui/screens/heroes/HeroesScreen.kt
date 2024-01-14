@@ -54,11 +54,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
+import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroDetails
-import com.aowen.monolith.data.HeroImage
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.navigation.navigateToHeroDetails
-import com.aowen.monolith.ui.common.MonolithCollapsableColumn
+import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -146,8 +146,7 @@ fun HeroesScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                MonolithCollapsableColumn(listState = listState) {
-
+                MonolithCollapsableGridColumn(listState = listState) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -312,7 +311,7 @@ fun HeroCardPreview() {
         Surface {
             HeroCard(
                 hero = HeroDetails(
-                    imageId = HeroImage.NARBASH.drawableId,
+                    imageId = Hero.NARBASH.drawableId,
                 )
             )
         }
@@ -331,53 +330,53 @@ fun HeroesScreenPreview() {
                     isLoading = true,
                     allHeroes = listOf(
                         HeroDetails(
-                            imageId = HeroImage.NARBASH.drawableId,
+                            imageId = Hero.NARBASH.drawableId,
                             displayName = "Narbash"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.BELICA.drawableId,
+                            imageId = Hero.BELICA.drawableId,
                             displayName = " Lt. Belica"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.MORIGESH.drawableId,
+                            imageId = Hero.MORIGESH.drawableId,
                             displayName = "Morigesh"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.TWINBLAST.drawableId,
+                            imageId = Hero.TWINBLAST.drawableId,
                             displayName = "TwinBlast"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.GREYSTONE.drawableId,
+                            imageId = Hero.GREYSTONE.drawableId,
                             displayName = "Greystone"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.GRUX.drawableId,
+                            imageId = Hero.GRUX.drawableId,
                             displayName = "Grux"
                         ),
                     ),
                     currentHeroes = listOf(
                         HeroDetails(
-                            imageId = HeroImage.NARBASH.drawableId,
+                            imageId = Hero.NARBASH.drawableId,
                             displayName = "Narbash"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.BELICA.drawableId,
+                            imageId = Hero.BELICA.drawableId,
                             displayName = " Lt. Belica"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.MORIGESH.drawableId,
+                            imageId = Hero.MORIGESH.drawableId,
                             displayName = "Morigesh"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.TWINBLAST.drawableId,
+                            imageId = Hero.TWINBLAST.drawableId,
                             displayName = "TwinBlast"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.GREYSTONE.drawableId,
+                            imageId = Hero.GREYSTONE.drawableId,
                             displayName = "Greystone"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.GRUX.drawableId,
+                            imageId = Hero.GRUX.drawableId,
                             displayName = "Grux"
                         ),
                     )
@@ -400,53 +399,53 @@ fun HeroesScreenPreviewDeviceSizes() {
                     isLoading = false,
                     allHeroes = listOf(
                         HeroDetails(
-                            imageId = HeroImage.NARBASH.drawableId,
+                            imageId = Hero.NARBASH.drawableId,
                             displayName = "Narbash"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.BELICA.drawableId,
+                            imageId = Hero.BELICA.drawableId,
                             displayName = " Lt. Belica"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.MORIGESH.drawableId,
+                            imageId = Hero.MORIGESH.drawableId,
                             displayName = "Morigesh"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.TWINBLAST.drawableId,
+                            imageId = Hero.TWINBLAST.drawableId,
                             displayName = "TwinBlast"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.GREYSTONE.drawableId,
+                            imageId = Hero.GREYSTONE.drawableId,
                             displayName = "Greystone"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.GRUX.drawableId,
+                            imageId = Hero.GRUX.drawableId,
                             displayName = "Grux"
                         ),
                     ),
                     currentHeroes = listOf(
                         HeroDetails(
-                            imageId = HeroImage.NARBASH.drawableId,
+                            imageId = Hero.NARBASH.drawableId,
                             displayName = "Narbash"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.BELICA.drawableId,
+                            imageId = Hero.BELICA.drawableId,
                             displayName = " Lt. Belica"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.MORIGESH.drawableId,
+                            imageId = Hero.MORIGESH.drawableId,
                             displayName = "Morigesh"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.TWINBLAST.drawableId,
+                            imageId = Hero.TWINBLAST.drawableId,
                             displayName = "TwinBlast"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.GREYSTONE.drawableId,
+                            imageId = Hero.GREYSTONE.drawableId,
                             displayName = "Greystone"
                         ),
                         HeroDetails(
-                            imageId = HeroImage.GRUX.drawableId,
+                            imageId = Hero.GRUX.drawableId,
                             displayName = "Grux"
                         ),
                     )

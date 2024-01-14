@@ -4,8 +4,6 @@ import android.content.Context
 import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.AuthRepositoryImpl
-import com.aowen.monolith.network.BuildsRepository
-import com.aowen.monolith.network.BuildsRepositoryOmedaImpl
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.OmedaCityRepositoryImpl
 import com.aowen.monolith.network.OmedaCityService
@@ -132,10 +130,4 @@ object AppModule {
         repository: UserRepository
     ): UserRecentSearchRepository =
         UserRecentSearchRepositoryImpl(postgrestService, repository)
-
-    @Provides
-    fun provideBuildsRepository(
-        omedaCityService: OmedaCityService
-    ): BuildsRepository =
-        BuildsRepositoryOmedaImpl(omedaCityService)
 }

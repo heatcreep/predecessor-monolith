@@ -11,11 +11,11 @@ enum class RoleImage(val roleName: String, val drawableId: Int) {
     UNKNOWN("unknown", R.drawable.unknown),
 }
 
-fun getRoleImage(roleName: String) = RoleImage.values().first {
-    it.roleName == roleName
-}
+fun getRoleImage(roleName: String? = "") : RoleImage = RoleImage.entries.firstOrNull {
+    it.roleName == roleName?.lowercase()
+} ?: RoleImage.UNKNOWN
 
-enum class HeroImage(val heroName: String, val heroId: Int, val drawableId: Int) {
+enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     BELICA("Lt. Belica",  13, R.drawable.belica),
     COUNTESS("Countess", 1, R.drawable.countess),
     CRUNCH("Crunch", 2, R.drawable.crunch),
@@ -51,6 +51,6 @@ enum class HeroImage(val heroName: String, val heroId: Int, val drawableId: Int)
     UNKNOWN("Unknown", 999, R.drawable.unknown),
 }
 
-fun getHeroImage(heroId: Int?) = HeroImage.entries.firstOrNull {
+fun getHeroImage(heroId: Int?) = Hero.entries.firstOrNull {
     it.heroId == heroId
-} ?: HeroImage.UNKNOWN
+} ?: Hero.UNKNOWN

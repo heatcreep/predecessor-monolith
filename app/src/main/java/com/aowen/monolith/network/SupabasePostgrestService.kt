@@ -1,10 +1,7 @@
 package com.aowen.monolith.network
 
-import com.aowen.monolith.data.BuildDto
-import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.PlayerSearchDto
 import com.aowen.monolith.data.UserInfo
-import com.aowen.monolith.data.create
 import com.aowen.monolith.logDebug
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
@@ -43,7 +40,7 @@ interface SupabasePostgrestService {
         playerSearchDto: PlayerSearchDto
     )
 
-    suspend fun fetchAllUserBuilds(): Result<List<BuildListItem>?>
+//    suspend fun fetchAllUserBuilds(): Result<List<BuildListItem>?>
 }
 
 class SupabasePostgrestServiceImpl @Inject constructor(
@@ -132,30 +129,31 @@ class SupabasePostgrestServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchAllUserBuilds(): Result<List<BuildListItem>?> {
-        return postgrest.from(TABLE_BUILDS)
-            .select(
-                columns = Columns.list(
-                    "id",
-                    "created_at",
-                    "updated_at",
-                    "title",
-                    "author",
-                    "role",
-                    "crest_id",
-                    "items",
-                    "items_first_buy",
-                    "items_flex",
-                    "items_core",
-                    "skill_order",
-                    "description",
-                    "hero_id",
-                )
-            ) {
-                order("created_at", Order.ASCENDING)
-            }.decodeList<BuildDto>().let { buildListDto ->
-                Result.success(buildListDto.map { it.create() })
-            }
-
-    }
+    // TODO: Implement this
+//    override suspend fun fetchAllUserBuilds(): Result<List<BuildListItem>?> {
+//        return postgrest.from(TABLE_BUILDS)
+//            .select(
+//                columns = Columns.list(
+//                    "id",
+//                    "created_at",
+//                    "updated_at",
+//                    "title",
+//                    "author",
+//                    "role",
+//                    "crest_id",
+//                    "items",
+//                    "items_first_buy",
+//                    "items_flex",
+//                    "items_core",
+//                    "skill_order",
+//                    "description",
+//                    "hero_id",
+//                )
+//            ) {
+//                order("created_at", Order.ASCENDING)
+//            }.decodeList<BuildDto>().let { buildListDto ->
+//                Result.success(buildListDto.map { it.create() })
+//            }
+//
+//    }
 }

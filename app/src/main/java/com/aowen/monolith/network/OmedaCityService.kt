@@ -13,7 +13,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.QueryMap
 
 interface OmedaCityService {
     // Player Details
@@ -54,8 +53,20 @@ interface OmedaCityService {
     suspend fun getItemByName(@Path("item_name") itemName: String): Response<ItemDto>
 
 
-    // https://omeda.city/builds?q%5Bname%5D=&q%5Brole%5D=offlane&q%5Border%5D=popular&q%5Bskill_order%5D=1&q%5Bmodules%5D=1
     // Builds
     @GET("builds.json")
-    suspend fun getBuilds(@QueryMap params: Map<String, String>): Response<List<BuildDto>>
+    suspend fun getBuilds(
+        @Query("filter[name]") name: String? = null,
+        @Query("filter[role]") role: String? = null,
+        @Query("filter[order]") order: String? = "popular",
+        @Query("filter[hero_id]") heroId: Int? = null,
+        @Query("filter[skill_order]") skillOrder: Int? = null,
+        @Query("filter[modules]") modules: Int? = null,
+        @Query("page") page: Int? = 1,
+    ): Response<List<BuildDto>>
+
+    @GET("builds/{build_id}.json")
+    suspend fun getBuildById(
+        @Path("build_id") buildId: String
+    ): Response<BuildDto>
 }

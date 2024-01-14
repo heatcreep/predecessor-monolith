@@ -20,6 +20,7 @@ gson = "2.9.0"
 kotlinBom = "1.8.20"
 kotlinTest = "1.7.3"
 ksp = "1.9.0-1.0.11"
+meetupMarkdown = "0.2.2"
 supabaseBom = "1.1.0"
 ktorClientAndroid = "2.3.2"
 junit4 = "4.13.2"
@@ -59,6 +60,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktorClientAndroid" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktorClientAndroid" }
+meetup-markdown = { module = "com.meetup:twain", version.ref = "meetupMarkdown" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "gson" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson" }
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }

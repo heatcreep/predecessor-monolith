@@ -59,7 +59,7 @@ import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.StatDetails
 import com.aowen.monolith.navigation.navigateToItemDetails
-import com.aowen.monolith.ui.common.MonolithCollapsableColumn
+import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
@@ -72,6 +72,7 @@ fun ItemsScreenRoute(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+
     ItemsScreen(
         uiState = uiState,
         navigateToItemDetails = navController::navigateToItemDetails,
@@ -136,7 +137,7 @@ fun ItemsScreen(
                         .padding(top = 16.dp, start = 16.dp, end = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    MonolithCollapsableColumn(listState = listState) {
+                    MonolithCollapsableGridColumn(listState = listState) {
                         SearchBar(
                             searchLabel = "Item lookup",
                             searchValue = uiState.searchFieldValue,
