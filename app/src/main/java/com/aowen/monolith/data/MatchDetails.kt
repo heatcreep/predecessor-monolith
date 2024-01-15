@@ -25,10 +25,14 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
     return MatchPlayerDetails(
         playerId = this.id,
         playerName = this.displayName,
-        mmr = when (this.mmr) {
-            is Float -> this.mmr.toDecimal()
-            is Double -> this.mmr.toFloat().toDecimal()
-            else -> this.mmr.toString()
+        mmr = if (this.mmr == null) {
+            "0"
+        } else {
+            when (this.mmr) {
+                is Float -> this.mmr.toDecimal()
+                is Double -> this.mmr.toFloat().toDecimal()
+                else -> this.mmr.toString()
+            }
         },
         mmrChange = this.mmrChange.toDecimal(),
         rankedImage = RetrofitHelper.getRankImageUrl(this.rankImage),

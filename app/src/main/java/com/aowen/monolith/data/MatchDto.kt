@@ -9,11 +9,11 @@ data class MatchPlayerDto(
     val displayName: String,
     @SerializedName("is_ranked")
     val isRanked: Boolean,
-    val mmr: Any,
+    val mmr: Any?,
     @SerializedName("mmr_change")
     val mmrChange: Float,
     @SerializedName("rank_image")
-    val rankImage: String,
+    val rankImage: String?,
     val team: String,
     @SerializedName("hero_id")
     val heroId: Int,

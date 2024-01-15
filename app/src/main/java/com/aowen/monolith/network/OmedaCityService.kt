@@ -35,7 +35,10 @@ interface OmedaCityService {
 
     // Find Players By Name
     @GET("players.json")
-    suspend fun getPlayersByName(@Query("q[name]") playerName: String): Response<List<PlayerDto>>
+    suspend fun getPlayersByName(
+        @Query("filter[name]") playerName: String,
+        @Query("filter[include_inactive]") includeInactive: Int = 0
+    ): Response<List<PlayerDto>>
 
     @GET("heroes.json")
     suspend fun getAllHeroes(): Response<List<HeroDto>>

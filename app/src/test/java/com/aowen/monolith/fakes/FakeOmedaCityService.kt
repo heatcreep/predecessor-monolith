@@ -75,7 +75,7 @@ class FakeOmedaCityService(private val resCode: Int? = null) : OmedaCityService 
         }
     }
 
-    override suspend fun getPlayersByName(playerName: String): Response<List<PlayerDto>> {
+    override suspend fun getPlayersByName(playerName: String, includeInactive: Int): Response<List<PlayerDto>> {
         return when (resCode) {
             404 -> Response.error(404, "Not Found".toResponseBody(null))
             200 -> Response.success(listOf(fakePlayerDto))

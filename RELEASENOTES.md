@@ -1,6 +1,14 @@
 # Release Notes
 
-## 0.7.0 - Latest
+## 0.7.1 - Latest
+
+#### Improvements & Bug Fixes
+
+- Fixes search input on the search screen not returning searched for users
+- Fixes a bug in player details if MMR or rank came back null
+- Improves loading of images on the match detail drop down of each player
+
+## 0.7.0
 
 #### New Features
 

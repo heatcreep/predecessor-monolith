@@ -1,7 +1,6 @@
 package com.aowen.monolith.ui.screens.matches
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
@@ -35,9 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -47,12 +44,12 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.RoleImage
 import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.data.getKda
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.KDAText
@@ -204,21 +201,12 @@ fun PlayerRow(
                     maxItemsInEachRow = 4
                 ) {
                     playerItems.forEach { item ->
-                        val painter = rememberAsyncImagePainter(item.image)
-                        val state = painter.state
-
-                        val transition by animateFloatAsState(
-                            targetValue = if (state is AsyncImagePainter.State.Success) 1f else 0f,
-                            label = "itemFloatAnimationState",
-                        )
                         Image(
-                            painter = painter,
-                            contentDescription = null,
                             modifier = Modifier
-                                .scale(.8f + (.2f * transition))
-                                .alpha(transition)
                                 .size(56.dp)
-                                .clickable { openItemDetails(item) }
+                                .clickable { openItemDetails(item) },
+                            painter = painterResource(id = getItemImage(item.id)),
+                            contentDescription = null
                         )
                     }
                 }
