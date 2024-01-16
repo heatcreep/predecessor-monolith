@@ -32,6 +32,7 @@ enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     KALLARI("Kallari", 11, R.drawable.kallari),
     KHAIMERA("Khaimera", 12, R.drawable.khaimera),
     KIRA("Kira", 24, R.drawable.kira),
+    KWANG("Kwang", 44, R.drawable.kwang),
     MORIGESH("Morigesh", 27, R.drawable.morigesh),
     MURDOCK("Murdock", 14, R.drawable.murdock),
     MURIEL("Muriel", 15, R.drawable.muriel),
