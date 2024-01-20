@@ -36,6 +36,10 @@ class BuildsScreenViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<BuildsUiState> = MutableStateFlow(BuildsUiState())
     val uiState = _uiState
 
+    init {
+        initViewModel()
+    }
+
     fun initViewModel() {
         viewModelScope.launch {
             val buildsResult = repository.fetchAllBuilds()

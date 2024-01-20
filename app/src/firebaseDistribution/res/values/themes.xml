@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Monolith" parent="Theme.AppCompat.Light.DarkActionBar"/>
+    <style name="Theme.Monolith" parent="android:Theme.Material.Light.NoActionBar"/>
 </resources>

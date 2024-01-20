@@ -24,7 +24,10 @@ class BuildsScreenViewModelTest {
     fun `creating a new BuildsScreenViewModel should initialize with empty builds`() {
         viewModel = BuildsScreenViewModel(repository = FakeOmedaCityRepository())
         val actual = viewModel.uiState.value
-        val expected = BuildsUiState()
+        val expected = BuildsUiState(
+            isLoading = false,
+            builds = listOf(fakeBuildDto.create()),
+        )
         assertEquals(expected, actual)
     }
 
@@ -122,7 +125,10 @@ class BuildsScreenViewModelTest {
         val expected = BuildsUiState(
             isLoading = false,
             currentPage = 2,
-            builds = listOf(fakeBuildDto.create()),
+            builds = listOf(
+                fakeBuildDto.create(),
+                fakeBuildDto.create(),
+            ),
         )
         assertEquals(expected, actual)
     }
@@ -166,7 +172,9 @@ class BuildsScreenViewModelTest {
         viewModel.updateSearchField("test")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
+            isLoading = false,
             searchFieldValue = "test",
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -179,7 +187,9 @@ class BuildsScreenViewModelTest {
         viewModel.updateSelectedRole("Support")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
+            isLoading = false,
             selectedRoleFilter = HeroRole.Support,
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -191,12 +201,16 @@ class BuildsScreenViewModelTest {
         )
         viewModel.updateSelectedRole("Support")
         var expected = BuildsUiState(
+            isLoading = false,
             selectedRoleFilter = HeroRole.Support,
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
         viewModel.clearSelectedRole()
         expected = BuildsUiState(
+            isLoading = false,
             selectedRoleFilter = null,
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
     }
@@ -209,7 +223,9 @@ class BuildsScreenViewModelTest {
         viewModel.updateSelectedHero("Narbash")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
+            isLoading = false,
             selectedHeroFilter = Hero.NARBASH,
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -221,12 +237,16 @@ class BuildsScreenViewModelTest {
         )
         viewModel.updateSelectedHero("Narbash")
         var expected = BuildsUiState(
+            isLoading = false,
             selectedHeroFilter = Hero.NARBASH,
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
         viewModel.clearSelectedHero()
         expected = BuildsUiState(
+            isLoading = false,
             selectedHeroFilter = null,
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
     }
@@ -239,7 +259,9 @@ class BuildsScreenViewModelTest {
         viewModel.updateSelectedSortOrder("Trending")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
+            isLoading = false,
             selectedSortOrder = "Trending",
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -251,12 +273,16 @@ class BuildsScreenViewModelTest {
         )
         viewModel.updateSelectedSortOrder("Trending")
         var expected = BuildsUiState(
+            isLoading = false,
             selectedSortOrder = "Trending",
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
         viewModel.clearSelectedSortOrder()
         expected = BuildsUiState(
+            isLoading = false,
             selectedSortOrder = "Popular",
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
     }
@@ -269,7 +295,9 @@ class BuildsScreenViewModelTest {
         viewModel.updateHasSkillOrder(true)
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
+            isLoading = false,
             hasSkillOrderSelected = true,
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -282,7 +310,9 @@ class BuildsScreenViewModelTest {
         viewModel.updateHasModules(true)
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
+            isLoading = false,
             hasModulesSelected = true,
+            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }

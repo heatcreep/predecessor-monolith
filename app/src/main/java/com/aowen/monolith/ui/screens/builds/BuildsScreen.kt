@@ -96,7 +96,6 @@ fun BuildsScreenRoute(
 
     BuildsScreen(
         uiState = uiState,
-        initViewModel = viewModel::initViewModel,
         loadMoreBuilds = viewModel::loadMoreBuilds,
         onSelectRoleFilter = viewModel::updateSelectedRole,
         onClearRoleFilter = viewModel::clearSelectedRole,
@@ -114,7 +113,6 @@ fun BuildsScreenRoute(
 @Composable
 fun BuildsScreen(
     uiState: BuildsUiState,
-    initViewModel: () -> Unit,
     loadMoreBuilds: () -> Unit,
     onSelectRoleFilter: (String) -> Unit,
     onClearRoleFilter: () -> Unit,
@@ -142,10 +140,6 @@ fun BuildsScreen(
         derivedStateOf {
             scrollState.isScrolledToEnd()
         }
-    }
-
-    LaunchedEffect(Unit) {
-        initViewModel()
     }
 
     LaunchedEffect(expanded) {
