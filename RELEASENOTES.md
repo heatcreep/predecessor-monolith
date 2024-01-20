@@ -1,11 +1,15 @@
 # Release Notes
 
-## 0.7.2 - Latest
+## 0.7.3 - Latest
 
 #### Improvements & Bug Fixes
 
 - Build list now retains its filters and scroll position when navigating back to it
 - Fixes theming bug where top bar would be hidden in dark mode (Firebase Testing Only)
+
+## 0.7.2
+
+- Adds photo for Kwang
 
 ## 0.7.1 - Latest
 
