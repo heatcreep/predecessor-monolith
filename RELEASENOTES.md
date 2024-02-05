@@ -1,6 +1,16 @@
 # Release Notes
 
-## 0.7.3 - Latest
+## 0.8.0 - Latest
+
+#### New Features
+
+- Users can now delete their account from the Profile screen
+
+#### Improvements and Bug Fixes
+
+- Search box on Builds tab now works properly and can be used to search for specific builds
+
+## 0.7.3
 
 #### Improvements & Bug Fixes
 
