@@ -16,6 +16,8 @@ interface AuthRepository {
 
     suspend fun getPlayer(): Result<UserProfile?>
     suspend fun handleSavePlayer(playerId: String): Result<Unit>
+
+    suspend fun deleteUserAccount(userId: String): Result<String>
 }
 
 
@@ -64,6 +66,15 @@ class AuthRepositoryImpl @Inject constructor(
             } ?: Result.failure(Exception("No current session"))
         } catch (e: Exception) {
             return Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteUserAccount(userId: String): Result<String> {
+        val response = authService.deleteUserAccount(userId = userId)
+        return if(response.isSuccessful) {
+            Result.success("Your account has been deleted.")
+        } else {
+            Result.failure(Exception("Error ${response.code()}: ${response.message()}"))
         }
     }
 }

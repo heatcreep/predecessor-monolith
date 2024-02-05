@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -31,6 +32,11 @@ fun MonolithApp(
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = appState.snackbarHostState,
+            )
+        },
         bottomBar = {
             if (appState.shouldShowBottomBar) {
                 MonolithBottomBar(
@@ -42,9 +48,12 @@ fun MonolithApp(
         }
     ) { padding ->
         MonolithNavHost(
-            appState = appState,
+            navController = appState.navController,
             modifier = Modifier.padding(padding),
-            startDestination = if (userId.isNotEmpty() || uiState.session != null) SearchRoute else LoginRoute
+            startDestination = if (userId.isNotEmpty() || uiState.session != null) SearchRoute else LoginRoute,
+            showSnackbar = { message, duration ->
+                appState.showSnackbar(message, duration)
+            }
         )
     }
 }

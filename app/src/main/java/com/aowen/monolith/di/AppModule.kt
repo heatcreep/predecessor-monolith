@@ -24,6 +24,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.functions.Functions
+import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.postgrest.Postgrest
@@ -67,6 +69,7 @@ object AppModule {
                 scheme = "monolith"
                 host = "login"
             }
+            install(Functions)
         }
         return client
     }
@@ -85,8 +88,14 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSupabaseAuthService(goTrue: GoTrue): SupabaseAuthService {
-        return SupabaseAuthServiceImpl(goTrue)
+    fun provideSupabaseFunctions(client: SupabaseClient): Functions {
+        return client.functions
+    }
+
+    @Provides
+    @Singleton
+    fun provideSupabaseAuthService(goTrue: GoTrue, functions: Functions): SupabaseAuthService {
+        return SupabaseAuthServiceImpl(goTrue, functions)
     }
 
     @Provides

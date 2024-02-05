@@ -77,4 +77,26 @@ class AuthRepositoryTest {
         val actual = authRepository.getPlayer()
         assertEquals(null, actual.getOrNull())
     }
+
+    @Test
+    fun `deleteUserAccount returns success on 200`() = runTest {
+        authRepository = AuthRepositoryImpl(
+            authService = FakeSupabaseAuthService(resCode = 200),
+            postgrestService = FakeSupabasePostgrestService()
+        )
+
+        val actual = authRepository.deleteUserAccount("fake-user-id")
+        assertEquals("Your account has been deleted.", actual.getOrNull())
+    }
+
+    @Test
+    fun `deleteUserAccount returns failure on not 200`() = runTest {
+        authRepository = AuthRepositoryImpl(
+            authService = FakeSupabaseAuthService(),
+            postgrestService = FakeSupabasePostgrestService()
+        )
+
+        val actual = authRepository.deleteUserAccount("fake-user-id").exceptionOrNull()
+        assertEquals("Error 400: Response.error()", actual?.message)
+    }
 }

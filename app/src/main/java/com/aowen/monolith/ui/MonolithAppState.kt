@@ -1,8 +1,11 @@
 package com.aowen.monolith.ui
 
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -20,23 +23,43 @@ import com.aowen.monolith.navigation.navigateToHeroes
 import com.aowen.monolith.navigation.navigateToItems
 import com.aowen.monolith.navigation.navigateToProfile
 import com.aowen.monolith.navigation.navigateToSearch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun rememberMonolithAppState(
-    navController: NavHostController = rememberNavController()
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    navController: NavHostController = rememberNavController(),
+    snackbarScope: CoroutineScope = rememberCoroutineScope()
 ): MonolithAppState {
     return remember(
         navController
     ) {
-        MonolithAppState(navController)
+        MonolithAppState(
+            snackbarHostState = snackbarHostState,
+            navController = navController,
+            snackbarScope = snackbarScope
+        )
     }
 }
 
 @Stable
 class MonolithAppState(
+    val snackbarHostState: SnackbarHostState,
+    val snackbarScope: CoroutineScope,
     val navController: NavHostController
 ) {
+
+    fun showSnackbar(message: String, duration: SnackbarDuration = SnackbarDuration.Short) {
+        snackbarScope.launch {
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = duration
+            )
+        }
+    }
+
     val currentDestination: NavDestination?
         @Composable get() = navController
             .currentBackStackEntryAsState().value?.destination

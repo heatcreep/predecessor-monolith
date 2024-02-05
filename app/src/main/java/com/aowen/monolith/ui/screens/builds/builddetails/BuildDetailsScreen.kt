@@ -275,7 +275,7 @@ fun PlayerCardWithRole(
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
             painter = painterResource(
-                id = getRoleImage(buildDetails?.role).drawableId
+                id = getRoleImage(buildDetails.role).drawableId
             ),
             contentDescription = null
         )

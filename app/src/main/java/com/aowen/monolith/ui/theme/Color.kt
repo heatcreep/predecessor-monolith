@@ -28,6 +28,7 @@ val DarkGreenHighlight = Color(0x561C421C)
 // Red
 val RedHighlight = Color(0xFFAF6969)
 val DarkRedHighlight = Color(0xFF683D3D)
+val RedDanger = Color(0xFF9E0404)
 
 // Blue
 val BlueHighlight = Color(0xFF6969AF)

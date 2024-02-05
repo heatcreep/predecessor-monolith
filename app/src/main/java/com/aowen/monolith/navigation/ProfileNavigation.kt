@@ -1,6 +1,7 @@
 package com.aowen.monolith.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.material3.SnackbarDuration
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -13,7 +14,10 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
     this.navigate(ProfileRoute, navOptions)
 }
 
-fun NavGraphBuilder.profileScreen(navController: NavController) {
+fun NavGraphBuilder.profileScreen(
+    navController: NavController,
+    showSnackbar: (String, SnackbarDuration) -> Unit
+) {
     composable(
         route = ProfileRoute,
         enterTransition = {
@@ -23,6 +27,6 @@ fun NavGraphBuilder.profileScreen(navController: NavController) {
             slideOutOfContainer(SlideDirection.End)
         }
     ) {
-        ProfileScreenRoute(navController = navController)
+        ProfileScreenRoute(navController = navController, showSnackbar = showSnackbar)
     }
 }

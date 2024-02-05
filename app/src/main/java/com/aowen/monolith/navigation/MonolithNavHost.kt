@@ -1,17 +1,18 @@
 package com.aowen.monolith.navigation
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.aowen.monolith.ui.MonolithAppState
 
 @Composable
 fun MonolithNavHost(
-    appState: MonolithAppState,
+    navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: String = LoginRoute,
+    showSnackbar: (String, SnackbarDuration) -> Unit
 ) {
-    val navController = appState.navController
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -22,6 +23,6 @@ fun MonolithNavHost(
         heroesScreen(navController = navController)
         itemsScreen(navController = navController)
         buildsScreen(navController = navController)
-        profileScreen(navController = navController)
+        profileScreen(navController = navController, showSnackbar = showSnackbar)
     }
 }

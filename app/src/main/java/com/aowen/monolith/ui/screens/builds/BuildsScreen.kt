@@ -97,6 +97,7 @@ fun BuildsScreenRoute(
     BuildsScreen(
         uiState = uiState,
         loadMoreBuilds = viewModel::loadMoreBuilds,
+        onSearchFieldUpdate = viewModel::updateSearchField,
         onSelectRoleFilter = viewModel::updateSelectedRole,
         onClearRoleFilter = viewModel::clearSelectedRole,
         onSelectHeroFilter = viewModel::updateSelectedHero,
@@ -114,6 +115,7 @@ fun BuildsScreenRoute(
 fun BuildsScreen(
     uiState: BuildsUiState,
     loadMoreBuilds: () -> Unit,
+    onSearchFieldUpdate: (String) -> Unit,
     onSelectRoleFilter: (String) -> Unit,
     onClearRoleFilter: () -> Unit,
     onSelectHeroFilter: (String) -> Unit,
@@ -176,9 +178,16 @@ fun BuildsScreen(
                         SearchBar(
                             searchLabel = "Builds lookup",
                             searchValue = uiState.searchFieldValue,
-                            setSearchValue = {},
+                            setSearchValue = {
+                                onSearchFieldUpdate(it)
+                            },
                             modifier = Modifier.weight(1f),
-                            handleClearSearch = {}
+                            handleClearSearch = {
+                                onSearchFieldUpdate("")
+                            },
+                            handleSubmitSearch = {
+                                onSubmitFilters()
+                            }
                         )
                         IconButton(
                             onClick = {

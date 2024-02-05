@@ -5,6 +5,7 @@ import io.github.jan.supabase.gotrue.user.AppMetadata
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.datetime.Instant
+import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
@@ -31,6 +32,7 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
             expiresAt = Instant.DISTANT_FUTURE,
         )
     }
+
     override suspend fun loginWithDiscord(): Response<Unit> {
         return when (resCode) {
             408 -> Response.error(408, "Request Timeout".toResponseBody(null))
@@ -49,5 +51,12 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
 
     override suspend fun logout() {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteUserAccount(userId: String): Response<ResponseBody> {
+        return when (resCode) {
+            200 -> Response.success(200, "OK".toResponseBody(null))
+            else -> Response.error(400, "Bad Request".toResponseBody())
+        }
     }
 }

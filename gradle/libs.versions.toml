@@ -8,7 +8,7 @@ androidXLifecycleRuntimeKtx = "2.6.1"
 androidXComposeMaterial3 = "1.1.2"
 androidXTestExt = "1.1.5"
 coilCompose = "2.2.2"
-composeBom = "2023.10.01"
+composeBom = "2024.01.00"
 composeNavigation = "2.7.3"
 daggerHilt = "2.47"
 daggerHiltCompose = "1.0.0"
@@ -66,6 +66,7 @@ retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", ver
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
 supabase-gotrue = { module = "io.github.jan-tennert.supabase:gotrue-kt" }
 supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-functions = { module = "io.github.jan-tennert.supabase:functions-kt" }
 
 
 [plugins]

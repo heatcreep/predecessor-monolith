@@ -3,6 +3,7 @@ package com.aowen.monolith.ui.screens.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.UserInfo
+import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -18,22 +19,34 @@ data class ProfileScreenUiState(
     val userInfo: UserInfo? = null,
 )
 
+enum class ProfileToastState {
+    DELETE,
+    LOGOUT,
+    ERROR,
+    NONE
+}
+
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileScreenUiState())
     val uiState: StateFlow<ProfileScreenUiState> = _uiState
 
-    fun handleLogout() {
-        viewModelScope.launch {
-            userRepository.logout()
-        }
-    }
+    private val _showProfileToast = MutableStateFlow(ProfileToastState.NONE)
+    val showProfileToast = _showProfileToast
 
     init {
         initViewModel()
+    }
+
+    fun handleLogout() {
+        viewModelScope.launch {
+            userRepository.logout()
+            _showProfileToast.emit(ProfileToastState.LOGOUT)
+        }
     }
 
     fun initViewModel() {
@@ -62,4 +75,24 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun deleteUserAccount() {
+        viewModelScope.launch {
+            val userId = userRepository.getUser()?.id
+            if (userId != null) {
+                val deleteResult = authRepository.deleteUserAccount(userId.toString())
+                if(deleteResult.isSuccess) {
+                    userRepository.logout()
+                    _showProfileToast.emit(ProfileToastState.DELETE)
+                } else {
+                    _showProfileToast.emit(ProfileToastState.ERROR)
+                }
+            } else {
+                _showProfileToast.emit(ProfileToastState.ERROR)
+            }
+        }
+    }
+
+    fun onShowToastComplete() {
+        _showProfileToast.value = ProfileToastState.NONE
+    }
 }

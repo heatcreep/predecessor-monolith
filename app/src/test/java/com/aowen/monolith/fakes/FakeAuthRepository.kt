@@ -2,11 +2,16 @@ package com.aowen.monolith.fakes
 
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.UserProfile
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeAuthRepository(
     private val hasGetPlayerError: Boolean = false,
-    private val hasHandleSavePlayerError: Boolean = false
+    private val hasHandleSavePlayerError: Boolean = false,
+    private val hasDeleteUserAccountError: Boolean = false
 ) : AuthRepository {
+
+    private val _deleteUserAccountCounter: MutableStateFlow<Int> = MutableStateFlow(0)
+    val deleteUserAccountCounter: MutableStateFlow<Int> = _deleteUserAccountCounter
 
     companion object {
         const val GetPlayerError = "Failed to get player"
@@ -28,6 +33,15 @@ class FakeAuthRepository(
             Result.failure(Exception("Failed to save player"))
         } else {
             Result.success(Unit)
+        }
+    }
+
+    override suspend fun deleteUserAccount(userId: String): Result<String> {
+        _deleteUserAccountCounter.value++
+        return if(hasDeleteUserAccountError) {
+            Result.failure(Exception("Failed to delete user account"))
+        } else {
+            Result.success("User account deleted")
         }
     }
 }
