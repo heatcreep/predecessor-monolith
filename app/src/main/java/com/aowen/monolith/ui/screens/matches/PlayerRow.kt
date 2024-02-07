@@ -58,6 +58,7 @@ import com.aowen.monolith.ui.components.KDAText
 @Composable
 fun PlayerRow(
     player: MatchPlayerDetails,
+    index: String,
     playerItems: List<ItemDetails> = emptyList(),
     openItemDetails: (ItemDetails) -> Unit,
     creepScorePerMinute: String = "",
@@ -146,7 +147,7 @@ fun PlayerRow(
                     }
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = player.playerName,
+                        text = "Player $index",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.ExtraBold

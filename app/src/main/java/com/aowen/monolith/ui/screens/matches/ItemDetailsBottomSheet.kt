@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.R
@@ -93,15 +94,15 @@ fun ItemDetailsContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(32.dp)
                             .clip(CircleShape)
                             .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape),
                         painter = painterResource(id = R.drawable.gold_per_second),
@@ -120,7 +121,7 @@ fun ItemDetailsContent(
                 ) {
                     Icon(
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(32.dp)
                             .clip(CircleShape)
                             .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape),
                         painter = painterResource(id = R.drawable.gold_per_second),
@@ -130,6 +131,7 @@ fun ItemDetailsContent(
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
                         text = "${itemDetails.price} Upgrade Cost",
+                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )

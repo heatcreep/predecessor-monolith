@@ -11,7 +11,7 @@ data class PlayerHeroStatsDto(
     @SerializedName("hero_id") val heroId: Int,
     @SerializedName("display_name") val displayName: String,
     @SerializedName("match_count") val matchCount: Int,
-    @SerializedName("win_rate") val winRate: Double,
+    @SerializedName("winrate") val winRate: Double,
     @SerializedName("cs_min") val csMin: Double,
     @SerializedName("gold_min") val goldMin: Double,
     @SerializedName("largest_killing_spree") val largestKillingSpree: Int,
