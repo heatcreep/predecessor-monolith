@@ -59,7 +59,7 @@ val fakeMatchPlayerDto = MatchPlayerDto(
 
 )
 
-val fakeDawnTeam = TeamDto(
+val fakeDawnTeamDto = TeamDto(
 averageMmr = "1000",
     players = listOf(
         fakeMatchPlayerDto,
@@ -70,7 +70,7 @@ averageMmr = "1000",
     )
 )
 
-val fakeDuskTeam = TeamDto(
+val fakeDuskTeamDto = TeamDto(
 averageMmr = "1000",
     players = listOf(
         fakeMatchPlayerDto,

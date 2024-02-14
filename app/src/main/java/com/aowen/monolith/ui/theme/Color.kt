@@ -15,6 +15,7 @@ val NeroGrey = Color(0xFF2C2C2C)
 // Browns
 val DarkKhaki = Color(0xFF645C45)
 val LightKhaki = Color(0xFFE6DEC6)
+val Dawn = Color(0xFF966426)
 
 // Whites
 val WarmWhite = Color(0xFFE3E3E1)
@@ -32,6 +33,7 @@ val RedDanger = Color(0xFF9E0404)
 
 // Blue
 val BlueHighlight = Color(0xFF6969AF)
+val Dusk = Color(0xFF22308D)
 
 // SOCIAL
 

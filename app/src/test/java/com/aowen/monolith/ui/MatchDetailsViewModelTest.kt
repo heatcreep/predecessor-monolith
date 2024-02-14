@@ -3,6 +3,8 @@ package com.aowen.monolith.ui
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.fakes.data.fakeAllItems
+import com.aowen.monolith.fakes.data.fakeDawnTeam
+import com.aowen.monolith.fakes.data.fakeDuskTeam
 import com.aowen.monolith.fakes.data.fakeMatchDetailsWithItems
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.ResponseType
@@ -43,6 +45,7 @@ class MatchDetailsViewModelTest {
         val expected = MatchDetailsUiState(
             isLoading = false,
             match = fakeMatchDetailsWithItems,
+            selectedTeam = fakeDawnTeam,
             items = fakeAllItems
         )
         val actual = viewModel.uiState.value
@@ -137,15 +140,35 @@ class MatchDetailsViewModelTest {
 
     @Test
     fun `getCreepScorePerMinute() should return correct value`() {
-        val expected = "0.4 CS/min"
+        val expected = "0.4"
         val actual = viewModel.getCreepScorePerMinute(25)
         assertEquals(expected, actual)
     }
 
     @Test
     fun `getGoldEarnedPerMinute() should return correct value`() {
-        val expected = "0.4 Gold/min"
+        val expected = "0.4"
         val actual = viewModel.getGoldEarnedPerMinute(25)
         assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `onTeamSelected() should set uiState to correct state when duskTeamSelected is false`() {
+        viewModel.onTeamSelected(
+            duskTeamSelected = false
+        )
+
+        val actual = viewModel.uiState.value.selectedTeam
+        assertEquals(fakeDawnTeam, actual)
+    }
+
+    @Test
+    fun `onTeamSelected() should set uiState to correct state when duskTeamSelected is true`() {
+        viewModel.onTeamSelected(
+            duskTeamSelected = true
+        )
+
+        val actual = viewModel.uiState.value.selectedTeam
+        assertEquals(fakeDuskTeam, actual)
     }
 }

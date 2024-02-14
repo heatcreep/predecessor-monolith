@@ -93,7 +93,6 @@ fun ScoreboardPanel(
             teamDetails.forEachIndexed() { index, player ->
                 PlayerRow(
                     player = player,
-                    index = "${index + 1}",
                     playerItems = player.playerItems,
                     openItemDetails = openItemDetails,
                     creepScorePerMinute = getCreepScorePerMinute(player.minionsKilled),

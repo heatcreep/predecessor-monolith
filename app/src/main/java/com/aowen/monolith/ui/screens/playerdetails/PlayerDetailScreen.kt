@@ -157,7 +157,8 @@ fun PlayerDetailScreen(
                                 TabRowDefaults.Indicator(
                                     Modifier.tabIndicatorOffset(
                                         tabPositions[pagerState.currentPage]
-                                    )
+                                    ),
+                                    color = MaterialTheme.colorScheme.secondary
                                 )
                             }
                         ) {

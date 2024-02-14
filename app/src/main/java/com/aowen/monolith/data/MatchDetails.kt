@@ -16,9 +16,45 @@ data class MatchPlayerDetails(
     val deaths: Int = 0,
     val assists: Int = 0,
     val minionsKilled: Int = 0,
+    val laneMinionsKilled: Int = 0,
+    val neutralMinionsKilled: Int = 0,
+    val neutralMinionsTeamJungle: Int = 0,
+    val neutralMinionsEnemyJungle: Int = 0,
+    val largestKillingSpree: Int = 0,
+    val largestMultiKill: Int = 0,
+    val totalDamageDealt: Int = 0,
+    val physicalDamageDealt: Int = 0,
+    val magicalDamageDealt: Int = 0,
+    val trueDamageDealt: Int = 0,
+    val largestCriticalStrike: Int = 0,
+    val totalDamageDealtToHeroes: Int = 0,
+    val physicalDamageDealtToHeroes: Int = 0,
+    val magicalDamageDealtToHeroes: Int = 0,
+    val trueDamageDealtToHeroes: Int = 0,
+    val totalDamageDealtToStructures: Int = 0,
+    val totalDamageDealtToObjectives: Int = 0,
+    val totalDamageTaken: Int = 0,
+    val physicalDamageTaken: Int = 0,
+    val magicalDamageTaken: Int = 0,
+    val trueDamageTaken: Int = 0,
+    val totalDamageTakenFromHeroes: Int = 0,
+    val physicalDamageTakenFromHeroes: Int = 0,
+    val magicalDamageTakenFromHeroes: Int = 0,
+    val trueDamageTakenFromHeroes: Int = 0,
+    val totalDamageMitigated: Int = 0,
+    val totalHealingDone: Int = 0,
+    val itemHealingDone: Int = 0,
+    val crestHealingDone: Int = 0,
+    val utilityHealingDone: Int = 0,
+    val totalShieldingReceived: Int = 0,
+    val wardsPlaced: Int = 0,
+    val wardsDestroyed: Int = 0,
     val goldEarned: Int = 0,
+    val goldSpent: Int = 0,
     val itemIds: List<Int> = emptyList(),
     val playerItems: List<ItemDetails> = emptyList()
+    // stats
+
 )
 
 fun MatchPlayerDto.create(): MatchPlayerDetails {
@@ -44,7 +80,41 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
         deaths = this.deaths.toInt(),
         assists = this.assists.toInt(),
         minionsKilled = this.minionsKilled,
+        laneMinionsKilled = this.laneMinionsKilled,
+        neutralMinionsKilled = this.neutralMinionsKilled,
+        neutralMinionsTeamJungle = this.neutralMinionsTeamJungle,
+        neutralMinionsEnemyJungle = this.neutralMinionsEnemyJungle,
+        largestKillingSpree = this.largestKillingSpree,
+        largestMultiKill = this.largestMultiKill,
+        totalDamageDealt = this.totalDamageDealt,
+        physicalDamageDealt = this.physicalDamageDealt,
+        magicalDamageDealt = this.magicalDamageDealt,
+        trueDamageDealt = this.trueDamageDealt,
+        largestCriticalStrike = this.largestCriticalStrike,
+        totalDamageDealtToHeroes = this.totalDamageDealtToHeroes,
+        physicalDamageDealtToHeroes = this.physicalDamageDealtToHeroes,
+        magicalDamageDealtToHeroes = this.magicalDamageDealtToHeroes,
+        trueDamageDealtToHeroes = this.trueDamageDealtToHeroes,
+        totalDamageDealtToStructures = this.totalDamageDealtToStructures,
+        totalDamageDealtToObjectives = this.totalDamageDealtToObjectives,
+        totalDamageTaken = this.totalDamageTaken,
+        physicalDamageTaken = this.physicalDamageTaken,
+        magicalDamageTaken = this.magicalDamageTaken,
+        trueDamageTaken = this.trueDamageTaken,
+        totalDamageTakenFromHeroes = this.totalDamageTakenFromHeroes,
+        physicalDamageTakenFromHeroes = this.physicalDamageTakenFromHeroes,
+        magicalDamageTakenFromHeroes = this.magicalDamageTakenFromHeroes,
+        trueDamageTakenFromHeroes = this.trueDamageTakenFromHeroes,
+        totalDamageMitigated = this.totalDamageMitigated,
+        totalHealingDone = this.totalHealingDone,
+        itemHealingDone = this.itemHealingDone,
+        crestHealingDone = this.crestHealingDone,
+        utilityHealingDone = this.utilityHealingDone,
+        totalShieldingReceived = this.totalShieldingReceived,
+        wardsPlaced = this.wardsPlaced,
+        wardsDestroyed = this.wardsDestroyed,
         goldEarned = this.goldEarned,
+        goldSpent = this.goldSpent,
         itemIds = this.inventoryData
     )
 
@@ -71,10 +141,13 @@ fun MatchPlayerDetails.getDetailsWithItems(allItems: List<ItemDetails>?): MatchP
     return this.copy(playerItems = playerItems)
 }
 
+abstract class Team {
+    abstract val players: List<MatchPlayerDetails>
 
-data class TeamDetails(
-    val players: List<MatchPlayerDetails> = emptyList()
-)
+    data class Dawn(override val players: List<MatchPlayerDetails>) : Team()
+    data class Dusk(override val players: List<MatchPlayerDetails>) : Team()
+}
+
 
 data class MatchDetails(
     val matchId: String = "",
@@ -83,8 +156,8 @@ data class MatchDetails(
     val gameDuration: Int = 0,
     val region: String = "",
     val winningTeam: String = "",
-    val dawn: List<MatchPlayerDetails> = emptyList(),
-    val dusk: List<MatchPlayerDetails> = emptyList()
+    val dawn: Team = Team.Dawn(emptyList()),
+    val dusk: Team = Team.Dusk(emptyList())
 )
 
 fun MatchDto.create(): MatchDetails {
@@ -99,13 +172,16 @@ fun MatchDto.create(): MatchDetails {
             player.team == "dawn"
         }.map { player ->
             player.create()
+        }.let { players ->
+              Team.Dawn(players)
         },
         dusk = this.players.filter { player ->
             player.team == "dusk"
         }.map { player ->
             player.create()
+        }.let { players ->
+            Team.Dusk(players)
         }
-
     )
 }
 
