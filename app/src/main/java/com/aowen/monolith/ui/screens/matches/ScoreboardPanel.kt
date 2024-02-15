@@ -90,7 +90,7 @@ fun ScoreboardPanel(
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            teamDetails.forEachIndexed() { index, player ->
+            teamDetails.forEach { player ->
                 PlayerRow(
                     player = player,
                     playerItems = player.playerItems,

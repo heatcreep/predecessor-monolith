@@ -21,6 +21,7 @@ private val DarkColorScheme = darkColorScheme(
     primaryContainer = NeroGrey,
     onPrimaryContainer = LightKhaki,
     background = NeroBlack,
+    onBackground = NeroGrey,
     secondaryContainer = DiscordBlurple,
     onSecondaryContainer = WarmWhite,
     tertiaryContainer = LightKhaki,

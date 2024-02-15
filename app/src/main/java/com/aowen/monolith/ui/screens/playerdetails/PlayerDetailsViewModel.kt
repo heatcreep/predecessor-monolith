@@ -18,10 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import java.util.concurrent.TimeUnit
+import java.time.Duration
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 
 data class PlayerErrors(
@@ -91,22 +90,23 @@ class PlayerDetailsViewModel @Inject constructor(
     }
 
     fun handleTimeSinceMatch(endTime: String): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-        val endDate = sdf.parse(endTime)
-        val now = Calendar.getInstance().time
-        val diff = now.time - (endDate?.time ?: 0)
 
-        val days = TimeUnit.MILLISECONDS.toDays(diff)
-        val hours = TimeUnit.MILLISECONDS.toHours(diff)
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(diff) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(diff))
+        val pastInstant = Instant.parse(endTime)
+        val pastLocalInstant = pastInstant.atZone(ZoneId.systemDefault()).toInstant()
+
+        val nowInstant = Instant.now()
+        val nowLocalInstant = nowInstant.atZone(ZoneId.systemDefault()).toInstant()
+
+        val duration = Duration.between(pastLocalInstant, nowLocalInstant)
 
         return when {
-            days > 1 -> "$days days ago"
-            days.toInt() == 1 -> "$days day ago"
-            hours >= 2 -> "${hours}hrs ago"
-            hours == 1L -> "${hours}h ago"
-            minutes >= 2 -> "$minutes mins ago"
-            minutes == 1L -> "$minutes min ago"
+            duration.toDays() > 1 -> "${duration.toDays()} days ago"
+            duration.toDays().toInt() == 1 -> "1 day ago"
+            duration.toHours() >= 2 -> "${duration.toHours()}hrs ago"
+            duration.toHours().toInt() == 1 -> "1h ago"
+            duration.toMinutes() >= 2 -> "${duration.toMinutes()} mins ago"
+            duration.toMinutes().toInt() == 1 -> "1 min ago"
+            duration.seconds in 5..59 -> "${duration.seconds} sec ago"
             else -> "Just now"
         }
     }

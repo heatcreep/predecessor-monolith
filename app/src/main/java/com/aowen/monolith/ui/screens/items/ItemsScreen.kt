@@ -2,6 +2,7 @@ package com.aowen.monolith.ui.screens.items
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,19 +46,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
-import coil.request.ImageRequest
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.StatDetails
+import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.navigation.navigateToItemDetails
 import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.ui.screens.search.SearchBar
@@ -335,23 +334,17 @@ fun ItemCard(
     modifier: Modifier = Modifier,
     navigateToItemDetails: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val model = ImageRequest.Builder(context)
-        .placeholder(R.drawable.unknown)
-        .data(itemDetails.image)
-        .fallback(R.drawable.unknown)
-        .error(R.drawable.unknown)
-        .crossfade(true)
-        .build()
 
     Card(
-        modifier = Modifier.clickable {
-            navigateToItemDetails()
-        }
+        modifier = Modifier
+            .clickable {
+                navigateToItemDetails()
+            }
     ) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .heightIn(min = 200.dp)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -360,23 +353,18 @@ fun ItemCard(
             Text(
                 modifier = Modifier.heightIn(50.dp),
                 text = itemDetails.displayName,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center
             )
-            SubcomposeAsyncImage(
-                model = model,
-                contentDescription = null,
-            ) {
-
-                SubcomposeAsyncImageContent(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape),
-                )
-
-            }
-
+            Image(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape),
+                painter = painterResource(id = getItemImage(itemDetails.id)),
+                contentDescription = "image for ${itemDetails.displayName}"
+            )
         }
     }
 }

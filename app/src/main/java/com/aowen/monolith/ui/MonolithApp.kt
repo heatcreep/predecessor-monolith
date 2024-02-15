@@ -65,8 +65,8 @@ private fun MonolithBottomBar(
     currentDestination: NavDestination?
 ) {
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.secondary,
     ) {
         destinations.forEach { destination ->
             val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
@@ -75,12 +75,14 @@ private fun MonolithBottomBar(
                 onClick = { onNavigateToDestination(destination) },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.secondary,
+                    unselectedTextColor = MaterialTheme.colorScheme.tertiary,
                     selectedTextColor = MaterialTheme.colorScheme.secondary,
 
                     ),
                 icon = {
                     Icon(
                         imageVector = destination.unselectedIcon,
+                        tint = MaterialTheme.colorScheme.tertiary,
                         contentDescription = null
                     )
                 },

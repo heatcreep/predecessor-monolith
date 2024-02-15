@@ -43,6 +43,7 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -79,6 +80,7 @@ def getEnvironmentVariable(String key) {
 }
 
 dependencies {
+    coreLibraryDesugaring libs.desugar.jdk.libs
     implementation platform(libs.firebase.bom)
     implementation platform(libs.kotlin.bom)
     compileOnly(libs.android.gradle.plugin)

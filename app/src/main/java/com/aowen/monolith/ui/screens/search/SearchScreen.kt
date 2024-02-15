@@ -35,12 +35,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltipBox
-import androidx.compose.material3.PlainTooltipState
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -126,7 +128,7 @@ fun SearchScreen(
 ) {
 
     val coroutineScope = rememberCoroutineScope()
-    val tooltipState = remember { PlainTooltipState() }
+    val tooltipState = remember { TooltipState() }
     var alertDialogIsOpen by remember { mutableStateOf(false) }
     val isRefreshing by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
@@ -243,11 +245,14 @@ fun SearchScreen(
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }
-                        PlainTooltipBox(
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                             tooltip = {
-                                Text(text = "We hide cheaters and players with MMR disabled from the search results.")
+                                PlainTooltip {
+                                    Text(text = "We hide cheaters and players with MMR disabled from the search results.")
+                                }
                             },
-                            tooltipState = tooltipState,
+                            state = tooltipState,
                             modifier = Modifier.align(Alignment.CenterVertically)
                         ) {
                             IconButton(
@@ -256,7 +261,6 @@ fun SearchScreen(
                                         tooltipState.show()
                                     }
                                 },
-                                modifier = Modifier.tooltipAnchor()
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Info,

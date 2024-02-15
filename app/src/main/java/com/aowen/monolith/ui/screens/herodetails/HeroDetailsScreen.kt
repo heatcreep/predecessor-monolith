@@ -19,20 +19,19 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Chip
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.ProgressIndicatorDefaults
-import androidx.compose.material.TabRowDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.ElevatedAssistChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,7 +77,6 @@ import com.aowen.monolith.ui.components.SpiderChart
 import com.aowen.monolith.ui.theme.LightKhaki
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.NeroBlack
-import com.aowen.monolith.ui.theme.NeroGrey
 import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -129,10 +127,11 @@ fun HeroDetailsRoute(
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
                         indicator = { tabPositions ->
-                            TabRowDefaults.Indicator(
+                            TabRowDefaults.SecondaryIndicator(
                                 Modifier.tabIndicatorOffset(
                                     tabPositions[pagerState.currentPage]
-                                )
+                                ),
+                                color = MaterialTheme.colorScheme.secondary
                             )
                         }
                     ) {
@@ -256,8 +255,8 @@ fun HeroStatsRateBar(
         modifier = Modifier
             .height(16.dp)
             .fillMaxWidth(),
-        progress = animatedProgress,
-        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+        progress = { animatedProgress },
+        trackColor = MaterialTheme.colorScheme.primaryContainer,
         color = MaterialTheme.colorScheme.secondary,
         strokeCap = StrokeCap.Butt,
     )
@@ -412,7 +411,7 @@ fun StatRow(
         )
     }
     if (!isLastRow) {
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.padding(vertical = 4.dp),
             color = MaterialTheme.colorScheme.secondary
         )
@@ -501,7 +500,7 @@ fun HeroAbilitiesScreen(
                     }
                 }
                 if (index < uiState.hero.abilities.lastIndex) {
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.padding(vertical = 16.dp),
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -512,7 +511,6 @@ fun HeroAbilitiesScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HeroRoleChips(
     roles: List<HeroRole?>,
@@ -524,24 +522,24 @@ fun HeroRoleChips(
     ) {
         roles.forEach { role ->
             if (role != null) {
-                Chip(
+                ElevatedAssistChip(
                     onClick = {},
-                    colors = ChipDefaults.chipColors(
-                        backgroundColor = NeroGrey
-                    )
-                ) {
-                    Text(
-                        text = role.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = WarmWhite
-                    )
-                }
+                    colors = AssistChipDefaults.elevatedAssistChipColors().copy(
+                        containerColor = LightKhaki
+                    ),
+                    label = {
+                        Text(
+                            text = role.name,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = WarmWhite
+                        )
+                    }
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HeroClassChips(
     heroClasses: List<HeroClass?>,
@@ -554,18 +552,19 @@ fun HeroClassChips(
     ) {
         heroClasses.forEach { heroClass ->
             if (heroClass != null) {
-                Chip(
+                ElevatedAssistChip(
                     onClick = {},
-                    colors = ChipDefaults.chipColors(
-                        backgroundColor = LightKhaki
-                    )
-                ) {
-                    Text(
-                        text = heroClass.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = NeroBlack
-                    )
-                }
+                    colors = AssistChipDefaults.elevatedAssistChipColors().copy(
+                        containerColor = LightKhaki
+                    ),
+                    label = {
+                        Text(
+                            text = heroClass.name,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = NeroBlack
+                        )
+                    }
+                )
             }
         }
     }

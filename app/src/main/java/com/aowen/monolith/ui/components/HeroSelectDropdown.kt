@@ -1,6 +1,5 @@
 package com.aowen.monolith.ui.components
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -24,11 +23,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.Hero
+import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
 
@@ -40,7 +38,6 @@ internal fun HeroSelectDropdown(
     heroes: List<HeroDetails>,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
     val heroImage = selectedHero.imageId ?: Hero.UNKNOWN.drawableId
@@ -107,13 +104,7 @@ internal fun HeroSelectDropdown(
                         colors = dropDownDefaults(),
                         onClick = {
                             onSelect(hero)
-
                             expanded = false
-                            Toast.makeText(
-                                context,
-                                hero.displayName,
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
                     )
                 }

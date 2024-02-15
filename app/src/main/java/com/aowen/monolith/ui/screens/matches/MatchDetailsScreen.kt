@@ -103,7 +103,7 @@ fun MatchDetailsRoute(
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
                         indicator = { tabPositions ->
-                            TabRowDefaults.Indicator(
+                            TabRowDefaults.SecondaryIndicator(
                                 Modifier.tabIndicatorOffset(
                                     tabPositions[pagerState.currentPage]
                                 ),
@@ -562,21 +562,6 @@ fun RowScope.MatchStatsPlayerImageRow(
     }
 }
 
-@Composable
-fun MatchPlayerStatValue(value: String) {
-    Box(
-        modifier = Modifier
-            .size(52.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.secondary
-        )
-    }
-}
-
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
@@ -635,7 +620,7 @@ fun MatchDetailsScreenPreview() {
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
-@Composable()
+@Composable
 fun MatchStatsTabPreview() {
     MonolithTheme {
         Surface(
