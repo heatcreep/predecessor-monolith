@@ -77,6 +77,7 @@ import com.aowen.monolith.ui.components.SpiderChart
 import com.aowen.monolith.ui.theme.LightKhaki
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.NeroBlack
+import com.aowen.monolith.ui.theme.NeroGrey
 import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -525,7 +526,7 @@ fun HeroRoleChips(
                 ElevatedAssistChip(
                     onClick = {},
                     colors = AssistChipDefaults.elevatedAssistChipColors().copy(
-                        containerColor = LightKhaki
+                        containerColor = NeroGrey
                     ),
                     label = {
                         Text(
