@@ -55,6 +55,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -393,7 +394,9 @@ fun ItemCard(
                 text = itemDetails.displayName,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
+                softWrap = false
             )
             Image(
                 modifier = Modifier
@@ -501,7 +504,7 @@ fun ItemsScreenScreenSizePreview() {
                     ),
                     ItemDetails(
                         id = 2,
-                        displayName = "Item 2",
+                        displayName = "Witchstalker",
 
                         stats = listOf(
                             StatDetails(
@@ -575,7 +578,7 @@ fun ItemsScreenScreenSizePreview() {
                     ),
                     ItemDetails(
                         id = 2,
-                        displayName = "Item 2",
+                        displayName = "The Witchstalker",
 
                         stats = listOf(
                             StatDetails(
