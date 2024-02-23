@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,6 +65,7 @@ import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.theme.Dawn
 import com.aowen.monolith.ui.theme.Dusk
 import com.aowen.monolith.ui.theme.MonolithTheme
+import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -347,7 +349,7 @@ fun MatchStatsTab(
                 )
                 team.players.forEach { player ->
                     MatchStatsPlayerImageRow(
-                        playerHeroId = player.heroId,
+                        player = player
                     )
                 }
 
@@ -543,11 +545,12 @@ fun MatchStatsRow(label: String, stats: List<String>) {
 
 @Composable
 fun RowScope.MatchStatsPlayerImageRow(
-    playerHeroId: Int,
+    player: MatchPlayerDetails
 ) {
     Box(
         modifier = Modifier
-            .weight(1f)
+            .weight(1f),
+        contentAlignment = Alignment.BottomCenter
     ) {
         Image(
             modifier = Modifier
@@ -555,10 +558,33 @@ fun RowScope.MatchStatsPlayerImageRow(
                 .aspectRatio(1f),
             contentScale = ContentScale.Crop,
             painter = painterResource(
-                id = getHeroImage(playerHeroId).drawableId
+                id = getHeroImage(player.heroId).drawableId
             ),
             contentDescription = null
         )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        listOf(
+                            Color.Transparent,
+                            Color.Black
+                        ),
+                    ),
+                    shape = RoundedCornerShape(4.dp),
+                )
+                .padding(start = 4.dp, top = 20.dp, end = 4.dp, bottom = 4.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = player.playerName,
+                overflow = TextOverflow.Ellipsis,
+                softWrap = false,
+                style = MaterialTheme.typography.bodySmall,
+                color = WarmWhite
+            )
+        }
     }
 }
 
@@ -646,7 +672,7 @@ fun MatchStatsTabPreview() {
                         MatchPlayerDetails(
                             mmr = "1234.5",
                             mmrChange = "-11.1",
-                            playerName = "Player 2",
+                            playerName = "Player 4567",
                             kills = 4,
                             deaths = 13,
                             assists = 7,
