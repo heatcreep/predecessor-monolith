@@ -1,8 +1,6 @@
 package com.aowen.monolith.ui.screens.playerdetails
 
 import android.content.res.Configuration
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -72,7 +70,6 @@ import com.aowen.monolith.ui.utils.animateHorizontalAlignmentAsState
 import kotlinx.coroutines.launch
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 internal fun PlayerDetailsRoute(
     modifier: Modifier = Modifier,

@@ -60,6 +60,7 @@ fun PlayerRow(
     player: MatchPlayerDetails,
     playerItems: List<ItemDetails> = emptyList(),
     openItemDetails: (ItemDetails) -> Unit,
+    navigateToPlayerDetails: (String) -> Unit,
     creepScorePerMinute: String = "",
     goldEarnedPerMinute: String = ""
 ) {
@@ -125,6 +126,9 @@ fun PlayerRow(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     PlayerIcon(
+                        modifier = Modifier.clickable {
+                            navigateToPlayerDetails(player.playerId)
+                        },
                         heroImageId = getHeroImage(player.heroId).drawableId,
                     ) {
                         Image(

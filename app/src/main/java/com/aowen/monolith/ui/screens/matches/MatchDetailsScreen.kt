@@ -54,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
@@ -61,6 +62,7 @@ import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.Team
 import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.navigation.navigateToPlayerDetails
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.theme.Dawn
 import com.aowen.monolith.ui.theme.Dusk
@@ -72,6 +74,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MatchDetailsRoute(
     modifier: Modifier = Modifier,
+    navController: NavController,
     viewModel: MatchDetailsViewModel = hiltViewModel()
 ) {
 
@@ -138,7 +141,8 @@ fun MatchDetailsRoute(
                                 modifier = modifier,
                                 getCreepScorePerMinute = viewModel::getCreepScorePerMinute,
                                 getGoldEarnedPerMinute = viewModel::getGoldEarnedPerMinute,
-                                onItemClicked = viewModel::onItemClicked
+                                onItemClicked = viewModel::onItemClicked,
+                                navigateToPlayerDetails = navController::navigateToPlayerDetails
                             )
 
                             1 -> MatchStatsTab(
@@ -164,7 +168,8 @@ fun MatchDetailsTab(
     modifier: Modifier = Modifier,
     getCreepScorePerMinute: (Int) -> String,
     getGoldEarnedPerMinute: (Int) -> String,
-    onItemClicked: (ItemDetails) -> Unit
+    onItemClicked: (ItemDetails) -> Unit,
+    navigateToPlayerDetails: (String) -> Unit = {}
 ) {
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val closeBottomSheet = { openBottomSheet = false }
@@ -200,14 +205,16 @@ fun MatchDetailsTab(
                 isWinningTeam = uiState.match.winningTeam == "Dusk",
                 teamDetails = uiState.match.dusk.players,
                 openItemDetails = ::openItemDetailsBottomSheet,
+                navigateToPlayerDetails = navigateToPlayerDetails,
                 getCreepScorePerMinute = getCreepScorePerMinute,
-                getGoldEarnedPerMinute = getGoldEarnedPerMinute
+                getGoldEarnedPerMinute = getGoldEarnedPerMinute,
             )
             ScoreboardPanel(
                 teamName = "Dawn",
                 isWinningTeam = uiState.match.winningTeam == "Dawn",
                 teamDetails = uiState.match.dawn.players,
                 openItemDetails = ::openItemDetailsBottomSheet,
+                navigateToPlayerDetails = navigateToPlayerDetails,
                 getCreepScorePerMinute = getCreepScorePerMinute,
                 getGoldEarnedPerMinute = getGoldEarnedPerMinute
             )

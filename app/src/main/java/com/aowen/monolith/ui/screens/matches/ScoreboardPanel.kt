@@ -35,6 +35,7 @@ fun ScoreboardPanel(
     isWinningTeam: Boolean,
     teamDetails: List<MatchPlayerDetails>,
     openItemDetails: (ItemDetails) -> Unit,
+    navigateToPlayerDetails: (String) -> Unit,
     getCreepScorePerMinute: (Int) -> String,
     getGoldEarnedPerMinute: (Int) -> String
 ) {
@@ -96,7 +97,8 @@ fun ScoreboardPanel(
                     playerItems = player.playerItems,
                     openItemDetails = openItemDetails,
                     creepScorePerMinute = getCreepScorePerMinute(player.minionsKilled),
-                    goldEarnedPerMinute = getGoldEarnedPerMinute(player.goldEarned)
+                    goldEarnedPerMinute = getGoldEarnedPerMinute(player.goldEarned),
+                    navigateToPlayerDetails = navigateToPlayerDetails
                 )
             }
         }
@@ -134,7 +136,8 @@ fun ScoreboardPanelPreview() {
                 ),
                 openItemDetails = {},
                 getCreepScorePerMinute = { "1.2" },
-                getGoldEarnedPerMinute = { "1.2" }
+                getGoldEarnedPerMinute = { "1.2" },
+                navigateToPlayerDetails = {}
             )
         }
     }

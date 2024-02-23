@@ -18,7 +18,9 @@ fun NavController.navigateToMatchDetails(
     this.navigate("$MatchDetailRoute/$playerId/$matchId", navOptions)
 }
 
-fun NavGraphBuilder.matchDetailsScreen() {
+fun NavGraphBuilder.matchDetailsScreen(
+    navController: NavController
+) {
     composable(
         route = "$MatchDetailRoute/{playerId}/{matchId}",
         arguments = listOf(navArgument("matchId") {
@@ -27,6 +29,6 @@ fun NavGraphBuilder.matchDetailsScreen() {
             type = NavType.StringType
         })
     ) {
-        MatchDetailsRoute()
+        MatchDetailsRoute(navController = navController)
     }
 }

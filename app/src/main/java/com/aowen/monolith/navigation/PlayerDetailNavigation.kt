@@ -27,5 +27,7 @@ fun NavGraphBuilder.playerDetailsScreen(
             navigateToMatchDetails = navController::navigateToMatchDetails,
         )
     }
-    matchDetailsScreen()
+    matchDetailsScreen(
+        navController = navController
+    )
 }

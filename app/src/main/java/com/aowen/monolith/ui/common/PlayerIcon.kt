@@ -29,12 +29,13 @@ import com.aowen.monolith.ui.theme.MonolithTheme
 
 @Composable
 fun PlayerIcon(
+    modifier: Modifier = Modifier,
     heroImageId: Int? = null,
     heroIconSize: Dp = 52.dp,
     roleIcon: (@Composable BoxScope.() -> Unit)? = null
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(IntrinsicSize.Min)
             .height(IntrinsicSize.Min)
     ) {
