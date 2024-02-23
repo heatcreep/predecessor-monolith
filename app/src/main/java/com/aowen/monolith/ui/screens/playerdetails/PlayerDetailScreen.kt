@@ -27,7 +27,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -39,6 +38,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,7 +53,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -69,6 +68,7 @@ import com.aowen.monolith.ui.components.HeroSelectDropdown
 import com.aowen.monolith.ui.components.PlayerCard
 import com.aowen.monolith.ui.components.RefreshableContainer
 import com.aowen.monolith.ui.theme.MonolithTheme
+import com.aowen.monolith.ui.utils.animateHorizontalAlignmentAsState
 import kotlinx.coroutines.launch
 
 
@@ -154,7 +154,7 @@ fun PlayerDetailScreen(
                         TabRow(
                             selectedTabIndex = pagerState.currentPage,
                             indicator = { tabPositions ->
-                                TabRowDefaults.Indicator(
+                                TabRowDefaults.SecondaryIndicator(
                                     Modifier.tabIndicatorOffset(
                                         tabPositions[pagerState.currentPage]
                                     ),
@@ -454,11 +454,18 @@ fun LongHeroStatCard(
 
     val floatAnimator = animateFloatAsState(targetValue = 1f, label = "statTitle")
 
+    val alignment by animateHorizontalAlignmentAsState(horizontalBias)
+
+
     LaunchedEffect(isExpanded) {
         horizontalBias = if (isExpanded) 0f else -1f
     }
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                isExpanded = !isExpanded
+            },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -467,38 +474,42 @@ fun LongHeroStatCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
-                .clickable {
-                    isExpanded = !isExpanded
-                },
+                .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
+                Column(
                     modifier = Modifier.weight(floatAnimator.value),
-                    textAlign = if (isExpanded) TextAlign.Center else TextAlign.Start,
-                    text = statTitle,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.tertiary
-                )
-                Spacer(modifier = Modifier.size(24.dp))
-                AnimatedVisibility(visible = !isExpanded) {
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = alignment
+                ) {
                     Text(
-                        text = "$statValue (avg)",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.ExtraBold),
-                        color = MaterialTheme.colorScheme.secondary
+                        text = statTitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.tertiary
                     )
                 }
-                Icon(
-                    imageVector = if (isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                    tint = MaterialTheme.colorScheme.secondary,
-                    contentDescription = null
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    AnimatedVisibility(visible = !isExpanded) {
+                        Text(
+                            text = "$statValue (avg)",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.ExtraBold),
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    Icon(
+                        imageVector = if (isExpanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        contentDescription = null
+                    )
+                }
 
             }
             AnimatedVisibility(visible = isExpanded) {
