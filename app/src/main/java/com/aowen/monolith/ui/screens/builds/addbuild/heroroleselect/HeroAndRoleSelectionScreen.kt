@@ -41,7 +41,7 @@ import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildState
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
-import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToBuildDetails
+import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToAddBuildDetails
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.inputFieldDefaults
 
@@ -57,7 +57,7 @@ fun HeroAndRoleSelectionRoute(
         uiState = uiState,
         onHeroSelected = viewModel::onHeroSelected,
         onRoleSelected = viewModel::onRoleSelected,
-        navigateToBuildDetails = navController::navigateToBuildDetails
+        navigateToBuildDetails = navController::navigateToAddBuildDetails
     )
 }
 

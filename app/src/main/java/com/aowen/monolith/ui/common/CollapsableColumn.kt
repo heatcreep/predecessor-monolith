@@ -56,7 +56,11 @@ fun MonolithCollapsableGridColumn(listState: LazyGridState, content: @Composable
 }
 
 @Composable
-fun MonolithCollapsableListColumn(listState: LazyListState, content: @Composable () -> Unit) {
+fun MonolithCollapsableListColumn(
+    modifier: Modifier = Modifier,
+    listState: LazyListState,
+    content: @Composable () -> Unit
+) {
     val contentShown = remember { mutableStateOf(true) }
 
     var previousIndex by remember { mutableIntStateOf(listState.firstVisibleItemIndex) }
@@ -82,7 +86,7 @@ fun MonolithCollapsableListColumn(listState: LazyListState, content: @Composable
     Column {
         AnimatedVisibility(visible = contentShown.value) {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {

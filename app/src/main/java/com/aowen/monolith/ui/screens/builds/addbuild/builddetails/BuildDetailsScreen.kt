@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Surface
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildState
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
+import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToItemSelect
 import com.aowen.monolith.ui.theme.MonolithTheme
 
 @Composable
@@ -43,24 +46,28 @@ fun BuildDetailsRoute(
     val uiState by viewModel.uiState.collectAsState()
     BuildDetailsScreen(
         uiState = uiState,
-        onSkillSelected = viewModel::onSkillSelected
+        onSkillSelected = viewModel::onSkillSelected,
+        navigateToItemSelect = navController::navigateToItemSelect
     )
 }
 
 @Composable
 fun BuildDetailsScreen(
     uiState: AddBuildState,
-    onSkillSelected: (Int, Int) -> Unit
+    onSkillSelected: (Int, Int) -> Unit,
+    navigateToItemSelect: () -> Unit
 ) {
     BuildOrderPicker(
-        onSkillSelected = onSkillSelected
+        onSkillSelected = onSkillSelected,
+        navigateToItemSelect = navigateToItemSelect
     )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BuildOrderPicker(
-    onSkillSelected: (Int, Int) -> Unit
+    onSkillSelected: (Int, Int) -> Unit,
+    navigateToItemSelect: () -> Unit
 
 ) {
     Column {
@@ -85,6 +92,18 @@ fun BuildOrderPicker(
                     onSkillSelected = onSkillSelected,
                     skillColumnIndex = skillColumnIndex
                 )
+            }
+            item {
+                ElevatedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    onClick = navigateToItemSelect
+                ) {
+                    Text(text = "Next")
+                }
             }
         }
     }
@@ -170,7 +189,8 @@ fun BuildOrderPickerPreview() {
 
         ) {
             BuildOrderPicker(
-                onSkillSelected = { _, _ -> }
+                onSkillSelected = { _, _ -> },
+                navigateToItemSelect = { }
             )
         }
     }

@@ -28,6 +28,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
@@ -43,6 +44,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -68,6 +70,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Hero
@@ -75,9 +79,12 @@ import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.data.getRoleImage
+import com.aowen.monolith.navigation.navigateToBuildDetails
+import com.aowen.monolith.ui.common.MonolithCollapsableFabButton
 import com.aowen.monolith.ui.common.MonolithCollapsableListColumn
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
+import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToAddBuildFlow
 import com.aowen.monolith.ui.screens.search.SearchBar
 import com.aowen.monolith.ui.theme.GreenHighlight
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -88,7 +95,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BuildsScreenRoute(
-    navigateToBuildDetails: (Int) -> Unit,
+    navController: NavController,
     viewModel: BuildsScreenViewModel = hiltViewModel()
 ) {
 
@@ -107,7 +114,8 @@ fun BuildsScreenRoute(
         onCheckHasSkillOrder = viewModel::updateHasSkillOrder,
         onCheckHasModules = viewModel::updateHasModules,
         onSubmitFilters = viewModel::filterBuilds,
-        navigateToBuildDetails = navigateToBuildDetails
+        navigateToBuildDetails = navController::navigateToBuildDetails,
+        navigateToAddBuildFlow = navController::navigateToAddBuildFlow
     )
 }
 
@@ -125,7 +133,8 @@ fun BuildsScreen(
     onCheckHasSkillOrder: (Boolean) -> Unit,
     onCheckHasModules: (Boolean) -> Unit,
     onSubmitFilters: () -> Unit,
-    navigateToBuildDetails: (Int) -> Unit
+    navigateToBuildDetails: (Int) -> Unit,
+    navigateToAddBuildFlow: () -> Unit
 ) {
 
 
@@ -163,137 +172,156 @@ fun BuildsScreen(
 
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            ) {
-                MonolithCollapsableListColumn(listState = scrollState) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        SearchBar(
-                            searchLabel = "Builds lookup",
-                            searchValue = uiState.searchFieldValue,
-                            setSearchValue = {
-                                onSearchFieldUpdate(it)
-                            },
-                            modifier = Modifier.weight(1f),
-                            handleClearSearch = {
-                                onSearchFieldUpdate("")
-                            },
-                            handleSubmitSearch = {
-                                onSubmitFilters()
+            Scaffold(
+                floatingActionButton = {
+                    if(BuildConfig.DEBUG) {
+                        MonolithCollapsableFabButton(
+                            listState = scrollState,
+                            icon = Icons.Filled.Add,
+                            text = "Add Build",
+                            onClick = {
+                                navigateToAddBuildFlow()
                             }
                         )
-                        IconButton(
-                            onClick = {
-                                expanded = !expanded
-                            }) {
-                            Icon(
-                                imageVector = Icons.Filled.Settings,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .rotate(rotationAngle.value),
-                                tint = MaterialTheme.colorScheme.secondary
-                            )
-                        }
                     }
-                    AnimatedVisibility(visible = expanded) {
-                        Column(
+
+                }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(it)
+                        .padding(horizontal = 16.dp),
+                ) {
+                    MonolithCollapsableListColumn(
+                        modifier = Modifier.padding(vertical = 16.dp),
+                        listState = scrollState
+                    ) {
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text(
-                                text = "Filters:",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-
-                                FilterDropdown(
-                                    dropdownTitle = "Role",
-                                    filterOptions = HeroRole.entries.map { it.name },
-                                    selectedFilter = uiState.selectedRoleFilter?.name,
-                                    onSelectOption = onSelectRoleFilter,
-                                    onClearOption = onClearRoleFilter
-                                )
-                                FilterDropdown(
-                                    dropdownTitle = "Hero",
-                                    filterOptions = Hero.entries.map { it.heroName },
-                                    selectedFilter = uiState.selectedHeroFilter?.heroName,
-                                    onSelectOption = onSelectHeroFilter,
-                                    onClearOption = onClearHeroFilter
-                                )
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                FilterDropdown(
-                                    dropdownTitle = "Sort by ${uiState.selectedSortOrder}",
-                                    filterOptions = listOf("Popular", "Trending", "Latest"),
-                                    selectedFilter = uiState.selectedSortOrder,
-                                    onSelectOption = onSelectSortFilter,
-                                    onClearOption = onClearSortFilter
-                                )
-                            }
-                            FilterSwitchWithLabel(
-                                label = "Has skill order",
-                                isChecked = uiState.hasSkillOrderSelected,
-                                onCheckedChange = onCheckHasSkillOrder
-                            )
-                            FilterSwitchWithLabel(
-                                label = "Has modules",
-                                isChecked = uiState.hasModulesSelected,
-                                onCheckedChange = onCheckHasModules
-                            )
-                            ElevatedButton(
-                                contentPadding = PaddingValues(16.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                ),
-                                onClick = {
-                                    expanded = false
+                            SearchBar(
+                                searchLabel = "Builds lookup",
+                                searchValue = uiState.searchFieldValue,
+                                setSearchValue = { searchValue ->
+                                    onSearchFieldUpdate(searchValue)
+                                },
+                                modifier = Modifier.weight(1f),
+                                handleClearSearch = {
+                                    onSearchFieldUpdate("")
+                                },
+                                handleSubmitSearch = {
                                     onSubmitFilters()
                                 }
-                            ) {
-                                Text(text = "Update Filters")
+                            )
+                            IconButton(
+                                onClick = {
+                                    expanded = !expanded
+                                }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Settings,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .rotate(rotationAngle.value),
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
                             }
-                            Spacer(modifier = Modifier.size(16.dp))
                         }
+                        AnimatedVisibility(visible = expanded) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "Filters:",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
 
+                                    FilterDropdown(
+                                        dropdownTitle = "Role",
+                                        filterOptions = HeroRole.entries.map { role -> role.name },
+                                        selectedFilter = uiState.selectedRoleFilter?.name,
+                                        onSelectOption = onSelectRoleFilter,
+                                        onClearOption = onClearRoleFilter
+                                    )
+                                    FilterDropdown(
+                                        dropdownTitle = "Hero",
+                                        filterOptions = Hero.entries.map { hero -> hero.heroName },
+                                        selectedFilter = uiState.selectedHeroFilter?.heroName,
+                                        onSelectOption = onSelectHeroFilter,
+                                        onClearOption = onClearHeroFilter
+                                    )
+                                }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    FilterDropdown(
+                                        dropdownTitle = "Sort by ${uiState.selectedSortOrder}",
+                                        filterOptions = listOf("Popular", "Trending", "Latest"),
+                                        selectedFilter = uiState.selectedSortOrder,
+                                        onSelectOption = onSelectSortFilter,
+                                        onClearOption = onClearSortFilter
+                                    )
+                                }
+                                FilterSwitchWithLabel(
+                                    label = "Has skill order",
+                                    isChecked = uiState.hasSkillOrderSelected,
+                                    onCheckedChange = onCheckHasSkillOrder
+                                )
+                                FilterSwitchWithLabel(
+                                    label = "Has modules",
+                                    isChecked = uiState.hasModulesSelected,
+                                    onCheckedChange = onCheckHasModules
+                                )
+                                ElevatedButton(
+                                    contentPadding = PaddingValues(16.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    ),
+                                    onClick = {
+                                        expanded = false
+                                        onSubmitFilters()
+                                    }
+                                ) {
+                                    Text(text = "Update Filters")
+                                }
+                                Spacer(modifier = Modifier.size(16.dp))
+                            }
+
+                        }
                     }
+
+                    LazyColumn(
+                        state = scrollState,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(uiState.builds) { buildListItem ->
+                            BuildListItem(
+                                build = buildListItem,
+                                navigateToBuildDetails = navigateToBuildDetails
+                            )
+                        }
+                        item {
+                            LaunchedEffect(endOfListReached && uiState.isLastPage.not()) {
+                                loadMoreBuilds()
+                            }
+                            if (uiState.isLoadingMoreBuilds) {
+                                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                            }
+                        }
+                    }
+
                 }
-
-                LazyColumn(
-                    state = scrollState,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(uiState.builds) {
-                        BuildListItem(
-                            build = it,
-                            navigateToBuildDetails = navigateToBuildDetails
-                        )
-                    }
-                    item {
-                        LaunchedEffect(endOfListReached && uiState.isLastPage.not()) {
-                            loadMoreBuilds()
-                        }
-                        if (uiState.isLoadingMoreBuilds) {
-                            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                        }
-                    }
-                }
-
             }
         }
     }
@@ -491,7 +519,7 @@ fun BuildListItem(
                     )
                     IconButton(onClick = {
                         // TODO: Replace with actual upvote logic
-                        Toast.makeText(context,"Coming soon!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Coming soon!", Toast.LENGTH_LONG).show()
                     }
                     ) {
                         Icon(
@@ -512,7 +540,7 @@ fun BuildListItem(
                     )
                     IconButton(onClick = {
                         // TODO: Replace with actual downvote logic
-                        Toast.makeText(context,"Coming soon!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "Coming soon!", Toast.LENGTH_LONG).show()
                     }) {
                         Icon(
                             modifier = Modifier.size(16.dp),

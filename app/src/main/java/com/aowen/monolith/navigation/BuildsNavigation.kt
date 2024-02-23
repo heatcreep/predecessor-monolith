@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.aowen.monolith.ui.screens.builds.BuildsScreenRoute
+import com.aowen.monolith.ui.screens.builds.addbuild.navigation.addBuildsScreen
 
 const val BuildsRoute = "builds"
 
@@ -37,7 +38,8 @@ fun NavGraphBuilder.buildsScreen(
             )
         }
     ) {
-        BuildsScreenRoute(navController::navigateToBuildDetails)
+        BuildsScreenRoute(navController = navController)
     }
     buildDetailsScreen()
+    addBuildsScreen(navController)
 }

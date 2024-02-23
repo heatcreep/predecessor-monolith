@@ -11,8 +11,33 @@ data class AddBuildState(
     val selectedHero: Int? = null,
     val selectedRole: HeroRole? = null,
     val selectedCrest: ItemDetails? = null,
-    val selectedItems: List<ItemDetails> = emptyList(),
-    val skillOrder: List<Int> = listOf(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
+    val selectedItems: List<ItemDetails> = listOf(
+        ItemDetails(1),
+        ItemDetails(2),
+        ItemDetails(3),
+        ItemDetails(4),
+        ItemDetails(5),
+    ),
+    val skillOrder: List<Int> = listOf(
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+    ),
     val firstBuyItem: ItemDetails? = null,
     val selectedCoreItems: List<ItemDetails> = emptyList(),
     val selectedFlexItems: List<ItemDetails> = emptyList(),
@@ -20,7 +45,7 @@ data class AddBuildState(
 )
 
 @HiltViewModel
-class AddBuildViewModel @Inject constructor(): ViewModel() {
+class AddBuildViewModel @Inject constructor() : ViewModel() {
 
     private val _uiState: MutableStateFlow<AddBuildState> = MutableStateFlow(AddBuildState())
     val uiState = _uiState
@@ -38,13 +63,22 @@ class AddBuildViewModel @Inject constructor(): ViewModel() {
     }
 
     fun onSkillSelected(skillIndex: Int, skillId: Int) {
-        _uiState.value = _uiState.value.copy(skillOrder = _uiState.value.skillOrder.toMutableList().apply {
-            this[skillIndex] = skillId
-        })
+        _uiState.value =
+            _uiState.value.copy(skillOrder = _uiState.value.skillOrder.toMutableList().apply {
+                this[skillIndex] = skillId
+            })
     }
 
     fun onItemAdded(item: ItemDetails) {
         _uiState.value = _uiState.value.copy(selectedItems = _uiState.value.selectedItems + item)
+    }
+
+    fun onChangeItemOrder(fromIndex: Int, toIndex: Int) {
+        val newItemOrder = _uiState.value.selectedItems.toMutableList().apply {
+            val item = removeAt(fromIndex)
+            add(toIndex, item)
+        }
+        _uiState.value = _uiState.value.copy(selectedItems = newItemOrder)
     }
 
     fun onFirstBuyItemSelected(item: ItemDetails) {
