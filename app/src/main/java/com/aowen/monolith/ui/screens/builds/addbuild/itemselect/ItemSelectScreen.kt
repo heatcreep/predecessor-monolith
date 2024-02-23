@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -83,6 +84,7 @@ fun ItemsList(
 
     LazyRow(
         modifier = Modifier
+            .padding(bottom = 16.dp)
             .dragContainer(
                 dragDropState,
                 onStart = {

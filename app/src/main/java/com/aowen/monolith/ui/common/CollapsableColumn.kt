@@ -1,9 +1,9 @@
 package com.aowen.monolith.ui.common
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
@@ -46,8 +46,8 @@ fun MonolithCollapsableGridColumn(listState: LazyGridState, content: @Composable
         AnimatedVisibility(visible = contentShown.value) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .fillMaxWidth()
+                    .padding(top= 16.dp)
             ) {
                 content()
             }
@@ -88,7 +88,6 @@ fun MonolithCollapsableListColumn(
             Column(
                 modifier = modifier
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 content()
             }

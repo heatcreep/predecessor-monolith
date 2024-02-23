@@ -30,6 +30,7 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -141,110 +142,113 @@ fun HeroesScreen(
                 handleRetry()
             }
         } else {
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                MonolithCollapsableGridColumn(listState = listState) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+            Scaffold { paddingValues ->
+                Column(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(horizontal = 16.dp)
+                ) {
+                    MonolithCollapsableGridColumn(listState = listState) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
 
-                        SearchBar(
-                            searchLabel = "Hero lookup",
-                            searchValue = uiState.searchFieldValue,
-                            setSearchValue = setSearchValue,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = {
-                                expanded = !expanded
-                            }) {
-                            Icon(
-                                imageVector = Icons.Filled.Settings,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .rotate(rotationAngle.value),
-                                tint = MaterialTheme.colorScheme.secondary
+                            SearchBar(
+                                searchLabel = "Hero lookup",
+                                searchValue = uiState.searchFieldValue,
+                                setSearchValue = setSearchValue,
+                                modifier = Modifier.weight(1f)
                             )
+                            IconButton(
+                                onClick = {
+                                    expanded = !expanded
+                                }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Settings,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .rotate(rotationAngle.value),
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+
                         }
-
-                    }
-                    AnimatedVisibility(visible = expanded) {
-                        Column {
-                            Spacer(modifier = Modifier.size(4.dp))
-                            Text(
-                                text = "Roles",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                            Spacer(modifier = Modifier.size(4.dp))
-                            FlowRow(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                HeroRole.entries.forEach { role ->
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Checkbox(
-                                            checked = uiState.selectedRoleFilters.contains(
-                                                role
-                                            ),
-                                            onCheckedChange = { isChecked ->
-                                                onFilterRole(role, isChecked)
-                                            },
-                                            colors = CheckboxDefaults.colors(
-                                                checkedColor = MaterialTheme.colorScheme.secondary,
+                        AnimatedVisibility(visible = expanded) {
+                            Column {
+                                Spacer(modifier = Modifier.size(4.dp))
+                                Text(
+                                    text = "Roles",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                                Spacer(modifier = Modifier.size(4.dp))
+                                FlowRow(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    HeroRole.entries.forEach { role ->
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Checkbox(
+                                                checked = uiState.selectedRoleFilters.contains(
+                                                    role
+                                                ),
+                                                onCheckedChange = { isChecked ->
+                                                    onFilterRole(role, isChecked)
+                                                },
+                                                colors = CheckboxDefaults.colors(
+                                                    checkedColor = MaterialTheme.colorScheme.secondary,
+                                                )
                                             )
-                                        )
-                                        Text(
-                                            text = role.name,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.secondary
-                                        )
+                                            Text(
+                                                text = role.name,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.secondary
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                }
-                if (uiState.currentHeroes.isEmpty()) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "No heroes matched your search.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
                     }
-                } else {
-                    LazyVerticalGrid(
-                        modifier = Modifier.fillMaxSize(),
-                        state = listState,
-                        columns = GridCells.Fixed(if (isTablet) 6 else 3),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(uiState.currentHeroes) { hero ->
-                            HeroCard(
-                                hero = hero,
-                                onClick = {
-                                    navigateToHeroDetails(hero.id, hero.name)
-                                }
+                    if (uiState.currentHeroes.isEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "No heroes matched your search.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.padding(start = 16.dp)
                             )
                         }
+                    } else {
+                        LazyVerticalGrid(
+                            modifier = Modifier.fillMaxSize(),
+                            state = listState,
+                            columns = GridCells.Fixed(if (isTablet) 6 else 3),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            items(uiState.currentHeroes) { hero ->
+                                HeroCard(
+                                    hero = hero,
+                                    onClick = {
+                                        navigateToHeroDetails(hero.id, hero.name)
+                                    }
+                                )
+                            }
 
+                        }
                     }
                 }
             }

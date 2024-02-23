@@ -2,6 +2,8 @@ package com.aowen.monolith.ui.screens.items
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +24,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -29,10 +33,12 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -45,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -103,6 +110,9 @@ fun ItemsScreen(
 
     val isTablet = screenWidthDp >= 600
 
+    var expanded by remember { mutableStateOf(false) }
+    val rotationAngle = remember { Animatable(0f) }
+
     val listState = rememberLazyGridState()
 
     LaunchedEffect(
@@ -116,52 +126,80 @@ fun ItemsScreen(
     if (uiState.isLoading) {
         FullScreenLoadingIndicator("Items")
     } else {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            if (uiState.itemsError != null) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = uiState.itemsError)
-                }
-            } else {
+
+        if (uiState.itemsError != null) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = uiState.itemsError)
+            }
+        } else {
+            Scaffold { paddingValues ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                        .padding(paddingValues)
+                        .padding(horizontal = 16.dp),
                 ) {
                     MonolithCollapsableGridColumn(listState = listState) {
-                        SearchBar(
-                            searchLabel = "Item lookup",
-                            searchValue = uiState.searchFieldValue,
-                            setSearchValue = onSetSearchValue,
-                            modifier = Modifier.fillMaxWidth(),
-                            handleClearSearch = onClearSearch
-                        )
-                        Text(text = "Filters:", style = MaterialTheme.typography.bodyMedium)
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            TierFilterDropdown(
-                                selectedTierFilter = uiState.selectedTierFilter,
-                                onSelectTier = onSelectTier,
-                                onClearTierFilter = onClearTierFilter
+                            SearchBar(
+                                searchLabel = "Item lookup",
+                                searchValue = uiState.searchFieldValue,
+                                setSearchValue = onSetSearchValue,
+                                modifier = Modifier.weight(1f),
+                                handleClearSearch = onClearSearch
                             )
-                            StatFilterDropdown(
-                                allStats = uiState.allStats,
-                                selectedStatFilters = uiState.selectedStatFilters,
-                                onSelectStat = onSelectStat,
-                                onClearStatsFilters = onClearStats
-                            )
+                            IconButton(
+                                onClick = {
+                                    expanded = !expanded
+                                }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Settings,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(28.dp)
+                                        .rotate(rotationAngle.value),
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+                            }
                         }
-                        Spacer(modifier = Modifier.size(16.dp))
+                        AnimatedVisibility(visible = expanded) {
+                            Column {
+                                Spacer(modifier = Modifier.size(8.dp))
+                                Text(
+                                    text = "Filters:",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                                Spacer(modifier = Modifier.size(8.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    TierFilterDropdown(
+                                        selectedTierFilter = uiState.selectedTierFilter,
+                                        onSelectTier = onSelectTier,
+                                        onClearTierFilter = onClearTierFilter
+                                    )
+                                    StatFilterDropdown(
+                                        allStats = uiState.allStats,
+                                        selectedStatFilters = uiState.selectedStatFilters,
+                                        onSelectStat = onSelectStat,
+                                        onClearStatsFilters = onClearStats
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(16.dp))
+                            }
+                        }
+
                     }
                     if (uiState.filteredItems.isEmpty()) {
                         Column(
@@ -187,9 +225,9 @@ fun ItemsScreen(
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.size(16.dp))
 
                 }
-
             }
         }
     }
