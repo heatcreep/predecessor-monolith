@@ -39,7 +39,7 @@ val Dusk = Color(0xFF22308D)
 
 // Discord
 val DiscordDarkBackground = Color(0xFF36393E)
-val DiscordBlurple = Color(0xFF8B9CDE)
+val DiscordBlurple = Color(0xFF444CB9)
 
 @Composable
 fun inputFieldDefaults() = TextFieldDefaults.colors(
