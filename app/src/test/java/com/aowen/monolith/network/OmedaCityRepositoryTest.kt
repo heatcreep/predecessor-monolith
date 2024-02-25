@@ -1,7 +1,9 @@
 package com.aowen.monolith.network
 
 import com.aowen.monolith.data.AbilityDetails
+import com.aowen.monolith.data.HeroClass
 import com.aowen.monolith.data.HeroDetails
+import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.FakeOmedaCityService
@@ -207,8 +209,8 @@ class OmedaCityRepositoryTest {
                 name = "test",
                 displayName = "Test",
                 stats = listOf(3, 4, 5, 6),
-                classes = listOf(null, null),
-                roles = listOf(null, null),
+                classes = listOf(HeroClass.Assassin, HeroClass.Fighter),
+                roles = listOf(HeroRole.Offlane, HeroRole.Jungle),
                 abilities = listOf(
                     AbilityDetails(
                         displayName = "ability",
@@ -216,7 +218,7 @@ class OmedaCityRepositoryTest {
                         gameDescription = "gameDescription",
                         menuDescription = "menuDescription",
                         cooldown = listOf(1.2f, 3.4f, 5.6f),
-                        cost = listOf(1, 2, 3)
+                        cost = listOf(1.0f, 2.0f, 3.0f)
                     )
                 ),
                 baseStats = defaultHeroBaseStats

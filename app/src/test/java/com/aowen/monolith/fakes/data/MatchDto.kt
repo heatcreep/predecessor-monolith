@@ -7,7 +7,7 @@ import com.aowen.monolith.data.TeamDto
 val fakeMatchPlayerDto = MatchPlayerDto(
     id = "player1",
     displayName = "Player 1",
-    mmr = 1000,
+    mmr = 1000.0,
     mmrChange = 100.0f,
     rankImage = "test",
     heroId = 1,

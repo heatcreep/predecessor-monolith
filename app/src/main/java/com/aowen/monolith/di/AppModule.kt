@@ -17,6 +17,7 @@ import com.aowen.monolith.network.UserRecentSearchRepositoryImpl
 import com.aowen.monolith.network.UserRepository
 import com.aowen.monolith.network.UserRepositoryImpl
 import com.aowen.monolith.network.utils.NetworkUtil.getOkHttpClientWithCache
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,21 +33,33 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Provides
     @Singleton
-    fun provideRetrofit(@ApplicationContext appContext: Context): Retrofit {
+    fun providesNetworkJson(): Json = Json {
+        ignoreUnknownKeys = true
+        explicitNulls = false
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(@ApplicationContext appContext: Context, json: Json): Retrofit {
 
         return Retrofit.Builder()
             .baseUrl(RetrofitHelper.baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(
+                json.asConverterFactory("application/json".toMediaType())
+            )
             .client(getOkHttpClientWithCache(appContext))
             .build()
     }

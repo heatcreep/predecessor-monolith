@@ -12,7 +12,7 @@ val fakePlayerStatsDto = PlayerStatsDto(
     ),
     averageKdaRatio = 1.23.toBigDecimal(),
     averagePerformanceScore = 123.45.toBigDecimal(),
-    favoriteHero = fakeHeroDto,
+    favoriteHero = fakeFavoriteHeroDto,
     favoriteRole = "favoriteRole",
     hoursPlayed = 240.0.toBigDecimal()
 )

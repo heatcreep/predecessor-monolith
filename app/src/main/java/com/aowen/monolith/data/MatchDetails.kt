@@ -64,11 +64,7 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
         mmr = if (this.mmr == null) {
             "0"
         } else {
-            when (this.mmr) {
-                is Float -> this.mmr.toDecimal()
-                is Double -> this.mmr.toFloat().toDecimal()
-                else -> this.mmr.toString()
-            }
+            this.mmr.toFloat().toDecimal()
         },
         mmrChange = this.mmrChange.toDecimal(),
         rankedImage = RetrofitHelper.getRankImageUrl(this.rankImage),

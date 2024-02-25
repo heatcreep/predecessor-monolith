@@ -1,53 +1,75 @@
 package com.aowen.monolith.data
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class BaseStatsDto(
-    @SerializedName("max_health")
+    @SerialName("max_health")
     val maxHealth: List<Float>,
-    @SerializedName("base_health_regeneration")
+    @SerialName("base_health_regeneration")
     val healthRegen: List<Float>,
-    @SerializedName("max_mana")
+    @SerialName("max_mana")
     val maxMana: List<Float>,
-    @SerializedName("base_mana_regeneration")
+    @SerialName("base_mana_regeneration")
     val manaRegen: List<Float>,
-    @SerializedName("attack_speed")
+    @SerialName("attack_speed")
     val attackSpeed: List<Float>,
-    @SerializedName("physical_armor")
+    @SerialName("physical_armor")
     val physicalArmor: List<Float>,
-    @SerializedName("magical_armor")
+    @SerialName("magical_armor")
     val magicalArmor: List<Float>,
-    @SerializedName("physical_power")
+    @SerialName("physical_power")
     val physicalPower: List<Float>,
-    @SerializedName("base_movement_speed")
+    @SerialName("base_movement_speed")
     val movementSpeed: List<Float>,
     val cleave: List<Float>,
-    @SerializedName("attack_range")
+    @SerialName("attack_range")
     val attackRange: List<Float>,
 )
 
+@Serializable
 data class AbilityDto(
-    @SerializedName("display_name")
+    @SerialName("display_name")
     val displayName: String,
     val image: String,
-    @SerializedName("game_description")
+    @SerialName("game_description")
     val gameDescription: String,
-    @SerializedName("menu_description")
+    @SerialName("menu_description")
     val menuDescription: String?,
     val cooldown: List<Float?>,
-    val cost: List<Int>,
+    val cost: List<Float>,
 )
 
+@Serializable
 data class HeroDto(
     val id: Int,
     val name: String,
-    @SerializedName("display_name")
+    @SerialName("display_name")
     val displayName: String,
     val stats: List<Int>,
     val classes: List<String>,
     val roles: List<String>,
     val abilities: List<AbilityDto>,
-    @SerializedName("base_stats")
+    @SerialName("base_stats")
     val baseStats: BaseStatsDto,
+)
 
+@Serializable
+data class FavoriteHeroDto(
+    val id: Int,
+    @SerialName("game_id")
+    val gameId: Int,
+    val name: String,
+    @SerialName("display_name")
+    val displayName: String,
+    val stats: List<Int>,
+    val classes: List<String>,
+    val roles: List<String>,
+    val visible: Boolean,
+    val enabled: Boolean,
+    @SerialName("created_at")
+    val createdAt: String,
+    @SerialName("updated_at")
+    val updatedAt: String,
 )

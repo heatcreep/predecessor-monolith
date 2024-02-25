@@ -3,9 +3,9 @@ package com.aowen.monolith.fakes.data
 import com.aowen.monolith.data.HeroStatisticsDto
 
 val fakeHeroStatisticsDto = HeroStatisticsDto(
-    heroId = "hero1",
+    heroId = 1,
     displayName = "Hero 1",
-    matchCount = 10,
+    matchCount = 10f,
     winRate = 0.5f,
     pickRate = 0.7f,
     kills = 20,

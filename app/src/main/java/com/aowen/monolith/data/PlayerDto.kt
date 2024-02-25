@@ -1,24 +1,27 @@
 package com.aowen.monolith.data
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PlayerFlagDto(
     val identifier: String,
     val text: String,
     val color: String
 )
 
+@Serializable
 data class PlayerDto(
     val id: String,
-    @SerializedName("display_name")
+    @SerialName("display_name")
     val displayName: String,
     val region: String?,
     val rank: Int,
-    @SerializedName("rank_title")
+    @SerialName("rank_title")
     val rankTitle: String,
-    @SerializedName("rank_image")
+    @SerialName("rank_image")
     val rankImage: String,
-    @SerializedName("is_ranked")
+    @SerialName("is_ranked")
     val isRanked: Boolean,
     val mmr: Float?,
     val flags: List<PlayerFlagDto?>? = null

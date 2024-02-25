@@ -18,7 +18,9 @@ firebasePlugin = "2.9.9"
 firebaseAppDistribution = "16.0.0-beta11"
 googleServices = "4.3.15"
 gson = "2.9.0"
+retrofitKotlinSerialization = "1.0.0"
 kotlinBom = "1.8.20"
+kotlinSerialization = "1.5.1"
 kotlinTest = "1.7.3"
 ksp = "1.9.0-1.0.11"
 meetupMarkdown = "0.2.2"
@@ -58,12 +60,14 @@ hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-comp
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlinBom" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinTest" }
 ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktorClientAndroid" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktorClientAndroid" }
 meetup-markdown = { module = "com.meetup:twain", version.ref = "meetupMarkdown" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "gson" }
+retrofit-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerialization" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson" }
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
 supabase-gotrue = { module = "io.github.jan-tennert.supabase:gotrue-kt" }

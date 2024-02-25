@@ -1,23 +1,29 @@
 package com.aowen.monolith.data
 
-import com.google.gson.annotations.SerializedName
+import com.aowen.monolith.network.json.BigDecimalSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 
+@Serializable
 data class PlayerStatsDto(
-    @SerializedName("matches_played")
+    @SerialName("matches_played")
     val matchesPlayed: Long,
-    @SerializedName("hours_played")
+    @Serializable(with = BigDecimalSerializer::class)
+    @SerialName("hours_played")
     val hoursPlayed: BigDecimal,
-    @SerializedName("avg_performance_score")
+    @Serializable(with = BigDecimalSerializer::class)
+    @SerialName("avg_performance_score")
     val averagePerformanceScore: BigDecimal,
-    @SerializedName("avg_kda")
-    val averageKda: List<BigDecimal>,
-    @SerializedName("avg_kdar")
+    @SerialName("avg_kda")
+    val averageKda: List<@Serializable(with = BigDecimalSerializer::class) BigDecimal>,
+    @Serializable(with = BigDecimalSerializer::class)
+    @SerialName("avg_kdar")
     val averageKdaRatio: BigDecimal,
-    @SerializedName("favorite_hero")
-    val favoriteHero: HeroDto,
-    @SerializedName("favorite_role")
+    @SerialName("favorite_hero")
+    val favoriteHero: FavoriteHeroDto,
+    @SerialName("favorite_role")
     val favoriteRole: String?,
-    @SerializedName("winrate")
+    @SerialName("winrate")
     val winRate: Float
 )

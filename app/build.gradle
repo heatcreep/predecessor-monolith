@@ -37,7 +37,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources false
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
@@ -117,11 +118,9 @@ dependencies {
     // RichText
     implementation libs.meetup.markdown
 
-    // Retrofit
-    implementation libs.retrofit.gson
-
-    // Gson
-    implementation libs.retrofit.gson
+    // Serialization
+    implementation libs.kotlinx.serialization
+    implementation libs.retrofit.serialization.converter
 
     // Coil
     implementation libs.coil.compose

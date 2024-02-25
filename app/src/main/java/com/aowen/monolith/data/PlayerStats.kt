@@ -16,8 +16,8 @@ fun PlayerStatsDto.create(): PlayerStats {
     return PlayerStats(
         matchesPlayed = this.matchesPlayed.toString(),
         hoursPlayed = this.hoursPlayed.toString(),
-        averagePerformanceScore = this.averagePerformanceScore.toString(),
-        averageKda = this.averageKda.map { it.toString() },
+        averagePerformanceScore = this.averagePerformanceScore.toFloat().toString(),
+        averageKda = this.averageKda.map { it.toFloat().toString() },
         averageKdaRatio = this.averageKdaRatio.toString(),
         favoriteHero = this.favoriteHero.displayName,
         favoriteRole = this.favoriteRole?.replaceFirstChar { it.uppercase() } ?: "None",
