@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +31,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -70,16 +74,19 @@ fun ProfileScreenRoute(
                     showSnackbar("Account deleted successfully", SnackbarDuration.Short)
                     navController.navigateToLoginFromLogout()
                 }
+
                 ProfileToastState.LOGOUT -> {
                     showSnackbar("Successfully logged out", SnackbarDuration.Short)
                     navController.navigateToLoginFromLogout()
                 }
+
                 ProfileToastState.ERROR -> {
                     showSnackbar(
                         "There was an issue processing your request. Please try again later",
                         SnackbarDuration.Short
                     )
                 }
+
                 else -> {}
             }
             viewModel.onShowToastComplete()
@@ -112,6 +119,8 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     onDelete: () -> Unit,
 ) {
+
+    val uriHandler = LocalUriHandler.current
 
     var deleteModalOpen by remember { mutableStateOf(false) }
 
@@ -179,6 +188,16 @@ fun ProfileScreen(
                                 text = "App Version: ${BuildConfig.VERSION_NAME}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary,
+                            )
+                            ClickableText(
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    textDecoration = TextDecoration.Underline
+                                ),
+                                text = AnnotatedString("Privacy Policy"),
+                                onClick = {
+                                    uriHandler.openUri("https://monolith-app.dev/privacy")
+                                }
                             )
                             ElevatedButton(
                                 onClick = { deleteModalOpen = true },
