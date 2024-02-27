@@ -1,7 +1,12 @@
 package com.aowen.monolith.ui.screens.profile
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,8 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -30,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
@@ -54,6 +64,7 @@ import com.aowen.monolith.ui.theme.DiscordDarkBackground
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.RedDanger
 import com.aowen.monolith.ui.theme.WarmWhite
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreenRoute(
@@ -167,23 +178,26 @@ fun ProfileScreen(
                             Surface(shape = RoundedCornerShape(5.dp)) {
                                 ProfileCard(userInfo = uiState.userInfo)
                             }
-                            TextButton(onClick = {
-                                onLogout()
-                            }) {
-                                Text(
-                                    text = "Sign Out",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
+                            Text(
+                                text = "FAQ",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            FaqPanel(
+                                questionText = "How does the \"Claim Player\" button work?",
+                                answerText = """
+                                    The "Claim Player" button allows you to claim a player's profile as your own. However, due to limitations 
+                                    of the OmedaCity API, it isn't actually tied to your game account or your OmedaCity account. Think of it as a favorites menu of
+                                    one that serves as a convenient way to access your own stats without having to search for yourself everytime.",
+                                """.trimIndent()
+                            )
+                            FaqPanel(
+                                questionText = "Why don't I see all the stats that OmedaCity has?",
+                                answerText = """
+                                    The OmedaCity API exposes a lot of data, but not all of it. Both this app and the OmedaCity API/Website are managed by one person.
+                                    We are working to hopefully expose more data in the future, but for now, we are limited to what is available.
+                                """.trimIndent()
+                            )
                             Text(
                                 text = "App Version: ${BuildConfig.VERSION_NAME}",
                                 style = MaterialTheme.typography.bodySmall,
@@ -213,8 +227,16 @@ fun ProfileScreen(
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
+                            TextButton(onClick = {
+                                onLogout()
+                            }) {
+                                Text(
+                                    text = "Sign Out",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
                         }
-
                     } else {
                         Column(
                             modifier = Modifier
@@ -295,6 +317,68 @@ fun ProfileCard(
                     color = WarmWhite,
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun FaqPanel(
+    questionText: String,
+    answerText: String,
+    modifier: Modifier = Modifier
+) {
+
+    var expanded by remember { mutableStateOf(false) }
+    val rotationAngle = remember { Animatable(0f) }
+
+    LaunchedEffect(expanded) {
+        this.launch {
+            rotationAngle.animateTo(
+                targetValue = if (expanded) 45f else 0f,
+                animationSpec = tween(durationMillis = 200, easing = LinearEasing),
+            )
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    expanded = !expanded
+                },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = questionText,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Icon(
+                imageVector = Icons.Filled.Add,
+                modifier = Modifier
+                    .size(28.dp)
+                    .rotate(rotationAngle.value),
+                tint = MaterialTheme.colorScheme.secondary,
+                contentDescription = null
+            )
+
+        }
+        HorizontalDivider(modifier.padding(vertical = 8.dp))
+        AnimatedVisibility(visible = expanded) {
+            Text(
+                modifier = Modifier.padding(vertical = 16.dp),
+                text = answerText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+
         }
     }
 }
