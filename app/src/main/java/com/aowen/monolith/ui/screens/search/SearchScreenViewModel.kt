@@ -137,7 +137,8 @@ class SearchScreenViewModel @Inject constructor(
     fun handleAddToRecentSearch(playerDetails: PlayerDetails) {
         viewModelScope.launch {
             try {
-                userRecentSearchesRepository.addRecentSearch(playerDetails)
+                val addRecentSearchDeferred = async {userRecentSearchesRepository.addRecentSearch(playerDetails) }
+                addRecentSearchDeferred.await()
             } catch (e: Exception) {
                 logDebug(e.toString())
             }

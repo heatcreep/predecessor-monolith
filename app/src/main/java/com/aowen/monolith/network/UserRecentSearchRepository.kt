@@ -79,7 +79,7 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                     postgrestService.updateRecentSearch(
                         user.id,
                         playerSearchDto.playerId,
-                        recentSearches.first().rankImage,
+                        playerSearchDto.rankImage,
                         playerSearchDto
                     )
                 }
