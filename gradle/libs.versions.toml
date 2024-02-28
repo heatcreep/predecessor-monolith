@@ -6,6 +6,7 @@ androidXCoreKtx = "1.10.1"
 androidXEspresso = "3.5.0"
 androidXLifecycleRuntimeKtx = "2.6.1"
 androidXComposeMaterial3 = "1.2.0"
+androidXPaging = "3.2.1"
 androidXTestExt = "1.1.5"
 coilCompose = "2.2.2"
 composeBom = "2024.01.00"
@@ -17,7 +18,7 @@ firebaseBom = "32.2.3"
 firebasePlugin = "2.9.9"
 firebaseAppDistribution = "16.0.0-beta11"
 googleServices = "4.3.15"
-gson = "2.9.0"
+retrofit = "2.9.0"
 retrofitKotlinSerialization = "1.0.0"
 kotlinBom = "1.8.20"
 kotlinSerialization = "1.5.1"
@@ -49,6 +50,9 @@ androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "daggerHiltCompose" }
+androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "androidXPaging" }
+androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidXPaging" }
+androidx-paging-testing = { group = "androidx.paging", name = "paging-testing", version.ref = "androidXPaging" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
@@ -66,9 +70,8 @@ ksp-gradle = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktorClientAndroid" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktorClientAndroid" }
 meetup-markdown = { module = "com.meetup:twain", version.ref = "meetupMarkdown" }
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "gson" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerialization" }
-retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson" }
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
 supabase-gotrue = { module = "io.github.jan-tennert.supabase:gotrue-kt" }
 supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }

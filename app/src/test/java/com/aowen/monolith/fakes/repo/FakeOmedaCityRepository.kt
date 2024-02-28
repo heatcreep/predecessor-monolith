@@ -31,6 +31,8 @@ enum class ResponseType {
     SuccessNull,
 }
 
+private var pageCount = 1
+
 class FakeOmedaCityRepository(
     private val hasPlayerDetailsError: Boolean = false,
     private val hasPlayerInfoError: Boolean = false,
@@ -192,9 +194,16 @@ class FakeOmedaCityRepository(
             Result.failure(Exception("Failed to fetch builds"))
         } else when(buildsResponse) {
             ResponseType.Empty -> Result.success(emptyList())
-            else -> Result.success(
-                listOf(fakeBuildDto.create())
-            )
+            else -> {
+                if(pageCount >= 4) {
+                    return Result.success(emptyList())
+                } else {
+                    pageCount++
+                    return Result.success(
+                        listOf(fakeBuildDto.create())
+                    )
+                }
+            }
         }
     }
 

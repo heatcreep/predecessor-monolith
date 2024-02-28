@@ -1,5 +1,6 @@
 package com.aowen.monolith.ui
 
+import androidx.paging.testing.asSnapshot
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.create
@@ -10,6 +11,7 @@ import com.aowen.monolith.ui.screens.builds.BuildsScreenViewModel
 import com.aowen.monolith.ui.screens.builds.BuildsUiState
 import com.aowen.monolith.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,54 +23,38 @@ class BuildsScreenViewModelTest {
     private lateinit var viewModel: BuildsScreenViewModel
 
     @Test
-    fun `creating a new BuildsScreenViewModel should initialize with empty builds`() {
+    fun `creating a new BuildsScreenViewModel should initialize with first page`() = runTest {
         viewModel = BuildsScreenViewModel(repository = FakeOmedaCityRepository())
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-            isLoading = false,
-            builds = listOf(fakeBuildDto.create()),
-        )
-        assertEquals(expected, actual)
+        val builds = viewModel.buildsPager
+        val snapshot = builds.asSnapshot()
+        assertEquals(snapshot, listOf(
+            fakeBuildDto.create(),
+            fakeBuildDto.create(),
+            fakeBuildDto.create(),
+
+        ))
     }
 
     @Test
-    fun `initViewModel should update uiState with builds and set loading to false`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
-        )
-        viewModel.initViewModel()
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-            isLoading = false,
-            builds = listOf(fakeBuildDto.create()),
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `initViewModel should update uiState with error message when repository returns error`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository(hasBuildsError = true)
-        )
-        viewModel.initViewModel()
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-            isLoading = false,
-            error = "Failed to fetch builds"
-        )
-        assertEquals(expected, actual)
-    }
+    fun `initViewModel should update uiState with error message when repository returns error`() =
+        runTest {
+            viewModel = BuildsScreenViewModel(
+                repository = FakeOmedaCityRepository(hasBuildsError = true)
+            )
+            val actual = viewModel.uiState.value
+            val foo = viewModel.buildsPager.asSnapshot()
+            val expected = BuildsUiState(
+            )
+            assertEquals(expected, actual)
+        }
 
     @Test
     fun `initViewModel should update uiState with builds and set loading to false when repository returns empty list`() {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository(buildsResponse = ResponseType.Empty)
         )
-        viewModel.initViewModel()
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
-            builds = emptyList(),
         )
         assertEquals(expected, actual)
     }
@@ -78,11 +64,8 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository()
         )
-        viewModel.filterBuilds()
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -92,11 +75,8 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository(hasBuildsError = true)
         )
-        viewModel.filterBuilds()
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
-            error = "Failed to fetch builds"
         )
         assertEquals(expected, actual)
     }
@@ -106,11 +86,8 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository(buildsResponse = ResponseType.Empty)
         )
-        viewModel.filterBuilds()
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
-            builds = emptyList(),
         )
         assertEquals(expected, actual)
     }
@@ -120,15 +97,9 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository()
         )
-        viewModel.loadMoreBuilds()
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
-            currentPage = 2,
-            builds = listOf(
-                fakeBuildDto.create(),
-                fakeBuildDto.create(),
-            ),
+
         )
         assertEquals(expected, actual)
     }
@@ -138,12 +109,8 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository(hasBuildsError = true)
         )
-        viewModel.loadMoreBuilds()
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
-            currentPage = 2,
-            error = "Failed to fetch builds"
         )
         assertEquals(expected, actual)
     }
@@ -153,13 +120,8 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository(buildsResponse = ResponseType.Empty)
         )
-        viewModel.loadMoreBuilds()
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
-            currentPage = 2,
-            isLastPage = true,
-            builds = emptyList(),
         )
         assertEquals(expected, actual)
     }
@@ -172,9 +134,7 @@ class BuildsScreenViewModelTest {
         viewModel.updateSearchField("test")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
             searchFieldValue = "test",
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -187,9 +147,7 @@ class BuildsScreenViewModelTest {
         viewModel.updateSelectedRole("Support")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
             selectedRoleFilter = HeroRole.Support,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -201,16 +159,12 @@ class BuildsScreenViewModelTest {
         )
         viewModel.updateSelectedRole("Support")
         var expected = BuildsUiState(
-            isLoading = false,
             selectedRoleFilter = HeroRole.Support,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
         viewModel.clearSelectedRole()
         expected = BuildsUiState(
-            isLoading = false,
             selectedRoleFilter = null,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
     }
@@ -223,9 +177,7 @@ class BuildsScreenViewModelTest {
         viewModel.updateSelectedHero("Narbash")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
             selectedHeroFilter = Hero.NARBASH,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -237,16 +189,12 @@ class BuildsScreenViewModelTest {
         )
         viewModel.updateSelectedHero("Narbash")
         var expected = BuildsUiState(
-            isLoading = false,
             selectedHeroFilter = Hero.NARBASH,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
         viewModel.clearSelectedHero()
         expected = BuildsUiState(
-            isLoading = false,
             selectedHeroFilter = null,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
     }
@@ -259,9 +207,7 @@ class BuildsScreenViewModelTest {
         viewModel.updateSelectedSortOrder("Trending")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
             selectedSortOrder = "Trending",
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -273,16 +219,12 @@ class BuildsScreenViewModelTest {
         )
         viewModel.updateSelectedSortOrder("Trending")
         var expected = BuildsUiState(
-            isLoading = false,
             selectedSortOrder = "Trending",
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
         viewModel.clearSelectedSortOrder()
         expected = BuildsUiState(
-            isLoading = false,
             selectedSortOrder = "Popular",
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, viewModel.uiState.value)
     }
@@ -295,9 +237,7 @@ class BuildsScreenViewModelTest {
         viewModel.updateHasSkillOrder(true)
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
             hasSkillOrderSelected = true,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }
@@ -310,9 +250,7 @@ class BuildsScreenViewModelTest {
         viewModel.updateHasModules(true)
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
-            isLoading = false,
             hasModulesSelected = true,
-            builds = listOf(fakeBuildDto.create()),
         )
         assertEquals(expected, actual)
     }

@@ -122,6 +122,10 @@ dependencies {
     implementation libs.kotlinx.serialization
     implementation libs.retrofit.serialization.converter
 
+    // Paging
+    implementation libs.androidx.paging.runtime
+    implementation libs.androidx.paging.compose
+
     // Coil
     implementation libs.coil.compose
 
@@ -135,6 +139,7 @@ dependencies {
 
     testImplementation libs.junit4
     testImplementation libs.kotlinx.coroutines.test
+    testImplementation libs.androidx.paging.testing
     androidTestImplementation libs.androidx.test.ext
     androidTestImplementation libs.androidx.test.espresso.core
     androidTestImplementation platform(libs.androidx.compose.bom)
