@@ -28,12 +28,11 @@ class BuildsPagingSource(
                 skillOrder = skillOrder,
                 modules = modules,
                 page = page
-            ).getOrNull() ?: emptyList()
-            val nextKey =
-                if(response.isEmpty()) null else page + 1
+            ).getOrThrow()
+            val nextKey = if(response.isNullOrEmpty()) null else page + 1
 
             LoadResult.Page(
-                data = response,
+                data = response ?: emptyList(),
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = nextKey
             )

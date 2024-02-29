@@ -33,6 +33,10 @@ enum class ResponseType {
 
 private var pageCount = 1
 
+fun resetPageCount() {
+    pageCount = 1
+}
+
 class FakeOmedaCityRepository(
     private val hasPlayerDetailsError: Boolean = false,
     private val hasPlayerInfoError: Boolean = false,
@@ -115,7 +119,7 @@ class FakeOmedaCityRepository(
     override suspend fun fetchMatchById(matchId: String): Result<MatchDetails?> {
         return if (hasMatchDetailsError) {
             Result.failure(Exception(FetchMatchError))
-        } else if( hasItemDetailsErrors) {
+        } else if (hasItemDetailsErrors) {
             Result.failure(Exception(FetchItemsError))
         } else when (matchId) {
             "No Match" -> Result.success(null)
@@ -189,18 +193,18 @@ class FakeOmedaCityRepository(
         skillOrder: Int?,
         modules: Int?,
         page: Int?
-    ): Result<List<BuildListItem>?> {
-        return if(hasBuildsError) {
+    ): Result<List<BuildListItem>> {
+        return if (hasBuildsError) {
             Result.failure(Exception("Failed to fetch builds"))
-        } else when(buildsResponse) {
+        } else when (buildsResponse) {
             ResponseType.Empty -> Result.success(emptyList())
             else -> {
-                if(pageCount >= 4) {
+                if (pageCount >= 4) {
                     return Result.success(emptyList())
                 } else {
                     pageCount++
                     return Result.success(
-                        listOf(fakeBuildDto.create())
+                        List(10) { fakeBuildDto.create() }
                     )
                 }
             }
@@ -208,9 +212,9 @@ class FakeOmedaCityRepository(
     }
 
     override suspend fun fetchBuildById(buildId: String): Result<BuildListItem?> {
-        return if(hasBuildsError) {
+        return if (hasBuildsError) {
             Result.failure(Exception("Failed to fetch build details."))
-        } else when(buildsResponse) {
+        } else when (buildsResponse) {
             ResponseType.SuccessNull -> Result.success(null)
             else -> Result.success(
                 fakeBuildDto.create()

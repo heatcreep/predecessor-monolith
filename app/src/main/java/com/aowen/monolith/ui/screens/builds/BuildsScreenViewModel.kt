@@ -29,11 +29,11 @@ class BuildsScreenViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<BuildsUiState> = MutableStateFlow(BuildsUiState())
     val uiState = _uiState
 
-    private lateinit var buildsPagingSource: BuildsPagingSource
+    lateinit var buildsPagingSource: BuildsPagingSource
 
-    val buildsPager = Pager(PagingConfig(
-        pageSize = PAGE_SIZE
-    )) {
+    val buildsPager = Pager(
+        config = PagingConfig(pageSize = PAGE_SIZE)
+    ) {
         BuildsPagingSource(
             name = uiState.value.searchFieldValue
                 .replace(" ", "+")
@@ -41,8 +41,8 @@ class BuildsScreenViewModel @Inject constructor(
             role = uiState.value.selectedRoleFilter?.name?.lowercase(),
             order = uiState.value.selectedSortOrder.lowercase(),
             heroId = uiState.value.selectedHeroFilter?.heroId,
-            skillOrder = if (uiState.value.hasSkillOrderSelected) 1 else 0,
-            modules = if (uiState.value.hasModulesSelected) 1 else 0,
+            skillOrder = if (uiState.value.hasSkillOrderSelected) 1 else null,
+            modules = if (uiState.value.hasModulesSelected) 1 else null,
             repository = repository
         ).also {
             buildsPagingSource = it

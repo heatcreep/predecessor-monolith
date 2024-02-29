@@ -6,12 +6,13 @@ import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.fakes.repo.ResponseType
+import com.aowen.monolith.ui.screens.builds.BuildsPagingSource
 import com.aowen.monolith.ui.screens.builds.BuildsScreenViewModel
 import com.aowen.monolith.ui.screens.builds.BuildsUiState
 import com.aowen.monolith.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -22,141 +23,63 @@ class BuildsScreenViewModelTest {
 
     private lateinit var viewModel: BuildsScreenViewModel
 
+    private val fakeRepository = FakeOmedaCityRepository()
+
     @Test
     fun `creating a new BuildsScreenViewModel should initialize with first page`() = runTest {
         viewModel = BuildsScreenViewModel(repository = FakeOmedaCityRepository())
         val builds = viewModel.buildsPager
         val snapshot = builds.asSnapshot()
-        assertEquals(snapshot, listOf(
-            fakeBuildDto.create(),
-            fakeBuildDto.create(),
-            fakeBuildDto.create(),
-
-        ))
+        assertEquals(snapshot, List(20) { fakeBuildDto.create() })
     }
 
     @Test
-    fun `initViewModel should update uiState with error message when repository returns error`() =
-        runTest {
-            viewModel = BuildsScreenViewModel(
-                repository = FakeOmedaCityRepository(hasBuildsError = true)
-            )
-            val actual = viewModel.uiState.value
-            val foo = viewModel.buildsPager.asSnapshot()
-            val expected = BuildsUiState(
-            )
-            assertEquals(expected, actual)
-        }
+    fun `updateSearchField should update uiState with searchFieldValue`() = runTest {
 
-    @Test
-    fun `initViewModel should update uiState with builds and set loading to false when repository returns empty list`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository(buildsResponse = ResponseType.Empty)
+            repository = fakeRepository
         )
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-        )
-        assertEquals(expected, actual)
-    }
 
-    @Test
-    fun `filterBuilds should update uiState with builds and set loading to false`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
-        )
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `filterBuilds should update uiState with error message when repository returns error`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository(hasBuildsError = true)
-        )
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `filterBuilds should update uiState with builds and set loading to false when repository returns empty list`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository(buildsResponse = ResponseType.Empty)
-        )
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `loadMoreBuilds should update uiState with builds and set loading to false`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
-        )
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `loadMoreBuilds should update uiState with error message when repository returns error`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository(hasBuildsError = true)
-        )
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `loadMoreBuilds should update uiState with builds and set isLastPage to true when repository returns empty list`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository(buildsResponse = ResponseType.Empty)
-        )
-        val actual = viewModel.uiState.value
-        val expected = BuildsUiState(
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `updateSearchField should update uiState with searchFieldValue`() {
-        viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
         )
         viewModel.updateSearchField("test")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
             searchFieldValue = "test",
         )
+        assertTrue(viewModel.buildsPagingSource.invalid)
         assertEquals(expected, actual)
     }
 
     @Test
-    fun `updateSelectedRoleFilter should update uiState with selectedRoleFilter`() {
+    fun `updateSelectedRoleFilter should update uiState with selectedRoleFilter and invalidate the paging source`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            repository = fakeRepository
+        )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
         )
         viewModel.updateSelectedRole("Support")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
             selectedRoleFilter = HeroRole.Support,
         )
+        assertTrue(viewModel.buildsPagingSource.invalid)
         assertEquals(expected, actual)
     }
 
     @Test
     fun `clearSelectedRoleFilter should update uiState with selectedRoleFilter`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            repository = fakeRepository
         )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
+        )
+
         viewModel.updateSelectedRole("Support")
         var expected = BuildsUiState(
             selectedRoleFilter = HeroRole.Support,
@@ -166,6 +89,7 @@ class BuildsScreenViewModelTest {
         expected = BuildsUiState(
             selectedRoleFilter = null,
         )
+        assertTrue(viewModel.buildsPagingSource.invalid)
         assertEquals(expected, viewModel.uiState.value)
     }
 
@@ -174,6 +98,11 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository()
         )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
+        )
+
         viewModel.updateSelectedHero("Narbash")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
@@ -187,6 +116,11 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository()
         )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
+        )
+
         viewModel.updateSelectedHero("Narbash")
         var expected = BuildsUiState(
             selectedHeroFilter = Hero.NARBASH,
@@ -204,6 +138,11 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository()
         )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
+        )
+
         viewModel.updateSelectedSortOrder("Trending")
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
@@ -217,6 +156,11 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository()
         )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
+        )
+
         viewModel.updateSelectedSortOrder("Trending")
         var expected = BuildsUiState(
             selectedSortOrder = "Trending",
@@ -234,6 +178,11 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository()
         )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
+        )
+
         viewModel.updateHasSkillOrder(true)
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
@@ -247,6 +196,11 @@ class BuildsScreenViewModelTest {
         viewModel = BuildsScreenViewModel(
             repository = FakeOmedaCityRepository()
         )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
+        )
+
         viewModel.updateHasModules(true)
         val actual = viewModel.uiState.value
         val expected = BuildsUiState(
