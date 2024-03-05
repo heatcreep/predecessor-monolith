@@ -1,4 +1,4 @@
-package com.aowen.monolith.ui.screens.builds.addbuild.builddetails
+package com.aowen.monolith.ui.screens.builds.addbuild.skillorder
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Surface
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,13 +38,13 @@ import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToItemSe
 import com.aowen.monolith.ui.theme.MonolithTheme
 
 @Composable
-fun BuildDetailsRoute(
+fun SkillOrderRoute(
     navController: NavController,
     viewModel: AddBuildViewModel
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
-    BuildDetailsScreen(
+    SkillOrderScreen(
         uiState = uiState,
         onSkillSelected = viewModel::onSkillSelected,
         navigateToItemSelect = navController::navigateToItemSelect
@@ -52,7 +52,7 @@ fun BuildDetailsRoute(
 }
 
 @Composable
-fun BuildDetailsScreen(
+fun SkillOrderScreen(
     uiState: AddBuildState,
     onSkillSelected: (Int, Int) -> Unit,
     navigateToItemSelect: () -> Unit

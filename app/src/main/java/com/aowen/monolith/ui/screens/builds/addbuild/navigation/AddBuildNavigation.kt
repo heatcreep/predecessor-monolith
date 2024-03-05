@@ -11,13 +11,15 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
-import com.aowen.monolith.ui.screens.builds.addbuild.builddetails.BuildDetailsRoute
 import com.aowen.monolith.ui.screens.builds.addbuild.heroroleselect.HeroAndRoleSelectionRoute
 import com.aowen.monolith.ui.screens.builds.addbuild.itemselect.ItemSelectRoute
+import com.aowen.monolith.ui.screens.builds.addbuild.skillmoduleselect.SkillOrderAndModuleSelectRoute
+import com.aowen.monolith.ui.screens.builds.addbuild.skillorder.SkillOrderRoute
 
 const val AddBuildRoute = "add-build"
 const val HeroRoleSelectionRoute = "hero-and-role-selection"
-const val BuildDetailsRoute = "build-details"
+const val SkillOrderAndModuleMenuRoute = "skill-order-and-module-menu"
+const val SkillOrderRoute = "skill-order"
 const val ItemSelectRoute = "item-select"
 
 
@@ -25,8 +27,12 @@ fun NavController.navigateToAddBuildFlow(navOptions: NavOptions? = null) {
     this.navigate(AddBuildRoute, navOptions)
 }
 
+fun NavController.navigateToSkillOrderAndModuleMenu(navOptions: NavOptions? = null) {
+    this.navigate(SkillOrderAndModuleMenuRoute, navOptions)
+}
+
 fun NavController.navigateToAddBuildDetails(navOptions: NavOptions? = null) {
-    this.navigate(BuildDetailsRoute, navOptions)
+    this.navigate(SkillOrderRoute, navOptions)
 }
 
 fun NavController.navigateToItemSelect(navOptions: NavOptions? = null) {
@@ -50,13 +56,25 @@ fun NavGraphBuilder.addBuildsScreen(
             )
         }
         composable(
-            route = BuildDetailsRoute
+            route = SkillOrderAndModuleMenuRoute
         ) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
                     navController = navController
                 )
-            BuildDetailsRoute(
+            SkillOrderAndModuleSelectRoute(
+                navController = navController,
+                viewModel = addBuildViewModel
+            )
+        }
+        composable(
+            route = SkillOrderRoute
+        ) { backStackEntry ->
+            val addBuildViewModel = backStackEntry
+                .sharedViewModel<AddBuildViewModel>(
+                    navController = navController
+                )
+            SkillOrderRoute(
                 navController = navController,
                 viewModel = addBuildViewModel
             )

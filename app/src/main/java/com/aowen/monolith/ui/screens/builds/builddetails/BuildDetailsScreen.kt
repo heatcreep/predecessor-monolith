@@ -56,9 +56,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.ItemModule
-import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
-import com.aowen.monolith.data.getRoleImage
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.screens.matches.ItemDetailsBottomSheet
@@ -257,7 +256,7 @@ fun PlayerCardWithRole(
     buildDetails: BuildListItem
 ) {
     PlayerIcon(
-        heroImageId = getHeroImage(buildDetails.heroId).drawableId,
+        heroImageId = getHeroRole(buildDetails.heroId).drawableId,
         heroIconSize = 64.dp,
     ) {
         Image(
@@ -274,7 +273,7 @@ fun PlayerCardWithRole(
             contentScale = ContentScale.Crop,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
             painter = painterResource(
-                id = getRoleImage(buildDetails.role).drawableId
+                id = getHeroRole(buildDetails.role).drawableId
             ),
             contentDescription = null
         )
@@ -282,9 +281,12 @@ fun PlayerCardWithRole(
 }
 
 @Composable
-fun SkillOrderScrollableRow(skillOrder: List<Int>) {
+fun SkillOrderScrollableRow(
+    modifier: Modifier = Modifier,
+    scrollState: LazyListState = rememberLazyListState(),
+    skillOrder: List<Int>
+) {
 
-    val scrollState = rememberLazyListState()
 
     fun LazyListState.isScrolledToEnd(): Boolean {
         return layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
@@ -298,7 +300,7 @@ fun SkillOrderScrollableRow(skillOrder: List<Int>) {
 
     var rowHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .onGloballyPositioned { coordinates ->

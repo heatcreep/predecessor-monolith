@@ -77,9 +77,8 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
-import com.aowen.monolith.data.getRoleImage
 import com.aowen.monolith.navigation.navigateToBuildDetails
 import com.aowen.monolith.ui.common.MonolithCollapsableFabButton
 import com.aowen.monolith.ui.common.MonolithCollapsableListColumn
@@ -461,7 +460,7 @@ fun BuildListItem(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 PlayerIcon(
-                    heroImageId = getHeroImage(build.heroId).drawableId,
+                    heroImageId = getHeroRole(build.heroId).drawableId,
                 ) {
                     Image(
                         modifier = Modifier
@@ -477,7 +476,7 @@ fun BuildListItem(
                         contentScale = ContentScale.Crop,
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
                         painter = painterResource(
-                            id = getRoleImage(build.role.lowercase()).drawableId
+                            id = getHeroRole(build.role.lowercase()).drawableId
                         ),
                         contentDescription = null
                     )

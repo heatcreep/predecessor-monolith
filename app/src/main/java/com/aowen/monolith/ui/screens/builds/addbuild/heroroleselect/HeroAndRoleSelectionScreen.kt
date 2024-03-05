@@ -1,49 +1,54 @@
 package com.aowen.monolith.ui.screens.builds.addbuild.heroroleselect
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.Hero
+import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildState
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
 import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToAddBuildDetails
+import com.aowen.monolith.ui.screens.heroes.HeroCard
 import com.aowen.monolith.ui.theme.MonolithTheme
-import com.aowen.monolith.ui.theme.inputFieldDefaults
+import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
+import java.util.Locale
 
 @Composable
 fun HeroAndRoleSelectionRoute(
@@ -65,14 +70,10 @@ fun HeroAndRoleSelectionRoute(
 @Composable
 fun HeroAndRoleSelectionScreen(
     uiState: AddBuildState,
-    onHeroSelected: (Int) -> Unit,
+    onHeroSelected: (HeroDetails) -> Unit,
     onRoleSelected: (HeroRole) -> Unit,
     navigateToBuildDetails: () -> Unit
 ) {
-
-    var isHeroDropdownOpen by remember { mutableStateOf(false) }
-    var isRoleDropdownOpen by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -98,140 +99,140 @@ fun HeroAndRoleSelectionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp)
                 .padding(padding)
+                .padding(horizontal = 16.dp)
+
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = isHeroDropdownOpen,
-                            onExpandedChange = { isHeroDropdownOpen = !isHeroDropdownOpen }
-                        ) {
-                            TextField(
-                                value = Hero.entries.firstOrNull {
-                                    it.heroId == uiState.selectedHero
-                                }?.heroName ?: "Select a hero",
-                                onValueChange = {},
-                                readOnly = true,
-                                textStyle = MaterialTheme.typography.bodyMedium,
-                                trailingIcon = {
-                                    AnimatedContent(targetState = isHeroDropdownOpen, label = "") {
-                                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = it)
-                                    }
-                                },
-                                colors = inputFieldDefaults(),
-                                modifier = Modifier
-                                    .menuAnchor()
-                                    .fillMaxWidth()
-                            )
-                            ExposedDropdownMenu(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .selectableGroup(),
-                                expanded = isHeroDropdownOpen,
-                                onDismissRequest = {
-                                    isHeroDropdownOpen = false
-                                }
-                            ) {
-                                Hero.entries.forEach { hero ->
-                                    DropdownMenuItem(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        text = {
-                                            Text(
-                                                text = hero.heroName,
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
-                                        },
-                                        onClick = {
-                                            onHeroSelected(hero.heroId)
-                                            isHeroDropdownOpen = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = isRoleDropdownOpen,
-                            onExpandedChange = { isRoleDropdownOpen = !isRoleDropdownOpen }
-                        ) {
-                            TextField(
-                                value = HeroRole.entries.firstOrNull {
-                                    it == uiState.selectedRole
-                                }?.name ?: "Select a role",
-                                onValueChange = {},
-                                readOnly = true,
-                                textStyle = MaterialTheme.typography.bodyMedium,
-                                trailingIcon = {
-                                    AnimatedContent(targetState = isRoleDropdownOpen, label = "") {
-                                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = it)
-                                    }
-                                },
-                                colors = inputFieldDefaults(),
-                                modifier = Modifier
-                                    .menuAnchor()
-                                    .fillMaxWidth()
-                            )
-                            ExposedDropdownMenu(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .selectableGroup(),
-                                expanded = isRoleDropdownOpen,
-                                onDismissRequest = {
-                                    isRoleDropdownOpen = false
-                                }
-                            ) {
-                                HeroRole.entries.forEach { role ->
-                                    DropdownMenuItem(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        text = {
-                                            Text(
-                                                text = role.name,
-                                                style = MaterialTheme.typography.bodyMedium
-                                            )
-                                        },
-                                        onClick = {
-                                            onRoleSelected(role)
-                                            isRoleDropdownOpen = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-                    }
+                Text(text = "Select a Role:")
+                RoleSelection(
+                    selectedRole = uiState.selectedRole,
+                    onRoleSelected = onRoleSelected
+                )
+                Text(text = "Select a Hero:")
+                if (uiState.isLoadingHeroes) {
+                    FullScreenLoadingIndicator("Heroes")
+                } else {
+                    HeroSelection(
+                        modifier = Modifier.weight(1f),
+                        selectedHeroId = uiState.selectedHeroId,
+                        heroes = uiState.heroes,
+                        onHeroSelected = onHeroSelected
+                    )
                 }
-                Row(
+                ElevatedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    enabled = uiState.selectedHeroId != null && uiState.selectedRole != null,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    onClick = { navigateToBuildDetails() }
                 ) {
-                    ElevatedButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            contentColor = MaterialTheme.colorScheme.primaryContainer
-                        ),
-                        onClick = navigateToBuildDetails
-                    ) {
-                        Text(text = "Next")
-                    }
+                    Text(text = "Next")
                 }
             }
         }
     }
+}
+
+@Composable
+fun RoleSelection(
+    modifier: Modifier = Modifier,
+    selectedRole: HeroRole? = HeroRole.UNKNOWN,
+    onRoleSelected: (HeroRole) -> Unit = {}
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        HeroRole.entries.filter {
+            it != HeroRole.UNKNOWN
+
+        }.forEach {
+            RoleButton(
+                modifier = Modifier.weight(1f),
+                isSelected = it.roleName == selectedRole?.name?.lowercase(),
+                role = it,
+                label = it.roleName,
+                onClick = { onRoleSelected(HeroRole.valueOf(it.roleName.uppercase())) }
+            )
+        }
+    }
+}
+
+@Composable
+fun HeroSelection(
+    modifier: Modifier = Modifier,
+    selectedHeroId: Int? = null,
+    heroes: List<HeroDetails> = emptyList(),
+    onHeroSelected: (HeroDetails) -> Unit
+) {
+
+    val listState = rememberLazyGridState()
+
+    LazyVerticalGrid(
+        modifier = modifier.fillMaxSize(),
+        state = listState,
+        columns = GridCells.Fixed(4),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        items(heroes) { hero ->
+            HeroCard(
+                hero = hero,
+                isSelected = hero.id == selectedHeroId,
+                labelTextStyle = MaterialTheme.typography.bodySmall,
+                onClick = { onHeroSelected(hero) }
+            )
+
+        }
+    }
+}
+
+@Composable
+fun RoleButton(
+    modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
+    role: HeroRole,
+    label: String,
+    onClick: () -> Unit
+) {
+
+    IconButton(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .background(
+                color = if (isSelected)
+                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f)
+                else Color.Transparent,
+                shape = RoundedCornerShape(8.dp)
+            ),
+        onClick = onClick,
+
+        ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painterResource(id = role.drawableId),
+                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                contentDescription = role.roleName
+            )
+            Text(
+                text = label.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Normal),
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+            )
+        }
+    }
+
+
 }
 
 @Preview(
@@ -242,10 +243,93 @@ fun HeroAndRoleSelectionScreen(
 fun HeroAndRoleSelectionScreenPreview() {
     MonolithTheme {
         HeroAndRoleSelectionScreen(
-            uiState = AddBuildState(),
+            uiState = AddBuildState(
+                isLoadingHeroes = false,
+                heroes = listOf(
+                    HeroDetails(id = 3, imageId = Hero.NARBASH.drawableId, displayName = "Narbash"),
+                    HeroDetails(
+                        id = 4,
+                        imageId = Hero.BELICA.drawableId,
+                        displayName = "Lt. Belica"
+                    ),
+                    HeroDetails(
+                        id = 5,
+                        imageId = Hero.COUNTESS.drawableId,
+                        displayName = "Countess"
+                    ),
+                ),
+                selectedRole = HeroRole.CARRY,
+                selectedHeroId = 3
+            ),
             onHeroSelected = {},
             onRoleSelected = {},
             navigateToBuildDetails = {}
         )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun RoleSelectionPreview() {
+    MonolithTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Spacer(modifier = Modifier.padding(16.dp))
+                RoleSelection(
+                    selectedRole = HeroRole.JUNGLE
+                )
+                Spacer(modifier = Modifier.padding(16.dp))
+            }
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@LightDarkPreview
+@Composable
+fun HeroSelectionPreview() {
+    MonolithTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Spacer(modifier = Modifier.padding(16.dp))
+                HeroSelection(
+                    selectedHeroId = 3,
+                    heroes = listOf(
+                        HeroDetails(
+                            id = 3,
+                            imageId = Hero.NARBASH.drawableId,
+                            displayName = "Narbash"
+                        ),
+                        HeroDetails(
+                            id = 4,
+                            imageId = Hero.BELICA.drawableId,
+                            displayName = "Lt. Belica"
+                        ),
+                        HeroDetails(
+                            id = 5,
+                            imageId = Hero.COUNTESS.drawableId,
+                            displayName = "Countess"
+                        ),
+                    ),
+                ) {
+
+                }
+                Spacer(modifier = Modifier.padding(16.dp))
+            }
+        }
     }
 }

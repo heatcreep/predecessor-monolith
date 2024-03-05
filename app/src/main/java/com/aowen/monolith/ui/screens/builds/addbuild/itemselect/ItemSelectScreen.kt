@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildState
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
@@ -71,7 +70,7 @@ fun ItemSelectScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ItemsList(
-    selectedItems: List<ItemDetails> = emptyList(),
+    selectedItems: List<Int> = emptyList(),
     changeItemOrder: (Int, Int) -> Unit
 ) {
 
@@ -98,7 +97,7 @@ fun ItemsList(
         state = listState,
 
         ) {
-        itemsIndexed(selectedItems, key = { _, item -> item.id }) { index, item ->
+        itemsIndexed(selectedItems, key = { _, item -> item }) { index, item ->
             DraggableItem(
                 dragDropState = dragDropState,
                 index = index
@@ -109,7 +108,7 @@ fun ItemsList(
                     label = "",
                 )
                 Image(
-                    painter = painterResource(id = getItemImage(item.id)),
+                    painter = painterResource(id = getItemImage(item)),
                     contentDescription = null,
                     modifier = Modifier
                         .size(80.dp)
@@ -120,27 +119,49 @@ fun ItemsList(
     }
 }
 
+enum class DragDirection {
+    Horizontal,
+    Vertical
+}
+
 @ExperimentalFoundationApi
 @Composable
 fun LazyItemScope.DraggableItem(
     dragDropState: DragDropState,
     index: Int,
     modifier: Modifier = Modifier,
+    dragDirection: DragDirection = DragDirection.Horizontal,
     content: @Composable ColumnScope.(isDragging: Boolean) -> Unit
 ) {
     val dragging = index == dragDropState.draggingItemIndex
     val draggingModifier = if (dragging) {
         Modifier
             .zIndex(1f)
-            .graphicsLayer {
-                translationX = dragDropState.draggingItemOffset
-            }
+            .then(
+                when (dragDirection) {
+                    DragDirection.Horizontal -> Modifier.graphicsLayer {
+                        translationX = dragDropState.draggingItemOffset
+                    }
+
+                    DragDirection.Vertical -> Modifier.graphicsLayer {
+                        translationY = dragDropState.draggingItemOffset
+                    }
+                }
+            )
     } else if (index == dragDropState.previousIndexOfDraggedItem) {
         Modifier
             .zIndex(1f)
-            .graphicsLayer {
-                translationX = dragDropState.previousItemOffset.value
-            }
+            .then(
+                when (dragDirection) {
+                    DragDirection.Horizontal -> Modifier.graphicsLayer {
+                        translationX = dragDropState.previousItemOffset.value
+                    }
+
+                    DragDirection.Vertical -> Modifier.graphicsLayer {
+                        translationY = dragDropState.previousItemOffset.value
+                    }
+                }
+            )
     } else {
         Modifier.animateItemPlacement()
     }
@@ -209,11 +230,7 @@ fun SelectedItemsRowPreview() {
         ) {
             ItemsList(
                 selectedItems = listOf(
-                    ItemDetails(1),
-                    ItemDetails(2),
-                    ItemDetails(3),
-                    ItemDetails(4),
-                    ItemDetails(5)
+                    1, 2, 3, 4, 5
                 ),
                 changeItemOrder = { _, _ -> }
             )
