@@ -45,10 +45,10 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
+import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchPlayerDetails
-import com.aowen.monolith.data.RoleImage
-import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.data.getKda
 import com.aowen.monolith.ui.common.PlayerIcon
@@ -67,7 +67,7 @@ fun PlayerRow(
 
     var expanded by rememberSaveable { mutableStateOf(false) }
 
-    val roleImage = RoleImage.entries.first {
+    val roleImage = HeroRole.entries.first {
         it.roleName == player.role
     }
 
@@ -129,7 +129,7 @@ fun PlayerRow(
                         modifier = Modifier.clickable {
                             navigateToPlayerDetails(player.playerId)
                         },
-                        heroImageId = getHeroImage(player.heroId).drawableId,
+                        heroImageId = getHeroRole(player.heroId).drawableId,
                     ) {
                         Image(
                             modifier = Modifier
@@ -164,26 +164,27 @@ fun PlayerRow(
 
             }
         }
-        AnimatedVisibility(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            visible = expanded,
-            enter = expandHorizontally(
-                expandFrom = Alignment.CenterHorizontally
-            ),
-            exit = shrinkHorizontally(
-                shrinkTowards = Alignment.CenterHorizontally
-            )
-        ) {
-            HorizontalDivider(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(horizontal = 32.dp),
-                color = MaterialTheme.colorScheme.tertiary,
-                thickness = 1.dp
-            )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandHorizontally(
+                    expandFrom = Alignment.CenterHorizontally
+                ),
+                exit = shrinkHorizontally(
+                    shrinkTowards = Alignment.CenterHorizontally
+                )
+            ) {
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(horizontal = 32.dp),
+                    color = MaterialTheme.colorScheme.tertiary,
+                    thickness = 1.dp
+                )
+            }
         }
+
         AnimatedVisibility(
             visible = expanded,
             exit = shrinkVertically(

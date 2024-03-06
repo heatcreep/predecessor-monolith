@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -49,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -262,12 +265,15 @@ fun HeroesScreen(
 fun HeroCard(
     hero: HeroDetails,
     modifier: Modifier = Modifier,
+    labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    isSelected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
 
     val image = hero.imageId ?: R.drawable.unknown
     Box(
         modifier = modifier
+            .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .clickable {
                 onClick()
@@ -280,45 +286,88 @@ fun HeroCard(
             contentScale = ContentScale.FillWidth,
             contentDescription = hero.displayName
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        listOf(
-                            Color.Transparent,
-                            Color.Black
-                        ),
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                )
-                .padding(top = 20.dp, bottom = 4.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = hero.displayName,
-                style = MaterialTheme.typography.bodyMedium,
-                color = WarmWhite
+        if (isSelected) {
+            Box(
+                modifier = Modifier
+                    .aspectRatio(1f)
+                    .fillMaxSize()
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
+                        shape = RoundedCornerShape(8.dp)
+                    )
             )
+            Column(
+                modifier = modifier
+                    .aspectRatio(1f)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    modifier = Modifier.size(36.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.size(12.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 4.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = hero.displayName,
+                        style = labelTextStyle,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            listOf(
+                                Color.Transparent,
+                                Color.Black
+                            ),
+                        ),
+                        shape = RoundedCornerShape(4.dp),
+                    )
+                    .padding(top = 20.dp, bottom = 4.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = hero.displayName,
+                    style = labelTextStyle,
+                    color = WarmWhite
+                )
+            }
         }
     }
 }
 
 
 @Preview(
-    showBackground = true,
     group = "Hero Card"
 )
 @Composable
 fun HeroCardPreview() {
     MonolithTheme {
-        Surface {
-            HeroCard(
-                hero = HeroDetails(
-                    imageId = Hero.NARBASH.drawableId,
+        LazyVerticalGrid(GridCells.Fixed(5)) {
+            items(5) {
+                HeroCard(
+                    hero = HeroDetails(
+                        imageId = Hero.NARBASH.drawableId,
+                        displayName = "Narbash"
+                    ),
+                    isSelected = true
                 )
-            )
+            }
         }
+
     }
 }
 

@@ -1,23 +1,26 @@
 package com.aowen.monolith.ui.screens.builds.addbuild
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.ItemModule
+import com.aowen.monolith.network.OmedaCityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class AddBuildState(
-    val selectedHero: Int? = null,
+    val isLoadingHeroes: Boolean = true,
+    val heroes: List<HeroDetails> = emptyList(),
+    val items: List<ItemDetails> = emptyList(),
+    val selectedHeroId: Int? = null,
     val selectedRole: HeroRole? = null,
-    val selectedCrest: ItemDetails? = null,
-    val selectedItems: List<ItemDetails> = listOf(
-        ItemDetails(1),
-        ItemDetails(2),
-        ItemDetails(3),
-        ItemDetails(4),
-        ItemDetails(5),
-    ),
+    val selectedCrestId: Int? = null,
+    val selectedItems: List<Int> = emptyList(),
     val skillOrder: List<Int> = listOf(
         -1,
         -1,
@@ -38,20 +41,45 @@ data class AddBuildState(
         -1,
         -1
     ),
-    val firstBuyItem: ItemDetails? = null,
-    val selectedCoreItems: List<ItemDetails> = emptyList(),
-    val selectedFlexItems: List<ItemDetails> = emptyList(),
+    val modules: List<ItemModule> = emptyList(),
+    val buildTitle: String = "",
     val buildDescription: String? = null
 )
 
 @HiltViewModel
-class AddBuildViewModel @Inject constructor() : ViewModel() {
+class AddBuildViewModel @Inject constructor(
+    val repository: OmedaCityRepository
+) : ViewModel() {
 
     private val _uiState: MutableStateFlow<AddBuildState> = MutableStateFlow(AddBuildState())
     val uiState = _uiState
 
-    fun onHeroSelected(heroId: Int) {
-        _uiState.value = _uiState.value.copy(selectedHero = heroId)
+    init {
+        initViewModel()
+    }
+
+    fun initViewModel() {
+        viewModelScope.launch {
+            val heroesResultDeferred = async { repository.fetchAllHeroes() }
+            val itemsResultDeferred = async { repository.fetchAllItems() }
+            val heroesResult = heroesResultDeferred.await()
+            val itemsResult = itemsResultDeferred.await()
+            if(heroesResult.isSuccess && itemsResult.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingHeroes = false,
+                    heroes = heroesResult.getOrNull() ?: emptyList(),
+                    items = itemsResult.getOrNull() ?: emptyList()
+                )
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingHeroes = false
+                )
+            }
+        }
+    }
+
+    fun onHeroSelected(hero: HeroDetails) {
+        _uiState.value = _uiState.value.copy(selectedHeroId = hero.id)
     }
 
     fun onRoleSelected(role: HeroRole) {
@@ -59,7 +87,7 @@ class AddBuildViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onCrestSelected(crest: ItemDetails) {
-        _uiState.value = _uiState.value.copy(selectedCrest = crest)
+        _uiState.value = _uiState.value.copy(selectedCrestId = crest.id)
     }
 
     fun onSkillSelected(skillIndex: Int, skillId: Int) {
@@ -69,8 +97,16 @@ class AddBuildViewModel @Inject constructor() : ViewModel() {
             })
     }
 
-    fun onItemAdded(item: ItemDetails) {
-        _uiState.value = _uiState.value.copy(selectedItems = _uiState.value.selectedItems + item)
+    fun onItemAdded(itemId: Int) {
+        _uiState.value = _uiState.value.copy(selectedItems = _uiState.value.selectedItems + itemId)
+    }
+
+    fun onChangeModuleOrder(fromIndex: Int, toIndex: Int) {
+        val newModuleOrder = _uiState.value.modules.toMutableList().apply {
+            val module = removeAt(fromIndex)
+            add(toIndex, module)
+        }
+        _uiState.value = _uiState.value.copy(modules = newModuleOrder)
     }
 
     fun onChangeItemOrder(fromIndex: Int, toIndex: Int) {
@@ -81,18 +117,15 @@ class AddBuildViewModel @Inject constructor() : ViewModel() {
         _uiState.value = _uiState.value.copy(selectedItems = newItemOrder)
     }
 
-    fun onFirstBuyItemSelected(item: ItemDetails) {
-        _uiState.value = _uiState.value.copy(firstBuyItem = item)
+    fun onCreateNewModule(title: String, itemIds: List<Int>) {
+        _uiState.value = _uiState.value.copy(modules = _uiState.value.modules.plus(ItemModule(
+            title = title,
+            items = itemIds
+        )))
     }
 
-    fun onCoreItemSelected(item: ItemDetails) {
-        _uiState.value =
-            _uiState.value.copy(selectedCoreItems = _uiState.value.selectedCoreItems + item)
-    }
-
-    fun onFlexItemSelected(item: ItemDetails) {
-        _uiState.value =
-            _uiState.value.copy(selectedFlexItems = _uiState.value.selectedFlexItems + item)
+    fun onBuildTitleChanged(title: String) {
+        _uiState.value = _uiState.value.copy(buildTitle = title)
     }
 
     fun onBuildDescriptionChanged(description: String) {

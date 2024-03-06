@@ -78,14 +78,6 @@ fun FavoriteHeroDto.create(): FavoriteHero =
         updatedAt = updatedAt,
     )
 
-enum class HeroRole {
-    Midlane,
-    Offlane,
-    Jungle,
-    Carry,
-    Support,
-}
-
 enum class HeroClass {
     Assassin,
     Fighter,

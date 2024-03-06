@@ -35,9 +35,8 @@ import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.Team
-import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getKda
-import com.aowen.monolith.data.getRoleImage
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.KDAText
 import com.aowen.monolith.ui.theme.DarkGreenHighlight
@@ -167,7 +166,7 @@ fun MatchPlayerCard(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             PlayerIcon(
-                                heroImageId = getHeroImage(playerHero.heroId).drawableId
+                                heroImageId = getHeroRole(playerHero.heroId).drawableId
                             ) {
                                 Image(
                                     modifier = Modifier
@@ -183,7 +182,7 @@ fun MatchPlayerCard(
                                     contentScale = ContentScale.Crop,
                                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
                                     painter = painterResource(
-                                        id = getRoleImage(playerHero.role).drawableId
+                                        id = getHeroRole(playerHero.role).drawableId
                                     ),
                                     contentDescription = null
                                 )
@@ -191,7 +190,7 @@ fun MatchPlayerCard(
                             Spacer(modifier = Modifier.size(8.dp))
                             Column {
                                 Text(
-                                    text = getHeroImage(it.heroId).heroName,
+                                    text = getHeroRole(it.heroId).heroName,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.secondary
                                 )

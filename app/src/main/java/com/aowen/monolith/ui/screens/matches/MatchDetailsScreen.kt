@@ -61,7 +61,7 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.Team
-import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.navigation.navigateToPlayerDetails
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.theme.Dawn
@@ -565,7 +565,7 @@ fun RowScope.MatchStatsPlayerImageRow(
                 .aspectRatio(1f),
             contentScale = ContentScale.Crop,
             painter = painterResource(
-                id = getHeroImage(player.heroId).drawableId
+                id = getHeroRole(player.heroId).drawableId
             ),
             contentDescription = null
         )

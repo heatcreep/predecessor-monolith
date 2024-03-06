@@ -69,7 +69,7 @@ import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.getAbilityKey
-import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
@@ -197,7 +197,7 @@ fun HeroOverviewScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 PlayerIcon(
-                    heroImageId = getHeroImage(uiState.hero.id).drawableId,
+                    heroImageId = getHeroRole(uiState.hero.id).drawableId,
                     heroIconSize = 64.dp
                 )
                 Spacer(modifier = Modifier.size(16.dp))

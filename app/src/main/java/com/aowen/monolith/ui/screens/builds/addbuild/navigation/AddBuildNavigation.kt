@@ -11,14 +11,13 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
-import com.aowen.monolith.ui.screens.builds.addbuild.builddetails.BuildDetailsRoute
-import com.aowen.monolith.ui.screens.builds.addbuild.heroroleselect.HeroAndRoleSelectionRoute
-import com.aowen.monolith.ui.screens.builds.addbuild.itemselect.ItemSelectRoute
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.AddBuildDetailsRoute
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.addBuildDetailsScreen
+import com.aowen.monolith.ui.screens.builds.addbuild.HeroAndRoleSelectionRoute
 
 const val AddBuildRoute = "add-build"
 const val HeroRoleSelectionRoute = "hero-and-role-selection"
-const val BuildDetailsRoute = "build-details"
-const val ItemSelectRoute = "item-select"
+
 
 
 fun NavController.navigateToAddBuildFlow(navOptions: NavOptions? = null) {
@@ -26,11 +25,7 @@ fun NavController.navigateToAddBuildFlow(navOptions: NavOptions? = null) {
 }
 
 fun NavController.navigateToAddBuildDetails(navOptions: NavOptions? = null) {
-    this.navigate(BuildDetailsRoute, navOptions)
-}
-
-fun NavController.navigateToItemSelect(navOptions: NavOptions? = null) {
-    this.navigate(ItemSelectRoute, navOptions)
+    this.navigate(AddBuildDetailsRoute, navOptions)
 }
 
 fun NavGraphBuilder.addBuildsScreen(
@@ -49,30 +44,8 @@ fun NavGraphBuilder.addBuildsScreen(
                 viewModel = addBuildViewModel
             )
         }
-        composable(
-            route = BuildDetailsRoute
-        ) { backStackEntry ->
-            val addBuildViewModel = backStackEntry
-                .sharedViewModel<AddBuildViewModel>(
-                    navController = navController
-                )
-            BuildDetailsRoute(
-                navController = navController,
-                viewModel = addBuildViewModel
-            )
-        }
-        composable(
-            route = ItemSelectRoute
-        ) { backStackEntry ->
-            val addBuildViewModel = backStackEntry
-                .sharedViewModel<AddBuildViewModel>(
-                    navController = navController
-                )
-            ItemSelectRoute(
-                navController = navController,
-                viewModel = addBuildViewModel
-            )
-        }
+        addBuildDetailsScreen(navController)
+
 
     }
 }
