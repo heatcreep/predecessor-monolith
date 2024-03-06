@@ -8,6 +8,7 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.network.OmedaCityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -15,6 +16,7 @@ import javax.inject.Inject
 data class AddBuildState(
     val isLoadingHeroes: Boolean = true,
     val heroes: List<HeroDetails> = emptyList(),
+    val items: List<ItemDetails> = emptyList(),
     val selectedHeroId: Int? = null,
     val selectedRole: HeroRole? = null,
     val selectedCrestId: Int? = null,
@@ -58,11 +60,15 @@ class AddBuildViewModel @Inject constructor(
 
     fun initViewModel() {
         viewModelScope.launch {
-            val heroesResult = repository.fetchAllHeroes()
-            if(heroesResult.isSuccess) {
+            val heroesResultDeferred = async { repository.fetchAllHeroes() }
+            val itemsResultDeferred = async { repository.fetchAllItems() }
+            val heroesResult = heroesResultDeferred.await()
+            val itemsResult = itemsResultDeferred.await()
+            if(heroesResult.isSuccess && itemsResult.isSuccess) {
                 _uiState.value = _uiState.value.copy(
                     isLoadingHeroes = false,
-                    heroes = heroesResult.getOrNull() ?: emptyList()
+                    heroes = heroesResult.getOrNull() ?: emptyList(),
+                    items = itemsResult.getOrNull() ?: emptyList()
                 )
             } else {
                 _uiState.value = _uiState.value.copy(

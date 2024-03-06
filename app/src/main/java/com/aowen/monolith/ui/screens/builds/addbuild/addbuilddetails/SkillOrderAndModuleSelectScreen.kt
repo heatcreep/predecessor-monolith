@@ -1,4 +1,4 @@
-package com.aowen.monolith.ui.screens.builds.addbuild.skillmoduleselect
+package com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -24,6 +25,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,10 +57,15 @@ import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildState
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
-import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToItemSelect
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.navigateToAddModule
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.navigateToEditModuleOrder
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.navigateToItemSelect
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.navigateToSkillOrderSelect
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.navigateToTitleAndDescription
 import com.aowen.monolith.ui.screens.builds.builddetails.SkillOrderScrollableRow
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
+import com.meetup.twain.MarkdownText
 
 @Composable
 fun SkillOrderAndModuleSelectRoute(
@@ -70,16 +78,25 @@ fun SkillOrderAndModuleSelectRoute(
         uiState = uiState,
         onSkillSelected = viewModel::onSkillSelected,
         onBuildTitleChanged = viewModel::onBuildTitleChanged,
-        navigateToItemSelect = navController::navigateToItemSelect
+        navigateToItemSelect = navController::navigateToItemSelect,
+        navigateToSkillOrderSelect = navController::navigateToSkillOrderSelect,
+        navigateToAddModule = navController::navigateToAddModule,
+        navigateToEditModuleOrder = navController::navigateToEditModuleOrder,
+        navigateToEditTitleAndDescription = navController::navigateToTitleAndDescription
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SkillOrderAndModuleSelectScreen(
     uiState: AddBuildState,
     onSkillSelected: (Int, Int) -> Unit,
     onBuildTitleChanged: (String) -> Unit,
-    navigateToItemSelect: () -> Unit
+    navigateToItemSelect: () -> Unit,
+    navigateToSkillOrderSelect: () -> Unit,
+    navigateToEditModuleOrder: () -> Unit = {},
+    navigateToAddModule: () -> Unit = {},
+    navigateToEditTitleAndDescription: () -> Unit = {}
 ) {
 
     var isSkillOrderEnabled by rememberSaveable { mutableStateOf(true) }
@@ -92,10 +109,11 @@ fun SkillOrderAndModuleSelectScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            // Items
             SectionWithAction(
                 title = "Items",
                 action = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = navigateToItemSelect) {
                         Icon(
                             imageVector = if (uiState.selectedItems.isEmpty()) Icons.Default.Add else Icons.Default.Edit,
                             tint = MaterialTheme.colorScheme.secondary,
@@ -116,7 +134,7 @@ fun SkillOrderAndModuleSelectScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     if (uiState.selectedItems.isEmpty()) {
-                        Text("No items added. Tap the '+' button to add items.")
+                        Text(text = "No items added. Tap the '+' button to add items.")
                     } else {
                         Box(modifier = Modifier
                             .weight(1f)
@@ -163,6 +181,7 @@ fun SkillOrderAndModuleSelectScreen(
                 }
                 Spacer(modifier = Modifier.size(16.dp))
             }
+            // Skill Order
             SectionWithAction(
                 title = "Skill Order",
                 action = {
@@ -216,7 +235,7 @@ fun SkillOrderAndModuleSelectScreen(
                             skillOrder = uiState.skillOrder
                         )
                         Row {
-                            IconButton(onClick = { /*TODO*/ }) {
+                            IconButton(onClick = navigateToSkillOrderSelect) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
                                     tint = MaterialTheme.colorScheme.secondary,
@@ -227,15 +246,27 @@ fun SkillOrderAndModuleSelectScreen(
                     }
                 }
             }
+            // Modules
             SectionWithAction(
                 title = "Modules",
                 action = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            tint = MaterialTheme.colorScheme.secondary,
-                            contentDescription = "Add Module"
-                        )
+                    Row {
+                        if (uiState.modules.isNotEmpty()) {
+                            IconButton(onClick = navigateToEditModuleOrder) {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    contentDescription = "Edit Module Order"
+                                )
+                            }
+                        }
+                        IconButton(onClick = navigateToAddModule) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                contentDescription = "Add Module"
+                            )
+                        }
                     }
                 },
             ) {
@@ -313,10 +344,11 @@ fun SkillOrderAndModuleSelectScreen(
 
             }
             Spacer(modifier = Modifier.size(16.dp))
+            // Title and Description
             SectionWithAction(
                 title = "Title and Description",
                 action = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = navigateToEditTitleAndDescription) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             tint = MaterialTheme.colorScheme.secondary,
@@ -330,19 +362,58 @@ fun SkillOrderAndModuleSelectScreen(
                     thickness = 1.dp
                 )
                 Spacer(modifier = Modifier.size(16.dp))
-                Row(
 
-                ) {
-                    Text(
-                        text = "Title: ",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    Text(
-                        text = uiState.buildTitle,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                if (uiState.buildTitle.isEmpty()) {
+                    Text(text = "Tap the '+' button to add a title and description.")
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.secondary)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            text = uiState.buildTitle,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 16.sp
+                            ),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        uiState.buildDescription?.let {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                MarkdownText(
+                                    markdown = it,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    maxLines = 4
+                                )
+                            }
+                        }
+                    }
                 }
+
+
+            }
+            Spacer(modifier = Modifier.size(16.dp))
+            ElevatedButton(
+                modifier = Modifier.fillMaxWidth(),
+                enabled = uiState.selectedHeroId != null && uiState.selectedRole != null,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    contentColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                onClick = { /*TODO*/ }
+            ) {
+                Text(text = "Save Build")
             }
         }
     }
@@ -382,6 +453,11 @@ fun SkillOrderAndModuleSelectScreenPreview() {
         SkillOrderAndModuleSelectScreen(
             uiState = AddBuildState(
                 buildTitle = "Super Tank Narbash",
+                buildDescription = """
+                    ## Core Items
+                    
+                    First up there's Wayfarer's Bauble. It's a great first item and I love it so much. This is just more text. akdjwakawjdkajdakdjwdkawjdakdjwakdkdajwdklawjdaklwjawlkdjawlkdajwdklajdklawdjawkldjadklajdalwkdjalkdjwakldjadlkawjdlakwdjawlkdjawlkdjawkldwad
+                """.trimIndent(),
                 selectedCrestId = 37,
                 selectedItems = listOf(1, 2, 3, 4, 5),
                 modules = listOf(
@@ -407,7 +483,11 @@ fun SkillOrderAndModuleSelectScreenPreview() {
             ),
             onSkillSelected = { _, _ -> },
             navigateToItemSelect = { },
-            onBuildTitleChanged = { }
+            onBuildTitleChanged = { },
+            navigateToSkillOrderSelect = { },
+            navigateToEditModuleOrder = { },
+            navigateToAddModule = { },
+            navigateToEditTitleAndDescription = { }
         )
 
     }

@@ -1,4 +1,4 @@
-package com.aowen.monolith.ui.screens.builds.addbuild.skillorder
+package com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildState
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
-import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToItemSelect
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.navigateToItemSelect
 import com.aowen.monolith.ui.theme.MonolithTheme
 
 @Composable

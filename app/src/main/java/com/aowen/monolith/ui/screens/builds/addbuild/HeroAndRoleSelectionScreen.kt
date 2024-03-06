@@ -1,4 +1,4 @@
-package com.aowen.monolith.ui.screens.builds.addbuild.heroroleselect
+package com.aowen.monolith.ui.screens.builds.addbuild
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -42,8 +42,6 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildState
-import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
 import com.aowen.monolith.ui.screens.builds.addbuild.navigation.navigateToAddBuildDetails
 import com.aowen.monolith.ui.screens.heroes.HeroCard
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -100,11 +98,11 @@ fun HeroAndRoleSelectionScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
-                .padding(horizontal = 16.dp)
 
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(text = "Select a Role:")

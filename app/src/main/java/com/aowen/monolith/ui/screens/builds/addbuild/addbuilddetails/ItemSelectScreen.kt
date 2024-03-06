@@ -1,4 +1,4 @@
-package com.aowen.monolith.ui.screens.builds.addbuild.itemselect
+package com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
@@ -18,7 +18,16 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -52,19 +61,48 @@ fun ItemSelectRoute(
 
     ItemSelectScreen(
         uiState = uiState,
+        navigateBack = navController::navigateUp,
         changeItemOrder = viewModel::onChangeItemOrder
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemSelectScreen(
     uiState: AddBuildState,
+    navigateBack: () -> Unit,
     changeItemOrder: (Int, Int) -> Unit
 ) {
-    ItemsList(
-        selectedItems = uiState.selectedItems,
-        changeItemOrder = changeItemOrder
-    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "SelectItems",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = navigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "navigate up"
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Surface(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            ItemsList(
+                selectedItems = uiState.selectedItems,
+                changeItemOrder = changeItemOrder
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
