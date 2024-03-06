@@ -16,6 +16,7 @@ fun getRoleImage(roleName: String? = "") : RoleImage = RoleImage.entries.firstOr
 } ?: RoleImage.UNKNOWN
 
 enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
+    ARGUS("Argus", 49, R.drawable.argus),
     BELICA("Lt. Belica",  13, R.drawable.belica),
     COUNTESS("Countess", 1, R.drawable.countess),
     CRUNCH("Crunch", 2, R.drawable.crunch),

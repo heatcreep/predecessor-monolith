@@ -77,7 +77,7 @@ class HeroesScreenViewModel @Inject constructor(
 
             val heroesResult = repository.fetchAllHeroes()
             if (heroesResult.isSuccess) {
-                val heroes = heroesResult.getOrNull() ?: emptyList()
+                val heroes = heroesResult.getOrNull()?.sortedBy { it.displayName } ?: emptyList()
                 _uiState.update {
                     it.copy(
                         isLoading = false,

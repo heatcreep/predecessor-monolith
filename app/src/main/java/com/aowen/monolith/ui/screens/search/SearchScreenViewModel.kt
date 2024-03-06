@@ -20,6 +20,8 @@ data class SearchScreenUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val searchError: String? = null,
+    val claimedUserError: String? = null,
+    val recentSearchError: String? = null,
     val isLoadingSearch: Boolean = false,
     val playersList: List<PlayerDetails?> = emptyList(),
     val recentSearchesList: List<PlayerDetails?> = emptyList(),
@@ -62,7 +64,7 @@ class SearchScreenViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = "Failed to fetch claimed user"
+                            claimedUserError = "Failed to fetch claimed user"
                         )
                     }
                 }

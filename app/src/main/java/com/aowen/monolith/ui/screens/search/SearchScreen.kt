@@ -214,6 +214,11 @@ fun SearchScreen(
                                         navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
                                     }
                                 )
+                            } else if(uiState.claimedUserError != null) {
+                                Text(
+                                    text = "There was an error fetching your claimed player. Please try again or search for your player and claim again.",
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
                             } else {
                                 Text(
                                     text = "No player claimed! Navigate to a player's profile and click the" +
@@ -270,7 +275,7 @@ fun SearchScreen(
                             }
                         }
                     }
-                    if (uiState.playersList.isEmpty()) {
+                    if (uiState.playersList.isNotEmpty()) {
                         TextButton(onClick = { alertDialogIsOpen = true }) {
                             Text(
                                 text = "Clear All",

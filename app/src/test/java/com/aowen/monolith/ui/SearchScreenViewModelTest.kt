@@ -256,7 +256,7 @@ class SearchScreenViewModelTest {
         viewModel.initViewModel()
         val expected = SearchScreenUiState(
             isLoading = false,
-            error = "Failed to fetch claimed user"
+            claimedUserError = "Failed to fetch claimed user"
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
