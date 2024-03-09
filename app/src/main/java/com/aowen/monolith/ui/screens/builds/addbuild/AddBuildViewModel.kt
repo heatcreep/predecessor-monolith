@@ -2,6 +2,7 @@ package com.aowen.monolith.ui.screens.builds.addbuild
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aowen.monolith.data.AbilityDetails
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.ItemDetails
@@ -17,10 +18,12 @@ data class AddBuildState(
     val isLoadingHeroes: Boolean = true,
     val heroes: List<HeroDetails> = emptyList(),
     val items: List<ItemDetails> = emptyList(),
-    val selectedHeroId: Int? = null,
+    val selectedHero: HeroDetails? = null,
     val selectedRole: HeroRole? = null,
-    val selectedCrestId: Int? = null,
-    val selectedItems: List<Int> = emptyList(),
+    val selectedCrestId: Int? = 37,
+    val selectedItems: List<Int> = listOf(
+        1,2,3,4
+    ),
     val skillOrder: List<Int> = listOf(
         -1,
         -1,
@@ -43,7 +46,8 @@ data class AddBuildState(
     ),
     val modules: List<ItemModule> = emptyList(),
     val buildTitle: String = "",
-    val buildDescription: String? = null
+    val buildDescription: String? = null,
+    val selectedSkill : AbilityDetails? = null
 )
 
 @HiltViewModel
@@ -79,7 +83,7 @@ class AddBuildViewModel @Inject constructor(
     }
 
     fun onHeroSelected(hero: HeroDetails) {
-        _uiState.value = _uiState.value.copy(selectedHeroId = hero.id)
+        _uiState.value = _uiState.value.copy(selectedHero = hero)
     }
 
     fun onRoleSelected(role: HeroRole) {
@@ -95,6 +99,10 @@ class AddBuildViewModel @Inject constructor(
             _uiState.value.copy(skillOrder = _uiState.value.skillOrder.toMutableList().apply {
                 this[skillIndex] = skillId
             })
+    }
+
+    fun onSkillDetailsSelected(skill: AbilityDetails) {
+        _uiState.value = _uiState.value.copy(selectedSkill = skill)
     }
 
     fun onItemAdded(itemId: Int) {

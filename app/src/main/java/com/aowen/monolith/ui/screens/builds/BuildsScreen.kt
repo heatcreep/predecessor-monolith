@@ -72,7 +72,6 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Hero
@@ -154,7 +153,7 @@ fun BuildsScreen(
 
     Scaffold(
         floatingActionButton = {
-            if (BuildConfig.DEBUG) {
+
                 MonolithCollapsableFabButton(
                     listState = scrollState,
                     icon = Icons.Filled.Add,
@@ -163,7 +162,7 @@ fun BuildsScreen(
                         navigateToAddBuildFlow()
                     }
                 )
-            }
+
 
         }
     ) {

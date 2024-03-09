@@ -10,8 +10,9 @@ import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.ItemSelectR
 import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.ModuleAddRoute
 import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.ModuleEditOrderRoute
 import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.SkillOrderAndModuleSelectRoute
-import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.SkillOrderRoute
 import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.TitleAndDescriptionRoute
+import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.skillorder.SkillOrderRoute
+import com.aowen.monolith.ui.screens.builds.addbuild.navigation.AddBuildRoute
 import com.aowen.monolith.ui.screens.builds.addbuild.navigation.sharedViewModel
 
 const val AddBuildDetailsRoute = "add-build-details"
@@ -49,42 +50,48 @@ fun NavGraphBuilder.addBuildDetailsScreen(
         composable(route = SkillOrderAndModuleMenuRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
-                    navController = navController
+                    navController = navController,
+                    parentRoute = AddBuildRoute
                 )
             SkillOrderAndModuleSelectRoute(navController, addBuildViewModel)
         }
         composable(route = ItemSelectRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
-                    navController = navController
+                    navController = navController,
+                    parentRoute = AddBuildRoute
                 )
             ItemSelectRoute(navController, addBuildViewModel)
         }
         composable(route = SkillOrderRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
-                    navController = navController
+                    navController = navController,
+                    parentRoute = AddBuildRoute
                 )
             SkillOrderRoute(navController, addBuildViewModel)
         }
         composable(route = ModuleAddRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
-                    navController = navController
+                    navController = navController,
+                    parentRoute = AddBuildRoute
                 )
             ModuleAddRoute(navController, addBuildViewModel)
         }
         composable(route = ModuleEditRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
-                    navController = navController
+                    navController = navController,
+                    parentRoute = AddBuildRoute
                 )
             ModuleEditOrderRoute(navController, addBuildViewModel)
         }
         composable(route = TitleAndDescriptionRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
-                    navController = navController
+                    navController = navController,
+                    parentRoute = AddBuildRoute
                 )
             TitleAndDescriptionRoute(navController, addBuildViewModel)
         }

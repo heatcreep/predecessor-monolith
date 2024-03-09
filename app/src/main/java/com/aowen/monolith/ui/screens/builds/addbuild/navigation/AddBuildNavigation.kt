@@ -11,13 +11,12 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
+import com.aowen.monolith.ui.screens.builds.addbuild.HeroAndRoleSelectionRoute
 import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.AddBuildDetailsRoute
 import com.aowen.monolith.ui.screens.builds.addbuild.addbuilddetails.navigation.addBuildDetailsScreen
-import com.aowen.monolith.ui.screens.builds.addbuild.HeroAndRoleSelectionRoute
 
 const val AddBuildRoute = "add-build"
 const val HeroRoleSelectionRoute = "hero-and-role-selection"
-
 
 
 fun NavController.navigateToAddBuildFlow(navOptions: NavOptions? = null) {
@@ -45,16 +44,17 @@ fun NavGraphBuilder.addBuildsScreen(
             )
         }
         addBuildDetailsScreen(navController)
-
-
     }
 }
 
 @Composable
-inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavController): T {
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
+    navController: NavController,
+    parentRoute: String? = null
+): T {
     val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
     val parentEntry = remember(this) {
-        navController.getBackStackEntry(navGraphRoute)
+        navController.getBackStackEntry(parentRoute ?: navGraphRoute)
     }
 
     return hiltViewModel(parentEntry)

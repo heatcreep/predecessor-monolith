@@ -116,14 +116,14 @@ fun HeroAndRoleSelectionScreen(
                 } else {
                     HeroSelection(
                         modifier = Modifier.weight(1f),
-                        selectedHeroId = uiState.selectedHeroId,
+                        selectedHero = uiState.selectedHero,
                         heroes = uiState.heroes,
                         onHeroSelected = onHeroSelected
                     )
                 }
                 ElevatedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = uiState.selectedHeroId != null && uiState.selectedRole != null,
+                    enabled = uiState.selectedHero != null && uiState.selectedRole != null,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentColor = MaterialTheme.colorScheme.primaryContainer
@@ -165,7 +165,7 @@ fun RoleSelection(
 @Composable
 fun HeroSelection(
     modifier: Modifier = Modifier,
-    selectedHeroId: Int? = null,
+    selectedHero: HeroDetails? = null,
     heroes: List<HeroDetails> = emptyList(),
     onHeroSelected: (HeroDetails) -> Unit
 ) {
@@ -182,7 +182,7 @@ fun HeroSelection(
         items(heroes) { hero ->
             HeroCard(
                 hero = hero,
-                isSelected = hero.id == selectedHeroId,
+                isSelected = hero.id == selectedHero?.id,
                 labelTextStyle = MaterialTheme.typography.bodySmall,
                 onClick = { onHeroSelected(hero) }
             )
@@ -257,7 +257,7 @@ fun HeroAndRoleSelectionScreenPreview() {
                     ),
                 ),
                 selectedRole = HeroRole.CARRY,
-                selectedHeroId = 3
+                selectedHero = HeroDetails(id = 3)
             ),
             onHeroSelected = {},
             onRoleSelected = {},
@@ -305,7 +305,7 @@ fun HeroSelectionPreview() {
             ) {
                 Spacer(modifier = Modifier.padding(16.dp))
                 HeroSelection(
-                    selectedHeroId = 3,
+                    selectedHero = HeroDetails(id = 3),
                     heroes = listOf(
                         HeroDetails(
                             id = 3,

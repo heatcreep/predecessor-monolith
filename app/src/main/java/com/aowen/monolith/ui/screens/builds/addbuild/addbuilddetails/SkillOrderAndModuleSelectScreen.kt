@@ -406,7 +406,7 @@ fun SkillOrderAndModuleSelectScreen(
             Spacer(modifier = Modifier.size(16.dp))
             ElevatedButton(
                 modifier = Modifier.fillMaxWidth(),
-                enabled = uiState.selectedHeroId != null && uiState.selectedRole != null,
+                enabled = uiState.selectedHero != null && uiState.selectedRole != null,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     contentColor = MaterialTheme.colorScheme.primaryContainer

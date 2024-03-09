@@ -48,7 +48,7 @@ fun ItemDetailsBottomSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = closeBottomSheet,
-        sheetState = sheetState,
+        sheetState = sheetState
     ) {
         ItemDetailsContent(
             modifier = modifier,

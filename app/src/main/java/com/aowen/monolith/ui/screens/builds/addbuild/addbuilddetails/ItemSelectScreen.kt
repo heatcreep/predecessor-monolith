@@ -78,7 +78,7 @@ fun ItemSelectScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "SelectItems",
+                        text = "Select Items",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.secondary
                     )
