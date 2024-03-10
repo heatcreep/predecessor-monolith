@@ -409,6 +409,10 @@ fun MatchStatsTab(
                     stats = team.players.map { it.totalDamageDealt.toString() }
                 )
                 MatchStatsRow(
+                    label = "Total Damage Dealt to Heroes",
+                    stats = team.players.map { it.totalDamageDealtToHeroes.toString() }
+                )
+                MatchStatsRow(
                     label = "Physical Damage Dealt",
                     stats = team.players.map { it.physicalDamageDealt.toString() }
                 )
