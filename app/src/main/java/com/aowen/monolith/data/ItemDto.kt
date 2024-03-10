@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 data class EffectDto(
     val name: String = "",
     val active: Boolean = false,
-    @SerialName("game_description")
-    val gameDescription: String? = "",
+    val condition: String? = "",
+    val cooldown: String?,
     @SerialName("menu_description")
     val menuDescription: String? = "",
 )

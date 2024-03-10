@@ -31,9 +31,16 @@ val RedHighlight = Color(0xFFAF6969)
 val DarkRedHighlight = Color(0xFF683D3D)
 val RedDanger = Color(0xFF9E0404)
 
+// Orange
+val OrangeHighlight = Color(0xFFAF8769)
+
+// Yellow
+val YellowHighlight = Color (0xFFAFAF69)
+
 // Blue
 val BlueHighlight = Color(0xFF6969AF)
 val Dusk = Color(0xFF22308D)
+val ManaBlue = Color(0xFF69AFA8)
 
 // SOCIAL
 

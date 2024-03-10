@@ -6,7 +6,8 @@ import com.aowen.monolith.network.RetrofitHelper
 data class EffectDetails(
     val name: String = "",
     val active: Boolean = false,
-    val gameDescription: String? = "",
+    val condition: String? = "",
+    val cooldown: String? = "",
     val menuDescription: String? = "",
 )
 
@@ -168,7 +169,8 @@ fun EffectDto.create(): EffectDetails {
     return EffectDetails(
         name = this.name,
         active = this.active,
-        gameDescription = this.gameDescription,
+        condition = this.condition,
+        cooldown = this.cooldown,
         menuDescription = this.menuDescription,
     )
 }

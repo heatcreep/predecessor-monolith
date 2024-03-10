@@ -140,7 +140,7 @@ fun HeroAndRoleSelectionScreen(
 @Composable
 fun RoleSelection(
     modifier: Modifier = Modifier,
-    selectedRole: HeroRole? = HeroRole.UNKNOWN,
+    selectedRole: HeroRole? = HeroRole.Unknown,
     onRoleSelected: (HeroRole) -> Unit = {}
 ) {
     Row(
@@ -148,7 +148,7 @@ fun RoleSelection(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         HeroRole.entries.filter {
-            it != HeroRole.UNKNOWN
+            it != HeroRole.Unknown
 
         }.forEach {
             RoleButton(
@@ -256,7 +256,7 @@ fun HeroAndRoleSelectionScreenPreview() {
                         displayName = "Countess"
                     ),
                 ),
-                selectedRole = HeroRole.CARRY,
+                selectedRole = HeroRole.Carry,
                 selectedHero = HeroDetails(id = 3)
             ),
             onHeroSelected = {},
@@ -281,7 +281,7 @@ fun RoleSelectionPreview() {
             ) {
                 Spacer(modifier = Modifier.padding(16.dp))
                 RoleSelection(
-                    selectedRole = HeroRole.JUNGLE
+                    selectedRole = HeroRole.Jungle
                 )
                 Spacer(modifier = Modifier.padding(16.dp))
             }

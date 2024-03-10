@@ -6,14 +6,14 @@ import com.aowen.monolith.data.ItemDto
 val effectDto1 = EffectDto(
     name = "Effect1",
     active = true,
-    gameDescription = "Effect 1 Game Description",
+    cooldown = "",
     menuDescription = "Effect 1 Menu Description"
 )
 
 val effectDto2 = EffectDto(
     name = "Effect2",
     active = false,
-    gameDescription = "Effect 2 Game Description",
+    cooldown = "",
     menuDescription = "Effect 2 Menu Description"
 )
 
