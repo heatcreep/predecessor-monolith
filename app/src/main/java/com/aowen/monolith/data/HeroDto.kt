@@ -59,7 +59,7 @@ data class HeroDto(
 data class FavoriteHeroDto(
     val id: Int,
     @SerialName("game_id")
-    val gameId: Int,
+    val gameId: Int? = 0,
     val name: String,
     @SerialName("display_name")
     val displayName: String,

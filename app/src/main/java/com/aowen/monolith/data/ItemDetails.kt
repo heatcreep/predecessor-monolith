@@ -214,7 +214,7 @@ fun ItemDto.create(): ItemDetails {
     }
     return ItemDetails(
         id = this.id,
-        gameId = this.gameId,
+        gameId = this.gameId ?: 0,
         name = this.name,
         displayName = this.displayName,
         image = RetrofitHelper.getRankImageUrl(this.image),

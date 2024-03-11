@@ -17,7 +17,7 @@ data class EffectDto(
 data class ItemDto(
     val id: Int = 0,
     @SerialName("game_id")
-    val gameId: Int = 0,
+    val gameId: Int? = 0,
     val name: String = "",
     @SerialName("display_name")
     val displayName: String = "",

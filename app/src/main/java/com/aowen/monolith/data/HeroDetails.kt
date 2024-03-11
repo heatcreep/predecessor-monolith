@@ -66,7 +66,7 @@ fun HeroDto.create(): HeroDetails =
 fun FavoriteHeroDto.create(): FavoriteHero =
     FavoriteHero(
         id = id,
-        gameId = gameId,
+        gameId = gameId ?: 0,
         name = name,
         displayName = displayName,
         stats = stats,
