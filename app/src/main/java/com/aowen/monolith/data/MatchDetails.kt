@@ -144,6 +144,11 @@ abstract class Team {
     data class Dusk(override val players: List<MatchPlayerDetails>) : Team()
 }
 
+data class MatchesDetails(
+    val matches: List<MatchDetails>,
+    val cursor: String? = ""
+)
+
 
 data class MatchDetails(
     val matchId: String = "",
@@ -155,6 +160,15 @@ data class MatchDetails(
     val dawn: Team = Team.Dawn(emptyList()),
     val dusk: Team = Team.Dusk(emptyList())
 )
+
+fun MatchesDto.create(): MatchesDetails {
+    return MatchesDetails(
+        matches = this.matches.map { match ->
+            match.create()
+        },
+        cursor = this.cursor
+    )
+}
 
 fun MatchDto.create(): MatchDetails {
     return MatchDetails(

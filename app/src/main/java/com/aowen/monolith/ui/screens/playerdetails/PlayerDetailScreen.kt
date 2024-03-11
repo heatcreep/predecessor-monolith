@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
 import com.aowen.monolith.data.HeroDetails
@@ -61,6 +62,8 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.logDebug
+import com.aowen.monolith.navigation.navigateToMatchDetails
+import com.aowen.monolith.navigation.navigateToMoreMatches
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.HeroSelectDropdown
 import com.aowen.monolith.ui.components.PlayerCard
@@ -74,7 +77,7 @@ import kotlinx.coroutines.launch
 internal fun PlayerDetailsRoute(
     modifier: Modifier = Modifier,
     viewModel: PlayerDetailsViewModel = hiltViewModel(),
-    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
+    navController: NavController
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -83,10 +86,10 @@ internal fun PlayerDetailsRoute(
         uiState = uiState,
         handleRetry = viewModel::initViewModel,
         modifier = modifier,
-        timeSinceMatch = viewModel::handleTimeSinceMatch,
         handleSavePlayer = viewModel::handleSavePlayer,
         handlePlayerHeroStatsSelect = viewModel::handlePlayerHeroStatsSelect,
-        navigateToMatchDetails = navigateToMatchDetails
+        navigateToMatchDetails = navController::navigateToMatchDetails,
+        navigateToMoreMatches = navController::navigateToMoreMatches
     )
 }
 
@@ -96,10 +99,10 @@ fun PlayerDetailScreen(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
-    timeSinceMatch: (String) -> String = { _ -> "" },
     handleSavePlayer: suspend (Boolean) -> Unit = {},
     handlePlayerHeroStatsSelect: (Int) -> Unit = { },
-    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> }
+    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
+    navigateToMoreMatches: (String) -> Unit = { }
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -181,8 +184,8 @@ fun PlayerDetailScreen(
                                 0 -> PlayerStatsTab(
                                     uiState = uiState,
                                     handleSavePlayer = handleSavePlayer,
-                                    timeSinceMatch = timeSinceMatch,
-                                    navigateToMatchDetails = navigateToMatchDetails
+                                    navigateToMatchDetails = navigateToMatchDetails,
+                                    navigateToMoreMatches = navigateToMoreMatches
                                 )
 
                                 1 -> PlayerHeroStatsTab(
@@ -206,8 +209,8 @@ fun PlayerStatsTab(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
-    timeSinceMatch: (String) -> String = { _ -> "" },
-    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> }
+    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
+    navigateToMoreMatches: (String) -> Unit = { }
 ) {
 
     Column(
@@ -226,8 +229,8 @@ fun PlayerStatsTab(
             MatchesList(
                 playerId = uiState.playerId,
                 matches = uiState.matches,
-                timeSinceMatch = timeSinceMatch,
-                navigateToMatchDetails = navigateToMatchDetails
+                navigateToMatchDetails = navigateToMatchDetails,
+                navigateToMoreMatches= navigateToMoreMatches
             )
 
         }

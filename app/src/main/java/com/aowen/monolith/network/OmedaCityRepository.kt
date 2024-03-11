@@ -5,6 +5,7 @@ import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
+import com.aowen.monolith.data.MatchesDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
@@ -20,7 +21,15 @@ interface OmedaCityRepository {
     suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>?>
 
     // Matches
-    suspend fun fetchMatchesById(playerId: String): Result<List<MatchDetails>?>
+    suspend fun fetchMatchesById(
+        playerId: String,
+        perPage: Int? = null,
+        timeFrame: String? = null,
+        heroId: Int? = null,
+        role: String? = null,
+        playerName: String? = null,
+        page: Int? = 1
+    ): Result<MatchesDetails?>
     suspend fun fetchMatchById(matchId: String): Result<MatchDetails?>
 
     // Items
@@ -88,11 +97,27 @@ class OmedaCityRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun fetchMatchesById(playerId: String): Result<List<MatchDetails>?> {
+    override suspend fun fetchMatchesById(
+        playerId: String,
+        perPage: Int?,
+        timeFrame: String?,
+        heroId: Int?,
+        role: String?,
+        playerName: String?,
+        page: Int?
+    ): Result<MatchesDetails?> {
         return try {
-            val matchesResponse = playerApiService.getPlayerMatchesById(playerId)
+            val matchesResponse = playerApiService.getPlayerMatchesById(
+                playerId = playerId,
+                perPage = perPage,
+                timeFrame = timeFrame,
+                heroId = heroId,
+                role = role,
+                playerName = playerName,
+                page = page
+            )
             if (matchesResponse.isSuccessful) {
-                Result.success(matchesResponse.body()?.matches?.map { it.create() })
+                Result.success(matchesResponse.body()?.create())
             } else {
                 Result.failure(Exception("Failed to fetch matches: Code ${matchesResponse.code()}"))
             }

@@ -105,7 +105,7 @@ class OmedaCityRepositoryTest {
 
     @Test
     fun `fetchMatchesById - successful response returns a list of MatchDetails`() = runTest {
-        val actual = omedaCityRepository.fetchMatchesById("123").getOrNull()
+        val actual = omedaCityRepository.fetchMatchesById("123").getOrNull()?.matches
         val expected = listOf(
             fakeMatchDto.create()
         )

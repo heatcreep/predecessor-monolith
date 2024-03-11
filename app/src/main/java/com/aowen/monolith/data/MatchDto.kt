@@ -130,5 +130,6 @@ data class MatchDto(
 
 @Serializable
 data class MatchesDto(
-    val matches: List<MatchDto>
+    val matches: List<MatchDto>,
+    val cursor: String?
 )

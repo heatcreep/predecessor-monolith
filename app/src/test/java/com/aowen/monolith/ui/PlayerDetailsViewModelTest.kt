@@ -18,6 +18,7 @@ import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.ui.screens.playerdetails.PlayerDetailsUiState
 import com.aowen.monolith.ui.screens.playerdetails.PlayerDetailsViewModel
 import com.aowen.monolith.ui.screens.playerdetails.PlayerErrors
+import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -333,7 +334,7 @@ class PlayerDetailsViewModelTest {
     fun `handleTimeSinceMatch() should return correct time for 1 day ago`() {
         val fakeTime = Instant.now().atZone(ZoneId.of("UTC")).minusDays(1).format(formatter)
         val expected = "1 day ago"
-        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        val actual = handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
 
@@ -341,7 +342,7 @@ class PlayerDetailsViewModelTest {
     fun `handleTimeSinceMatch() should return correct time for 2 days ago`() {
         val fakeTime = Instant.now().atZone(ZoneId.of("UTC")).minusDays(2).format(formatter)
         val expected = "2 days ago"
-        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        val actual = handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
 
@@ -349,7 +350,7 @@ class PlayerDetailsViewModelTest {
     fun `handleTimeSinceMatch() should return correct time for 2 hours ago`() {
         val fakeTime = Instant.now().atZone(ZoneId.of("UTC")).minusHours(2).format(formatter)
         val expected = "2hrs ago"
-        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        val actual = handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
 
@@ -357,7 +358,7 @@ class PlayerDetailsViewModelTest {
     fun `handleTimeSinceMatch() should return correct time for 1 hour ago`() {
         val fakeTime = Instant.now().atZone(ZoneId.of("UTC")).minusHours(1).format(formatter)
         val expected = "1h ago"
-        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        val actual = handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
 
@@ -365,7 +366,7 @@ class PlayerDetailsViewModelTest {
     fun `handleTimeSinceMatch() should return correct time for less than 1 hour ago`() {
         val fakeTime = Instant.now().atZone(ZoneId.of("UTC")).minusMinutes(59).format(formatter)
         val expected = "59 mins ago"
-        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        val actual = handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
 
@@ -373,7 +374,7 @@ class PlayerDetailsViewModelTest {
     fun `handleTimeSinceMatch() should return correct time for 1 minute ago`() {
         val fakeTime = Instant.now().atZone(ZoneId.of("UTC")).minusMinutes(1).format(formatter)
         val expected = "1 min ago"
-        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        val actual = handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
 
@@ -381,7 +382,7 @@ class PlayerDetailsViewModelTest {
     fun `handleTimeSinceMatch() should return correct time for less than 1 minute ago`() {
         val fakeTime = Instant.now().atZone(ZoneId.of("UTC")).minusSeconds(30).format(formatter)
         val expected = "30 sec ago"
-        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        val actual = handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
 
@@ -389,7 +390,7 @@ class PlayerDetailsViewModelTest {
     fun `handleTimeSinceMatch() should return correct time for less than 5 seconds ago`() {
         val fakeTime = Instant.now().atZone(ZoneId.of("UTC")).minusSeconds(4).format(formatter)
         val expected = "Just now"
-        val actual = viewModel.handleTimeSinceMatch(fakeTime.toString())
+        val actual = handleTimeSinceMatch(fakeTime.toString())
         assertEquals(expected, actual)
     }
 

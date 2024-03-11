@@ -54,12 +54,21 @@ class FakeOmedaCityService(private val resCode: Int? = null) : OmedaCityService 
         }
     }
 
-    override suspend fun getPlayerMatchesById(playerId: String): Response<MatchesDto> {
+    override suspend fun getPlayerMatchesById(
+        playerId: String,
+        perPage: Int?,
+        timeFrame: String?,
+        heroId: Int?,
+        role: String?,
+        playerName: String?,
+        page: Int?
+    ): Response<MatchesDto> {
         return when (resCode) {
             404 -> Response.error(404, "Not Found".toResponseBody(null))
             200 -> Response.success(
                 MatchesDto(
-                    matches = listOf(fakeMatchDto)
+                    matches = listOf(fakeMatchDto),
+                    cursor = "cursor"
                 )
             )
 

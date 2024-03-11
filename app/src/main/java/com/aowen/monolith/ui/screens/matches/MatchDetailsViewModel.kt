@@ -75,7 +75,7 @@ class MatchDetailsViewModel @Inject constructor(
                     )
                 }
             } else {
-                val match = matchResult.getOrNull()?.firstOrNull { it.matchId == matchId }
+                val match = matchResult.getOrNull()?.matches?.firstOrNull { it.matchId == matchId }
                 val allItems = itemsResult.getOrNull()
                 val newMatch = match?.copy(
                     dusk = Team.Dusk(

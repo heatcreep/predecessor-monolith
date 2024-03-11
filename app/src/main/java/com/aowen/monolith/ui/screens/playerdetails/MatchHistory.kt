@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,21 +44,38 @@ import com.aowen.monolith.ui.theme.DarkGreenHighlight
 import com.aowen.monolith.ui.theme.GreenHighlight
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.RedHighlight
+import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 
 @Composable
 fun MatchesList(
     modifier: Modifier = Modifier,
     playerId: String? = "",
     matches: List<MatchDetails>? = null,
-    timeSinceMatch: (String) -> String = { _ -> "" },
+    navigateToMoreMatches: (String) -> Unit = { },
     navigateToMatchDetails: (String, String) -> Unit = { _, _ -> }
 ) {
     Column {
-        Text(
-            text = "Match History",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.secondary
-        )
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Match History",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            playerId?.let {
+                TextButton(onClick = { navigateToMoreMatches(it) }) {
+                    Text(
+                        text = "See All Matches",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
         Spacer(modifier = Modifier.size(16.dp))
         matches?.let { it ->
             Column(
@@ -74,7 +92,7 @@ fun MatchesList(
                             navigateToMatchDetails(playerHero?.playerId!!, match.matchId)
                         },
                         isWinner = isWinner,
-                        timeSinceMatch = timeSinceMatch(match.endTime),
+                        timeSinceMatch = handleTimeSinceMatch(match.endTime),
                         playerHero = playerHero
                     )
                 }

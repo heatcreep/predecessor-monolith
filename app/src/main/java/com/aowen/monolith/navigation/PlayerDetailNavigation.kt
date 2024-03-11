@@ -24,10 +24,13 @@ fun NavGraphBuilder.playerDetailsScreen(
         })
     ) {
         PlayerDetailsRoute(
-            navigateToMatchDetails = navController::navigateToMatchDetails,
+            navController = navController
         )
     }
     matchDetailsScreen(
+        navController = navController
+    )
+    moreMatchesScreen(
         navController = navController
     )
 }

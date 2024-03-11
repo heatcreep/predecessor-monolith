@@ -5,6 +5,7 @@ import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
+import com.aowen.monolith.data.MatchesDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
@@ -107,12 +108,20 @@ class FakeOmedaCityRepository(
         }
     }
 
-    override suspend fun fetchMatchesById(playerId: String): Result<List<MatchDetails>?> {
+    override suspend fun fetchMatchesById(
+        playerId: String,
+        perPage: Int?,
+        timeFrame: String?,
+        heroId: Int?,
+        role: String?,
+        playerName: String?,
+        page: Int?
+    ): Result<MatchesDetails?> {
         return if (hasMatchDetailsError) {
             Result.failure(Exception(FetchMatchesError))
         } else when (playerId) {
             "Empty" -> Result.success(null)
-            else -> Result.success(listOf(fakeMatchDto.create()))
+            else -> Result.success(MatchesDetails(listOf(fakeMatchDto.create()), "cursor"))
         }
     }
 

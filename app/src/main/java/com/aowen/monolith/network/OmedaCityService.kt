@@ -28,7 +28,15 @@ interface OmedaCityService {
 
     // Player Matches
     @GET("/players/{player_id}/matches.json")
-    suspend fun getPlayerMatchesById(@Path("player_id") playerId: String): Response<MatchesDto>
+    suspend fun getPlayerMatchesById(
+        @Path("player_id") playerId: String,
+        @Query("per_page") perPage: Int? = 10,
+        @Query("time_frame") timeFrame: String? = null,
+        @Query("filter[hero_id]") heroId: Int? = null,
+        @Query("filter[role]") role: String? = null,
+        @Query("filter[player_name]") playerName: String? = null,
+        @Query("page") page: Int? = 1
+    ): Response<MatchesDto>
 
     @GET("/matches/{match_id}.json")
     suspend fun getMatchById(@Path("match_id") matchId: String): Response<MatchDto>
