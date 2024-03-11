@@ -46,7 +46,7 @@ class HeroDetailsViewModel @Inject constructor(
     }
 
     fun initViewModel() {
-        _uiState.value = HeroDetailsUiState(isLoading = true)
+        _uiState.value = HeroDetailsUiState(isLoading = true, heroDetailsErrors = null)
         viewModelScope.launch {
             val hero = async { omedaCityRepository.fetchHeroByName(heroName) }
             val statistics =

@@ -1,6 +1,8 @@
 package com.aowen.monolith.data
 
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 data class PlayerHeroStats(
     val heroId: Int = 0,
@@ -60,7 +62,8 @@ data class PlayerHeroStats(
 
 fun PlayerHeroStatsDto.create(): PlayerHeroStats {
 
-    val df = DecimalFormat("#.##")
+    val symbols = DecimalFormatSymbols(Locale.US)
+    val df = DecimalFormat("#.##", symbols)
 
 
     return PlayerHeroStats(

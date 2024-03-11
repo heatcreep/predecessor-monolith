@@ -2,6 +2,8 @@ package com.aowen.monolith.data
 
 import com.aowen.monolith.network.RetrofitHelper
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 data class PlayerFlags(
     val identifier: String = "",
@@ -40,6 +42,7 @@ fun PlayerDto.create(): PlayerDetails {
 
 fun Float?.toDecimal(pattern: String = "#.#"): String {
     val float = this?.toDouble() ?: 0.0
-    val df = DecimalFormat(pattern)
+    val symbols = DecimalFormatSymbols(Locale.US)
+    val df = DecimalFormat(pattern, symbols)
     return "${df.format(float).toFloat()}"
 }
