@@ -8,9 +8,9 @@ import com.aowen.monolith.fakes.data.fakeDuskTeam
 import com.aowen.monolith.fakes.data.fakeMatchDetailsWithItems
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.ResponseType
-import com.aowen.monolith.ui.screens.matches.MatchDetailsErrors
-import com.aowen.monolith.ui.screens.matches.MatchDetailsUiState
-import com.aowen.monolith.ui.screens.matches.MatchDetailsViewModel
+import com.aowen.monolith.feature.matches.MatchDetailsErrors
+import com.aowen.monolith.feature.matches.MatchDetailsUiState
+import com.aowen.monolith.feature.matches.MatchDetailsViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
 import org.junit.Assert.assertEquals
 import org.junit.Before

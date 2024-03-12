@@ -6,8 +6,8 @@ import com.aowen.monolith.fakes.data.fakeItemDto2
 import com.aowen.monolith.fakes.data.fakeItemDto3
 import com.aowen.monolith.fakes.data.fakeItemDto4
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.ui.screens.items.ItemsUiState
-import com.aowen.monolith.ui.screens.items.ItemsViewModel
+import com.aowen.monolith.feature.items.ItemsUiState
+import com.aowen.monolith.feature.items.ItemsViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

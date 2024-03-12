@@ -5,9 +5,9 @@ import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.ui.screens.herodetails.HeroDetailsErrors
-import com.aowen.monolith.ui.screens.herodetails.HeroDetailsUiState
-import com.aowen.monolith.ui.screens.herodetails.HeroDetailsViewModel
+import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsErrors
+import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsUiState
+import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

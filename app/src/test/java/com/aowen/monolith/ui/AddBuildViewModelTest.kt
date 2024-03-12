@@ -2,7 +2,7 @@ package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.ui.screens.builds.addbuild.AddBuildViewModel
+import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule

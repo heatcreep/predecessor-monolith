@@ -3,9 +3,9 @@ package com.aowen.monolith.ui
 import com.aowen.monolith.fakes.FakeAuthRepository
 import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.data.fakeUserInfo
-import com.aowen.monolith.ui.screens.profile.ProfileScreenUiState
-import com.aowen.monolith.ui.screens.profile.ProfileToastState
-import com.aowen.monolith.ui.screens.profile.ProfileViewModel
+import com.aowen.monolith.feature.profile.ProfileScreenUiState
+import com.aowen.monolith.feature.profile.ProfileToastState
+import com.aowen.monolith.feature.profile.ProfileViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch

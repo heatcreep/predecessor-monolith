@@ -5,6 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.aowen.monolith.feature.auth.navigation.LoginRoute
+import com.aowen.monolith.feature.auth.navigation.loginScreen
+import com.aowen.monolith.feature.builds.navigation.buildsScreen
+import com.aowen.monolith.feature.heroes.navigation.heroesScreen
+import com.aowen.monolith.feature.items.navigation.itemsScreen
+import com.aowen.monolith.feature.profile.navigation.profileScreen
+import com.aowen.monolith.feature.search.navigation.searchScreen
 
 @Composable
 fun MonolithNavHost(

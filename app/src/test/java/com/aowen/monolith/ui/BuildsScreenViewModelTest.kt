@@ -6,9 +6,9 @@ import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.ui.screens.builds.BuildsPagingSource
-import com.aowen.monolith.ui.screens.builds.BuildsScreenViewModel
-import com.aowen.monolith.ui.screens.builds.BuildsUiState
+import com.aowen.monolith.feature.builds.BuildsPagingSource
+import com.aowen.monolith.feature.builds.BuildsScreenViewModel
+import com.aowen.monolith.feature.builds.BuildsUiState
 import com.aowen.monolith.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest

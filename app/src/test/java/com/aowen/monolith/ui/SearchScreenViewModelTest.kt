@@ -10,8 +10,8 @@ import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.network.ClaimedUser
-import com.aowen.monolith.ui.screens.search.SearchScreenUiState
-import com.aowen.monolith.ui.screens.search.SearchScreenViewModel
+import com.aowen.monolith.feature.search.SearchScreenUiState
+import com.aowen.monolith.feature.search.SearchScreenViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

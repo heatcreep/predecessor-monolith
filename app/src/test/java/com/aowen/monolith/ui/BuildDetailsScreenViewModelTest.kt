@@ -9,9 +9,9 @@ import com.aowen.monolith.fakes.data.fakeItemDto3
 import com.aowen.monolith.fakes.data.fakeItemDto4
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.ResponseType
-import com.aowen.monolith.ui.screens.builds.builddetails.BuildDetailsErrors
-import com.aowen.monolith.ui.screens.builds.builddetails.BuildDetailsScreenViewModel
-import com.aowen.monolith.ui.screens.builds.builddetails.BuildDetailsUiState
+import com.aowen.monolith.feature.builds.builddetails.BuildDetailsErrors
+import com.aowen.monolith.feature.builds.builddetails.BuildDetailsScreenViewModel
+import com.aowen.monolith.feature.builds.builddetails.BuildDetailsUiState
 import com.aowen.monolith.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest

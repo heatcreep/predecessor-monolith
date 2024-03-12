@@ -15,9 +15,9 @@ import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.ResponseType
 import com.aowen.monolith.network.ClaimedUser
-import com.aowen.monolith.ui.screens.playerdetails.PlayerDetailsUiState
-import com.aowen.monolith.ui.screens.playerdetails.PlayerDetailsViewModel
-import com.aowen.monolith.ui.screens.playerdetails.PlayerErrors
+import com.aowen.monolith.feature.search.playerdetails.PlayerDetailsUiState
+import com.aowen.monolith.feature.search.playerdetails.PlayerDetailsViewModel
+import com.aowen.monolith.feature.search.playerdetails.PlayerErrors
 import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.runBlocking

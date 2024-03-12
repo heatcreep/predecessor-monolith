@@ -8,7 +8,7 @@ import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.resetPageCount
-import com.aowen.monolith.ui.screens.builds.BuildsPagingSource
+import com.aowen.monolith.feature.builds.BuildsPagingSource
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
