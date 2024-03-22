@@ -62,9 +62,9 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.feature.matches.MatchesList
-import com.aowen.monolith.logDebug
-import com.aowen.monolith.feature.matches.navigation.navigateToMatchDetails
 import com.aowen.monolith.feature.matches.morematches.navigation.navigateToMoreMatches
+import com.aowen.monolith.feature.matches.navigation.navigateToMatchDetails
+import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.HeroSelectDropdown
 import com.aowen.monolith.ui.components.PlayerCard
@@ -338,7 +338,7 @@ fun PlayerHeroStatsTab(
                     ),
                     StatPair(
                         "Average:",
-                        uiState.selectedHeroStats?.maxDamageDealtToStructures.toString()
+                        uiState.selectedHeroStats?.avgDamageDealtToStructures.toString()
                     ),
                     StatPair(
                         "Highest:",
