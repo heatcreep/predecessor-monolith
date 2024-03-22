@@ -66,6 +66,7 @@ import com.aowen.monolith.feature.builds.builddetails.SkillOrderScrollableRow
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 import com.meetup.twain.MarkdownText
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SkillOrderAndModuleSelectRoute(
@@ -459,7 +460,7 @@ fun SkillOrderAndModuleSelectScreenPreview() {
                     First up there's Wayfarer's Bauble. It's a great first item and I love it so much. This is just more text. akdjwakawjdkajdakdjwdkawjdakdjwakdkdajwdklawjdaklwjawlkdjawlkdajwdklajdklawdjawkldjadklajdalwkdjalkdjwakldjadlkawjdlakwdjawlkdjawlkdjawkldwad
                 """.trimIndent(),
                 selectedCrestId = 37,
-                selectedItems = listOf(1, 2, 3, 4, 5),
+                selectedItems = persistentListOf(1, 2, 3, 4, 5),
                 modules = listOf(
                     ItemModule(
                         title = "First Buy",

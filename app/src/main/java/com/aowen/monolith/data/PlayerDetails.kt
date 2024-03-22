@@ -44,5 +44,5 @@ fun Float?.toDecimal(pattern: String = "#.#"): String {
     val float = this?.toDouble() ?: 0.0
     val symbols = DecimalFormatSymbols(Locale.US)
     val df = DecimalFormat(pattern, symbols)
-    return "${df.format(float).toFloat()}"
+    return df.format(float)
 }

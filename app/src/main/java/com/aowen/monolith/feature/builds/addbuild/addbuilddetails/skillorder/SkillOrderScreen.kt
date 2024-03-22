@@ -30,12 +30,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,7 +57,7 @@ import com.aowen.monolith.data.AbilityDetails
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.feature.builds.addbuild.AddBuildState
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
-import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation.navigateToItemSelect
+import com.aowen.monolith.ui.components.MonolithAlertDialog
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 
@@ -68,9 +70,8 @@ fun SkillOrderRoute(
     val uiState by viewModel.uiState.collectAsState()
     SkillOrderScreen(
         uiState = uiState,
-        onSkillSelected = viewModel::onSkillSelected,
         onSkillDetailsSelected = viewModel::onSkillDetailsSelected,
-        navigateToItemSelect = navController::navigateToItemSelect,
+        onSaveSkillOrder = viewModel::onSaveSkillOrder,
         navigateBack = navController::navigateUp
     )
 }
@@ -79,14 +80,18 @@ fun SkillOrderRoute(
 @Composable
 fun SkillOrderScreen(
     uiState: AddBuildState,
-    onSkillSelected: (Int, Int) -> Unit,
+    onSaveSkillOrder: (List<Int>) -> Unit,
     onSkillDetailsSelected: (AbilityDetails) -> Unit = {},
-    navigateToItemSelect: () -> Unit,
     navigateBack: () -> Unit
 ) {
 
+    var currentSkillOrder by remember { mutableStateOf(uiState.skillOrder) }
+
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     val closeBottomSheet = { openBottomSheet = false }
+
+    var openCancelSkillOrderDialog by rememberSaveable { mutableStateOf(false) }
+    val closeCancelSkillOrderDialog = { openCancelSkillOrderDialog = false }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     fun openSkillBottomSheet(ability: AbilityDetails) {
@@ -106,10 +111,40 @@ fun SkillOrderScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = navigateBack) {
+                    IconButton(onClick = {
+                        if (currentSkillOrder != uiState.skillOrder) {
+                            openCancelSkillOrderDialog = true
+                        } else {
+                            navigateBack()
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "navigate up"
+                        )
+                    }
+                },
+                actions = {
+                    TextButton(
+                        onClick = {
+                            onSaveSkillOrder(currentSkillOrder)
+                            navigateBack()
+                        },
+                        colors = ButtonDefaults.textButtonColors(
+                            disabledContentColor = MaterialTheme.colorScheme.inversePrimary,
+                            contentColor = MaterialTheme.colorScheme.secondary
+                        ),
+                        enabled = currentSkillOrder.all { it != -1}
+                    ) {
+                        val buttonText = if (currentSkillOrder.all { it != -1 }) {
+                            "Save"
+                        } else {
+                            val numberLeft = currentSkillOrder.count { it == -1 }
+                            "$numberLeft choices remaining"
+                        }
+                        Text(
+                            text = buttonText,
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
@@ -119,17 +154,31 @@ fun SkillOrderScreen(
         Surface(
             modifier = Modifier.padding(paddingValues)
         ) {
-            if(openBottomSheet && uiState.selectedSkill != null) {
+            if (openBottomSheet && uiState.selectedSkill != null) {
                 SkillBottomSheet(
                     sheetState = bottomSheetState,
                     ability = uiState.selectedSkill,
                     closeBottomSheet = closeBottomSheet
                 )
             }
+            if (openCancelSkillOrderDialog) {
+                MonolithAlertDialog(
+                    bodyText = "Are you sure you want to cancel your changes? Any unsaved changes will be lost.",
+                    cancelText = "Go back",
+                    confirmText = "Yes, Exit",
+                    onDismissRequest = closeCancelSkillOrderDialog,
+                    onConfirm = navigateBack
+                )
+            }
             BuildOrderPicker(
-                selectedHeroAbilities = uiState.selectedHero!!.abilities,
-                skillOrder = uiState.skillOrder,
-                onSkillSelected = onSkillSelected,
+                selectedHeroAbilities = uiState.selectedHero?.abilities,
+                skillOrder = currentSkillOrder,
+                onSkillSelected = { index, skill ->
+                    currentSkillOrder = currentSkillOrder.toMutableList().apply {
+                        this[index] = skill
+                    }
+                },
+                onSaveSkillOrder = onSaveSkillOrder,
                 openSkillBottomSheet = ::openSkillBottomSheet,
                 navigateBack = navigateBack
             )
@@ -140,10 +189,11 @@ fun SkillOrderScreen(
 @Composable
 fun BuildOrderPicker(
     modifier: Modifier = Modifier,
-    selectedHeroAbilities: List<AbilityDetails>,
+    selectedHeroAbilities: List<AbilityDetails>?,
     skillOrder: List<Int>,
     openSkillBottomSheet: (AbilityDetails) -> Unit,
     onSkillSelected: (Int, Int) -> Unit,
+    onSaveSkillOrder: (List<Int>) -> Unit,
     navigateBack: () -> Unit
 
 ) {
@@ -155,26 +205,28 @@ fun BuildOrderPicker(
                 .fillMaxWidth(),
             Arrangement.SpaceEvenly,
         ) {
-            BuilderHeaderRowItem(
-                onClick = openSkillBottomSheet,
-                ability = selectedHeroAbilities[2],
-                text = "Q"
-            )
-            BuilderHeaderRowItem(
-                onClick = openSkillBottomSheet,
-                ability = selectedHeroAbilities[3],
-                text = "E"
-            )
-            BuilderHeaderRowItem(
-                onClick = openSkillBottomSheet,
-                ability = selectedHeroAbilities[4],
-                text = "R"
-            )
-            BuilderHeaderRowItem(
-                onClick = openSkillBottomSheet,
-                ability = selectedHeroAbilities[1],
-                text = "RMB"
-            )
+            if(selectedHeroAbilities != null) {
+                BuilderHeaderRowItem(
+                    onClick = openSkillBottomSheet,
+                    ability = selectedHeroAbilities[2],
+                    text = "Q"
+                )
+                BuilderHeaderRowItem(
+                    onClick = openSkillBottomSheet,
+                    ability = selectedHeroAbilities[3],
+                    text = "E"
+                )
+                BuilderHeaderRowItem(
+                    onClick = openSkillBottomSheet,
+                    ability = selectedHeroAbilities[4],
+                    text = "R"
+                )
+                BuilderHeaderRowItem(
+                    onClick = openSkillBottomSheet,
+                    ability = selectedHeroAbilities[1],
+                    text = "RMB"
+                )
+            }
         }
         Spacer(modifier = Modifier.size(8.dp))
         LazyColumn(
@@ -196,9 +248,12 @@ fun BuildOrderPicker(
                         containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentColor = MaterialTheme.colorScheme.primaryContainer
                     ),
-                    onClick = navigateBack
+                    onClick = {
+                        onSaveSkillOrder(skillOrder)
+                        navigateBack()
+                    }
                 ) {
-                    Text(text = "Next")
+                    Text(text = "Save")
                 }
             }
         }
@@ -376,94 +431,8 @@ fun SkillOrderPickerScreenPreview() {
                     -1
                 )
             ),
-            onSkillSelected = { _, _ -> },
-            navigateToItemSelect = { /*TODO*/ },
+            onSaveSkillOrder = { /*TODO*/ },
             navigateBack = { /*TODO*/ })
 
-    }
-}
-
-
-@Preview(
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun BuildOrderPickerPreview() {
-    MonolithTheme {
-        Surface(
-            modifier = Modifier
-                .padding(16.dp)
-                .background(MaterialTheme.colorScheme.primary)
-
-        ) {
-            BuildOrderPicker(
-                onSkillSelected = { _, _ -> },
-                navigateBack = { },
-                selectedHeroAbilities = listOf(
-                    AbilityDetails(
-                        displayName = "Ability 1",
-                        image = "https://via.placeholder.com/150",
-                        gameDescription = "Ability 1 description",
-                        menuDescription = "Ability 1 description",
-                        cooldown = listOf(1f, 2f, 3f),
-                        cost = listOf(1f, 2f, 3f)
-                    ),
-                    AbilityDetails(
-                        displayName = "Ability 1",
-                        image = "https://via.placeholder.com/150",
-                        gameDescription = "Ability 1 description",
-                        menuDescription = "Ability 1 description",
-                        cooldown = listOf(1f, 2f, 3f),
-                        cost = listOf(1f, 2f, 3f)
-                    ),
-                    AbilityDetails(
-                        displayName = "Ability 1",
-                        image = "https://via.placeholder.com/150",
-                        gameDescription = "Ability 1 description",
-                        menuDescription = "Ability 1 description",
-                        cooldown = listOf(1f, 2f, 3f),
-                        cost = listOf(1f, 2f, 3f)
-                    ),
-                    AbilityDetails(
-                        displayName = "Ability 1",
-                        image = "https://via.placeholder.com/150",
-                        gameDescription = "Ability 1 description",
-                        menuDescription = "Ability 1 description",
-                        cooldown = listOf(1f, 2f, 3f),
-                        cost = listOf(1f, 2f, 3f)
-                    ),
-                    AbilityDetails(
-                        displayName = "Ability 1",
-                        image = "https://via.placeholder.com/150",
-                        gameDescription = "Ability 1 description",
-                        menuDescription = "Ability 1 description",
-                        cooldown = listOf(1f, 2f, 3f),
-                        cost = listOf(1f, 2f, 3f)
-                    )
-                ),
-                skillOrder = listOf(
-                    1,
-                    2,
-                    1,
-                    3,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1,
-                    -1
-                ),
-                openSkillBottomSheet = { }
-            )
-        }
     }
 }

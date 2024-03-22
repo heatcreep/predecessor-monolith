@@ -66,8 +66,8 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.StatDetails
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.items.itemdetails.navigation.navigateToItemDetails
-import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.feature.search.SearchBar
+import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
@@ -221,7 +221,7 @@ fun ItemsScreen(
                             items(uiState.filteredItems) { item ->
                                 ItemCard(
                                     itemDetails = item,
-                                    navigateToItemDetails = { navigateToItemDetails(item.name) }
+                                    onClick = { navigateToItemDetails(item.name) }
                                 )
                             }
                         }
@@ -371,13 +371,13 @@ fun RowScope.StatFilterDropdown(
 fun ItemCard(
     itemDetails: ItemDetails,
     modifier: Modifier = Modifier,
-    navigateToItemDetails: () -> Unit = {}
+    onClick: () -> Unit = {}
 ) {
 
     Card(
         modifier = Modifier
             .clickable {
-                navigateToItemDetails()
+                onClick()
             }
     ) {
         Column(

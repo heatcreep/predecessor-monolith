@@ -156,7 +156,7 @@ fun RoleSelection(
                 isSelected = it.roleName == selectedRole?.name?.lowercase(),
                 role = it,
                 label = it.roleName,
-                onClick = { onRoleSelected(HeroRole.valueOf(it.roleName.uppercase())) }
+                onClick = { onRoleSelected(HeroRole.valueOf(it.name)) }
             )
         }
     }

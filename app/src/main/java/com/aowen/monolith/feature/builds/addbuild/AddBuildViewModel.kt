@@ -9,6 +9,10 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.network.OmedaCityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.plus
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -21,9 +25,7 @@ data class AddBuildState(
     val selectedHero: HeroDetails? = null,
     val selectedRole: HeroRole? = null,
     val selectedCrestId: Int? = 37,
-    val selectedItems: List<Int> = listOf(
-        1,2,3,4
-    ),
+    val selectedItems: PersistentList<Int> = persistentListOf(),
     val skillOrder: List<Int> = listOf(
         -1,
         -1,
@@ -101,12 +103,22 @@ class AddBuildViewModel @Inject constructor(
             })
     }
 
+    fun onSaveSkillOrder(skillOrder: List<Int>) {
+        _uiState.value = _uiState.value.copy(skillOrder = skillOrder)
+    }
+
     fun onSkillDetailsSelected(skill: AbilityDetails) {
         _uiState.value = _uiState.value.copy(selectedSkill = skill)
     }
 
     fun onItemAdded(itemId: Int) {
-        _uiState.value = _uiState.value.copy(selectedItems = _uiState.value.selectedItems + itemId)
+        val newItems: PersistentList<Int> = _uiState.value.selectedItems + itemId
+        _uiState.value = _uiState.value.copy(selectedItems = newItems)
+    }
+
+    fun onItemRemoved(itemId: Int) {
+        val newItems: PersistentList<Int> = _uiState.value.selectedItems.filter { it != itemId }.toPersistentList()
+        _uiState.value = _uiState.value.copy(selectedItems = newItems)
     }
 
     fun onChangeModuleOrder(fromIndex: Int, toIndex: Int) {
@@ -121,7 +133,7 @@ class AddBuildViewModel @Inject constructor(
         val newItemOrder = _uiState.value.selectedItems.toMutableList().apply {
             val item = removeAt(fromIndex)
             add(toIndex, item)
-        }
+        }.toPersistentList()
         _uiState.value = _uiState.value.copy(selectedItems = newItemOrder)
     }
 
