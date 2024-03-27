@@ -36,8 +36,8 @@ object NetworkUtil {
     fun getOkHttpClientWithCache(appContext: Context): OkHttpClient {
         val cacheSize = 10 * 1024 * 1024L // 10 MB
         val maxRequestStale = 60 * 60 * 24 * 7 // 7 days
-        val maxRequestAge = 5 // 5 seconds
-        val maxResponseAge = 60 // 1 minute
+        val maxRequestAge = 60 // 1 minute
+        val maxResponseAge = 3600 // 1 hour
         val cache = Cache(appContext.cacheDir, cacheSize)
 
         return OkHttpClient.Builder()
@@ -45,7 +45,9 @@ object NetworkUtil {
             .addNetworkInterceptor { chain ->
                 val response = chain.proceed(chain.request())
                 response.newBuilder()
-                    .header("Cache-Control", "public, max-age=$maxResponseAge")
+                    .header(
+                        name = "Cache-Control",
+                        value = "public, max-age=$maxResponseAge")
                     .removeHeader("Pragma")
                     .build()
             }

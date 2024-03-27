@@ -26,6 +26,7 @@ interface UserRecentSearchRepository {
 
 class UserRecentSearchRepositoryImpl @Inject constructor(
     private val postgrestService: SupabasePostgrestService,
+    private val omedaCityRepository: OmedaCityRepository,
     private val userRepository: UserRepository
 ) : UserRecentSearchRepository {
 
@@ -64,22 +65,28 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                 )
                 val recentSearches = postgrestService.fetchRecentSearches(user.id)
 
-                if (recentSearches.any { it.playerId == playerSearchDto.playerId }.not()) {
+                // If the player is not already in the recent searches, add it
+                if (!recentSearches.any { it.playerId == playerSearchDto.playerId }) {
+                    // If the table is full, update the oldest search
                     if (recentSearches.size >= TABLE_MAX_ROWS) {
                         postgrestService.updateRecentSearch(
-                            user.id,
-                            recentSearches.first().playerId,
-                            recentSearches.first().rankImage,
+                            userId = user.id,
+                            recentPlayerId = playerSearchDto.playerId,
+                            rankImage = playerSearchDto.rankImage,
                             playerSearchDto
                         )
                     }
                     postgrestService.insertRecentSearch(playerSearchDto)
 
                 } else {
+                    val updatedPlayerDetailsResult = omedaCityRepository.fetchPlayerInfo(playerDetails.playerId)
+                    val updatedPlayerDetails = updatedPlayerDetailsResult.getOrNull()
+                    val updatedPlayerId = updatedPlayerDetails?.playerDetails?.playerId
+                    val updatedPlayerRank = updatedPlayerDetails?.playerDetails?.rankImage
                     postgrestService.updateRecentSearch(
-                        user.id,
-                        playerSearchDto.playerId,
-                        playerSearchDto.rankImage,
+                        userId = user.id,
+                        recentPlayerId = UUID.fromString(updatedPlayerId) ?: playerSearchDto.playerId,
+                        rankImage = updatedPlayerRank ?: playerSearchDto.rankImage,
                         playerSearchDto
                     )
                 }

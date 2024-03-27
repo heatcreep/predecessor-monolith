@@ -7,6 +7,7 @@ import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.RecentSearchStatus
 import com.aowen.monolith.fakes.data.fakeExistingPlayerSearchDto
 import com.aowen.monolith.fakes.data.fakePlayerDto
+import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -21,6 +22,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository()
         )
         val actual = userRecentSearchRepository.getRecentSearches()
@@ -33,6 +35,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(true)
         )
         val actual = userRecentSearchRepository.getRecentSearches()
@@ -46,6 +49,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository()
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
@@ -58,6 +62,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository()
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
@@ -70,6 +75,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(true)
         )
         userRecentSearchRepository.removeRecentSearch("addc8bb3-20ad-462a-a9f8-8b32bbf57514")
@@ -81,6 +87,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService(RecentSearchStatus.UPDATE)
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository()
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
@@ -93,6 +100,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService(RecentSearchStatus.FULL)
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository()
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
@@ -105,6 +113,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService(RecentSearchStatus.ADD)
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository()
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
@@ -117,6 +126,7 @@ class UserRecentSearchRepositoryTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService(RecentSearchStatus.ADD)
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
+            omedaCityRepository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(true)
         )
         userRecentSearchRepository.addRecentSearch(fakePlayerDto.create())
