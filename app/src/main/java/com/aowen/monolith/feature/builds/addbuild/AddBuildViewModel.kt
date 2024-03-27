@@ -11,7 +11,6 @@ import com.aowen.monolith.network.OmedaCityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.plus
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +23,9 @@ data class AddBuildState(
     val items: List<ItemDetails> = emptyList(),
     val selectedHero: HeroDetails? = null,
     val selectedRole: HeroRole? = null,
-    val selectedCrestId: Int? = 37,
-    val selectedItems: PersistentList<Int> = persistentListOf(),
+    val selectedCrest: ItemDetails? = null,
+    val currentSelectedItems: PersistentList<ItemDetails> = persistentListOf(),
+    val selectedItems: PersistentList<ItemDetails> = persistentListOf(),
     val skillOrder: List<Int> = listOf(
         -1,
         -1,
@@ -49,7 +49,7 @@ data class AddBuildState(
     val modules: List<ItemModule> = emptyList(),
     val buildTitle: String = "",
     val buildDescription: String? = null,
-    val selectedSkill : AbilityDetails? = null
+    val selectedSkill: AbilityDetails? = null
 )
 
 @HiltViewModel
@@ -70,7 +70,7 @@ class AddBuildViewModel @Inject constructor(
             val itemsResultDeferred = async { repository.fetchAllItems() }
             val heroesResult = heroesResultDeferred.await()
             val itemsResult = itemsResultDeferred.await()
-            if(heroesResult.isSuccess && itemsResult.isSuccess) {
+            if (heroesResult.isSuccess && itemsResult.isSuccess) {
                 _uiState.value = _uiState.value.copy(
                     isLoadingHeroes = false,
                     heroes = heroesResult.getOrNull() ?: emptyList(),
@@ -93,7 +93,7 @@ class AddBuildViewModel @Inject constructor(
     }
 
     fun onCrestSelected(crest: ItemDetails) {
-        _uiState.value = _uiState.value.copy(selectedCrestId = crest.id)
+        _uiState.value = _uiState.value.copy(selectedCrest = crest)
     }
 
     fun onSkillSelected(skillIndex: Int, skillId: Int) {
@@ -111,14 +111,14 @@ class AddBuildViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(selectedSkill = skill)
     }
 
-    fun onItemAdded(itemId: Int) {
-        val newItems: PersistentList<Int> = _uiState.value.selectedItems + itemId
-        _uiState.value = _uiState.value.copy(selectedItems = newItems)
-    }
-
-    fun onItemRemoved(itemId: Int) {
-        val newItems: PersistentList<Int> = _uiState.value.selectedItems.filter { it != itemId }.toPersistentList()
-        _uiState.value = _uiState.value.copy(selectedItems = newItems)
+    fun onItemsSaved(
+        crest: ItemDetails?,
+        items: PersistentList<ItemDetails>
+    ) {
+        _uiState.value = _uiState.value.copy(
+            selectedCrest = crest,
+            selectedItems = items
+        )
     }
 
     fun onChangeModuleOrder(fromIndex: Int, toIndex: Int) {
@@ -129,19 +129,35 @@ class AddBuildViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(modules = newModuleOrder)
     }
 
+    fun onAddSelectedItem(item: ItemDetails) {
+        _uiState.value = _uiState.value.copy(
+            currentSelectedItems = _uiState.value.currentSelectedItems.add(item)
+        )
+    }
+
+    fun onRemoveSelectedItem(item: ItemDetails) {
+        _uiState.value = _uiState.value.copy(
+            currentSelectedItems = _uiState.value.currentSelectedItems.remove(item)
+        )
+    }
+
     fun onChangeItemOrder(fromIndex: Int, toIndex: Int) {
-        val newItemOrder = _uiState.value.selectedItems.toMutableList().apply {
+        val newItemOrder = _uiState.value.currentSelectedItems.toMutableList().apply {
             val item = removeAt(fromIndex)
             add(toIndex, item)
         }.toPersistentList()
-        _uiState.value = _uiState.value.copy(selectedItems = newItemOrder)
+        _uiState.value = _uiState.value.copy(currentSelectedItems = newItemOrder)
     }
 
     fun onCreateNewModule(title: String, itemIds: List<Int>) {
-        _uiState.value = _uiState.value.copy(modules = _uiState.value.modules.plus(ItemModule(
-            title = title,
-            items = itemIds
-        )))
+        _uiState.value = _uiState.value.copy(
+            modules = _uiState.value.modules.plus(
+                ItemModule(
+                    title = title,
+                    items = itemIds
+                )
+            )
+        )
     }
 
     fun onBuildTitleChanged(title: String) {

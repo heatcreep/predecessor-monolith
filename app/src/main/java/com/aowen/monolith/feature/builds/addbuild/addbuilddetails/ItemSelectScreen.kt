@@ -24,8 +24,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -36,10 +38,12 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TooltipState
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,24 +55,31 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.SlotType
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.addbuild.AddBuildState
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
+import com.aowen.monolith.feature.items.itemdetails.ItemDetailsBottomSheet
 import com.aowen.monolith.feature.search.SearchBar
+import com.aowen.monolith.ui.components.MonolithAlertDialog
 import com.aowen.monolith.ui.theme.MonolithTheme
+import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 import com.aowen.monolith.ui.utils.DragDropState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
@@ -82,10 +93,11 @@ fun ItemSelectRoute(
 
     ItemSelectScreen(
         uiState = uiState,
-        onItemClicked = viewModel::onItemAdded,
+        onItemsSaved = viewModel::onItemsSaved,
         navigateBack = navController::navigateUp,
         changeItemOrder = viewModel::onChangeItemOrder,
-        onSelectedItemClicked = viewModel::onItemRemoved
+        onAddSelectedItem = viewModel::onAddSelectedItem,
+        onRemoveSelectedItem = viewModel::onRemoveSelectedItem
     )
 }
 
@@ -93,21 +105,43 @@ fun ItemSelectRoute(
 @Composable
 fun ItemSelectScreen(
     uiState: AddBuildState,
-    onItemClicked: (Int) -> Unit,
-    onSelectedItemClicked: (Int) -> Unit,
+    onItemsSaved: (crest: ItemDetails?, items: PersistentList<ItemDetails>) -> Unit,
     navigateBack: () -> Unit,
-    changeItemOrder: (Int, Int) -> Unit
+    changeItemOrder: (Int, Int) -> Unit,
+    onAddSelectedItem: (ItemDetails) -> Unit,
+    onRemoveSelectedItem: (ItemDetails) -> Unit
 ) {
 
     val coroutineScope = rememberCoroutineScope()
     val selectedItemsTooltipState = remember { TooltipState() }
     val allItemsTooltipState = remember { TooltipState() }
+    var confirmBackDialogIsOpen by rememberSaveable { mutableStateOf(false) }
     var searchFieldValue by rememberSaveable { mutableStateOf("") }
+    var currentlySelectedCrest by remember { mutableStateOf(uiState.selectedCrest) }
 
     fun getFilteredItems(): List<ItemDetails> {
         return uiState.items.filter {
             it.displayName.contains(searchFieldValue, ignoreCase = true)
         }
+    }
+
+    if (confirmBackDialogIsOpen) {
+        MonolithAlertDialog(
+            bodyText = "Do you want to save your changes before leaving?",
+            cancelText = "Discard",
+            confirmText = "Save",
+            onDismissRequest = {
+                confirmBackDialogIsOpen = false
+                navigateBack()
+            },
+            onConfirm = {
+                onItemsSaved(
+                    currentlySelectedCrest,
+                    uiState.currentSelectedItems
+                )
+                navigateBack()
+            },
+        )
     }
 
     Scaffold(
@@ -121,10 +155,32 @@ fun ItemSelectScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = navigateBack) {
+                    IconButton(onClick = {
+                        if ((uiState.currentSelectedItems != uiState.selectedItems)
+                            || (currentlySelectedCrest != uiState.selectedCrest)
+                        ) {
+                            confirmBackDialogIsOpen = true
+                        } else {
+                            navigateBack()
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "navigate up"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        onItemsSaved(
+                            currentlySelectedCrest,
+                            uiState.currentSelectedItems
+                        )
+                        navigateBack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Save selected items"
                         )
                     }
                 }
@@ -134,6 +190,24 @@ fun ItemSelectScreen(
         Surface(
             modifier = Modifier.padding(paddingValues)
         ) {
+
+            var itemDetailsBottomSheetOpen by remember { mutableStateOf(false) }
+
+            var currentlyOpenItem by remember { mutableStateOf<ItemDetails?>(null) }
+            val closeBottomSheet = { itemDetailsBottomSheetOpen = false }
+            val bottomSheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = true
+            )
+
+            if (itemDetailsBottomSheetOpen && currentlyOpenItem != null) {
+                currentlyOpenItem?.let {
+                    ItemDetailsBottomSheet(
+                        itemDetails = it,
+                        sheetState = bottomSheetState,
+                        closeBottomSheet = closeBottomSheet
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -175,13 +249,24 @@ fun ItemSelectScreen(
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                if (uiState.selectedItems.isEmpty()) {
+                if (uiState.currentSelectedItems.isEmpty() && currentlySelectedCrest == null) {
                     Text(text = "Select items to add to your build.")
                 } else {
                     ItemsList(
-                        selectedItems = uiState.selectedItems,
-                        removeItem = onSelectedItemClicked,
-                        changeItemOrder = changeItemOrder
+                        selectedCrest = currentlySelectedCrest,
+                        selectedItems = uiState.currentSelectedItems,
+                        onItemDetailClicked = { item ->
+                            currentlyOpenItem = item
+                            itemDetailsBottomSheetOpen = true
+                        },
+                        onRemoveItem = {
+                            if (it.slotType == SlotType.CREST) {
+                                currentlySelectedCrest = null
+                            } else {
+                                onRemoveSelectedItem(it)
+                            }
+                        },
+                        changeItemOrder = changeItemOrder,
                     )
                 }
                 Spacer(modifier = Modifier.size(16.dp))
@@ -195,7 +280,7 @@ fun ItemSelectScreen(
                         positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                         tooltip = {
                             PlainTooltip {
-                                Text(text = "Tap to add item to build. Long press to get item details.")
+                                Text(text = "Tap to add item to build. You can also tap the item again to remove it.")
                             }
                         },
                         state = allItemsTooltipState,
@@ -235,8 +320,24 @@ fun ItemSelectScreen(
                 Spacer(modifier = Modifier.size(16.dp))
                 ItemSelectList(
                     itemsList = getFilteredItems(),
-                    selectedItems = uiState.selectedItems,
-                    onItemClicked = onItemClicked
+                    selectedCrest = currentlySelectedCrest,
+                    selectedItems = uiState.currentSelectedItems,
+                    onCrestAdded = { crest ->
+                        currentlySelectedCrest = crest
+                    },
+                    onCrestRemoved = {
+                        currentlySelectedCrest = null
+                    },
+                    onItemAdded = { item ->
+                        onAddSelectedItem(item)
+                    },
+                    onItemRemoved = { item ->
+                        onRemoveSelectedItem(item)
+                    },
+                    onItemDetailsClicked = { item ->
+                        currentlyOpenItem = item
+                        itemDetailsBottomSheetOpen = true
+                    }
                 )
             }
         }
@@ -246,8 +347,10 @@ fun ItemSelectScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ItemsList(
-    selectedItems: ImmutableList<Int?> = persistentListOf(),
-    removeItem: (Int) -> Unit,
+    selectedCrest: ItemDetails? = null,
+    selectedItems: ImmutableList<ItemDetails?> = persistentListOf(),
+    onItemDetailClicked: (ItemDetails) -> Unit = {},
+    onRemoveItem: (ItemDetails) -> Unit,
     changeItemOrder: (Int, Int) -> Unit
 ) {
 
@@ -258,6 +361,56 @@ fun ItemsList(
         changeItemOrder(fromIndex, toIndex)
     }
 
+
+    Column {
+        selectedCrest?.let { crest ->
+            Text(
+                text = "Crest:",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Spacer(modifier = Modifier.size(4.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .size(64.dp)
+                        .clickable {
+                            onRemoveItem(crest)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = getItemImage(crest.id)),
+                        contentDescription = null
+                    )
+                }
+                TextButton(
+                    onClick = { onItemDetailClicked(crest) },
+                ) {
+                    Text(
+                        text = "Details",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+
+        }
+    }
+    if (selectedItems.isNotEmpty()) {
+        Text(
+            text = "Items:",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.secondary
+        )
+    }
+    Spacer(modifier = Modifier.size(4.dp))
     LazyRow(
         modifier = Modifier
             .dragContainer(
@@ -272,7 +425,6 @@ fun ItemsList(
             ),
         state = listState,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
-
     ) {
         itemsIndexed(selectedItems) { index, selectedItem ->
             DraggableItem(
@@ -285,20 +437,34 @@ fun ItemsList(
                     label = "",
                 )
                 selectedItem?.let { item ->
-                    Box(
-                        modifier = Modifier
-                            .scale(animateScale)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .size(64.dp)
-                            .clickable {
-                                removeItem(item)
-                            },
-                        contentAlignment = Alignment.Center
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Image(
-                            painter = painterResource(id = getItemImage(item)),
-                            contentDescription = null
-                        )
+                        Box(
+                            modifier = Modifier
+                                .scale(animateScale)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .size(64.dp)
+                                .clickable {
+                                    onRemoveItem(item)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = getItemImage(item.id)),
+                                contentDescription = null
+                            )
+                        }
+                        TextButton(
+                            onClick = { onItemDetailClicked(item) },
+                        ) {
+                            Text(
+                                text = "Details",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
                     }
                 }
             }
@@ -409,6 +575,7 @@ fun Modifier.dragContainer(
 }
 
 @Preview
+@LightDarkPreview
 @Composable
 fun SelectedItemsRowPreview() {
     MonolithTheme {
@@ -417,10 +584,14 @@ fun SelectedItemsRowPreview() {
         ) {
             ItemsList(
                 selectedItems = persistentListOf(
-                    1, 2, 3, 4, 5
+                    ItemDetails(id = 1),
+                    ItemDetails(id = 2),
+                    ItemDetails(id = 3),
+                    ItemDetails(id = 4),
+                    ItemDetails(id = 5),
                 ),
                 changeItemOrder = { _, _ -> },
-                removeItem = {}
+                onRemoveItem = {}
             )
         }
     }

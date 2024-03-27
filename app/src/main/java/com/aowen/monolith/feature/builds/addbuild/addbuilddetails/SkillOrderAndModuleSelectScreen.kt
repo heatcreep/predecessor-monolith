@@ -53,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.addbuild.AddBuildState
@@ -134,7 +135,7 @@ fun SkillOrderAndModuleSelectScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    if (uiState.selectedItems.isEmpty()) {
+                    if (uiState.selectedItems.isEmpty() && uiState.selectedCrest == null) {
                         Text(text = "No items added. Tap the '+' button to add items.")
                     } else {
                         Box(modifier = Modifier
@@ -145,13 +146,13 @@ fun SkillOrderAndModuleSelectScreen(
                             .clickable {
                                 // TODO:
                             }) {
-                            uiState.selectedCrestId?.let { id ->
+                            uiState.selectedCrest?.let { crest ->
                                 Image(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .aspectRatio(1f),
                                     contentScale = ContentScale.FillBounds,
-                                    painter = painterResource(id = getItemImage(id)),
+                                    painter = painterResource(id = getItemImage(crest.id)),
                                     contentDescription = null,
                                 )
                             }
@@ -172,7 +173,7 @@ fun SkillOrderAndModuleSelectScreen(
                                             .fillMaxSize()
                                             .aspectRatio(1f),
                                         contentScale = ContentScale.FillBounds,
-                                        painter = painterResource(id = getItemImage(item)),
+                                        painter = painterResource(id = getItemImage(item.id)),
                                         contentDescription = null,
                                     )
                                 }
@@ -459,8 +460,14 @@ fun SkillOrderAndModuleSelectScreenPreview() {
                     
                     First up there's Wayfarer's Bauble. It's a great first item and I love it so much. This is just more text. akdjwakawjdkajdakdjwdkawjdakdjwakdkdajwdklawjdaklwjawlkdjawlkdajwdklajdklawdjawkldjadklajdalwkdjalkdjwakldjadlkawjdlakwdjawlkdjawlkdjawkldwad
                 """.trimIndent(),
-                selectedCrestId = 37,
-                selectedItems = persistentListOf(1, 2, 3, 4, 5),
+                selectedCrest = ItemDetails(id = 37, displayName = "Sanctification"),
+                selectedItems = persistentListOf(
+                    ItemDetails(id = 1),
+                    ItemDetails(id = 2),
+                    ItemDetails(id = 3),
+                    ItemDetails(id = 4),
+                    ItemDetails(id = 5)
+                ),
                 modules = listOf(
                     ItemModule(
                         title = "First Buy",
