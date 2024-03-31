@@ -36,7 +36,7 @@ object NetworkUtil {
     fun getOkHttpClientWithCache(appContext: Context): OkHttpClient {
         val cacheSize = 10 * 1024 * 1024L // 10 MB
         val maxRequestStale = 60 * 60 * 24 * 7 // 7 days
-        val maxRequestAge = 60 // 1 minute
+        val maxRequestAge = 5 // 1 minute
         val maxResponseAge = 3600 // 1 hour
         val cache = Cache(appContext.cacheDir, cacheSize)
 

@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.aowen.monolith.feature.search.navigation.SearchRoute
 import com.aowen.monolith.feature.items.ItemsScreenRoute
 import com.aowen.monolith.feature.items.itemdetails.navigation.itemDetailsScreen
+import com.aowen.monolith.feature.search.navigation.HomeRoute
 
 const val ItemsRoute = "items"
 
@@ -22,7 +23,7 @@ fun NavGraphBuilder.itemsScreen(
         route = ItemsRoute,
         enterTransition = {
             slideIntoContainer(
-                if (this.initialState.destination.route == SearchRoute) {
+                if (this.initialState.destination.route == HomeRoute) {
                     AnimatedContentTransitionScope.SlideDirection.Start
                 } else {
                     AnimatedContentTransitionScope.SlideDirection.End
@@ -31,7 +32,7 @@ fun NavGraphBuilder.itemsScreen(
         },
         exitTransition = {
             slideOutOfContainer(
-                if (this.targetState.destination.route == SearchRoute) {
+                if (this.targetState.destination.route == HomeRoute) {
                     AnimatedContentTransitionScope.SlideDirection.End
                 } else {
                     AnimatedContentTransitionScope.SlideDirection.Start

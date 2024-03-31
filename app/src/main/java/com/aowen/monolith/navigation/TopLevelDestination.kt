@@ -20,7 +20,7 @@ enum class TopLevelDestination(
     val iconTextId: Int,
     val titleTextId: Int,
 ) {
-    SEARCH(
+    HOME(
         selectedIcon = Icons.Filled.Search,
         unselectedIcon = Icons.Outlined.Search,
         iconTextId = R.string.icon_search,

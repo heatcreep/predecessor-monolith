@@ -14,6 +14,7 @@ import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroDto2
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
+import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
 import com.aowen.monolith.fakes.data.fakeItemDto
 import com.aowen.monolith.fakes.data.fakeItemDto2
 import com.aowen.monolith.fakes.data.fakeItemDto3
@@ -183,6 +184,14 @@ class FakeOmedaCityRepository(
             "Empty" -> Result.success(null)
             else -> Result.success(fakeHeroDto.create())
         }
+    }
+
+    override suspend fun fetchAllHeroStatistics(timeFrame: String?): Result<List<HeroStatistics>> {
+        return if (hasHeroStatisticsErrors) {
+            Result.failure(Exception(FetchHeroStatsError))
+        } else Result.success(
+            fakeHeroStatisticsResult
+        )
     }
 
     override suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?> {

@@ -40,7 +40,7 @@ import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getKda
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.KDAText
-import com.aowen.monolith.ui.theme.DarkGreenHighlight
+import com.aowen.monolith.ui.theme.DarkGreenHighlight35
 import com.aowen.monolith.ui.theme.GreenHighlight
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.RedHighlight
@@ -127,7 +127,7 @@ fun MatchPlayerCard(
                 .background(
                     brush = Brush.horizontalGradient(
                         listOf(
-                            if (isWinner) DarkGreenHighlight else RedHighlight,
+                            if (isWinner) DarkGreenHighlight35 else RedHighlight,
                             MaterialTheme.colorScheme.primary
                         ),
                         endX = 250f

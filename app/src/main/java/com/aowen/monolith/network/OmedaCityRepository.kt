@@ -42,6 +42,8 @@ interface OmedaCityRepository {
 
     suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?>
 
+    suspend fun fetchAllHeroStatistics(timeFrame: String? = "1M"): Result<List<HeroStatistics>>
+
     suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?>
 
     suspend fun fetchAllBuilds(
@@ -203,6 +205,15 @@ class OmedaCityRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    override suspend fun fetchAllHeroStatistics(timeFrame: String?): Result<List<HeroStatistics>> {
+        val heroStatisticsResponse = playerApiService.getAllHeroStatistics(timeFrame)
+        return if (heroStatisticsResponse.isSuccessful) {
+            Result.success(heroStatisticsResponse.body()?.heroStatistics?.map { it.create() } ?: emptyList())
+        } else {
+            Result.failure(Exception("Failed to fetch hero statistics"))
         }
     }
 

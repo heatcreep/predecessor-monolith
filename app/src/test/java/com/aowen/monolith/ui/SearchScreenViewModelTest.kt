@@ -4,14 +4,15 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.FakeUserRecentSearchesRepository
 import com.aowen.monolith.fakes.FakeUserRepository
+import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
 import com.aowen.monolith.fakes.data.fakePlayerDetails
 import com.aowen.monolith.fakes.data.fakePlayerDetails2
 import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.feature.search.SearchScreenUiState
 import com.aowen.monolith.feature.search.SearchScreenViewModel
+import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -230,12 +231,15 @@ class SearchScreenViewModelTest {
         val expected = SearchScreenUiState(
             isLoading = false,
             error = null,
+            heroStats = fakeHeroStatisticsResult,
             claimedPlayerStats = fakePlayerStatsDto.create(),
             claimedPlayerDetails = fakePlayerDto.create(),
             recentSearchesList = listOf(
                 fakePlayerDetails,
                 fakePlayerDetails2
-            )
+            ),
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed()
 
         )
         val actual = viewModel.uiState.value
@@ -257,6 +261,30 @@ class SearchScreenViewModelTest {
         val expected = SearchScreenUiState(
             isLoading = false,
             claimedUserError = "Failed to fetch claimed user"
+        )
+        val actual = viewModel.uiState.value
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `initViewModel() should set top five heroes by win rate`() {
+        val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+        viewModel = SearchScreenViewModel(
+            repository = FakeOmedaCityRepository(),
+            userRepository = FakeUserRepository(),
+            userRecentSearchesRepository = userRecentSearchesRepository,
+
+        )
+        viewModel.initViewModel()
+        val expected = SearchScreenUiState(
+            isLoading = false,
+            heroStats = fakeHeroStatisticsResult,
+            recentSearchesList = listOf(
+                fakePlayerDetails,
+                fakePlayerDetails2
+            ),
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed()
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)

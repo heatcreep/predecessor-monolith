@@ -55,6 +55,9 @@ interface OmedaCityService {
     suspend fun getHeroByName(@Path("hero_name") heroName: String): Response<HeroDto>
 
     @GET("dashboard/hero_statistics.json")
+    suspend fun getAllHeroStatistics(@Query("time_frame") timeFrame: String?): Response<HeroStatisticsResponseDto>
+
+    @GET("dashboard/hero_statistics.json")
     suspend fun getHeroStatisticsById(@Query("hero_ids") heroIds: String): Response<HeroStatisticsResponseDto>
 
     @GET("items.json")

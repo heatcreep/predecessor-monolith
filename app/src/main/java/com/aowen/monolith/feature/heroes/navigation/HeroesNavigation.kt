@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.aowen.monolith.feature.search.navigation.SearchRoute
 import com.aowen.monolith.feature.heroes.HeroesScreenRoute
 import com.aowen.monolith.feature.heroes.herodetails.navigation.heroDetailsScreen
+import com.aowen.monolith.feature.search.navigation.HomeRoute
 
 const val HeroesRoute = "heroes"
 
@@ -22,7 +23,7 @@ fun NavGraphBuilder.heroesScreen(
         route = HeroesRoute,
         enterTransition = {
             slideIntoContainer(
-                if (this.initialState.destination.route == SearchRoute) {
+                if (this.initialState.destination.route == HomeRoute) {
                     SlideDirection.Start
                 } else {
                     SlideDirection.End
@@ -31,7 +32,7 @@ fun NavGraphBuilder.heroesScreen(
         },
         exitTransition = {
             slideOutOfContainer(
-                if (this.targetState.destination.route == SearchRoute) {
+                if (this.targetState.destination.route == HomeRoute) {
                     SlideDirection.End
                 } else {
                     SlideDirection.Start

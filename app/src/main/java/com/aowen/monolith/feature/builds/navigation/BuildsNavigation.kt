@@ -9,6 +9,7 @@ import com.aowen.monolith.feature.search.navigation.SearchRoute
 import com.aowen.monolith.feature.builds.BuildsScreenRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.addBuildsScreen
 import com.aowen.monolith.feature.builds.builddetails.navigation.buildDetailsScreen
+import com.aowen.monolith.feature.search.navigation.HomeRoute
 
 const val BuildsRoute = "builds"
 
@@ -23,7 +24,7 @@ fun NavGraphBuilder.buildsScreen(
         route = BuildsRoute,
         enterTransition = {
             slideIntoContainer(
-                if (this.initialState.destination.route == SearchRoute) {
+                if (this.initialState.destination.route == HomeRoute) {
                     AnimatedContentTransitionScope.SlideDirection.Start
                 } else {
                     AnimatedContentTransitionScope.SlideDirection.End
@@ -32,7 +33,7 @@ fun NavGraphBuilder.buildsScreen(
         },
         exitTransition = {
             slideOutOfContainer(
-                if (this.targetState.destination.route == SearchRoute) {
+                if (this.targetState.destination.route == HomeRoute) {
                     AnimatedContentTransitionScope.SlideDirection.End
                 } else {
                     AnimatedContentTransitionScope.SlideDirection.Start

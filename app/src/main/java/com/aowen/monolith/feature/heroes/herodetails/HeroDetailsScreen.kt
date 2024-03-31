@@ -264,7 +264,6 @@ fun HeroStatsRateBar(
     LaunchedEffect(rate) {
         progress = rate / 100
     }
-
 }
 
 @Composable

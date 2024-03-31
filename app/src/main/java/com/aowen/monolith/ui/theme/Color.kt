@@ -11,9 +11,10 @@ import androidx.compose.ui.graphics.Color
 val NeroBlack = Color(0xFF1C1C1C)
 
 val NeroGrey = Color(0xFF2C2C2C)
+val NeroLightGrey = Color(0xFF797979)
 
 // Browns
-val DarkKhaki = Color(0xFF645C45)
+val DarkKhaki = Color(0xFFA39D8C)
 val LightKhaki = Color(0xFFE6DEC6)
 val Dawn = Color(0xFF966426)
 
@@ -24,7 +25,9 @@ val WarmWhite200 = Color(0xFFEEEEEE)
 
 // Green
 val GreenHighlight = Color(0xFF69AF69)
-val DarkGreenHighlight = Color(0x561C421C)
+val DarkGreenHighlight = Color(0xFF317231)
+val DarkGreenHighlight35 = Color(0x4D1C421C)
+
 
 // Red
 val RedHighlight = Color(0xFFAF6969)

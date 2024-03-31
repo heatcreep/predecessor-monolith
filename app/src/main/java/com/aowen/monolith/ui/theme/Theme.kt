@@ -26,7 +26,8 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = DiscordBlurple,
     onSecondaryContainer = WarmWhite,
     tertiaryContainer = LightKhaki,
-    onTertiaryContainer = NeroBlack,
+    onTertiary = NeroBlack,
+    onTertiaryContainer = DarkKhaki,
     inversePrimary = Color.LightGray
 )
 
@@ -39,8 +40,9 @@ private val LightColorScheme = lightColorScheme(
     background = WarmWhite200,
     secondaryContainer = DiscordBlurple,
     onSecondaryContainer = WarmWhite,
-    tertiaryContainer = NeroGrey,
-    onTertiaryContainer = LightKhaki
+    onTertiary = WarmWhite,
+    tertiaryContainer = NeroLightGrey,
+    onTertiaryContainer = NeroGrey
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

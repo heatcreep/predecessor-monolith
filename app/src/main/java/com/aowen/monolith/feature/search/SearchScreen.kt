@@ -1,7 +1,6 @@
 package com.aowen.monolith.feature.search
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,28 +29,20 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.TooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -64,14 +54,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.data.Hero
+import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.feature.heroes.herodetails.navigation.navigateToHeroDetails
+import com.aowen.monolith.feature.search.playerdetails.navigation.navigateToPlayerDetails
+import com.aowen.monolith.feature.search.winrate.navigation.navigateToHeroWinPickRate
 import com.aowen.monolith.network.firebase.Feedback
 import com.aowen.monolith.ui.components.MonolithAlertDialog
 import com.aowen.monolith.ui.components.RefreshableContainer
@@ -80,13 +74,12 @@ import com.aowen.monolith.ui.components.ShimmerLongText
 import com.aowen.monolith.ui.components.ShimmerShortText
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.inputFieldDefaults
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun SearchScreenRoute(
     modifier: Modifier = Modifier,
-    navigateToPlayerDetails: (String) -> Unit,
-    searchScreenViewModel: SearchScreenViewModel = hiltViewModel(),
+    navController: NavController,
+    searchScreenViewModel: SearchScreenViewModel
 ) {
     val searchUiState by searchScreenViewModel.uiState.collectAsState()
 
@@ -103,7 +96,11 @@ internal fun SearchScreenRoute(
         setSearchValue = searchScreenViewModel::setSearchValue,
         handleSubmitSearch = searchScreenViewModel::handleSubmitSearch,
         handleClearSearch = searchScreenViewModel::handleClearSearch,
-        navigateToPlayerDetails = navigateToPlayerDetails,
+        navigateToPlayerDetails = navController::navigateToPlayerDetails,
+        navigateToHeroDetails = navController::navigateToHeroDetails,
+        navigateToHeroWinPickRate = navController::navigateToHeroWinPickRate,
+        topFiveHeroesByWinRate = searchScreenViewModel.getTopFiveHeroesByWinRate(),
+        topFiveHeroesByPickRate = searchScreenViewModel.getTopFiveHeroesByPickRate(),
         handlePullRefresh = searchScreenViewModel::initViewModel,
         handleAddToRecentSearch = searchScreenViewModel::handleAddToRecentSearch,
         handleClearSingleSearch = searchScreenViewModel::handleClearSingleSearch,
@@ -112,7 +109,7 @@ internal fun SearchScreenRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchScreen(
     uiState: SearchScreenUiState,
@@ -120,6 +117,10 @@ fun SearchScreen(
     handleSubmitSearch: () -> Unit,
     handleClearSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
+    navigateToHeroDetails: (Int, String) -> Unit,
+    navigateToHeroWinPickRate: (String) -> Unit,
+    topFiveHeroesByWinRate: List<HeroStatistics>,
+    topFiveHeroesByPickRate: List<HeroStatistics>,
     handlePullRefresh: () -> Unit,
     handleAddToRecentSearch: (PlayerDetails) -> Unit,
     handleClearSingleSearch: (String) -> Unit,
@@ -127,8 +128,6 @@ fun SearchScreen(
     modifier: Modifier = Modifier
 ) {
 
-    val coroutineScope = rememberCoroutineScope()
-    val tooltipState = remember { TooltipState() }
     var alertDialogIsOpen by remember { mutableStateOf(false) }
     val isRefreshing by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
@@ -158,7 +157,11 @@ fun SearchScreen(
         Surface(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(
+                    top = 16.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                ),
             color = MaterialTheme.colorScheme.background
         ) {
 
@@ -167,6 +170,7 @@ fun SearchScreen(
                     .fillMaxHeight()
                     .pullRefresh(pullRefreshState)
                     .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 SearchBar(
                     searchLabel = "Player lookup",
@@ -176,199 +180,33 @@ fun SearchScreen(
                     handleClearSearch = handleClearSearch,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(
-                    text = "My Player",
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleMedium
+                ClaimedPlayerSection(
+                    uiState = uiState,
+                    handleAddToRecentSearch = handleAddToRecentSearch,
+                    navigateToPlayerDetails = navigateToPlayerDetails
                 )
-
-                Spacer(modifier = Modifier.size(16.dp))
-                AnimatedContent(targetState = uiState.isLoading, label = "") {
-                    if (it) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            PlayerLoadingCard(
-                                avatarSize = 64.dp,
-                                titleHeight = 16.dp,
-                                subtitleHeight = 12.dp,
-                                titleWidth = 100.dp,
-                                subtitleWidth = 200.dp,
-                            )
-                        }
-                    } else {
-                        if (uiState.error != null) {
-                            Text(
-                                text = uiState.error,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        } else {
-                            if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
-                                ClaimedPlayerCard(
-                                    playerDetails = uiState.claimedPlayerDetails,
-                                    playerStats = uiState.claimedPlayerStats,
-                                    navigateToPlayerDetails = {
-                                        handleAddToRecentSearch(uiState.claimedPlayerDetails)
-                                        navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
-                                    }
-                                )
-                            } else if(uiState.claimedUserError != null) {
-                                Text(
-                                    text = "There was an error fetching your claimed player. Please try again or search for your player and claim again.",
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            } else {
-                                Text(
-                                    text = "No player claimed! Navigate to a player's profile and click the" +
-                                            " 'Claim Player' button to claim a player.",
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.size(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        AnimatedContent(
-                            targetState = (uiState.playersList.isNotEmpty() || uiState.searchError != null),
-                            label = ""
-                        ) {
-                            Text(
-                                text = if (it) {
-                                    "Search Results"
-                                } else {
-                                    "Recent Searches"
-                                },
-                                color = MaterialTheme.colorScheme.secondary,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                        }
-                        TooltipBox(
-                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                            tooltip = {
-                                PlainTooltip {
-                                    Text(text = "We hide cheaters and players with MMR disabled from the search results.")
-                                }
-                            },
-                            state = tooltipState,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        tooltipState.show()
-                                    }
-                                },
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Info,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        }
-                    }
-                    if (uiState.playersList.isNotEmpty()) {
-                        TextButton(onClick = { alertDialogIsOpen = true }) {
-                            Text(
-                                text = "Clear All",
-                                color = MaterialTheme.colorScheme.secondary,
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                            )
-                        }
-                    }
-
-                }
-                Spacer(modifier = Modifier.size(16.dp))
-                AnimatedContent(
-                    targetState = (uiState.isLoading || uiState.isLoadingSearch),
-                    label = ""
-                ) {
-                    if (it) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            repeat(7) {
-                                PlayerLoadingCard(
-                                    titleWidth = 100.dp,
-                                    subtitleWidth = 75.dp
-                                )
-                            }
-
-                        }
-                    } else {
-                        if (uiState.error != null) {
-                            Text(
-                                text = uiState.error,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        } else if (uiState.searchError != null) {
-                            Text(
-                                text = uiState.searchError,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        } else if (uiState.playersList.isNotEmpty()) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                uiState.playersList.forEach { player ->
-                                    player?.let {
-                                        PlayerResultCard(
-                                            playerDetails = player,
-                                            navigateToPlayerDetails = {
-                                                handleAddToRecentSearch(player)
-                                                navigateToPlayerDetails(player.playerId)
-                                            }
-                                        )
-                                    }
-                                }
-
-                            }
-                        } else if (uiState.recentSearchesList.isNotEmpty()) {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                uiState.recentSearchesList.forEach { player ->
-                                    player?.let {
-                                        PlayerResultCard(
-                                            playerDetails = player,
-                                            handleClearSingleSearch = {
-                                                handleClearSingleSearch(player.playerId)
-                                            },
-                                            navigateToPlayerDetails = {
-                                                handleAddToRecentSearch(player)
-                                                navigateToPlayerDetails(player.playerId)
-                                            }
-                                        )
-
-                                    }
-                                }
-                            }
-                        } else {
-                            Text(
-                                text = "No recent searches",
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
-                    }
-                }
+                RecentPlayersSection(
+                    uiState = uiState,
+                    handleAddToRecentSearch = handleAddToRecentSearch,
+                    navigateToPlayerDetails = navigateToPlayerDetails,
+                    handleClearSingleSearch = handleClearSingleSearch,
+                    handleOpenAlertDialog = { alertDialogIsOpen = true }
+                )
+                HeroWinRateSection(
+                    heroStatsList = topFiveHeroesByWinRate,
+                    navigateToHeroDetails = navigateToHeroDetails,
+                    navigateToHeroWinRate = navigateToHeroWinPickRate
+                )
+                HeroPickRateSection(
+                    heroStatsList = topFiveHeroesByPickRate,
+                    navigateToHeroDetails = navigateToHeroDetails,
+                    navigateToHeroPickRate = navigateToHeroWinPickRate
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchBar(
     searchValue: String,
@@ -753,10 +591,14 @@ fun SearchScreenPreview() {
                 handleSubmitSearch = {},
                 handleClearSearch = {},
                 navigateToPlayerDetails = {},
+                navigateToHeroDetails = { _, _ -> },
+                navigateToHeroWinPickRate = {},
                 handleAddToRecentSearch = {},
                 handleClearSingleSearch = {},
                 handlePullRefresh = {},
-                handleClearAllRecentSearches = {}
+                handleClearAllRecentSearches = {},
+                topFiveHeroesByWinRate = emptyList(),
+                topFiveHeroesByPickRate = emptyList()
             )
         }
     }
@@ -799,10 +641,14 @@ fun SearchScreenRecentSearchPreview() {
                 handleSubmitSearch = {},
                 handleClearSearch = {},
                 navigateToPlayerDetails = {},
+                navigateToHeroDetails = { _, _ -> },
+                navigateToHeroWinPickRate = {},
                 handleAddToRecentSearch = {},
                 handleClearSingleSearch = {},
                 handleClearAllRecentSearches = {},
-                handlePullRefresh = {}
+                handlePullRefresh = {},
+                topFiveHeroesByWinRate = emptyList(),
+                topFiveHeroesByPickRate = emptyList()
             )
         }
     }

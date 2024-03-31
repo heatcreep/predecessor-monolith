@@ -15,6 +15,10 @@ fun getHeroRole(roleName: String? = "") : HeroRole = HeroRole.entries.firstOrNul
     it.roleName == roleName?.lowercase()
 } ?: HeroRole.Unknown
 
+fun getHeroImage(heroId: Int) = Hero.entries.firstOrNull {
+    it.heroId == heroId
+}?.drawableId ?: R.drawable.unknown
+
 enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     ARGUS("Argus", 49, R.drawable.argus),
     BELICA("Lt. Belica",  13, R.drawable.belica),

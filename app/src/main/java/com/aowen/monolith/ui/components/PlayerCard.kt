@@ -308,10 +308,10 @@ fun PlayerCard(
                         )
                     }
                 )
-                // Winrate
+                // WinRate
                 StatListItem(
                     modifier = modifier,
-                    statLabel = "Winrate:",
+                    statLabel = "WinRate:",
                     statValue = {
                         Text(
                             text = stats.winRate,

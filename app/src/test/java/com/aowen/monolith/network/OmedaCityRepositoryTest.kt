@@ -344,6 +344,37 @@ class OmedaCityRepositoryTest {
         assertEquals(expected, actual?.message)
     }
 
+    @Test
+    fun `fetchAllAllHeroes - successful response returns a list of HeroDetails`() = runTest {
+        val actual = omedaCityRepository.fetchAllHeroes().getOrNull()
+        val expected = listOf(
+            fakeHeroDto.create()
+        )
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `fetchAllAllHeroes - non-successful response returns exception with message`() = runTest {
+        omedaCityRepository = OmedaCityRepositoryImpl(
+            playerApiService = FakeOmedaCityService(404)
+        )
+        val actual = omedaCityRepository.fetchAllHeroes().exceptionOrNull()
+        val expected = "Failed to fetch heroes"
+        assertTrue(actual is Exception)
+        assertEquals(expected, actual?.message)
+    }
+
+    @Test
+    fun `fetchAllAllHeroes - thrown exception returns failure with message`() = runTest {
+        omedaCityRepository = OmedaCityRepositoryImpl(
+            playerApiService = FakeOmedaCityService()
+        )
+        val actual = omedaCityRepository.fetchAllHeroes().exceptionOrNull()
+        val expected = "Something went wrong"
+        assertTrue(actual is Exception)
+        assertEquals(expected, actual?.message)
+    }
+
     // fetchHeroStatisticsById
 
     @Test

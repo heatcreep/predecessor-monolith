@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.aowen.monolith.feature.auth.navigation.LoginRoute
+import com.aowen.monolith.feature.search.navigation.HomeRoute
 import com.aowen.monolith.feature.search.navigation.SearchRoute
 import com.aowen.monolith.navigation.MonolithNavHost
 import com.aowen.monolith.navigation.NavBarItem
@@ -50,7 +51,7 @@ fun MonolithApp(
         MonolithNavHost(
             navController = appState.navController,
             modifier = Modifier.padding(padding),
-            startDestination = if (userId.isNotEmpty() || uiState.session != null) SearchRoute else LoginRoute,
+            startDestination = if (userId.isNotEmpty() || uiState.session != null) HomeRoute else LoginRoute,
             showSnackbar = { message, duration ->
                 appState.showSnackbar(message, duration)
             }
