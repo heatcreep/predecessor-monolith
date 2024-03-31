@@ -1,6 +1,17 @@
 # Release Notes
 
-## 0.8.0 - Latest
+## 1.3.0 - Latest
+
+#### New Features
+
+- Adds Top 5 Win Rate and Pick Rate to Search Screen for Heroes with details screen for all heroes.
+
+#### Improvements & Bug Fixes
+
+- Improves logic for fetching recent players on search screen
+- Fixes a bug where total damage to structures was off in the match details screen
+
+## 0.8.0
 
 #### New Features
 
