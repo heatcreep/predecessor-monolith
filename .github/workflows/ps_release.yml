@@ -33,6 +33,8 @@ jobs:
         env:
           VERSION_CODE: ${{ github.run_number }}
           VERSION_NAME: ${{ env.version_name }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           KEYSTORE_FILE: ${{ github.workspace }}/keystore.jks
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
