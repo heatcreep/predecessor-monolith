@@ -25,15 +25,20 @@ jobs:
           VERSION_NAME=$(echo "${{ github.ref_name }}" | egrep -o '[0-9]+\.[0-9]+\.[0-9]+')
           echo "version_name=$VERSION_NAME" >> "$GITHUB_ENV"
 
-      - name: Build & Assemble Release APK
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE }}" | base64 --decode > keystore.jks
+
+      - name: Build & Bundle Release AAB
         env:
           VERSION_CODE: ${{ github.run_number }}
           VERSION_NAME: ${{ env.version_name }}
+          KEYSTORE_FILE: ${{ github.workspace }}/keystore.jks
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         run: |
-          ./gradlew assembleRelease
+          ./gradlew bundleRelease
 
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
