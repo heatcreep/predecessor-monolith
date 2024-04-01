@@ -40,7 +40,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_CREDENTIALS }}
           packageName: com.aowen.monolith
-          releaseFiles: app/build/outputs/apk/release/app-release.apk
+          releaseFiles: app/build/outputs/apk/release/app-release.aab
           track: production
 
       - uses: marvinpinto/action-automatic-releases@v1.2.1
