@@ -5,7 +5,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.aowen.monolith.feature.search.navigation.SearchRoute
 import com.aowen.monolith.feature.heroes.HeroesScreenRoute
 import com.aowen.monolith.feature.heroes.herodetails.navigation.heroDetailsScreen
 import com.aowen.monolith.feature.search.navigation.HomeRoute
@@ -42,5 +41,5 @@ fun NavGraphBuilder.heroesScreen(
     ) {
         HeroesScreenRoute(navController)
     }
-    heroDetailsScreen()
+    heroDetailsScreen(navController)
 }

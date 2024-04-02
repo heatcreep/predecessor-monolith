@@ -114,13 +114,10 @@ fun RecentPlayersSection(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    repeat(7) {
-                        PlayerLoadingCard(
-                            titleWidth = 100.dp,
-                            subtitleWidth = 75.dp
-                        )
-                    }
-
+                    PlayerLoadingCard(
+                        titleWidth = 100.dp,
+                        subtitleWidth = 75.dp
+                    )
                 }
             } else {
                 if (uiState.error != null) {
