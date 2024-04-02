@@ -54,7 +54,19 @@ class SearchScreenViewModelTest {
 
         )
         viewModel.handleClearSearch()
-        val expected = SearchScreenUiState()
+        val expected = SearchScreenUiState(
+            isLoading = false,
+            isLoadingSearch = false,
+            playersList = emptyList(),
+            heroStats = fakeHeroStatisticsResult,
+            recentSearchesList = listOf(
+                fakePlayerDetails,
+                fakePlayerDetails2
+            ),
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
+            searchFieldValue = ""
+        )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
     }
@@ -118,11 +130,19 @@ class SearchScreenViewModelTest {
         )
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
+            isLoading = false,
             isLoadingSearch = false,
             playersList = listOf(
                 fakePlayerDetails,
                 fakePlayerDetails2
-            )
+            ),
+            heroStats = fakeHeroStatisticsResult,
+            recentSearchesList = listOf(
+                fakePlayerDetails,
+                fakePlayerDetails2
+            ),
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -140,7 +160,15 @@ class SearchScreenViewModelTest {
         viewModel.setSearchValue("Cheater")
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
+            isLoading = false,
             isLoadingSearch = false,
+            heroStats = fakeHeroStatisticsResult,
+            recentSearchesList = listOf(
+                fakePlayerDetails,
+                fakePlayerDetails2
+            ),
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
             playersList = listOf(
                 fakePlayerDetails
             ),
@@ -162,7 +190,15 @@ class SearchScreenViewModelTest {
         viewModel.setSearchValue("MMR Disabled")
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
+            isLoading = false,
             isLoadingSearch = false,
+            heroStats = fakeHeroStatisticsResult,
+            recentSearchesList = listOf(
+                fakePlayerDetails,
+                fakePlayerDetails2
+            ),
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
             playersList = listOf(
                 fakePlayerDetails
             ),
@@ -184,8 +220,16 @@ class SearchScreenViewModelTest {
         viewModel.setSearchValue("Empty")
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
+            isLoading = false,
             isLoadingSearch = false,
             playersList = listOf(),
+            heroStats = fakeHeroStatisticsResult,
+            recentSearchesList = listOf(
+                fakePlayerDetails,
+                fakePlayerDetails2
+            ),
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
             searchError = "No results found",
             searchFieldValue = "Empty"
         )
@@ -204,8 +248,16 @@ class SearchScreenViewModelTest {
             )
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
+            isLoading = false,
             isLoadingSearch = false,
             playersList = emptyList(),
+            heroStats = fakeHeroStatisticsResult,
+            recentSearchesList = listOf(
+                fakePlayerDetails,
+                fakePlayerDetails2
+            ),
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
             initPlayersListText = "Hmm something went wrong. Please try your search again."
         )
         val actual = viewModel.uiState.value

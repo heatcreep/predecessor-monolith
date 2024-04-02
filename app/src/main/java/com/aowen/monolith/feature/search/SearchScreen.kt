@@ -60,7 +60,6 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.data.Hero
-import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.feature.heroes.herodetails.navigation.navigateToHeroDetails
@@ -85,12 +84,6 @@ internal fun SearchScreenRoute(
 
     Feedback()
 
-
-    LaunchedEffect(Unit) {
-        searchScreenViewModel.initViewModel()
-    }
-
-
     SearchScreen(
         uiState = searchUiState,
         setSearchValue = searchScreenViewModel::setSearchValue,
@@ -99,8 +92,6 @@ internal fun SearchScreenRoute(
         navigateToPlayerDetails = navController::navigateToPlayerDetails,
         navigateToHeroDetails = navController::navigateToHeroDetails,
         navigateToHeroWinPickRate = navController::navigateToHeroWinPickRate,
-        topFiveHeroesByWinRate = searchScreenViewModel.getTopFiveHeroesByWinRate(),
-        topFiveHeroesByPickRate = searchScreenViewModel.getTopFiveHeroesByPickRate(),
         handlePullRefresh = searchScreenViewModel::initViewModel,
         handleAddToRecentSearch = searchScreenViewModel::handleAddToRecentSearch,
         handleClearSingleSearch = searchScreenViewModel::handleClearSingleSearch,
@@ -119,8 +110,6 @@ fun SearchScreen(
     navigateToPlayerDetails: (String) -> Unit,
     navigateToHeroDetails: (Int, String) -> Unit,
     navigateToHeroWinPickRate: (String) -> Unit,
-    topFiveHeroesByWinRate: List<HeroStatistics>,
-    topFiveHeroesByPickRate: List<HeroStatistics>,
     handlePullRefresh: () -> Unit,
     handleAddToRecentSearch: (PlayerDetails) -> Unit,
     handleClearSingleSearch: (String) -> Unit,
@@ -193,12 +182,14 @@ fun SearchScreen(
                     handleOpenAlertDialog = { alertDialogIsOpen = true }
                 )
                 HeroWinRateSection(
-                    heroStatsList = topFiveHeroesByWinRate,
+                    isLoading = (uiState.isLoading || uiState.isLoadingSearch),
+                    heroStatsList = uiState.topFiveHeroesByWinRate,
                     navigateToHeroDetails = navigateToHeroDetails,
                     navigateToHeroWinRate = navigateToHeroWinPickRate
                 )
                 HeroPickRateSection(
-                    heroStatsList = topFiveHeroesByPickRate,
+                    isLoading = (uiState.isLoading || uiState.isLoadingSearch),
+                    heroStatsList = uiState.topFiveHeroesByPickRate,
                     navigateToHeroDetails = navigateToHeroDetails,
                     navigateToHeroPickRate = navigateToHeroWinPickRate
                 )
@@ -596,9 +587,7 @@ fun SearchScreenPreview() {
                 handleAddToRecentSearch = {},
                 handleClearSingleSearch = {},
                 handlePullRefresh = {},
-                handleClearAllRecentSearches = {},
-                topFiveHeroesByWinRate = emptyList(),
-                topFiveHeroesByPickRate = emptyList()
+                handleClearAllRecentSearches = {}
             )
         }
     }
@@ -646,9 +635,7 @@ fun SearchScreenRecentSearchPreview() {
                 handleAddToRecentSearch = {},
                 handleClearSingleSearch = {},
                 handleClearAllRecentSearches = {},
-                handlePullRefresh = {},
-                topFiveHeroesByWinRate = emptyList(),
-                topFiveHeroesByPickRate = emptyList()
+                handlePullRefresh = {}
             )
         }
     }

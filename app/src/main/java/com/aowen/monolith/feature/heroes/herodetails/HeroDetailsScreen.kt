@@ -1,7 +1,7 @@
 package com.aowen.monolith.feature.heroes.herodetails
 
-import android.content.res.Configuration
 import android.widget.TextView
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
@@ -19,13 +19,18 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ElevatedAssistChip
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -34,6 +39,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,25 +57,28 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
-import com.aowen.monolith.data.AbilityDetails
-import com.aowen.monolith.data.HeroBaseStats
 import com.aowen.monolith.data.HeroClass
-import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.getAbilityKey
 import com.aowen.monolith.data.getHeroRole
+import com.aowen.monolith.feature.builds.BuildListItem
+import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
+import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsLoadingState
+import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsState
+import com.aowen.monolith.feature.search.PlayerLoadingCard
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
@@ -79,13 +88,21 @@ import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.NeroBlack
 import com.aowen.monolith.ui.theme.NeroGrey
 import com.aowen.monolith.ui.theme.WarmWhite
+import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
 
+class SampleHeroDetailsScreenUiStateProvider :
+    CollectionPreviewParameterProvider<HeroDetailsUiState>(
+        collection = listOf(
+            heroBuildsLoadingState,
+            heroBuildsState
+        )
+    )
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HeroDetailsRoute(
+    navController: NavController,
     viewModel: HeroDetailsViewModel = hiltViewModel()
 ) {
 
@@ -103,72 +120,97 @@ fun HeroDetailsRoute(
     )
 
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        if (uiState.isLoading) {
-            FullScreenLoadingIndicator("Hero Details")
-        } else {
-            if (uiState.heroDetailsErrors != null) {
-                val errorMessage = uiState.heroDetailsErrors?.heroErrorMessage
-                    ?: uiState.heroDetailsErrors?.statisticsErrorMessage
-                    ?: "Something went wrong."
-                val errorLog = uiState.heroDetailsErrors?.heroError
-                    ?: uiState.heroDetailsErrors?.statisticsError
-                    ?: "Something went wrong."
-                logDebug(errorLog)
-                FullScreenErrorWithRetry(
-                    errorMessage = errorMessage
-                ) {
-                    viewModel.initViewModel()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Hero Details",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "navigate up"
+                        )
+                    }
                 }
+            )
+        }
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            if (uiState.isLoading) {
+                FullScreenLoadingIndicator("Hero Details")
             } else {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    TabRow(
-                        selectedTabIndex = pagerState.currentPage,
-                        indicator = { tabPositions ->
-                            TabRowDefaults.SecondaryIndicator(
-                                Modifier.tabIndicatorOffset(
-                                    tabPositions[pagerState.currentPage]
-                                ),
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
+                if (uiState.heroDetailsErrors != null) {
+                    val errorMessage = uiState.heroDetailsErrors?.heroErrorMessage
+                        ?: uiState.heroDetailsErrors?.statisticsErrorMessage
+                        ?: "Something went wrong."
+                    val errorLog = uiState.heroDetailsErrors?.heroError
+                        ?: uiState.heroDetailsErrors?.statisticsError
+                        ?: "Something went wrong."
+                    logDebug(errorLog)
+                    FullScreenErrorWithRetry(
+                        errorMessage = errorMessage
                     ) {
-                        tabs.forEachIndexed { index, tab ->
-                            Tab(
-                                text = { Text(text = tab) },
-                                unselectedContentColor = MaterialTheme.colorScheme.tertiary,
-                                selectedContentColor = MaterialTheme.colorScheme.secondary,
-                                selected = pagerState.currentPage == index,
-                                onClick = {
-                                    coroutineScope.launch {
-                                        pagerState.animateScrollToPage(index)
+                        viewModel.initViewModel()
+                    }
+                } else {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        TabRow(
+                            selectedTabIndex = pagerState.currentPage,
+                            indicator = { tabPositions ->
+                                TabRowDefaults.SecondaryIndicator(
+                                    Modifier.tabIndicatorOffset(
+                                        tabPositions[pagerState.currentPage]
+                                    ),
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                        ) {
+                            tabs.forEachIndexed { index, tab ->
+                                Tab(
+                                    text = { Text(text = tab) },
+                                    unselectedContentColor = MaterialTheme.colorScheme.tertiary,
+                                    selectedContentColor = MaterialTheme.colorScheme.secondary,
+                                    selected = pagerState.currentPage == index,
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            pagerState.animateScrollToPage(index)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
-                    }
-                    HorizontalPager(
-                        modifier = Modifier.fillMaxWidth(),
-                        state = pagerState
-                    ) { page ->
-                        when (page) {
-                            0 -> HeroOverviewScreen(
-                                uiState = uiState
-                            )
+                        HorizontalPager(
+                            modifier = Modifier.fillMaxWidth(),
+                            state = pagerState
+                        ) { page ->
+                            when (page) {
+                                0 -> HeroOverviewScreen(
+                                    uiState = uiState,
+                                    navigateToBuildDetails = navController::navigateToBuildDetails
+                                )
 
-                            1 -> HeroStatsScreen(
-                                uiState = uiState
-                            )
+                                1 -> HeroStatsScreen(
+                                    uiState = uiState
+                                )
 
-                            2 -> HeroAbilitiesScreen(
-                                uiState = uiState
-                            )
+                                2 -> HeroAbilitiesScreen(
+                                    uiState = uiState
+                                )
+                            }
                         }
-                    }
 
+                    }
                 }
             }
         }
@@ -179,7 +221,8 @@ fun HeroDetailsRoute(
 @Composable
 fun HeroOverviewScreen(
     uiState: HeroDetailsUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToBuildDetails: (Int) -> Unit = {}
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -229,6 +272,54 @@ fun HeroOverviewScreen(
                 title = "Pick Rate",
                 rate = uiState.statistics.pickRate
             )
+            Spacer(modifier = Modifier.size(32.dp))
+            Text(
+                text = "Popular Builds",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+            AnimatedContent(targetState = uiState.isLoadingBuilds, label = "") { loadingBuilds ->
+                if (loadingBuilds) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        PlayerLoadingCard(
+                            avatarSize = 64.dp,
+                            titleHeight = 16.dp,
+                            subtitleHeight = 12.dp,
+                            titleWidth = 100.dp,
+                            subtitleWidth = 200.dp,
+                        )
+                    }
+                } else {
+                    if (uiState.heroDetailsErrors?.heroBuildsError != null) {
+                        Text(
+                            text = uiState.heroDetailsErrors.heroBuildsErrorMessage
+                                ?: "Failed to fetch hero builds.",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else if (uiState.heroBuilds.isEmpty()) {
+                        Text(
+                            text = "No builds found.",
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            uiState.heroBuilds.forEach { build ->
+                                BuildListItem(
+                                    build = build,
+                                    navigateToBuildDetails = navigateToBuildDetails
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -523,9 +614,12 @@ fun HeroRoleChips(
         roles.forEach { role ->
             if (role != null) {
                 ElevatedAssistChip(
+                    enabled = false,
                     onClick = {},
                     colors = AssistChipDefaults.elevatedAssistChipColors().copy(
-                        containerColor = NeroGrey
+                        containerColor = NeroGrey,
+                        disabledContainerColor = NeroGrey,
+                        disabledLabelColor = WarmWhite,
                     ),
                     label = {
                         Text(
@@ -554,8 +648,12 @@ fun HeroClassChips(
             if (heroClass != null) {
                 ElevatedAssistChip(
                     onClick = {},
+                    enabled = false,
                     colors = AssistChipDefaults.elevatedAssistChipColors().copy(
-                        containerColor = LightKhaki
+                        containerColor = LightKhaki,
+                        disabledContainerColor = LightKhaki,
+                        disabledLabelColor = NeroBlack,
+                        labelColor = NeroBlack
                     ),
                     label = {
                         Text(
@@ -570,125 +668,43 @@ fun HeroClassChips(
     }
 }
 
-@Preview(
-    group = "HeroDetailsScreen",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@LightDarkPreview
 @Composable
-fun HeroOverviewScreenPreview() {
+fun HeroOverviewScreenPreview(
+    @PreviewParameter(SampleHeroDetailsScreenUiStateProvider::class) uiState: HeroDetailsUiState
+) {
     MonolithTheme {
         Surface {
             HeroOverviewScreen(
-                uiState = HeroDetailsUiState(
-                    statistics = HeroStatistics(
-                        winRate = 50f,
-                        pickRate = 62.13f
-                    ),
-                    hero = HeroDetails(
-                        name = "Narbash",
-                        displayName = "Narbash",
-                        stats = listOf(1, 2, 3, 4, 5),
-                        abilities = listOf(
-                            AbilityDetails(
-                                displayName = "Wallop",
-                                menuDescription = "Melee basic attack dealing 55 (+90% Physical Power) physical damage.\\r\\n\\r\\nGrants 2 Rhythm stacks on hit.",
-                                image = "",
-                                cooldown = listOf(),
-                                cost = listOf(),
-                                gameDescription = ""
-                            )
-                        )
-                    ),
-                    isLoading = false
-                )
+                uiState = uiState
             )
         }
     }
 }
 
-@Preview(
-    group = "HeroDetailsScreen",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@LightDarkPreview
 @Composable
-fun HeroStatsScreenPreview() {
+fun HeroStatsScreenPreview(
+    @PreviewParameter(SampleHeroDetailsScreenUiStateProvider::class) uiState: HeroDetailsUiState
+) {
     MonolithTheme {
         Surface {
             HeroStatsScreen(
-                uiState = HeroDetailsUiState(
-                    statistics = HeroStatistics(
-                        winRate = 50f,
-                        pickRate = 62.13f
-                    ),
-                    hero = HeroDetails(
-                        name = "Narbash",
-                        displayName = "Narbash",
-                        stats = listOf(1, 2, 3, 4, 5),
-                        abilities = listOf(
-                            AbilityDetails(
-                                displayName = "Wallop",
-                                menuDescription = "Melee basic attack dealing 55 (+90% Physical Power) physical damage.\\r\\n\\r\\nGrants 2 Rhythm stacks on hit.",
-                                image = "",
-                                cooldown = listOf(),
-                                cost = listOf(),
-                                gameDescription = ""
-                            )
-                        ),
-                        baseStats = HeroBaseStats(
-                            maxHealth = listOf(BigDecimal.TEN),
-                            healthRegen = listOf(BigDecimal.TEN),
-                            maxMana = listOf(BigDecimal.TEN),
-                            manaRegen = listOf(BigDecimal.TEN),
-                            attackSpeed = listOf(BigDecimal.TEN),
-                            physicalArmor = listOf(BigDecimal.TEN),
-                            magicalArmor = listOf(BigDecimal.TEN),
-                            physicalPower = listOf(BigDecimal.TEN),
-                            movementSpeed = 11f,
-                            cleave = 1f,
-                            attackRange = 1f
-                        )
-                    ),
-                    isLoading = false
-                )
+                uiState = uiState
             )
         }
     }
 }
 
-@Preview(
-    group = "HeroDetailsScreen",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@LightDarkPreview
 @Composable
-fun HeroAbilitiesScreenPreview() {
+fun HeroAbilitiesScreenPreview(
+    @PreviewParameter(SampleHeroDetailsScreenUiStateProvider::class) uiState: HeroDetailsUiState
+) {
     MonolithTheme {
         Surface {
             HeroAbilitiesScreen(
-                uiState = HeroDetailsUiState(
-                    statistics = HeroStatistics(
-                        winRate = 50f,
-                        pickRate = 62.13f
-                    ),
-                    hero = HeroDetails(
-                        name = "Narbash",
-                        displayName = "Narbash",
-                        stats = listOf(1, 2, 3, 4, 5),
-                        abilities = listOf(
-                            AbilityDetails(
-                                displayName = "Wallop",
-                                menuDescription = "Melee basic attack dealing 55 (+90% Physical Power) physical damage.\\r\\n\\r\\nGrants 2 Rhythm stacks on hit.",
-                                image = "",
-                                cooldown = listOf(),
-                                cost = listOf(),
-                                gameDescription = ""
-                            )
-                        )
-                    ),
-                    isLoading = false
-                )
+                uiState = uiState
             )
         }
     }

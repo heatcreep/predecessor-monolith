@@ -19,7 +19,7 @@ fun NavController.navigateToHeroDetails(
     this.navigate("$HeroDetailRoute/$heroId/$heroName", navOptions)
 }
 
-fun NavGraphBuilder.heroDetailsScreen() {
+fun NavGraphBuilder.heroDetailsScreen(navController: NavController) {
     composable(
         route = "$HeroDetailRoute/{heroId}/{heroName}",
         enterTransition = {
@@ -37,6 +37,8 @@ fun NavGraphBuilder.heroDetailsScreen() {
             },
         )
     ) {
-        HeroDetailsRoute()
+        HeroDetailsRoute(
+            navController = navController
+        )
     }
 }

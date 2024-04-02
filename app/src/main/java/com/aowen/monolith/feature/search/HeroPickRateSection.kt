@@ -1,5 +1,6 @@
 package com.aowen.monolith.feature.search
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,6 +33,7 @@ import com.aowen.monolith.ui.components.HeroInlineStatsRateBar
 
 @Composable
 fun HeroPickRateSection(
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
     heroStatsList: List<HeroStatistics>,
     navigateToHeroDetails: (heroId: Int, heroName: String) -> Unit = { _, _ -> },
@@ -62,63 +64,83 @@ fun HeroPickRateSection(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        heroStatsList.forEach { heroStats ->
-            Card(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        navigateToHeroDetails(heroStats.heroId, heroStats.name)
-                    }
-                    .border(
-                        1.dp,
-                        MaterialTheme.colorScheme.secondary,
-                        RoundedCornerShape(4.dp)
-                    ),
-                shape = RoundedCornerShape(4.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-
-                    )
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+        AnimatedContent(
+            targetState = isLoading,
+            label = "Animated List Hero by Pick Rate"
+        ) { loading ->
+            if (loading) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Player Favorite Hero
-                        Image(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
+                    HeroWinPickRateLoadingCard()
+                }
+            } else {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    heroStatsList.forEach { heroStats ->
+                        Card(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    navigateToHeroDetails(heroStats.heroId, heroStats.name)
+                                }
                                 .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    shape = CircleShape
+                                    1.dp,
+                                    MaterialTheme.colorScheme.secondary,
+                                    RoundedCornerShape(4.dp)
                                 ),
-                            contentScale = ContentScale.Crop,
-                            painter = painterResource(id = getHeroImage(heroStats.heroId)),
-                            contentDescription = null
-                        )
-                        Text(
-                            text = heroStats.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                            shape = RoundedCornerShape(4.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
 
+                                )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Player Favorite Hero
+                                    Image(
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .clip(CircleShape)
+                                            .border(
+                                                width = 1.dp,
+                                                color = MaterialTheme.colorScheme.secondary,
+                                                shape = CircleShape
+                                            ),
+                                        contentScale = ContentScale.Crop,
+                                        painter = painterResource(id = getHeroImage(heroStats.heroId)),
+                                        contentDescription = null
+                                    )
+                                    Text(
+                                        text = heroStats.name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+
+                                }
+                                HeroInlineStatsRateBar(
+                                    modifier = Modifier.weight(1f),
+                                    rate = heroStats.pickRate
+                                )
+                            }
+                        }
                     }
-                    HeroInlineStatsRateBar(
-                        modifier = Modifier.weight(1f),
-                        rate = heroStats.pickRate
-                    )
                 }
             }
+
         }
     }
 }

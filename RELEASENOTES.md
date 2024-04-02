@@ -1,6 +1,22 @@
 # Release Notes
 
-## 1.3.0 - Latest
+## 1.3.2 - Latest
+
+#### New Features
+
+- Adds top five most popular builds for a hero on the hero details page
+
+#### Improvements & Bug Fixes
+
+- cleans up loading state for search screen
+
+## 1.3.1
+
+#### Improvements & Bug Fixes
+
+- Fixed app crashing from missing SupaBase parameter
+
+## 1.3.0
 
 #### New Features
 

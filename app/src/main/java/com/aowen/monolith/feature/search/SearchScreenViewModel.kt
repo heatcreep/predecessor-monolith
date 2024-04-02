@@ -34,8 +34,8 @@ data class SearchScreenUiState(
     val isLoadingSearch: Boolean = false,
     val playersList: List<PlayerDetails?> = emptyList(),
     val heroStats: List<HeroStatistics> = emptyList(),
-    val topFiveHeroesByWinRate: List<HeroStatistics>? = emptyList(),
-    val topFiveHeroesByPickRate: List<HeroStatistics>? = emptyList(),
+    val topFiveHeroesByWinRate: List<HeroStatistics> = emptyList(),
+    val topFiveHeroesByPickRate: List<HeroStatistics> = emptyList(),
     val recentSearchesList: List<PlayerDetails?> = emptyList(),
     val initPlayersListText: String? = "Search a user to get started",
     val claimedPlayerId: String? = null,
@@ -53,6 +53,10 @@ class SearchScreenViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SearchScreenUiState())
     val uiState: StateFlow<SearchScreenUiState> = _uiState
+
+    init {
+        initViewModel()
+    }
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
@@ -69,7 +73,7 @@ class SearchScreenViewModel @Inject constructor(
                 val heroStatsResult = heroStatsDeferredResult.await()
                 val topFiveHeroesByWinRate = heroStatsResult.getOrNull()?.sortedBy { it.winRate }?.reversed()?.take(5)
                 val topFiveHeroesByPickRate = heroStatsResult.getOrNull()?.sortedBy { it.pickRate }?.reversed()?.take(5)
-                if (claimedUserResult.isSuccess) {
+                if (claimedUserResult.isSuccess && heroStatsResult.isSuccess) {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -77,8 +81,8 @@ class SearchScreenViewModel @Inject constructor(
                             claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
                             claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
                             heroStats = heroStatsResult.getOrNull() ?: emptyList(),
-                            topFiveHeroesByWinRate = topFiveHeroesByWinRate,
-                            topFiveHeroesByPickRate = topFiveHeroesByPickRate,
+                            topFiveHeroesByWinRate = topFiveHeroesByWinRate ?: emptyList(),
+                            topFiveHeroesByPickRate = topFiveHeroesByPickRate ?: emptyList(),
                             recentSearchesList = recentSearchesResult
                         )
                     }

@@ -3,6 +3,7 @@ package com.aowen.monolith.feature.heroes.herodetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.network.OmedaCityRepository
@@ -18,14 +19,18 @@ import javax.inject.Inject
 data class HeroDetailsErrors(
     val heroErrorMessage: String? = null,
     val heroError: String? = null,
+    val heroBuildsErrorMessage: String? = null,
+    val heroBuildsError: String? = null,
     val statisticsErrorMessage: String? = null,
     val statisticsError: String? = null
 )
 
 data class HeroDetailsUiState(
     val isLoading: Boolean = true,
+    val isLoadingBuilds: Boolean = true,
     val heroDetailsErrors: HeroDetailsErrors? = null,
     val hero: HeroDetails = HeroDetails(),
+    val heroBuilds: List<BuildListItem> = emptyList(),
     val statistics: HeroStatistics = HeroStatistics(),
 )
 
@@ -53,7 +58,7 @@ class HeroDetailsViewModel @Inject constructor(
                 async { omedaCityRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
             val heroResult = hero.await()
             val statisticsResult = statistics.await()
-            if(heroResult.isSuccess && statisticsResult.isSuccess) {
+            if (heroResult.isSuccess && statisticsResult.isSuccess) {
                 _uiState.update {
                     it.copy(
                         hero = heroResult.getOrNull() ?: HeroDetails(),
@@ -61,6 +66,30 @@ class HeroDetailsViewModel @Inject constructor(
                         isLoading = false,
                         heroDetailsErrors = null
                     )
+                }
+                val heroBuildsDeferred = async { omedaCityRepository.fetchAllBuilds(
+                    heroId = heroId.toInt(),
+                    order = "popular"
+                ) }
+                val heroBuildsResult = heroBuildsDeferred.await()
+                if(heroBuildsResult.isSuccess) {
+                    _uiState.update {
+                        it.copy(
+                            heroBuilds = heroBuildsResult.getOrNull()?.take(5) ?: emptyList(),
+                            isLoadingBuilds = false
+                        )
+                    }
+                }
+                else {
+                    _uiState.update {
+                        it.copy(
+                            heroDetailsErrors = HeroDetailsErrors(
+                                heroBuildsErrorMessage = "Failed to fetch hero builds.",
+                                heroBuildsError = heroBuildsResult.exceptionOrNull()?.message
+                            ),
+                            isLoadingBuilds = false
+                        )
+                    }
                 }
             } else {
                 _uiState.update {
@@ -71,7 +100,8 @@ class HeroDetailsViewModel @Inject constructor(
                             statisticsErrorMessage = "Failed to fetch hero statistics.",
                             statisticsError = statisticsResult.exceptionOrNull()?.message
                         ),
-                        isLoading = false
+                        isLoading = false,
+                        isLoadingBuilds = false
                     )
                 }
             }
