@@ -1,0 +1,19 @@
+{
+  "username": "Monolith Bot",
+  "avatar_url": "https://imgur.com/a/1ToZnpl",
+  "embeds": [
+    {
+      "author": {
+        "name": "Heat Creep",
+        "icon_url": "https://avatars.githubusercontent.com/u/95059383?v=4"
+      },
+      "title": "New Monolith Version $RELEASE_VERSION",
+      "url": "https://github.com/heatcreep/predecessor-monolith/releases/tag/$RELEASE_VERSION",
+      "description": "New Monolith version $RELEASE_VERSION has been released and will be available in the Play Store shortly. Please check the release notes for more information.",
+      "color": 15130310,
+      "image": {
+        "url": "https://imgur.com/a/26T9SEc"
+      }
+    }
+  ]
+}

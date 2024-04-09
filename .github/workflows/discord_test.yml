@@ -1,0 +1,29 @@
+name: Build & Release APK to PlayStore
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    environment: production
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set version variable
+        run: |
+          VERSION_NAME=$(echo "${{ github.ref_name }}" | egrep -o '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_ENV"
+
+      - name: Prepare Discord Notification
+        env:
+          VERSION_NAME: ${{ env.version_name }}
+        run: |
+          sed -i "s/\$VERSION_NAME/$VERSION_NAME/g" discord.json
+
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data @discord.json $DISCORD_WEBHOOK

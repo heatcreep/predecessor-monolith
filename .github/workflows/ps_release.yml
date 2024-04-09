@@ -50,9 +50,22 @@ jobs:
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
           track: production
 
-      - uses: marvinpinto/action-automatic-releases@v1.2.1
+      - name: Create Github Release
+        uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           files: |
             app/build/outputs/bundle/release/app-release.aab
+
+      - name: Prepare Discord Notification
+        env:
+          VERSION_NAME: ${{ env.version_name }}
+        run: |
+          sed -i "s/\$VERSION_NAME/$VERSION_NAME/g" discord.json
+
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data @discord.json $DISCORD_WEBHOOK
