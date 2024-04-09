@@ -26,4 +26,4 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data @discord.json $DISCORD_WEBHOOK
+          curl -X POST -H 'Content-type: application/json' --data @discord.json $DISCORD_WEBHOOK_URL
