@@ -1,6 +1,7 @@
 package com.aowen.monolith.data
 
 import com.aowen.monolith.network.RetrofitHelper
+import kotlinx.serialization.Serializable
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -11,6 +12,7 @@ data class PlayerFlags(
     val color: String = ""
 )
 
+@Serializable
 data class PlayerDetails(
     val playerId: String = "",
     val playerName: String = "",

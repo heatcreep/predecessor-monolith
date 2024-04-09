@@ -47,13 +47,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.glance.PlayerStatsAppWidget
+import com.aowen.monolith.glance.worker.UpdatePlayerStatsWorker
 import com.aowen.monolith.ui.theme.MonolithTheme
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 
@@ -253,7 +257,11 @@ fun PlayerCard(
                             if (isClaimed) {
                                 isDialogOpen = true
                             } else {
-                                handleSavePlayer(false)
+                                async { handleSavePlayer(false) }.await()
+                                val glanceId = GlanceAppWidgetManager(context).getGlanceIds(PlayerStatsAppWidget::class.java).firstOrNull()
+                                if (glanceId != null) {
+                                    UpdatePlayerStatsWorker.enqueue(context, glanceId, force = true)
+                                }
                             }
                         }
                     },

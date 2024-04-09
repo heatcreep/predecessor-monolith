@@ -40,6 +40,10 @@ android {
     }
     buildTypes {
 
+        debug {
+            debuggable = true
+        }
+
         firebaseDistribution {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -113,6 +117,10 @@ dependencies {
     // Compose Navigation
     implementation libs.androidx.compose.navigation
 
+    // Compose Glance
+    implementation libs.androidx.glance.appwidget
+    implementation libs.androidx.glance.material3
+
     // Accompanist - Pager
     implementation libs.accompanist.pager
     implementation libs.accompanist.page.indictators
@@ -123,7 +131,9 @@ dependencies {
     // Hilt
     implementation libs.hilt.android
     kapt libs.hilt.android.compiler
+    kapt libs.hilt.compiler
     implementation libs.androidx.hilt.navigation.compose
+    implementation libs.hilt.work
 
     // RichText
     implementation libs.meetup.markdown
@@ -146,6 +156,9 @@ dependencies {
     implementation libs.supabase.functions
     implementation libs.ktor.client.android
     implementation libs.ktor.client.okhttp
+
+    // Work
+    implementation libs.androidx.work
 
     testImplementation libs.junit4
     testImplementation libs.kotlinx.coroutines.test

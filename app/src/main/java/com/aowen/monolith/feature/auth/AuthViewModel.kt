@@ -33,7 +33,6 @@ class AuthViewModel @Inject constructor(
         try {
             viewModelScope.launch {
                 authRepo.signInWithDiscord()
-
             }
         } catch (e: Exception) {
             logDebug(e.toString())

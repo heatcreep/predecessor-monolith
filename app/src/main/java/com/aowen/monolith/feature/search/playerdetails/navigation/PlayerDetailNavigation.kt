@@ -6,6 +6,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.aowen.monolith.feature.matches.morematches.navigation.moreMatchesScreen
 import com.aowen.monolith.feature.matches.navigation.matchDetailsScreen
 import com.aowen.monolith.feature.search.playerdetails.PlayerDetailsRoute
@@ -21,6 +22,7 @@ fun NavGraphBuilder.playerDetailsScreen(
 ) {
     composable(
         route = "$PlayerDetailRoute/{playerId}",
+        deepLinks = listOf(navDeepLink { uriPattern = "monolith://player-detail/{playerId}" }),
         arguments = listOf(navArgument("playerId") {
             type = NavType.StringType
         })

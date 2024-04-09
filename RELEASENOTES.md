@@ -1,6 +1,12 @@
 # Release Notes
 
-## 1.3.2 - Latest
+## 1.4.0 - Latest
+
+#### New Features
+
+- Adds new widget that users can add to their phones home screen to quickly view their claimed player stats.
+
+## 1.3.2
 
 #### New Features
 

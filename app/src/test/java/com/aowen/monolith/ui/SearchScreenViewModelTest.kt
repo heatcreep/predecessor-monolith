@@ -2,6 +2,7 @@ package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.create
+import com.aowen.monolith.fakes.FakeClaimedPlayerPreferencesManager
 import com.aowen.monolith.fakes.FakeUserRecentSearchesRepository
 import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
@@ -32,7 +33,8 @@ class SearchScreenViewModelTest {
         viewModel = SearchScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+            userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
     }
 
@@ -50,6 +52,7 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
 
         )
@@ -78,6 +81,7 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
         )
         viewModel.initViewModel()
@@ -95,8 +99,9 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
-            )
+        )
         viewModel.initViewModel()
         viewModel.handleClearAllRecentSearches()
         val expectedPlayerDetailsList = emptyList<PlayerDetails>()
@@ -112,6 +117,7 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
         )
         viewModel.initViewModel()
@@ -126,6 +132,7 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
         )
         viewModel.handleSubmitSearch()
@@ -155,8 +162,8 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
-
-            )
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+        )
         viewModel.setSearchValue("Cheater")
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
@@ -185,8 +192,9 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
-            )
+        )
         viewModel.setSearchValue("MMR Disabled")
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
@@ -215,8 +223,9 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
-            )
+        )
         viewModel.setSearchValue("Empty")
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
@@ -244,8 +253,9 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(hasPlayerDetailsError = true),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
-            )
+        )
         viewModel.handleSubmitSearch()
         val expected = SearchScreenUiState(
             isLoading = false,
@@ -277,6 +287,7 @@ class SearchScreenViewModelTest {
                 )
             ),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
         )
         viewModel.initViewModel()
@@ -307,6 +318,7 @@ class SearchScreenViewModelTest {
                 error = true
             ),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
         )
         viewModel.initViewModel()
@@ -325,6 +337,7 @@ class SearchScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
 
         )
         viewModel.initViewModel()

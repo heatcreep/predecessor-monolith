@@ -10,6 +10,7 @@ import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
+import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,7 +61,8 @@ class PlayerDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: OmedaCityRepository,
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val claimedPlayerPreferencesManager: ClaimedPlayerPreferencesManager,
 ) : ViewModel() {
 
     companion object {
@@ -94,10 +96,12 @@ class PlayerDetailsViewModel @Inject constructor(
                 val userInfo = userInfoDeferred.await()
 
                 if (userInfo.isSuccess) {
-                    if(isRemoving) {
+                    if (isRemoving) {
                         userRepository.setClaimedUser(null, null)
                     } else {
                         userRepository.setClaimedUser(uiState.value.stats, uiState.value.player)
+                        claimedPlayerPreferencesManager.saveClaimedPlayerId(uiState.value.player.playerId)
+
                     }
                     _uiState.update {
                         it.copy(

@@ -6,6 +6,7 @@ import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.logDebug
+import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserRecentSearchRepository
 import com.aowen.monolith.network.UserRepository
@@ -13,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,11 +50,14 @@ data class SearchScreenUiState(
 class SearchScreenViewModel @Inject constructor(
     private val repository: OmedaCityRepository,
     private val userRepository: UserRepository,
-    private val userRecentSearchesRepository: UserRecentSearchRepository
+    private val userRecentSearchesRepository: UserRecentSearchRepository,
+    private val claimedPlayerPreferencesManager: ClaimedPlayerPreferencesManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchScreenUiState())
     val uiState: StateFlow<SearchScreenUiState> = _uiState
+
+
 
     init {
         initViewModel()
@@ -74,6 +79,11 @@ class SearchScreenViewModel @Inject constructor(
                 val topFiveHeroesByWinRate = heroStatsResult.getOrNull()?.sortedBy { it.winRate }?.reversed()?.take(5)
                 val topFiveHeroesByPickRate = heroStatsResult.getOrNull()?.sortedBy { it.pickRate }?.reversed()?.take(5)
                 if (claimedUserResult.isSuccess && heroStatsResult.isSuccess) {
+                    val claimedPlayerIdFromPrefs = claimedPlayerPreferencesManager.claimedPlayerId.firstOrNull()
+                    val claimedPlayerIdFromResult = claimedUserResult.getOrNull()?.playerDetails?.playerId
+                    if(claimedPlayerIdFromPrefs.isNullOrEmpty() && claimedPlayerIdFromResult != null) {
+                        claimedPlayerPreferencesManager.saveClaimedPlayerId(claimedPlayerIdFromResult)
+                    }
                     _uiState.update {
                         it.copy(
                             isLoading = false,

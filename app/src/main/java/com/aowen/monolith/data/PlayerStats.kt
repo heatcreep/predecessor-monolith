@@ -1,5 +1,8 @@
 package com.aowen.monolith.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class PlayerStats(
     val matchesPlayed: String = "",
     val hoursPlayed: String = "",

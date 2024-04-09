@@ -4,10 +4,13 @@ androidGradlePlugin = "8.1.1"
 androidXActivityCompose = "1.7.2"
 androidXCoreKtx = "1.10.1"
 androidXEspresso = "3.5.0"
+androidXGlance = "1.0.0"
+androidXHilt = "1.0.0"
 androidXLifecycleRuntimeKtx = "2.6.1"
 androidXComposeMaterial3 = "1.2.0"
 androidXPaging = "3.2.1"
 androidXTestExt = "1.1.5"
+androidXWork = "2.8.1"
 coilCompose = "2.2.2"
 composeBom = "2024.03.00"
 composeNavigation = "2.7.3"
@@ -50,10 +53,13 @@ androidx-compose-ui-graphics = { group = "androidx.compose.ui", name= "graphics"
 androidx-compose-ui-test = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "androidXGlance" }
+androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "androidXGlance" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "daggerHiltCompose" }
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "androidXPaging" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidXPaging" }
 androidx-paging-testing = { group = "androidx.paging", name = "paging-testing", version.ref = "androidXPaging" }
+androidx-work = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidXWork" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
@@ -62,6 +68,8 @@ firebase-app-distribution = { module = "com.google.firebase:firebase-appdistribu
 firebase-app-distribution-api = { module = "com.google.firebase:firebase-appdistribution-api-ktx", version.ref = "firebaseAppDistribution" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "daggerHilt" }
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "daggerHilt" }
+hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidXHilt" }
+hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "androidXHilt" }
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlinBom" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin" }

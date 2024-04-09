@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
+val DarkColorScheme = darkColorScheme(
     primary = NeroBlack,
     secondary = LightKhaki,
     tertiary = WarmWhite,
@@ -31,7 +31,7 @@ private val DarkColorScheme = darkColorScheme(
     inversePrimary = Color.LightGray
 )
 
-private val LightColorScheme = lightColorScheme(
+val LightColorScheme = lightColorScheme(
     primary = WarmWhite,
     secondary = NeroBlack,
     tertiary = NeroGrey,

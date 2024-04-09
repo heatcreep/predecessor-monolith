@@ -5,6 +5,7 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.FakeAuthRepository
+import com.aowen.monolith.fakes.FakeClaimedPlayerPreferencesManager
 import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroDto2
@@ -14,10 +15,10 @@ import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.ResponseType
-import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.feature.search.playerdetails.PlayerDetailsUiState
 import com.aowen.monolith.feature.search.playerdetails.PlayerDetailsViewModel
 import com.aowen.monolith.feature.search.playerdetails.PlayerErrors
+import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.runBlocking
@@ -52,7 +53,8 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository()
+            userRepository = FakeUserRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
     }
 
@@ -88,7 +90,8 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(hasGetPlayerError = true),
-            userRepository = FakeUserRepository()
+            userRepository = FakeUserRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
 
@@ -115,7 +118,8 @@ class PlayerDetailsViewModelTest {
                 hasPlayerInfoError = true
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository()
+            userRepository = FakeUserRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
 
@@ -143,7 +147,8 @@ class PlayerDetailsViewModelTest {
                 hasPlayerHeroStatsError = true
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository()
+            userRepository = FakeUserRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
 
@@ -170,7 +175,8 @@ class PlayerDetailsViewModelTest {
                 hasMatchDetailsError = true
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository()
+            userRepository = FakeUserRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
 
@@ -197,7 +203,8 @@ class PlayerDetailsViewModelTest {
                 hasHeroDetailsErrors = true
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository()
+            userRepository = FakeUserRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
 
@@ -225,7 +232,8 @@ class PlayerDetailsViewModelTest {
                 heroDetailsResponse = ResponseType.Empty
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository()
+            userRepository = FakeUserRepository(),
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
 
@@ -257,7 +265,8 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
-            userRepository = fakeUserRepository
+            userRepository = fakeUserRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.handleSavePlayer()
 
@@ -281,7 +290,8 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
-            userRepository = fakeUserRepository
+            userRepository = fakeUserRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.handleSavePlayer()
 
@@ -302,7 +312,8 @@ class PlayerDetailsViewModelTest {
             authRepository = FakeAuthRepository(
                 hasHandleSavePlayerError = true
             ),
-            userRepository = fakeUserRepository
+            userRepository = fakeUserRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.handleSavePlayer()
 
@@ -321,7 +332,8 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
-            userRepository = fakeUserRepository
+            userRepository = fakeUserRepository,
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.handleSavePlayer(isRemoving = true)
 

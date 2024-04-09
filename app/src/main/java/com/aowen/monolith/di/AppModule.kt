@@ -4,6 +4,8 @@ import android.content.Context
 import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.AuthRepositoryImpl
+import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
+import com.aowen.monolith.network.ClaimedPlayerPreferencesManagerImpl
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.OmedaCityRepositoryImpl
 import com.aowen.monolith.network.OmedaCityService
@@ -42,6 +44,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun providesClaimedPlayerPreferencesManager(@ApplicationContext appContext: Context): ClaimedPlayerPreferencesManager {
+        return ClaimedPlayerPreferencesManagerImpl(appContext)
+    }
 
     @OptIn(ExperimentalSerializationApi::class)
     @Provides
