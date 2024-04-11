@@ -6,11 +6,12 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
-import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.ItemSelectRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.ModuleAddRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.ModuleEditOrderRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.SkillOrderAndModuleSelectRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.TitleAndDescriptionRoute
+import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.ItemsOverviewRoute
+import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.navigation.addBuildItemSelectScreen
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.skillorder.SkillOrderRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.AddBuildRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
@@ -18,13 +19,13 @@ import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
 const val AddBuildDetailsRoute = "add-build-details"
 const val SkillOrderAndModuleMenuRoute = "skill-order-and-module-menu"
 const val SkillOrderRoute = "skill-order"
-const val ItemSelectRoute = "item-select"
+const val ItemsOverviewRoute = "item-overview"
 const val ModuleAddRoute = "module-add"
 const val ModuleEditRoute = "module-edit"
 const val TitleAndDescriptionRoute = "title-and-description"
 
 fun NavController.navigateToItemSelect(navOptions: NavOptions? = null) {
-    this.navigate(ItemSelectRoute, navOptions)
+    this.navigate(ItemsOverviewRoute, navOptions)
 }
 
 fun NavController.navigateToSkillOrderSelect(navOptions: NavOptions? = null) {
@@ -55,14 +56,15 @@ fun NavGraphBuilder.addBuildDetailsScreen(
                 )
             SkillOrderAndModuleSelectRoute(navController, addBuildViewModel)
         }
-        composable(route = ItemSelectRoute) { backStackEntry ->
+        composable(route = ItemsOverviewRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
                     navController = navController,
                     parentRoute = AddBuildRoute
                 )
-            ItemSelectRoute(navController, addBuildViewModel)
+            ItemsOverviewRoute(navController, addBuildViewModel)
         }
+        addBuildItemSelectScreen(navController)
         composable(route = SkillOrderRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(

@@ -47,6 +47,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -111,7 +112,7 @@ fun ItemsScreen(
 
     val isTablet = screenWidthDp >= 600
 
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
     val rotationAngle = remember { Animatable(0f) }
 
     val listState = rememberLazyGridState()
@@ -253,7 +254,7 @@ fun RowScope.TierFilterDropdown(
             }
         ) {
             TextField(
-                value = "Tier",
+                value = if (!selectedTierFilter.isNullOrEmpty()) selectedTierFilter else "Tier",
                 onValueChange = {},
                 readOnly = true,
                 textStyle = MaterialTheme.typography.bodyMedium,

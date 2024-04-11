@@ -1,4 +1,4 @@
-package com.aowen.monolith.feature.builds.addbuild.addbuilddetails
+package com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,7 +28,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.ItemDetails
-import com.aowen.monolith.data.SlotType
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
@@ -37,26 +36,14 @@ import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 fun ItemSelectList(
     modifier: Modifier = Modifier,
     itemsList: List<ItemDetails>,
-    selectedCrest: ItemDetails? = null,
     selectedItems: List<ItemDetails>,
-    onCrestAdded: (ItemDetails) -> Unit,
-    onCrestRemoved: (ItemDetails) -> Unit,
-    onItemAdded: (ItemDetails) -> Unit,
-    onItemRemoved: (ItemDetails) -> Unit,
     onItemDetailsClicked: (ItemDetails) -> Unit
 ) {
     LazyColumn(modifier = modifier.fillMaxWidth()) {
         itemsIndexed(itemsList) { index, item ->
-            val isItemEnabled = if (item.slotType == SlotType.CREST) {
-                true
-            } else {
-                selectedItems.size < 6
-            }
-            val isSelected = if (item.slotType == SlotType.CREST) {
-                selectedCrest == item
-            } else {
-                selectedItems.contains(item)
-            }
+            val isItemEnabled = selectedItems.size < 6
+            val isSelected = selectedItems.contains(item)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -68,21 +55,7 @@ fun ItemSelectList(
                         .weight(1f)
                         .clickable(
                             enabled = isItemEnabled,
-                        ) {
-                            if (isSelected) {
-                                if (item.slotType == SlotType.CREST) {
-                                    onCrestRemoved(item)
-                                } else {
-                                    onItemRemoved(item)
-                                }
-                            } else {
-                                if (item.slotType == SlotType.CREST) {
-                                    onCrestAdded(item)
-                                } else {
-                                    onItemAdded(item)
-                                }
-                            }
-                        },
+                        ) {},
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -159,10 +132,6 @@ fun ItemSelectListPreview() {
 
                 ),
                 selectedItems = listOf(ItemDetails(id = 4, displayName = "Stamina Tonic")),
-                onItemAdded = {},
-                onCrestAdded = {},
-                onCrestRemoved = {},
-                onItemRemoved = {},
                 onItemDetailsClicked = {}
             )
         }
