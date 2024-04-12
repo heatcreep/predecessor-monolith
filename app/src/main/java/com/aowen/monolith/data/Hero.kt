@@ -31,6 +31,7 @@ enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     GADGET("Gadget", 7, R.drawable.gadget),
     GIDEON("Gideon", 8, R.drawable.gideon),
     GREYSTONE("Greystone", 29, R.drawable.greystone),
+    GRIM("GRIM.exe", 52, R.drawable.grim),
     GRUX("Grux", 9, R.drawable.grux),
     HOWITZER("Howitzer", 10, R.drawable.howitzer),
     IGGYANDSCORCH("Iggy & Scorch", 42, R.drawable.iggyscorch),
