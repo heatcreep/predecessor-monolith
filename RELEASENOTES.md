@@ -1,6 +1,12 @@
 # Release Notes
 
-## 1.4.0 - Latest
+## 1.4.1 - Latest
+
+#### Improvements & Bug Fixes
+
+- Adds photo of GRIM.exe to the hero pool
+
+## 1.4.0
 
 #### New Features
 
