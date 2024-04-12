@@ -209,6 +209,7 @@ class FakeOmedaCityRepository(
         order: String?,
         heroId: Int?,
         skillOrder: Int?,
+        currentVersion: Int?,
         modules: Int?,
         page: Int?
     ): Result<List<BuildListItem>> {

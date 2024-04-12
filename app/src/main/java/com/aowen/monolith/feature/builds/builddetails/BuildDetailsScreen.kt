@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -58,9 +59,9 @@ import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
+import com.aowen.monolith.feature.items.itemdetails.ItemDetailsBottomSheet
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
-import com.aowen.monolith.feature.items.itemdetails.ItemDetailsBottomSheet
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.meetup.twain.MarkdownText
 
@@ -141,10 +142,27 @@ fun BuildDetailsScreen(
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.secondary
                             )
-                            Text(
-                                text = "Author: ${uiState.buildDetails.author}",
-                                style = MaterialTheme.typography.bodySmall,
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    text = "Author: ${uiState.buildDetails.author}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                                uiState.buildDetails.version?.let { version ->
+                                    Badge(
+                                        containerColor = MaterialTheme.colorScheme.secondary,
+                                        contentColor = MaterialTheme.colorScheme.primary
+                                    ) {
+                                        Text(
+                                            text = version,
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
+                                }
+                            }
+
                             Text(
                                 text = "Role: ${uiState.buildDetails.role}",
                                 style = MaterialTheme.typography.bodySmall

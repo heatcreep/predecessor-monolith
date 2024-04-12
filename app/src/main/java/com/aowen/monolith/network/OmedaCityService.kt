@@ -76,6 +76,7 @@ interface OmedaCityService {
         @Query("filter[hero_id]") heroId: Int? = null,
         @Query("filter[skill_order]") skillOrder: Int? = null,
         @Query("filter[modules]") modules: Int? = null,
+        @Query("filter[current_version]") currentVersion: Int? = null,
         @Query("page") page: Int? = 1,
     ): Response<List<BuildDto>>
 

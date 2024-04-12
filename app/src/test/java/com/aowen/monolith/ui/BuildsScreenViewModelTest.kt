@@ -209,4 +209,22 @@ class BuildsScreenViewModelTest {
         assertEquals(expected, actual)
     }
 
+    @Test
+    fun `updateHasCurrentVersion should update uiState with hasCurrentVersionSelected`() {
+        viewModel = BuildsScreenViewModel(
+            repository = FakeOmedaCityRepository()
+        )
+
+        viewModel.buildsPagingSource = BuildsPagingSource(
+            repository = fakeRepository
+        )
+
+        viewModel.updateHasCurrentVersion(true)
+        val actual = viewModel.uiState.value
+        val expected = BuildsUiState(
+            hasCurrentVersionSelected = true,
+        )
+        assertEquals(expected, actual)
+    }
+
 }

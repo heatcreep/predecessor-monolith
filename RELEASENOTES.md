@@ -1,6 +1,13 @@
 # Release Notes
 
-## 1.4.1 - Latest
+## 1.4.2 - Latest
+
+#### Improvements & Bug Fixes
+
+- Adds filter options to the Builds screen for builds of the most current version of the game
+- Adds version badge to build list and build detail page
+
+## 1.4.1
 
 #### Improvements & Bug Fixes
 

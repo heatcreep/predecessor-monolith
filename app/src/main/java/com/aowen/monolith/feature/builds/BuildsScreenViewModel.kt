@@ -18,6 +18,7 @@ data class BuildsUiState(
     val selectedSortOrder: String = "Popular",
     val hasSkillOrderSelected: Boolean = false,
     val hasModulesSelected: Boolean = false,
+    val hasCurrentVersionSelected: Boolean = false,
     val error: String? = null
 )
 
@@ -43,6 +44,7 @@ class BuildsScreenViewModel @Inject constructor(
             heroId = uiState.value.selectedHeroFilter?.heroId,
             skillOrder = if (uiState.value.hasSkillOrderSelected) 1 else null,
             modules = if (uiState.value.hasModulesSelected) 1 else null,
+            currentVersion = if(uiState.value.hasCurrentVersionSelected) 1 else null,
             repository = repository
         ).also {
             buildsPagingSource = it
@@ -113,6 +115,13 @@ class BuildsScreenViewModel @Inject constructor(
     fun updateHasModules(hasModulesSelected: Boolean) {
         _uiState.update {
             it.copy(hasModulesSelected = hasModulesSelected)
+        }
+        buildsPagingSource.invalidate()
+    }
+
+    fun updateHasCurrentVersion(hasCurrentVersionSelected: Boolean) {
+        _uiState.update {
+            it.copy(hasCurrentVersionSelected = hasCurrentVersionSelected)
         }
         buildsPagingSource.invalidate()
     }

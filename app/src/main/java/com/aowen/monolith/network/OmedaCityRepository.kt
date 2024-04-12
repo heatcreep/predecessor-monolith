@@ -52,6 +52,7 @@ interface OmedaCityRepository {
         order: String? = null,
         heroId: Int? = null,
         skillOrder: Int? = null,
+        currentVersion: Int? = null,
         modules: Int? = null,
         page: Int? = 1,
 
@@ -236,6 +237,7 @@ class OmedaCityRepositoryImpl @Inject constructor(
         order: String?,
         heroId: Int?,
         skillOrder: Int?,
+        currentVersion: Int?,
         modules: Int?,
         page: Int?
     ): Result<List<BuildListItem>?> {
@@ -247,6 +249,7 @@ class OmedaCityRepositoryImpl @Inject constructor(
                 heroId = heroId,
                 skillOrder = skillOrder,
                 modules = modules,
+                currentVersion = currentVersion,
                 page = page
             )
             if (response.isSuccessful) {

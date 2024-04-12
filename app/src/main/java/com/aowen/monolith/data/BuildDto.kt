@@ -33,7 +33,9 @@ data class BuildDto(
     @SerialName("updated_at")
     val updatedAt: String?,
     val author: String,
-    val modules: List<ModuleDto> = emptyList()
+    val modules: List<ModuleDto> = emptyList(),
+    @SerialName("game_version")
+    val gameVersion: GameVersionDto
 )
 
 @Serializable
@@ -51,5 +53,17 @@ data class ModuleDto(
     val item5Id: Int?,
     @SerialName("item6_id")
     val item6Id: Int?,
+)
 
+@Serializable
+data class GameVersionDto(
+    val id: Int?,
+    val name: String?,
+    val release: String?,
+    @SerialName("display_badge")
+    val displayBadge: Boolean?,
+    @SerialName("created_at")
+    val createdAt: String?,
+    @SerialName("updated_at")
+    val updatedAt: String?,
 )

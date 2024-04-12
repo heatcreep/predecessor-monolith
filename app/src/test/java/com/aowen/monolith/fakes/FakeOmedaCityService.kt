@@ -161,6 +161,7 @@ class FakeOmedaCityService(private val resCode: Int? = null) : OmedaCityService 
         heroId: Int?,
         skillOrder: Int?,
         modules: Int?,
+        currentVersion: Int?,
         page: Int?
     ): Response<List<BuildDto>> {
         return when (resCode) {

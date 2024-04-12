@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material3.Badge
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -79,13 +80,13 @@ import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
+import com.aowen.monolith.feature.builds.addbuild.navigation.navigateToAddBuildFlow
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
+import com.aowen.monolith.feature.search.SearchBar
 import com.aowen.monolith.ui.common.MonolithCollapsableFabButton
 import com.aowen.monolith.ui.common.MonolithCollapsableListColumn
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
-import com.aowen.monolith.feature.builds.addbuild.navigation.navigateToAddBuildFlow
-import com.aowen.monolith.feature.search.SearchBar
 import com.aowen.monolith.ui.theme.GreenHighlight
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.RedHighlight
@@ -114,6 +115,7 @@ fun BuildsScreenRoute(
         onClearSortFilter = viewModel::clearSelectedSortOrder,
         onCheckHasSkillOrder = viewModel::updateHasSkillOrder,
         onCheckHasModules = viewModel::updateHasModules,
+        onCheckHasCurrentVersion = viewModel::updateHasCurrentVersion,
         navigateToBuildDetails = navController::navigateToBuildDetails,
         navigateToAddBuildFlow = navController::navigateToAddBuildFlow
     )
@@ -132,6 +134,7 @@ fun BuildsScreen(
     onClearSortFilter: () -> Unit,
     onCheckHasSkillOrder: (Boolean) -> Unit,
     onCheckHasModules: (Boolean) -> Unit,
+    onCheckHasCurrentVersion: (Boolean) -> Unit,
     navigateToBuildDetails: (Int) -> Unit,
     navigateToAddBuildFlow: () -> Unit
 ) {
@@ -257,6 +260,11 @@ fun BuildsScreen(
                             label = "Has modules",
                             isChecked = uiState.hasModulesSelected,
                             onCheckedChange = onCheckHasModules
+                        )
+                        FilterSwitchWithLabel(
+                            label = "Has current version",
+                            isChecked = uiState.hasCurrentVersionSelected,
+                            onCheckedChange = onCheckHasCurrentVersion
                         )
                         ElevatedButton(
                             contentPadding = PaddingValues(16.dp),
@@ -495,13 +503,29 @@ fun BuildListItem(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text(
-                        text = "Author: ${build.author}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "Author: ${build.author}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        build.version?.let { version ->
+                            Badge(
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.primary
+                            ) {
+                                Text(
+                                    text = version,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
                     Row {
                         Image(
                             modifier = Modifier.size(24.dp),

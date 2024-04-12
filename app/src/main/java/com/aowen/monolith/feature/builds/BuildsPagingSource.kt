@@ -13,6 +13,7 @@ class BuildsPagingSource(
     private val order: String? = null,
     private val heroId: Int? = null,
     private val skillOrder: Int? = null,
+    private val currentVersion: Int? = null,
     private val modules: Int? = null,
     private val repository: OmedaCityRepository
 ) : PagingSource<Int, BuildListItem>() {
@@ -26,6 +27,7 @@ class BuildsPagingSource(
                 order = order,
                 heroId = heroId,
                 skillOrder = skillOrder,
+                currentVersion = currentVersion,
                 modules = modules,
                 page = page
             ).getOrThrow()

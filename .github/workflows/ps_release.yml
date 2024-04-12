@@ -70,4 +70,4 @@ jobs:
           OMEDA_DISCORD_WEBHOOK: ${{ secrets.OMEDA_DISCORD_WEBHOOK_URL }}
         run: |
           curl -X POST -H 'Content-type: application/json' --data @discord.json $DISCORD_WEBHOOK
-          curl -X POST -H 'Content-type: application/json' --data @discord.json $OMEMA_DISCORD_WEBHOOK
+          curl -X POST -H 'Content-type: application/json' --data @discord.json $OMEDA_DISCORD_WEBHOOK

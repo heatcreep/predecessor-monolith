@@ -16,6 +16,7 @@ data class BuildListItem(
     val modules: List<ItemModule> = emptyList(),
     val createdAt: String? = "",
     val updatedAt: String? = "",
+    val version: String? = ""
 )
 
 data class ItemModule(
@@ -38,7 +39,8 @@ fun BuildDto.create(): BuildListItem {
         downvotes = downvotesCount,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        modules = modules.map { it.create() }
+        modules = modules.map { it.create() },
+        version = gameVersion.name
     )
 }
 
