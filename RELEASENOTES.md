@@ -6,6 +6,8 @@
 
 - Adds filter options to the Builds screen for builds of the most current version of the game
 - Adds version badge to build list and build detail page
+- Enables Edge to Edge diplay
+- Fixes a bug where the app would crash for users on Android 12 and below
 
 ## 1.4.1
 
