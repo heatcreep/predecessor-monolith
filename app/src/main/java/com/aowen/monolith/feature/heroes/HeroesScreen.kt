@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,9 +63,9 @@ import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.feature.heroes.herodetails.navigation.navigateToHeroDetails
+import com.aowen.monolith.feature.search.SearchBar
 import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
-import com.aowen.monolith.feature.search.SearchBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.delay
@@ -145,7 +146,7 @@ fun HeroesScreen(
                 handleRetry()
             }
         } else {
-            Scaffold { paddingValues ->
+            Scaffold(contentWindowInsets = WindowInsets(0,0,0,0)) { paddingValues ->
                 Column(
                     modifier = modifier
                         .fillMaxSize()

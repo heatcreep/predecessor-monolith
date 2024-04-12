@@ -3,6 +3,7 @@ package com.aowen.monolith
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,9 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.aowen.monolith.feature.auth.AuthViewModel
 import com.aowen.monolith.ui.MonolithApp
 import com.aowen.monolith.ui.theme.MonolithTheme
-import com.aowen.monolith.feature.auth.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.handleDeeplinks
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
     private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         supabaseClient.handleDeeplinks(intent = intent,
             onSessionSuccess = { userSession ->

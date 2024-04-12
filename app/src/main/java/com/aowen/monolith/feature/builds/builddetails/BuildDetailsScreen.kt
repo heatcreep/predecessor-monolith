@@ -149,6 +149,7 @@ fun BuildDetailsScreen(
                                 Text(
                                     text = "Author: ${uiState.buildDetails.author}",
                                     style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.secondary
                                 )
                                 uiState.buildDetails.version?.let { version ->
                                     Badge(
@@ -157,7 +158,7 @@ fun BuildDetailsScreen(
                                     ) {
                                         Text(
                                             text = version,
-                                            style = MaterialTheme.typography.bodySmall
+                                            style = MaterialTheme.typography.bodySmall,
                                         )
                                     }
                                 }
@@ -165,7 +166,8 @@ fun BuildDetailsScreen(
 
                             Text(
                                 text = "Role: ${uiState.buildDetails.role}",
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.secondary
                             )
                         }
                     }
@@ -208,7 +210,11 @@ fun BuildDetailsScreen(
                     }
                     Spacer(modifier = Modifier.size(16.dp))
                     // Skill Order Row
-                    Text(text = "Skill Order", style = MaterialTheme.typography.titleSmall)
+                    Text(
+                        text = "Skill Order",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                     Spacer(modifier = Modifier.size(8.dp))
                     uiState.buildDetails.skillOrder?.let {
                         SkillOrderScrollableRow(skillOrder = it)
@@ -219,6 +225,7 @@ fun BuildDetailsScreen(
                         Text(
                             text = module.title,
                             style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.secondary
                         )
                         Spacer(modifier = Modifier.size(8.dp))
                         FlowRow(
