@@ -16,12 +16,12 @@ import com.aowen.monolith.feature.builds.navigation.BuildsRoute
 import com.aowen.monolith.feature.builds.navigation.navigateToBuilds
 import com.aowen.monolith.feature.heroes.navigation.HeroesRoute
 import com.aowen.monolith.feature.heroes.navigation.navigateToHeroes
+import com.aowen.monolith.feature.home.navigation.HomeScreenRoute
+import com.aowen.monolith.feature.home.navigation.navigateToHome
 import com.aowen.monolith.feature.items.navigation.ItemsRoute
 import com.aowen.monolith.feature.items.navigation.navigateToItems
 import com.aowen.monolith.feature.profile.navigation.ProfileRoute
 import com.aowen.monolith.feature.profile.navigation.navigateToProfile
-import com.aowen.monolith.feature.search.navigation.SearchRoute
-import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.navigation.TopLevelDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -65,7 +65,7 @@ class MonolithAppState(
             .currentBackStackEntryAsState().value?.destination
 
     private val bottomBarRoutes = listOf(
-        SearchRoute,
+        HomeScreenRoute,
         HeroesRoute,
         ItemsRoute,
         BuildsRoute,
@@ -89,7 +89,7 @@ class MonolithAppState(
         }
 
         when (topLevelDestination) {
-            TopLevelDestination.HOME -> navController.navigateToSearch(topLevelNavOptions)
+            TopLevelDestination.HOME -> navController.navigateToHome(topLevelNavOptions)
             TopLevelDestination.HEROES -> navController.navigateToHeroes(topLevelNavOptions)
             TopLevelDestination.ITEMS -> navController.navigateToItems(topLevelNavOptions)
             TopLevelDestination.BUILDS -> navController.navigateToBuilds(topLevelNavOptions)

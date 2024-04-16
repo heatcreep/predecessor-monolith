@@ -15,20 +15,30 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+abstract class HeroDetailsError {
+    abstract val errorMessage: String?
+    abstract val error: String?
 
-data class HeroDetailsErrors(
-    val heroErrorMessage: String? = null,
-    val heroError: String? = null,
-    val heroBuildsErrorMessage: String? = null,
-    val heroBuildsError: String? = null,
-    val statisticsErrorMessage: String? = null,
-    val statisticsError: String? = null
-)
+    data class HeroErrorMessage(
+        override val errorMessage: String? = null,
+        override val error: String? = null
+    ) : HeroDetailsError()
+
+    data class HeroBuildsErrorMessage(
+        override val errorMessage: String? = null,
+        override val error: String? = null
+    ) : HeroDetailsError()
+
+    data class StatisticsErrorMessage(
+        override val errorMessage: String? = null,
+        override val error: String? = null
+    ) : HeroDetailsError()
+}
 
 data class HeroDetailsUiState(
     val isLoading: Boolean = true,
     val isLoadingBuilds: Boolean = true,
-    val heroDetailsErrors: HeroDetailsErrors? = null,
+    val heroDetailsErrors: HeroDetailsError? = null,
     val hero: HeroDetails = HeroDetails(),
     val heroBuilds: List<BuildListItem> = emptyList(),
     val statistics: HeroStatistics = HeroStatistics(),
@@ -58,6 +68,30 @@ class HeroDetailsViewModel @Inject constructor(
                 async { omedaCityRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
             val heroResult = hero.await()
             val statisticsResult = statistics.await()
+            if (heroResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        heroDetailsErrors = HeroDetailsError.HeroErrorMessage(
+                            errorMessage = "Failed to fetch hero details.",
+                            error = heroResult.exceptionOrNull()?.message,
+                        ),
+                        isLoading = false,
+                        isLoadingBuilds = false
+                    )
+                }
+            }
+            if (statisticsResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        heroDetailsErrors = HeroDetailsError.StatisticsErrorMessage(
+                            errorMessage = "Failed to fetch hero statistics.",
+                            error = statisticsResult.exceptionOrNull()?.message,
+                        ),
+                        isLoading = false,
+                        isLoadingBuilds = false
+                    )
+                }
+            }
             if (heroResult.isSuccess && statisticsResult.isSuccess) {
                 _uiState.update {
                     it.copy(
@@ -67,42 +101,30 @@ class HeroDetailsViewModel @Inject constructor(
                         heroDetailsErrors = null
                     )
                 }
-                val heroBuildsDeferred = async { omedaCityRepository.fetchAllBuilds(
-                    heroId = heroId.toInt(),
-                    order = "popular"
-                ) }
+                val heroBuildsDeferred = async {
+                    omedaCityRepository.fetchAllBuilds(
+                        heroId = heroId.toInt(),
+                        order = "popular"
+                    )
+                }
                 val heroBuildsResult = heroBuildsDeferred.await()
-                if(heroBuildsResult.isSuccess) {
+                if (heroBuildsResult.isSuccess) {
                     _uiState.update {
                         it.copy(
                             heroBuilds = heroBuildsResult.getOrNull()?.take(5) ?: emptyList(),
                             isLoadingBuilds = false
                         )
                     }
-                }
-                else {
+                } else {
                     _uiState.update {
                         it.copy(
-                            heroDetailsErrors = HeroDetailsErrors(
-                                heroBuildsErrorMessage = "Failed to fetch hero builds.",
-                                heroBuildsError = heroBuildsResult.exceptionOrNull()?.message
+                            heroDetailsErrors = HeroDetailsError.HeroBuildsErrorMessage(
+                                errorMessage = "Failed to fetch hero builds.",
+                                error = heroBuildsResult.exceptionOrNull()?.message
                             ),
                             isLoadingBuilds = false
                         )
                     }
-                }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        heroDetailsErrors = HeroDetailsErrors(
-                            heroErrorMessage = "Failed to fetch hero details.",
-                            heroError = heroResult.exceptionOrNull()?.message,
-                            statisticsErrorMessage = "Failed to fetch hero statistics.",
-                            statisticsError = statisticsResult.exceptionOrNull()?.message
-                        ),
-                        isLoading = false,
-                        isLoadingBuilds = false
-                    )
                 }
             }
         }

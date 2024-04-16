@@ -2,127 +2,98 @@ package com.aowen.monolith.feature.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.monolith.data.HeroStatistics
+import com.aowen.monolith.data.BuildListItem
+import com.aowen.monolith.data.HeroDetails
+import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.logDebug
-import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserRecentSearchRepository
-import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-enum class TimeFrame(val value: String) {
-    ALL("ALL"),
-    ONE_YEAR("1Y"),
-    THREE_MONTH("3M"),
-    ONE_MONTH("1M"),
-    ONE_WEEK("1W")
-}
 
 data class SearchScreenUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val searchError: String? = null,
-    val claimedUserError: String? = null,
     val recentSearchError: String? = null,
-    val isLoadingSearch: Boolean = false,
-    val playersList: List<PlayerDetails?> = emptyList(),
-    val heroStats: List<HeroStatistics> = emptyList(),
-    val topFiveHeroesByWinRate: List<HeroStatistics> = emptyList(),
-    val topFiveHeroesByPickRate: List<HeroStatistics> = emptyList(),
-    val recentSearchesList: List<PlayerDetails?> = emptyList(),
+    val isLoadingSearch: Boolean = true,
+    val isLoadingRecentSearches: Boolean = true,
+    val searchFieldValue: String = "",
+    val isLoadingItemsAndHeroes: Boolean = true,
+    val allItems: List<ItemDetails> = emptyList(),
+    val filteredItems: List<ItemDetails> = emptyList(),
+    val itemsError: String? = null,
+    val allHeroes: List<HeroDetails> = emptyList(),
+    val filteredHeroes: List<HeroDetails> = emptyList(),
+    val heroesError: String? = null,
+    val filteredBuilds: List<BuildListItem> = emptyList(),
+    val buildsError: String? = null,
     val initPlayersListText: String? = "Search a user to get started",
-    val claimedPlayerId: String? = null,
-    val claimedPlayerStats: PlayerStats? = null,
-    val claimedPlayerDetails: PlayerDetails? = null,
-    val searchFieldValue: String = ""
+    val playersList: List<PlayerDetails?> = emptyList(),
+    val recentSearchesList: List<PlayerDetails?> = emptyList(),
 )
 
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
-    private val repository: OmedaCityRepository,
-    private val userRepository: UserRepository,
-    private val userRecentSearchesRepository: UserRecentSearchRepository,
-    private val claimedPlayerPreferencesManager: ClaimedPlayerPreferencesManager
+    private val omedaCityRepository: OmedaCityRepository,
+    private val userRecentSearchesRepository: UserRecentSearchRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchScreenUiState())
-    val uiState: StateFlow<SearchScreenUiState> = _uiState
-
-
+    val uiState = _uiState
 
     init {
         initViewModel()
     }
-    fun initViewModel() {
-        _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                val claimedUserDeferredResult =
-                    async { userRepository.getClaimedUser() }
-                val recentSearchesDeferredResult =
-                    async { userRecentSearchesRepository.getRecentSearches() }
-                val heroStatsDeferredResult =
-                    async { repository.fetchAllHeroStatistics() }
 
-                val claimedUserResult = claimedUserDeferredResult.await()
-                val recentSearchesResult = recentSearchesDeferredResult.await()
-                val heroStatsResult = heroStatsDeferredResult.await()
-                val topFiveHeroesByWinRate = heroStatsResult.getOrNull()?.sortedBy { it.winRate }?.reversed()?.take(5)
-                val topFiveHeroesByPickRate = heroStatsResult.getOrNull()?.sortedBy { it.pickRate }?.reversed()?.take(5)
-                if (claimedUserResult.isSuccess && heroStatsResult.isSuccess) {
-                    val claimedPlayerIdFromPrefs = claimedPlayerPreferencesManager.claimedPlayerId.firstOrNull()
-                    val claimedPlayerIdFromResult = claimedUserResult.getOrNull()?.playerDetails?.playerId
-                    if(claimedPlayerIdFromPrefs.isNullOrEmpty() && claimedPlayerIdFromResult != null) {
-                        claimedPlayerPreferencesManager.saveClaimedPlayerId(claimedPlayerIdFromResult)
-                    }
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = null,
-                            claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
-                            claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
-                            heroStats = heroStatsResult.getOrNull() ?: emptyList(),
-                            topFiveHeroesByWinRate = topFiveHeroesByWinRate ?: emptyList(),
-                            topFiveHeroesByPickRate = topFiveHeroesByPickRate ?: emptyList(),
-                            recentSearchesList = recentSearchesResult
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            claimedUserError = "Failed to fetch claimed user"
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                logDebug(e.toString())
+    fun initViewModel() {
+        viewModelScope.launch {
+
+            val recentSearchesDeferredResult =
+                async { userRecentSearchesRepository.getRecentSearches() }
+
+            val itemsDeferredResult =
+                async { omedaCityRepository.fetchAllItems() }
+
+            val heroesDeferredResult =
+                async { omedaCityRepository.fetchAllHeroes() }
+
+            val recentSearches = recentSearchesDeferredResult.await()
+            val itemsResult = itemsDeferredResult.await()
+            val heroesResult = heroesDeferredResult.await()
+
+
+            if (itemsResult.isFailure) {
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
-                        error = e.message
+                        itemsError = itemsResult.exceptionOrNull()?.message
                     )
                 }
             }
 
+            if (heroesResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        heroesError = heroesResult.exceptionOrNull()?.message
+                    )
+                }
+            }
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isLoadingRecentSearches = false,
+                    recentSearchesList = recentSearches,
+                    allItems = itemsResult.getOrNull() ?: emptyList(),
+                    allHeroes = heroesResult.getOrNull() ?: emptyList()
+                )
+            }
         }
-    }
-
-    fun getTopFiveHeroesByWinRate(): List<HeroStatistics> {
-        return uiState.value.heroStats.sortedBy { it.winRate }.reversed().take(5)
-    }
-
-    fun getTopFiveHeroesByPickRate(): List<HeroStatistics> {
-        return uiState.value.heroStats.sortedBy { it.pickRate }.reversed().take(5)
     }
 
     fun setSearchValue(text: String) {
@@ -138,13 +109,12 @@ class SearchScreenViewModel @Inject constructor(
             it.copy(
                 searchFieldValue = "",
                 playersList = emptyList(),
-                error = null,
                 searchError = null
             )
         }
     }
 
-    fun handleClearSingleSearch(playerId: String) {
+    fun handleClearSingleRecentSearch(playerId: String) {
         viewModelScope.launch {
             try {
                 userRecentSearchesRepository.removeRecentSearch(playerId)
@@ -194,40 +164,50 @@ class SearchScreenViewModel @Inject constructor(
 
     fun handleSubmitSearch() {
         _uiState.update { it.copy(isLoadingSearch = true) }
+        val fieldValue = uiState.value.searchFieldValue.trim()
+        val itemsList = uiState.value.allItems.filter { item ->
+            item.displayName.contains(fieldValue, ignoreCase = true)
+        }
+        val heroesList = uiState.value.allHeroes.filter { hero ->
+            hero.displayName.contains(fieldValue, ignoreCase = true)
+        }
+        _uiState.update {
+            it.copy(
+                filteredHeroes = heroesList,
+                filteredItems = itemsList,
+                isLoadingItemsAndHeroes = false
+            )
+        }
         viewModelScope.launch {
-            val fieldValue = uiState.value.searchFieldValue.trim()
-            val playersList = repository.fetchPlayersByName(fieldValue)
-            if (playersList.isSuccess) {
-                val filteredList = playersList.getOrNull()?.filter {
-                    !it.isCheater && !it.isMmrDisabled
-                }
+            val playersListDeferredResult = async { omedaCityRepository.fetchPlayersByName(fieldValue) }
+            val buildsListDeferredResult = async { omedaCityRepository.fetchAllBuilds(
+                name = fieldValue
+            ) }
+
+            val playersListResult = playersListDeferredResult.await()
+            val buildsListResult = buildsListDeferredResult.await()
+            if (playersListResult.isFailure) {
                 _uiState.update {
                     it.copy(
-                        isLoadingSearch = false,
-                        playersList = filteredList ?: emptyList(),
-                        searchError = if (filteredList.isNullOrEmpty()) "No results found" else null
-                    )
-                }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        isLoadingSearch = false,
-                        playersList = emptyList(),
-                        initPlayersListText = "Hmm something went wrong. Please try your search again."
+                        searchError = playersListResult.exceptionOrNull()?.message
                     )
                 }
             }
-        }
-    }
-
-    fun updateHeroStatsByTime(timeFrame: TimeFrame) {
-        viewModelScope.launch {
-            val heroStatsDeferredResult =
-                async { repository.fetchAllHeroStatistics(timeFrame = timeFrame.value) }
-            val heroStatsResult = heroStatsDeferredResult.await().getOrDefault(emptyList())
+            if(buildsListResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        buildsError = buildsListResult.exceptionOrNull()?.message
+                    )
+                }
+            }
+            val filteredPlayersList = playersListResult.getOrNull()?.filter {
+                !it.isCheater && !it.isMmrDisabled
+            }
             _uiState.update {
                 it.copy(
-                    heroStats = heroStatsResult
+                    isLoadingSearch = false,
+                    playersList = filteredPlayersList ?: emptyList(),
+                    filteredBuilds = buildsListResult.getOrNull() ?: emptyList()
                 )
             }
         }

@@ -1,4 +1,4 @@
-package com.aowen.monolith.feature.search.playerdetails.navigation
+package com.aowen.monolith.feature.home.playerdetails.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -9,7 +9,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.aowen.monolith.feature.matches.morematches.navigation.moreMatchesScreen
 import com.aowen.monolith.feature.matches.navigation.matchDetailsScreen
-import com.aowen.monolith.feature.search.playerdetails.PlayerDetailsRoute
+import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsRoute
 
 const val PlayerDetailRoute = "player-detail"
 

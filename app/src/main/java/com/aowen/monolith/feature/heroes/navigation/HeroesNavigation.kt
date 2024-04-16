@@ -7,7 +7,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.aowen.monolith.feature.heroes.HeroesScreenRoute
 import com.aowen.monolith.feature.heroes.herodetails.navigation.heroDetailsScreen
-import com.aowen.monolith.feature.search.navigation.HomeRoute
+import com.aowen.monolith.feature.home.navigation.HomeRoute
 
 const val HeroesRoute = "heroes"
 

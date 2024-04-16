@@ -1,4 +1,4 @@
-package com.aowen.monolith.feature.search
+package com.aowen.monolith.feature.home
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.getHeroImage
-import com.aowen.monolith.feature.search.winrate.WIN_RATE
+import com.aowen.monolith.feature.home.winrate.WIN_RATE
 import com.aowen.monolith.ui.components.HeroInlineStatsRateBar
 import com.aowen.monolith.ui.components.ShimmerCircle
 import com.aowen.monolith.ui.components.ShimmerLongText

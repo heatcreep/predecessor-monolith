@@ -5,11 +5,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.aowen.monolith.feature.search.navigation.SearchRoute
 import com.aowen.monolith.feature.builds.BuildsScreenRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.addBuildsScreen
 import com.aowen.monolith.feature.builds.builddetails.navigation.buildDetailsScreen
-import com.aowen.monolith.feature.search.navigation.HomeRoute
+import com.aowen.monolith.feature.home.navigation.HomeRoute
 
 const val BuildsRoute = "builds"
 

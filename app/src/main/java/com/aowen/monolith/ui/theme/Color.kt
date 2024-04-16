@@ -27,7 +27,7 @@ val WarmWhite200 = Color(0xFFEEEEEE)
 val GreenHighlight = Color(0xFF69AF69)
 val DarkGreenHighlight = Color(0xFF317231)
 val DarkGreenHighlight35 = Color(0x4D1C421C)
-
+val BadgeBlueGreen = Color(0xFF34B9AB)
 
 // Red
 val RedHighlight = Color(0xFFAF6969)
@@ -44,6 +44,7 @@ val YellowHighlight = Color (0xFFAFAF69)
 val BlueHighlight = Color(0xFF6969AF)
 val Dusk = Color(0xFF22308D)
 val ManaBlue = Color(0xFF69AFA8)
+val BadgePurple = Color(0xFF7D2387)
 
 // SOCIAL
 

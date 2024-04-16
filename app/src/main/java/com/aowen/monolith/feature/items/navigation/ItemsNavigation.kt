@@ -5,10 +5,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.aowen.monolith.feature.search.navigation.SearchRoute
 import com.aowen.monolith.feature.items.ItemsScreenRoute
 import com.aowen.monolith.feature.items.itemdetails.navigation.itemDetailsScreen
-import com.aowen.monolith.feature.search.navigation.HomeRoute
+import com.aowen.monolith.feature.home.navigation.HomeRoute
 
 const val ItemsRoute = "items"
 

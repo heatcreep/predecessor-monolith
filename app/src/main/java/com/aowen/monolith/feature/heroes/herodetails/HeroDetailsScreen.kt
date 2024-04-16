@@ -79,16 +79,13 @@ import com.aowen.monolith.feature.builds.BuildListItem
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
 import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsLoadingState
 import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsState
-import com.aowen.monolith.feature.search.PlayerLoadingCard
-import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
+import com.aowen.monolith.ui.components.PlayerLoadingCard
 import com.aowen.monolith.ui.components.SpiderChart
-import com.aowen.monolith.ui.theme.LightKhaki
+import com.aowen.monolith.ui.theme.BadgeBlueGreen
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.NeroBlack
-import com.aowen.monolith.ui.theme.NeroGrey
-import com.aowen.monolith.ui.theme.WarmWhite
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 import kotlinx.coroutines.launch
 
@@ -139,7 +136,7 @@ fun HeroDetailsRoute(
                         )
                     }
                 },
-                windowInsets = WindowInsets(0,0,0,0)
+                windowInsets = WindowInsets(0, 0, 0, 0)
             )
         },
     ) {
@@ -151,64 +148,63 @@ fun HeroDetailsRoute(
             if (uiState.isLoading) {
                 FullScreenLoadingIndicator("Hero Details")
             } else {
-                if (uiState.heroDetailsErrors != null) {
-                    val errorMessage = uiState.heroDetailsErrors?.heroErrorMessage
-                        ?: uiState.heroDetailsErrors?.statisticsErrorMessage
-                        ?: "Something went wrong."
-                    val errorLog = uiState.heroDetailsErrors?.heroError
-                        ?: uiState.heroDetailsErrors?.statisticsError
-                        ?: "Something went wrong."
-                    logDebug(errorLog)
-                    FullScreenErrorWithRetry(
-                        errorMessage = errorMessage
-                    ) {
-                        viewModel.initViewModel()
-                    }
-                } else {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        TabRow(
-                            selectedTabIndex = pagerState.currentPage,
-                            indicator = { tabPositions ->
-                                TabRowDefaults.SecondaryIndicator(
-                                    Modifier.tabIndicatorOffset(
-                                        tabPositions[pagerState.currentPage]
-                                    ),
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            }
+                when (uiState.heroDetailsErrors) {
+                    is HeroDetailsError.HeroErrorMessage,
+                    is HeroDetailsError.StatisticsErrorMessage -> {
+                        val errorMessage = uiState.heroDetailsErrors?.errorMessage
+                        FullScreenErrorWithRetry(
+                            errorMessage = errorMessage
                         ) {
-                            tabs.forEachIndexed { index, tab ->
-                                Tab(
-                                    text = { Text(text = tab) },
-                                    unselectedContentColor = MaterialTheme.colorScheme.tertiary,
-                                    selectedContentColor = MaterialTheme.colorScheme.secondary,
-                                    selected = pagerState.currentPage == index,
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            pagerState.animateScrollToPage(index)
-                                        }
-                                    }
-                                )
-                            }
+                            viewModel.initViewModel()
                         }
-                        HorizontalPager(
-                            modifier = Modifier.fillMaxWidth(),
-                            state = pagerState
-                        ) { page ->
-                            when (page) {
-                                0 -> HeroOverviewScreen(
-                                    uiState = uiState,
-                                    navigateToBuildDetails = navController::navigateToBuildDetails
-                                )
-
-                                1 -> HeroStatsScreen(
-                                    uiState = uiState
-                                )
-
-                                2 -> HeroAbilitiesScreen(
-                                    uiState = uiState
-                                )
+                    }
+                    else -> {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            TabRow(
+                                selectedTabIndex = pagerState.currentPage,
+                                indicator = { tabPositions ->
+                                    TabRowDefaults.SecondaryIndicator(
+                                        Modifier.tabIndicatorOffset(
+                                            tabPositions[pagerState.currentPage]
+                                        ),
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                            ) {
+                                tabs.forEachIndexed { index, tab ->
+                                    Tab(
+                                        text = { Text(text = tab) },
+                                        unselectedContentColor = MaterialTheme.colorScheme.tertiary,
+                                        selectedContentColor = MaterialTheme.colorScheme.secondary,
+                                        selected = pagerState.currentPage == index,
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                pagerState.animateScrollToPage(index)
+                                            }
+                                        }
+                                    )
+                                }
                             }
+                            HorizontalPager(
+                                modifier = Modifier.fillMaxWidth(),
+                                state = pagerState
+                            ) { page ->
+                                when (page) {
+                                    0 -> HeroOverviewScreen(
+                                        uiState = uiState,
+                                        navigateToBuildDetails = navController::navigateToBuildDetails
+                                    )
+
+                                    1 -> HeroStatsScreen(
+                                        uiState = uiState
+                                    )
+
+                                    2 -> HeroAbilitiesScreen(
+                                        uiState = uiState
+                                    )
+                                }
+                            }
+
                         }
 
                     }
@@ -295,9 +291,9 @@ fun HeroOverviewScreen(
                         )
                     }
                 } else {
-                    if (uiState.heroDetailsErrors?.heroBuildsError != null) {
+                    if (uiState.heroDetailsErrors is HeroDetailsError.HeroBuildsErrorMessage) {
                         Text(
-                            text = uiState.heroDetailsErrors.heroBuildsErrorMessage
+                            text = uiState.heroDetailsErrors.errorMessage
                                 ?: "Failed to fetch hero builds.",
                             color = MaterialTheme.colorScheme.secondary
                         )
@@ -618,15 +614,15 @@ fun HeroRoleChips(
                     enabled = false,
                     onClick = {},
                     colors = AssistChipDefaults.elevatedAssistChipColors().copy(
-                        containerColor = NeroGrey,
-                        disabledContainerColor = NeroGrey,
-                        disabledLabelColor = WarmWhite,
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        disabledContainerColor = MaterialTheme.colorScheme.secondary,
+                        disabledLabelColor = MaterialTheme.colorScheme.primary,
                     ),
                     label = {
                         Text(
                             text = role.name,
                             style = MaterialTheme.typography.bodySmall,
-                            color = WarmWhite
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 )
@@ -651,8 +647,8 @@ fun HeroClassChips(
                     onClick = {},
                     enabled = false,
                     colors = AssistChipDefaults.elevatedAssistChipColors().copy(
-                        containerColor = LightKhaki,
-                        disabledContainerColor = LightKhaki,
+                        containerColor = BadgeBlueGreen,
+                        disabledContainerColor = BadgeBlueGreen,
                         disabledLabelColor = NeroBlack,
                         labelColor = NeroBlack
                     ),

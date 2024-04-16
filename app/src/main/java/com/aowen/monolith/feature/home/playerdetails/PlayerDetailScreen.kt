@@ -1,4 +1,4 @@
-package com.aowen.monolith.feature.search.playerdetails
+package com.aowen.monolith.feature.home.playerdetails
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility

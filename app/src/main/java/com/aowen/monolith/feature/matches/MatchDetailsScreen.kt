@@ -63,7 +63,7 @@ import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.Team
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.feature.items.itemdetails.ItemDetailsBottomSheet
-import com.aowen.monolith.feature.search.playerdetails.navigation.navigateToPlayerDetails
+import com.aowen.monolith.feature.home.playerdetails.navigation.navigateToPlayerDetails
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.theme.Dawn
 import com.aowen.monolith.ui.theme.Dusk

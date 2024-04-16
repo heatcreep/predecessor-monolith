@@ -38,7 +38,6 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
             } else {
                 postgrestService.fetchRecentSearches(user.id)
                     .map { it.create() }
-
             }
         } catch (e: Exception) {
             emptyList()

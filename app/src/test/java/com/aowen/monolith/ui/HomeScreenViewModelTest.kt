@@ -11,8 +11,8 @@ import com.aowen.monolith.fakes.data.fakePlayerDetails2
 import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.feature.search.SearchScreenUiState
-import com.aowen.monolith.feature.search.SearchScreenViewModel
+import com.aowen.monolith.feature.home.HomeScreenUiState
+import com.aowen.monolith.feature.home.HomeScreenViewModel
 import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
@@ -21,16 +21,16 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class SearchScreenViewModelTest {
+class HomeScreenViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: SearchScreenViewModel
+    private lateinit var viewModel: HomeScreenViewModel
 
     @Before
     fun setup() {
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
@@ -48,7 +48,7 @@ class SearchScreenViewModelTest {
 
     @Test
     fun `handleClearSearch updates state accordingly`() {
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
@@ -57,7 +57,7 @@ class SearchScreenViewModelTest {
 
         )
         viewModel.handleClearSearch()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             isLoadingSearch = false,
             playersList = emptyList(),
@@ -77,7 +77,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `handleClearSingleSearch() should call removeRecentSearch()`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -95,7 +95,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `handleClearAllRecentSearches() should call removeAllRecentSearches()`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -113,7 +113,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `handleAddToRecentSearch() should call addRecentSearch()`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -128,7 +128,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `handleSubmitSearch() should update state with playersList`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -136,7 +136,7 @@ class SearchScreenViewModelTest {
 
         )
         viewModel.handleSubmitSearch()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             isLoadingSearch = false,
             playersList = listOf(
@@ -158,7 +158,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `handleSubmitSearch() filters results if player is cheater`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -166,7 +166,7 @@ class SearchScreenViewModelTest {
         )
         viewModel.setSearchValue("Cheater")
         viewModel.handleSubmitSearch()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             isLoadingSearch = false,
             heroStats = fakeHeroStatisticsResult,
@@ -188,7 +188,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `handleSubmitSearch() filters results if players MMR is disabled`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -197,7 +197,7 @@ class SearchScreenViewModelTest {
         )
         viewModel.setSearchValue("MMR Disabled")
         viewModel.handleSubmitSearch()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             isLoadingSearch = false,
             heroStats = fakeHeroStatisticsResult,
@@ -219,7 +219,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `handleSubmitSearch() shows error if results are empty`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -228,7 +228,7 @@ class SearchScreenViewModelTest {
         )
         viewModel.setSearchValue("Empty")
         viewModel.handleSubmitSearch()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             isLoadingSearch = false,
             playersList = listOf(),
@@ -249,7 +249,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `handleSubmitSearch() shows error if fetchPlayersByName fails`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(hasPlayerDetailsError = true),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -257,7 +257,7 @@ class SearchScreenViewModelTest {
 
         )
         viewModel.handleSubmitSearch()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             isLoadingSearch = false,
             playersList = emptyList(),
@@ -278,7 +278,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `initViewModel() should update state with recent searches`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(
                 fakeClaimedUser = ClaimedUser(
@@ -291,7 +291,7 @@ class SearchScreenViewModelTest {
 
         )
         viewModel.initViewModel()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             error = null,
             heroStats = fakeHeroStatisticsResult,
@@ -312,7 +312,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `initViewModel() should update state with error when getClaimedUser() fails`() = runTest {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(
                 error = true
@@ -322,7 +322,7 @@ class SearchScreenViewModelTest {
 
         )
         viewModel.initViewModel()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             claimedUserError = "Failed to fetch claimed user"
         )
@@ -333,7 +333,7 @@ class SearchScreenViewModelTest {
     @Test
     fun `initViewModel() should set top five heroes by win rate`() {
         val userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        viewModel = SearchScreenViewModel(
+        viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
             userRecentSearchesRepository = userRecentSearchesRepository,
@@ -341,7 +341,7 @@ class SearchScreenViewModelTest {
 
         )
         viewModel.initViewModel()
-        val expected = SearchScreenUiState(
+        val expected = HomeScreenUiState(
             isLoading = false,
             heroStats = fakeHeroStatisticsResult,
             recentSearchesList = listOf(

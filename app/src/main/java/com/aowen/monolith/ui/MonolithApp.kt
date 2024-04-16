@@ -17,8 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.aowen.monolith.feature.auth.navigation.LoginRoute
-import com.aowen.monolith.feature.search.navigation.HomeRoute
-import com.aowen.monolith.feature.search.navigation.SearchRoute
+import com.aowen.monolith.feature.home.navigation.HomeRoute
 import com.aowen.monolith.navigation.MonolithNavHost
 import com.aowen.monolith.navigation.NavBarItem
 import com.aowen.monolith.navigation.TopLevelDestination

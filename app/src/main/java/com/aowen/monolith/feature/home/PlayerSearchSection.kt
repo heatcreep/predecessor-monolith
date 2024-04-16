@@ -1,4 +1,4 @@
-package com.aowen.monolith.feature.search
+package com.aowen.monolith.feature.home
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
@@ -14,9 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TooltipState
@@ -25,21 +23,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.ui.theme.MonolithTheme
-import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
+import com.aowen.monolith.feature.search.SearchScreenUiState
+import com.aowen.monolith.feature.search.components.PlayerResultCard
+import com.aowen.monolith.ui.components.PlayerLoadingCard
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecentPlayersSection(
+fun PlayerSearchSection(
     uiState: SearchScreenUiState,
-    handleOpenAlertDialog: () -> Unit = {},
     handleAddToRecentSearch: (PlayerDetails) -> Unit = {},
-    handleClearSingleSearch: (String) -> Unit = {},
     navigateToPlayerDetails: (String) -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -51,20 +46,12 @@ fun RecentPlayersSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AnimatedContent(
-                    targetState = (uiState.playersList.isNotEmpty() || uiState.searchError != null),
-                    label = ""
-                ) {
-                    Text(
-                        text = if (it) {
-                            "Search Results"
-                        } else {
-                            "Recent Searches"
-                        },
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
+                Text(
+                    text = "Players",
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
                 TooltipBox(
                     positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                     tooltip = {
@@ -90,25 +77,13 @@ fun RecentPlayersSection(
                     }
                 }
             }
-            if (uiState.playersList.isNotEmpty()) {
-                TextButton(onClick = handleOpenAlertDialog) {
-                    Text(
-                        text = "Clear All",
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    )
-                }
-            }
-
         }
         Spacer(modifier = Modifier.size(16.dp))
         AnimatedContent(
-            targetState = (uiState.isLoading || uiState.isLoadingSearch),
+            targetState = uiState.isLoadingSearch,
             label = ""
-        ) {
-            if (it) {
+        ) { isLoadingSearch ->
+            if (isLoadingSearch) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -120,17 +95,7 @@ fun RecentPlayersSection(
                     )
                 }
             } else {
-                if (uiState.error != null) {
-                    Text(
-                        text = uiState.error,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                } else if (uiState.searchError != null) {
-                    Text(
-                        text = uiState.searchError,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                } else if (uiState.playersList.isNotEmpty()) {
+                if (uiState.playersList.isNotEmpty()) {
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -138,26 +103,6 @@ fun RecentPlayersSection(
                             player?.let {
                                 PlayerResultCard(
                                     playerDetails = player,
-                                    navigateToPlayerDetails = {
-                                        handleAddToRecentSearch(player)
-                                        navigateToPlayerDetails(player.playerId)
-                                    }
-                                )
-                            }
-                        }
-
-                    }
-                } else if (uiState.recentSearchesList.isNotEmpty()) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        uiState.recentSearchesList.forEach { player ->
-                            player?.let {
-                                PlayerResultCard(
-                                    playerDetails = player,
-                                    handleClearSingleSearch = {
-                                        handleClearSingleSearch(player.playerId)
-                                    },
                                     navigateToPlayerDetails = {
                                         handleAddToRecentSearch(player)
                                         navigateToPlayerDetails(player.playerId)
@@ -174,25 +119,6 @@ fun RecentPlayersSection(
                     )
                 }
             }
-        }
-    }
-}
-
-@LightDarkPreview
-@Composable
-fun RecentPlayersSectionPreview(
-    @PreviewParameter(SampleSearchScreenUiStateProvider::class)
-    uiState: SearchScreenUiState
-) {
-    MonolithTheme {
-        Surface {
-            RecentPlayersSection(
-                uiState = uiState,
-                handleOpenAlertDialog = {},
-                handleAddToRecentSearch = {},
-                handleClearSingleSearch = {},
-                navigateToPlayerDetails = {}
-            )
         }
     }
 }

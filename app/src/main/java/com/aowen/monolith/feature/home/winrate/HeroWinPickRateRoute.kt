@@ -1,4 +1,4 @@
-package com.aowen.monolith.feature.search.winrate
+package com.aowen.monolith.feature.home.winrate
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
@@ -47,9 +47,9 @@ import androidx.navigation.NavController
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.feature.heroes.herodetails.navigation.navigateToHeroDetails
-import com.aowen.monolith.feature.search.SearchScreenUiState
-import com.aowen.monolith.feature.search.SearchScreenViewModel
-import com.aowen.monolith.feature.search.TimeFrame
+import com.aowen.monolith.feature.home.HomeScreenUiState
+import com.aowen.monolith.feature.home.HomeScreenViewModel
+import com.aowen.monolith.feature.home.TimeFrame
 import com.aowen.monolith.ui.components.HeroInlineStatsRateBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
@@ -60,7 +60,7 @@ const val PICK_RATE = "pickRate"
 @Composable
 fun HeroWinPickRateRoute(
     navController: NavController,
-    viewModel: SearchScreenViewModel,
+    viewModel: HomeScreenViewModel,
     selectedStat: String
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -76,7 +76,7 @@ fun HeroWinPickRateRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HeroWinPickRateScreen(
-    uiState: SearchScreenUiState,
+    uiState: HomeScreenUiState,
     selectedStatFromNav: String,
     navigateToHeroDetails: (heroId: Int, heroName: String) -> Unit,
     updateHeroStatsByTime: (TimeFrame) -> Unit,
@@ -306,7 +306,7 @@ fun HeroWinPickRateScreen(
 fun HeroWinRateScreenPreview() {
     MonolithTheme {
         HeroWinPickRateScreen(
-            uiState = SearchScreenUiState(
+            uiState = HomeScreenUiState(
                 heroStats = listOf(
                     HeroStatistics(
                         1,

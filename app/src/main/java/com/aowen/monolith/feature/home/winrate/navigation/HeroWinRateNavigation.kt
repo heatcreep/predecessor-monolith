@@ -1,4 +1,4 @@
-package com.aowen.monolith.feature.search.winrate.navigation
+package com.aowen.monolith.feature.home.winrate.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.navigation.NavController
@@ -8,10 +8,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
-import com.aowen.monolith.feature.search.SearchScreenViewModel
-import com.aowen.monolith.feature.search.navigation.HomeRoute
-import com.aowen.monolith.feature.search.winrate.HeroWinPickRateRoute
-import com.aowen.monolith.feature.search.winrate.WIN_RATE
+import com.aowen.monolith.feature.home.HomeScreenViewModel
+import com.aowen.monolith.feature.home.navigation.HomeRoute
+import com.aowen.monolith.feature.home.winrate.HeroWinPickRateRoute
+import com.aowen.monolith.feature.home.winrate.WIN_RATE
 
 const val HeroWinPickRateRoute = "hero-win-pickrate"
 
@@ -34,15 +34,15 @@ fun NavGraphBuilder.heroWinPickRateScreen(
             slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End)
         }
     ) { backStackEntry ->
-        val searchScreenViewModel = backStackEntry
-            .sharedViewModel<SearchScreenViewModel>(
+        val homeScreenViewModel = backStackEntry
+            .sharedViewModel<HomeScreenViewModel>(
                 navController = navController,
                 parentRoute = HomeRoute
             )
         val selectedStat = backStackEntry.arguments?.getString("selectedStat") ?: WIN_RATE
         HeroWinPickRateRoute(
             navController = navController,
-            viewModel = searchScreenViewModel,
+            viewModel = homeScreenViewModel,
             selectedStat = selectedStat
         )
     }

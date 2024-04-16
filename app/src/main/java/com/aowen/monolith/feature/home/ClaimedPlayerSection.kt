@@ -1,4 +1,4 @@
-package com.aowen.monolith.feature.search
+package com.aowen.monolith.feature.home
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
@@ -16,13 +16,14 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.ui.components.PlayerLoadingCard
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 
-class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<SearchScreenUiState>(
+class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<HomeScreenUiState>(
     collection = listOf(
-        SearchScreenUiState(),
-        SearchScreenUiState(
+        HomeScreenUiState(),
+        HomeScreenUiState(
             isLoading = false,
             claimedPlayerDetails = PlayerDetails(
                 playerId = "1",
@@ -36,11 +37,11 @@ class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<Sea
                 favoriteHero = "Narbash",
             )
         ),
-        SearchScreenUiState(
+        HomeScreenUiState(
             isLoading = false,
             error = "Error fetching player details"
         ),
-        SearchScreenUiState(
+        HomeScreenUiState(
             isLoading = false,
         )
     )
@@ -48,9 +49,8 @@ class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<Sea
 
 @Composable
 fun ClaimedPlayerSection(
-    uiState: SearchScreenUiState,
+    uiState: HomeScreenUiState,
     modifier: Modifier = Modifier,
-    handleAddToRecentSearch: (PlayerDetails) -> Unit = {},
     navigateToPlayerDetails: (String) -> Unit = {}
 ) {
     Column(
@@ -88,7 +88,6 @@ fun ClaimedPlayerSection(
                             playerDetails = uiState.claimedPlayerDetails,
                             playerStats = uiState.claimedPlayerStats,
                             navigateToPlayerDetails = {
-                                handleAddToRecentSearch(uiState.claimedPlayerDetails)
                                 navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
                             }
                         )
@@ -113,7 +112,7 @@ fun ClaimedPlayerSection(
 @LightDarkPreview
 @Composable
 fun ClaimedPlayerSectionPreview(
-    @PreviewParameter(SampleSearchScreenUiStateProvider::class) uiState: SearchScreenUiState
+    @PreviewParameter(SampleSearchScreenUiStateProvider::class) uiState: HomeScreenUiState
 ) {
     MonolithTheme {
         Surface {
