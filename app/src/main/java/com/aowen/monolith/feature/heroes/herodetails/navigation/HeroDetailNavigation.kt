@@ -7,6 +7,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.aowen.monolith.feature.builds.builddetails.navigation.BuildDetailsRoute
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsRoute
 
 const val HeroDetailRoute = "hero-detail"
@@ -23,10 +24,17 @@ fun NavGraphBuilder.heroDetailsScreen(navController: NavController) {
     composable(
         route = "$HeroDetailRoute/{heroId}/{heroName}",
         enterTransition = {
-            slideIntoContainer(SlideDirection.Start)
+            when (initialState.destination.route) {
+                "$BuildDetailsRoute/{buildId}" -> slideIntoContainer(SlideDirection.End)
+                else -> slideIntoContainer(SlideDirection.Start)
+            }
         },
         exitTransition = {
-            slideOutOfContainer(SlideDirection.End)
+            when (targetState.destination.route) {
+                "$BuildDetailsRoute/{buildId}" -> slideOutOfContainer(SlideDirection.Start)
+
+                else -> slideOutOfContainer(SlideDirection.End)
+            }
         },
         arguments = listOf(
             navArgument("heroId") {

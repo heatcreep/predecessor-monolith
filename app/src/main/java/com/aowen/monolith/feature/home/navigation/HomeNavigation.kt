@@ -8,10 +8,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
+import com.aowen.monolith.feature.builds.navigation.BuildsRoute
+import com.aowen.monolith.feature.heroes.herodetails.navigation.HeroDetailRoute
+import com.aowen.monolith.feature.heroes.navigation.HeroesRoute
 import com.aowen.monolith.feature.home.HomeScreenRoute
 import com.aowen.monolith.feature.home.HomeScreenViewModel
 import com.aowen.monolith.feature.home.playerdetails.navigation.playerDetailsScreen
+import com.aowen.monolith.feature.home.winrate.navigation.HeroWinPickRateRoute
 import com.aowen.monolith.feature.home.winrate.navigation.heroWinPickRateScreen
+import com.aowen.monolith.feature.items.navigation.ItemsRoute
+import com.aowen.monolith.feature.profile.navigation.ProfileRoute
 
 
 const val HomeRoute = "home"
@@ -29,14 +35,31 @@ fun NavGraphBuilder.homeScreen(
         composable(
             route = HomeScreenRoute,
             enterTransition = {
-                if (this.initialState.destination.route != SearchRoute) {
-                    slideIntoContainer(SlideDirection.End)
-                } else {
+                if (initialState.destination.route == SearchRoute) {
                     null
+                } else {
+                    slideIntoContainer(
+                        when (initialState.destination.route) {
+                            HeroesRoute,
+                            ItemsRoute,
+                            BuildsRoute,
+                            ProfileRoute,
+                            "$HeroWinPickRateRoute/{selectedStat}",
+                            "$HeroDetailRoute/{heroId}/{heroName}" -> SlideDirection.End
+
+
+                            else -> SlideDirection.Start
+
+                        }
+                    )
                 }
             },
             exitTransition = {
-                slideOutOfContainer(SlideDirection.Start)
+                if (targetState.destination.route == SearchRoute) {
+                    null
+                } else {
+                    slideOutOfContainer(SlideDirection.Start)
+                }
             },
             deepLinks = listOf(navDeepLink { uriPattern = "monolith://login" })
         ) { backStackEntry ->

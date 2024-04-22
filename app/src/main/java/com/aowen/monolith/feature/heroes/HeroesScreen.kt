@@ -27,7 +27,8 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
@@ -63,9 +64,10 @@ import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.feature.heroes.herodetails.navigation.navigateToHeroDetails
-import com.aowen.monolith.feature.search.SearchBar
+import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.delay
@@ -84,12 +86,11 @@ fun HeroesScreenRoute(
         uiState = heroesScreenUiState,
         handleRetry = viewModel::initViewModel,
         onFilterRole = viewModel::updateRoleOption,
-        setSearchValue = viewModel::setSearchValue,
         onFilterHeroes = viewModel::getFilteredHeroes,
         modifier = modifier,
-        navigateToHeroDetails = navController::navigateToHeroDetails
+        navigateToHeroDetails = navController::navigateToHeroDetails,
+        navigateToSearch = navController::navigateToSearch
     )
-
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -97,11 +98,11 @@ fun HeroesScreenRoute(
 fun HeroesScreen(
     uiState: HeroesScreenUiState,
     onFilterRole: (HeroRole, Boolean) -> Unit,
-    setSearchValue: (text: String) -> Unit,
     onFilterHeroes: () -> Unit,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
     navigateToHeroDetails: (heroId: Int, heroName: String) -> Unit = { _, _ -> },
+    navigateToSearch: () -> Unit = { }
 ) {
 
     val config = LocalConfiguration.current
@@ -146,7 +147,35 @@ fun HeroesScreen(
                 handleRetry()
             }
         } else {
-            Scaffold(contentWindowInsets = WindowInsets(0,0,0,0)) { paddingValues ->
+            Scaffold(
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                topBar = {
+                    MonolithTopAppBar(
+                        title = "Heroes",
+                        actions = {
+                            IconButton(
+                                onClick = {
+                                    expanded = !expanded
+                                }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Settings,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .rotate(rotationAngle.value),
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                            IconButton(onClick = navigateToSearch) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Search,
+                                    contentDescription = "Search",
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                        }
+                    )
+                }
+            ) { paddingValues ->
                 Column(
                     modifier = modifier
                         .fillMaxSize()
@@ -154,42 +183,12 @@ fun HeroesScreen(
                         .padding(horizontal = 16.dp)
                 ) {
                     MonolithCollapsableGridColumn(listState = listState) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-
-                            SearchBar(
-                                searchLabel = "Hero lookup",
-                                searchValue = uiState.searchFieldValue,
-                                setSearchValue = setSearchValue,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(
-                                onClick = {
-                                    expanded = !expanded
-                                }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Settings,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(28.dp)
-                                        .rotate(rotationAngle.value),
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-
-                        }
                         AnimatedVisibility(visible = expanded) {
                             Column {
-                                Spacer(modifier = Modifier.size(4.dp))
                                 Text(
                                     text = "Roles",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.padding(start = 16.dp)
+                                    color = MaterialTheme.colorScheme.secondary
                                 )
                                 Spacer(modifier = Modifier.size(4.dp))
                                 FlowRow(
@@ -436,7 +435,6 @@ fun HeroesScreenPreview() {
                     )
                 ),
                 onFilterRole = { _, _ -> },
-                setSearchValue = {},
                 onFilterHeroes = {}
             )
         }
@@ -505,7 +503,6 @@ fun HeroesScreenPreviewDeviceSizes() {
                     )
                 ),
                 onFilterRole = { _, _ -> },
-                setSearchValue = {},
                 onFilterHeroes = {}
             )
         }

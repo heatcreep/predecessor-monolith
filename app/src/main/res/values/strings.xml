@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Monolith</string>
-    <string name="icon_search">Players</string>
+    <string name="icon_home">Home</string>
     <string name="icon_heroes">Heroes</string>
     <string name="icon_items">Items</string>
     <string name="icon_profile">Profile</string>

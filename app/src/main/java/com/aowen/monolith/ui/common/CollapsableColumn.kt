@@ -3,7 +3,6 @@ package com.aowen.monolith.ui.common
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
@@ -15,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.map
 
 @Composable
@@ -47,7 +45,6 @@ fun MonolithCollapsableGridColumn(listState: LazyGridState, content: @Composable
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top= 16.dp)
             ) {
                 content()
             }

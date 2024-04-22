@@ -108,7 +108,14 @@ fun HomeScreen(
             topBar = {
                 TopAppBar(
                     windowInsets = WindowInsets(0,0,0,0),
-                    title = { /* no-op */ },
+                    title = {
+                        Text(
+                            text = "Home",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    },
                     actions = {
                         IconButton(onClick = navigateToSearch) {
                             Icon(

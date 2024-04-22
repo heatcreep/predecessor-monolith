@@ -2,7 +2,6 @@ package com.aowen.monolith.feature.search
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,10 +15,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +36,7 @@ import com.aowen.monolith.feature.home.RecentPlayersSection
 import com.aowen.monolith.feature.home.playerdetails.navigation.navigateToPlayerDetails
 import com.aowen.monolith.feature.items.itemdetails.navigation.navigateToItemDetails
 import com.aowen.monolith.ui.components.MonolithAlertDialog
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.components.RefreshableContainer
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
@@ -122,16 +119,9 @@ internal fun SearchScreen(
     ) {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    windowInsets = WindowInsets(0, 0, 0, 0),
-                    title = {
-                        Text(
-                            text = "Search",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    },
-                    navigationIcon = {
+                MonolithTopAppBar(
+                    title = "Search",
+                    backAction = {
                         IconButton(onClick = navigateBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
@@ -149,7 +139,7 @@ internal fun SearchScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 SearchBar(
-                    searchLabel = "Player lookup",
+                    searchLabel = "Players, Heroes, Items, Builds..",
                     searchValue = uiState.searchFieldValue,
                     setSearchValue = setSearchValue,
                     handleSubmitSearch = {},

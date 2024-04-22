@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,7 +28,8 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -68,11 +71,13 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.StatDetails
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.items.itemdetails.navigation.navigateToItemDetails
-import com.aowen.monolith.feature.search.SearchBar
+import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
+import kotlinx.coroutines.launch
 
 @Composable
 fun ItemsScreenRoute(
@@ -85,6 +90,7 @@ fun ItemsScreenRoute(
     ItemsScreen(
         uiState = uiState,
         navigateToItemDetails = navController::navigateToItemDetails,
+        navigateToSearch = navController::navigateToSearch,
         onSetSearchValue = viewModel::onSetSearchValue,
         onClearSearch = viewModel::onClearSearch,
         onSelectTier = viewModel::onSelectTier,
@@ -95,10 +101,12 @@ fun ItemsScreenRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemsScreen(
     uiState: ItemsUiState,
     navigateToItemDetails: (String) -> Unit = {},
+    navigateToSearch: () -> Unit = {},
     onSetSearchValue: (String) -> Unit = {},
     onClearSearch: () -> Unit = {},
     onSelectTier: (String) -> Unit = {},
@@ -117,6 +125,15 @@ fun ItemsScreen(
     val rotationAngle = remember { Animatable(0f) }
 
     val listState = rememberLazyGridState()
+
+    LaunchedEffect(expanded) {
+        this.launch {
+            rotationAngle.animateTo(
+                targetValue = if (expanded) 90f else 0f,
+                animationSpec = tween(durationMillis = 200, easing = LinearEasing),
+            )
+        }
+    }
 
     LaunchedEffect(
         key1 = uiState.selectedTierFilter,
@@ -140,42 +157,41 @@ fun ItemsScreen(
             }
         } else {
             Scaffold(
-                contentWindowInsets = WindowInsets(0,0,0,0)
-            ) { paddingValues ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(paddingValues)
-                        .padding(horizontal = 16.dp),
-                ) {
-                    MonolithCollapsableGridColumn(listState = listState) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            SearchBar(
-                                searchLabel = "Item lookup",
-                                searchValue = uiState.searchFieldValue,
-                                setSearchValue = onSetSearchValue,
-                                modifier = Modifier.weight(1f),
-                                handleClearSearch = onClearSearch
-                            )
+                contentWindowInsets = WindowInsets(0,0,0,0),
+                topBar = {
+                    MonolithTopAppBar(
+                        title = "Items",
+                        actions = {
                             IconButton(
                                 onClick = {
                                     expanded = !expanded
                                 }) {
                                 Icon(
-                                    imageVector = Icons.Filled.Settings,
+                                    imageVector = Icons.Outlined.Settings,
                                     contentDescription = null,
                                     modifier = Modifier
-                                        .size(28.dp)
                                         .rotate(rotationAngle.value),
                                     tint = MaterialTheme.colorScheme.secondary
                                 )
                             }
+                            IconButton(onClick = navigateToSearch) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Search,
+                                    contentDescription = "Search",
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+                            }
                         }
+                    )
+                }
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(horizontal = 16.dp),
+                ) {
+                    MonolithCollapsableGridColumn(listState = listState) {
                         AnimatedVisibility(visible = expanded) {
                             Column {
                                 Spacer(modifier = Modifier.size(8.dp))

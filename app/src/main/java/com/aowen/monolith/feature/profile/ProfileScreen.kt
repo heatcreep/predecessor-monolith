@@ -19,10 +19,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -58,8 +61,10 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
 import com.aowen.monolith.data.UserInfo
 import com.aowen.monolith.feature.auth.navigation.navigateToLoginFromLogout
+import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.MonolithAlertDialog
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.DiscordBlurple
 import com.aowen.monolith.ui.theme.DiscordDarkBackground
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -67,6 +72,7 @@ import com.aowen.monolith.ui.theme.RedDanger
 import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenRoute(
     navController: NavController,
@@ -109,6 +115,19 @@ fun ProfileScreenRoute(
 
     Scaffold(
         contentWindowInsets = WindowInsets(0,0,0,0),
+        topBar = {
+            MonolithTopAppBar(
+                title = "Profile",
+                actions = {
+                    IconButton(onClick = navController::navigateToSearch) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Search"
+                        )
+                    }
+                }
+            )
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }

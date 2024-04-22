@@ -18,7 +18,9 @@ fun NavController.navigateToItemDetails(
     this.navigate("$ItemDetailRoute/$itemName", navOptions)
 }
 
-fun NavGraphBuilder.itemDetailsScreen() {
+fun NavGraphBuilder.itemDetailsScreen(
+    navController: NavController,
+) {
     composable(
         route = "$ItemDetailRoute/{itemName}",
         enterTransition = {
@@ -33,6 +35,6 @@ fun NavGraphBuilder.itemDetailsScreen() {
             },
         )
     ) {
-        ItemDetailsRoute()
+        ItemDetailsRoute(navController = navController)
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,7 +28,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,6 +49,7 @@ import com.aowen.monolith.feature.home.HomeScreenUiState
 import com.aowen.monolith.feature.home.HomeScreenViewModel
 import com.aowen.monolith.feature.home.TimeFrame
 import com.aowen.monolith.ui.components.HeroInlineStatsRateBar
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 
@@ -88,16 +87,10 @@ fun HeroWinPickRateScreen(
     var listDescending by rememberSaveable { mutableStateOf(true) }
     Scaffold(
         topBar = {
-            TopAppBar(
-                windowInsets = WindowInsets(0,0,0,0),
-                title = {
-                    Text(
-                        text = "Top Heroes by Win Rate",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                },
-                navigationIcon = {
+            MonolithTopAppBar(
+                title = if(selectedStat == WIN_RATE) "Top Heroes by Win Rate" else "Most Played Heroes",
+                titleStyle = MaterialTheme.typography.bodyLarge,
+                backAction = {
                     IconButton(onClick = navigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

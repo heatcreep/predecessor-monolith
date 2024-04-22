@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ElevatedAssistChip
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,7 +38,6 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -81,6 +78,7 @@ import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsLoadingSt
 import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsState
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.components.PlayerLoadingCard
 import com.aowen.monolith.ui.components.SpiderChart
 import com.aowen.monolith.ui.theme.BadgeBlueGreen
@@ -97,7 +95,7 @@ class SampleHeroDetailsScreenUiStateProvider :
         )
     )
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HeroDetailsRoute(
     navController: NavController,
@@ -120,23 +118,17 @@ fun HeroDetailsRoute(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Hero Details",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                },
-                navigationIcon = {
+            MonolithTopAppBar(
+                title = "Hero Details",
+                titleStyle = MaterialTheme.typography.bodyLarge,
+                backAction = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "navigate up"
                         )
                     }
-                },
-                windowInsets = WindowInsets(0, 0, 0, 0)
+                }
             )
         },
     ) {
@@ -158,6 +150,7 @@ fun HeroDetailsRoute(
                             viewModel.initViewModel()
                         }
                     }
+
                     else -> {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             TabRow(

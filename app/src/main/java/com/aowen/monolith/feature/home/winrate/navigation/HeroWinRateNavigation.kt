@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
+import com.aowen.monolith.feature.heroes.herodetails.navigation.HeroDetailRoute
 import com.aowen.monolith.feature.home.HomeScreenViewModel
 import com.aowen.monolith.feature.home.navigation.HomeRoute
 import com.aowen.monolith.feature.home.winrate.HeroWinPickRateRoute
@@ -25,13 +26,24 @@ fun NavGraphBuilder.heroWinPickRateScreen(
     composable(
         route = "$HeroWinPickRateRoute/{selectedStat}",
         arguments = listOf(navArgument("selectedStat") {
-           type = NavType.StringType
+            type = NavType.StringType
         }),
         enterTransition = {
-            slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start)
+            slideIntoContainer(
+                when (initialState.destination.route) {
+                    "$HeroDetailRoute/{heroId}/{heroName}" -> AnimatedContentTransitionScope.SlideDirection.End
+                    else -> AnimatedContentTransitionScope.SlideDirection.Start
+                }
+            )
         },
         exitTransition = {
-            slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End)
+            slideOutOfContainer(
+                when (targetState.destination.route) {
+                    "$HeroDetailRoute/{heroId}/{heroName}" -> AnimatedContentTransitionScope.SlideDirection.Start
+
+                    else -> AnimatedContentTransitionScope.SlideDirection.End
+                }
+            )
         }
     ) { backStackEntry ->
         val homeScreenViewModel = backStackEntry

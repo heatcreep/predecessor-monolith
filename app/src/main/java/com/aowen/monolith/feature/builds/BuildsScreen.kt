@@ -28,9 +28,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -83,11 +84,12 @@ import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.addbuild.navigation.navigateToAddBuildFlow
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
-import com.aowen.monolith.feature.search.SearchBar
+import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.ui.common.MonolithCollapsableFabButton
 import com.aowen.monolith.ui.common.MonolithCollapsableListColumn
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.GreenHighlight
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.RedHighlight
@@ -117,11 +119,13 @@ fun BuildsScreenRoute(
         onCheckHasSkillOrder = viewModel::updateHasSkillOrder,
         onCheckHasModules = viewModel::updateHasModules,
         onCheckHasCurrentVersion = viewModel::updateHasCurrentVersion,
+        navigateToSearch = navController::navigateToSearch,
         navigateToBuildDetails = navController::navigateToBuildDetails,
         navigateToAddBuildFlow = navController::navigateToAddBuildFlow
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuildsScreen(
     uiState: BuildsUiState,
@@ -136,6 +140,7 @@ fun BuildsScreen(
     onCheckHasSkillOrder: (Boolean) -> Unit,
     onCheckHasModules: (Boolean) -> Unit,
     onCheckHasCurrentVersion: (Boolean) -> Unit,
+    navigateToSearch: () -> Unit,
     navigateToBuildDetails: (Int) -> Unit,
     navigateToAddBuildFlow: () -> Unit
 ) {
@@ -158,6 +163,32 @@ fun BuildsScreen(
 
     Scaffold(
         contentWindowInsets = WindowInsets(0,0,0,0),
+        topBar = {
+            MonolithTopAppBar(
+                title = "Builds",
+                actions = {
+                    IconButton(
+                        onClick = {
+                            expanded = !expanded
+                        }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .rotate(rotationAngle.value),
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    IconButton(onClick = navigateToSearch) {
+                        Icon(
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = "Search",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             if (BuildConfig.DEBUG) {
                 MonolithCollapsableFabButton(
@@ -178,39 +209,8 @@ fun BuildsScreen(
                 .padding(horizontal = 16.dp),
         ) {
             MonolithCollapsableListColumn(
-                modifier = Modifier.padding(vertical = 16.dp),
                 listState = scrollState
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    SearchBar(
-                        searchLabel = "Builds lookup",
-                        searchValue = uiState.searchFieldValue,
-                        setSearchValue = { searchValue ->
-                            onSearchFieldUpdate(searchValue)
-                        },
-                        modifier = Modifier.weight(1f),
-                        handleClearSearch = {
-                            onSearchFieldUpdate("")
-                        }
-                    )
-                    IconButton(
-                        onClick = {
-                            expanded = !expanded
-                        }) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(28.dp)
-                                .rotate(rotationAngle.value),
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                }
                 AnimatedVisibility(visible = expanded) {
                     Column(
                         modifier = Modifier

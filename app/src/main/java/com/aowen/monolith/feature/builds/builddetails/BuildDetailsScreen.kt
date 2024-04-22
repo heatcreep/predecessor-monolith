@@ -26,9 +26,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -54,6 +59,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.ItemModule
@@ -62,11 +68,13 @@ import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.items.itemdetails.ItemDetailsBottomSheet
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.meetup.twain.MarkdownText
 
 @Composable
 fun BuildDetailsRoute(
+    navController: NavController,
     viewModel: BuildDetailsScreenViewModel = hiltViewModel()
 ) {
 
@@ -77,16 +85,35 @@ fun BuildDetailsRoute(
         viewModel.initViewModel()
     }
 
-    BuildDetailsScreen(
-        uiState = uiState,
-        onItemClicked = viewModel::onItemClicked
-    )
+    Scaffold(
+        topBar = {
+            MonolithTopAppBar(
+                title = "Build Details",
+                titleStyle = MaterialTheme.typography.bodyLarge,
+                backAction = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "navigate up"
+                        )
+                    }
+                }
+            )
+        },
+    ) {
+        BuildDetailsScreen(
+            uiState = uiState,
+            modifier = Modifier.padding(it),
+            onItemClicked = viewModel::onItemClicked
+        )
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun BuildDetailsScreen(
     uiState: BuildDetailsUiState,
+    modifier: Modifier = Modifier,
     onItemClicked: (Int) -> Unit
 ) {
 
@@ -118,7 +145,7 @@ fun BuildDetailsScreen(
             }
         } else {
             Surface(
-                modifier = Modifier
+                modifier = modifier
                     .background(MaterialTheme.colorScheme.background)
             ) {
                 Column(

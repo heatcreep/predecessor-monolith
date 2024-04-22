@@ -7,8 +7,10 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.aowen.monolith.feature.builds.BuildsScreenRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.addBuildsScreen
+import com.aowen.monolith.feature.builds.builddetails.navigation.BuildDetailsRoute
 import com.aowen.monolith.feature.builds.builddetails.navigation.buildDetailsScreen
-import com.aowen.monolith.feature.home.navigation.HomeRoute
+import com.aowen.monolith.feature.home.navigation.SearchRoute
+import com.aowen.monolith.feature.profile.navigation.ProfileRoute
 
 const val BuildsRoute = "builds"
 
@@ -22,26 +24,37 @@ fun NavGraphBuilder.buildsScreen(
     composable(
         route = BuildsRoute,
         enterTransition = {
-            slideIntoContainer(
-                if (this.initialState.destination.route == HomeRoute) {
-                    AnimatedContentTransitionScope.SlideDirection.Start
-                } else {
-                    AnimatedContentTransitionScope.SlideDirection.End
-                }
-            )
+            if (initialState.destination.route == SearchRoute) {
+                null
+            } else {
+                slideIntoContainer(
+                    when (initialState.destination.route) {
+                        ProfileRoute,
+                        "$BuildDetailsRoute/{buildId}" -> AnimatedContentTransitionScope.SlideDirection.End
+
+                        else -> AnimatedContentTransitionScope.SlideDirection.Start
+                    }
+                )
+            }
         },
         exitTransition = {
-            slideOutOfContainer(
-                if (this.targetState.destination.route == HomeRoute) {
-                    AnimatedContentTransitionScope.SlideDirection.End
-                } else {
-                    AnimatedContentTransitionScope.SlideDirection.Start
-                }
-            )
+            if (targetState.destination.route == SearchRoute) {
+                null
+            } else {
+                slideOutOfContainer(
+                    when (targetState.destination.route) {
+                        ProfileRoute,
+                        "$BuildDetailsRoute/{buildId}"
+                        -> AnimatedContentTransitionScope.SlideDirection.Start
+
+                        else -> AnimatedContentTransitionScope.SlideDirection.End
+                    }
+                )
+            }
         }
     ) {
         BuildsScreenRoute(navController = navController)
     }
-    buildDetailsScreen()
+    buildDetailsScreen(navController)
     addBuildsScreen(navController)
 }
