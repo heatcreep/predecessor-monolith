@@ -53,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.getItemImage
@@ -234,7 +235,9 @@ fun SkillOrderAndModuleSelectScreen(
                     ) {
                         SkillOrderScrollableRow(
                             modifier = Modifier.weight(1f),
-                            skillOrder = uiState.skillOrder
+                            skillOrder = uiState.skillOrder,
+                            // TODO: Replace with VM value
+                            console = Console.Xbox
                         )
                         Row {
                             IconButton(onClick = navigateToSkillOrderSelect) {

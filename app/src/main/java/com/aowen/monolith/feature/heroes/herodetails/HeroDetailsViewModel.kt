@@ -4,13 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.BuildListItem
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.UserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,6 +41,7 @@ abstract class HeroDetailsError {
 data class HeroDetailsUiState(
     val isLoading: Boolean = true,
     val isLoadingBuilds: Boolean = true,
+    val console: Console = Console.PC,
     val heroDetailsErrors: HeroDetailsError? = null,
     val hero: HeroDetails = HeroDetails(),
     val heroBuilds: List<BuildListItem> = emptyList(),
@@ -47,11 +51,15 @@ data class HeroDetailsUiState(
 @HiltViewModel
 class HeroDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val userPreferencesDataStore: UserPreferencesManager,
     private val omedaCityRepository: OmedaCityRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HeroDetailsUiState())
     val uiState: StateFlow<HeroDetailsUiState> = _uiState
+
+    private val _console = MutableStateFlow(Console.PC)
+    val console: StateFlow<Console> = _console
 
     private val heroName: String = checkNotNull(savedStateHandle["heroName"])
     private val heroId: String = checkNotNull(savedStateHandle["heroId"])
@@ -63,6 +71,7 @@ class HeroDetailsViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.value = HeroDetailsUiState(isLoading = true, heroDetailsErrors = null)
         viewModelScope.launch {
+            _console.emit(userPreferencesDataStore.console.first())
             val hero = async { omedaCityRepository.fetchHeroByName(heroName) }
             val statistics =
                 async { omedaCityRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
@@ -129,4 +138,6 @@ class HeroDetailsViewModel @Inject constructor(
             }
         }
     }
+
+
 }

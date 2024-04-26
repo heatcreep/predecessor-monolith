@@ -4,11 +4,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.BuildListItem
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.UserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,17 +31,22 @@ data class BuildDetailsUiState(
 @HiltViewModel
 class BuildDetailsScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val userPreferencesDataStore: UserPreferencesManager,
     private val repository: OmedaCityRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BuildDetailsUiState())
     val uiState = _uiState
 
+    private val _console = MutableStateFlow(Console.PC)
+    val console = _console
+
     private val buildId: String = checkNotNull(savedStateHandle["buildId"])
 
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
+            _console.emit(userPreferencesDataStore.console.first())
             val buildsDeferred = async { repository.fetchBuildById(buildId) }
             val itemsDeferred = async { repository.fetchAllItems() }
 

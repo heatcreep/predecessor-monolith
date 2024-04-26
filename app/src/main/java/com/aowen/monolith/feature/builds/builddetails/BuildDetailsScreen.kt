@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -56,15 +58,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.BuildListItem
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
+import com.aowen.monolith.data.getLevelingAbilities
 import com.aowen.monolith.feature.items.itemdetails.ItemDetailsBottomSheet
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
@@ -80,6 +85,7 @@ fun BuildDetailsRoute(
 
 
     val uiState by viewModel.uiState.collectAsState()
+    val console by viewModel.console.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.initViewModel()
@@ -103,6 +109,7 @@ fun BuildDetailsRoute(
     ) {
         BuildDetailsScreen(
             uiState = uiState,
+            console = console,
             modifier = Modifier.padding(it),
             onItemClicked = viewModel::onItemClicked
         )
@@ -113,6 +120,7 @@ fun BuildDetailsRoute(
 @Composable
 fun BuildDetailsScreen(
     uiState: BuildDetailsUiState,
+    console: Console,
     modifier: Modifier = Modifier,
     onItemClicked: (Int) -> Unit
 ) {
@@ -244,7 +252,10 @@ fun BuildDetailsScreen(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     uiState.buildDetails.skillOrder?.let {
-                        SkillOrderScrollableRow(skillOrder = it)
+                        SkillOrderScrollableRow(
+                            skillOrder = it,
+                            console = console
+                        )
                     }
                     Spacer(modifier = Modifier.size(16.dp))
                     // Modules Section
@@ -336,7 +347,8 @@ fun PlayerCardWithRole(
 fun SkillOrderScrollableRow(
     modifier: Modifier = Modifier,
     scrollState: LazyListState = rememberLazyListState(),
-    skillOrder: List<Int>
+    skillOrder: List<Int>,
+    console: Console
 ) {
 
 
@@ -359,12 +371,14 @@ fun SkillOrderScrollableRow(
                 rowHeight = with(density) { coordinates.size.height.toDp() }
             }) {
             Column(
+                modifier = Modifier.width(IntrinsicSize.Max),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                SkillOrderHeader("Q")
-                SkillOrderHeader("E")
-                SkillOrderHeader("R")
-                SkillOrderHeader("RMB")
+                val skillOrderHeaders = getLevelingAbilities(console)
+                SkillOrderHeader(skillOrderHeaders[1])
+                SkillOrderHeader(skillOrderHeaders[2])
+                SkillOrderHeader(skillOrderHeaders[3])
+                SkillOrderHeader(skillOrderHeaders[0])
             }
             Spacer(modifier = Modifier.size(4.dp))
             LazyRow(
@@ -413,14 +427,17 @@ fun SkillOrderHeader(
 ) {
     Box(
         modifier = Modifier
-            .size(36.dp)
+            .fillMaxWidth()
+            .height(36.dp)
             .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(horizontal = 2.dp),
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = input,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.align(Alignment.Center)
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -502,7 +519,8 @@ fun BuildDetailsScreenPreview() {
                     updatedAt = "Test",
                 )
             ),
-            onItemClicked = {}
+            onItemClicked = {},
+            console = Console.Xbox
         )
     }
 }
@@ -520,7 +538,8 @@ fun SkillOrderScrollableRowPreview() {
                 .background(MaterialTheme.colorScheme.primary)
         ) {
             SkillOrderScrollableRow(
-                skillOrder = listOf(4, 2, 1, 4, 3, 2, 2, 1, 4, 1, 1, 1, 1)
+                skillOrder = listOf(4, 2, 1, 4, 3, 2, 2, 1, 4, 1, 1, 1, 1),
+                console = Console.Xbox
             )
         }
     }

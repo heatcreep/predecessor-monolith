@@ -1,7 +1,9 @@
 package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.create
+import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
@@ -35,6 +37,7 @@ class HeroDetailsViewModelTest {
                 )
 
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityRepository = FakeOmedaCityRepository()
         )
     }
@@ -49,6 +52,7 @@ class HeroDetailsViewModelTest {
     fun `calling initViewModel() should update uiState with hero statistics and first five builds`() = runTest {
         viewModel.initViewModel()
         val actual = viewModel.uiState.value
+        val actualConsole = viewModel.console.value
         val expected = HeroDetailsUiState(
             isLoading = false,
             isLoadingBuilds = false,
@@ -58,6 +62,7 @@ class HeroDetailsViewModelTest {
             statistics = fakeHeroStatisticsDto.create()
         )
         assertEquals(expected, actual)
+        assertEquals(Console.PC, actualConsole)
     }
 
     @Test
@@ -70,6 +75,7 @@ class HeroDetailsViewModelTest {
                 )
 
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityRepository = FakeOmedaCityRepository(
                 hasHeroDetailsErrors = true
             )
@@ -98,6 +104,7 @@ class HeroDetailsViewModelTest {
                 )
 
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityRepository = FakeOmedaCityRepository(
                 hasHeroStatisticsErrors = true
             )
@@ -126,6 +133,7 @@ class HeroDetailsViewModelTest {
                 )
 
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityRepository = FakeOmedaCityRepository(
                 hasBuildsError = true
             )

@@ -68,9 +68,11 @@ import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.HeroClass
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.getAbilityKey
+import com.aowen.monolith.data.getAbilityName
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.feature.builds.BuildListItem
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
@@ -105,6 +107,7 @@ fun HeroDetailsRoute(
     val coroutineScope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsState()
+    val console by viewModel.console.collectAsState()
 
     // Tab State
     val tabs = listOf("Overview", "Stats", "Abilities")
@@ -193,7 +196,8 @@ fun HeroDetailsRoute(
                                     )
 
                                     2 -> HeroAbilitiesScreen(
-                                        uiState = uiState
+                                        uiState = uiState,
+                                        console = console
                                     )
                                 }
                             }
@@ -502,6 +506,7 @@ fun StatRow(
 @Composable
 fun HeroAbilitiesScreen(
     uiState: HeroDetailsUiState,
+    console: Console
 ) {
     val context = LocalContext.current
     Column(
@@ -511,6 +516,7 @@ fun HeroAbilitiesScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         uiState.hero.abilities.forEachIndexed { index, ability ->
+            val abilityKey = getAbilityKey(index, console)
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -552,7 +558,7 @@ fun HeroAbilitiesScreen(
                             color = MaterialTheme.colorScheme.secondary
                         )
                         Text(
-                            text = getAbilityKey(index),
+                            text = "${getAbilityName(index)} ${if (abilityKey != null) "($abilityKey)" else ""}",
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.tertiary
@@ -694,7 +700,8 @@ fun HeroAbilitiesScreenPreview(
     MonolithTheme {
         Surface {
             HeroAbilitiesScreen(
-                uiState = uiState
+                uiState = uiState,
+                console = Console.PC
             )
         }
     }

@@ -1,5 +1,9 @@
 # Release Notes
 
+## 1.4.4 - Latest
+
+- Adds new console dropdown in Profile screen to select your console. This will show hero abilities with the updated inputs based on the console you select.
+
 ## 1.4.3 - Latest
 
 #### Improvements & Bug Fixes

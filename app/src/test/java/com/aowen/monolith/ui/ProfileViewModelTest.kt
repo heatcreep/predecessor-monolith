@@ -1,6 +1,8 @@
 package com.aowen.monolith.ui
 
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.fakes.FakeAuthRepository
+import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.data.fakeUserInfo
 import com.aowen.monolith.feature.profile.ProfileScreenUiState
@@ -27,6 +29,7 @@ class ProfileViewModelTest {
     @Before
     fun setup() {
         viewModel = ProfileViewModel(
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = FakeUserRepository(),
             authRepository = FakeAuthRepository()
         )
@@ -38,7 +41,8 @@ class ProfileViewModelTest {
         val expected = ProfileScreenUiState(
             isLoading = false,
             error = null,
-            userInfo = fakeUserInfo
+            userInfo = fakeUserInfo,
+            console = Console.PC
         )
         val actual = viewModel.uiState.value
 
@@ -49,13 +53,15 @@ class ProfileViewModelTest {
     fun `when initViewModel is called, then uiState is error when getUser returns null`() {
 
         viewModel = ProfileViewModel(
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = FakeUserRepository(error = true),
             authRepository = FakeAuthRepository()
         )
 
         val expected = ProfileScreenUiState(
             isLoading = false,
-            error = "Error getting user info."
+            error = "Error getting user info.",
+            console = Console.PC
         )
         val actual = viewModel.uiState.value
 
@@ -66,6 +72,7 @@ class ProfileViewModelTest {
     fun `handleLogout() calls userRepository logout`() {
         val userRepository = FakeUserRepository()
         viewModel = ProfileViewModel(
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,
             authRepository = FakeAuthRepository()
         )
@@ -103,6 +110,7 @@ class ProfileViewModelTest {
         val userRepository = FakeUserRepository()
         val authRepository = FakeAuthRepository()
         viewModel = ProfileViewModel(
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,
             authRepository = authRepository
         )
@@ -122,6 +130,7 @@ class ProfileViewModelTest {
         val userRepository = FakeUserRepository()
         val authRepository = FakeAuthRepository()
         viewModel = ProfileViewModel(
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,
             authRepository = authRepository
         )
@@ -167,6 +176,7 @@ class ProfileViewModelTest {
         val userRepository = FakeUserRepository(error = true)
         val authRepository = FakeAuthRepository()
         viewModel = ProfileViewModel(
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,
             authRepository = authRepository
         )
@@ -193,6 +203,7 @@ class ProfileViewModelTest {
         val userRepository = FakeUserRepository()
         val authRepository = FakeAuthRepository(hasDeleteUserAccountError = true)
         viewModel = ProfileViewModel(
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,
             authRepository = authRepository
         )

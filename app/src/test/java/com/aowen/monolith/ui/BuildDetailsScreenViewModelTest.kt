@@ -2,6 +2,7 @@ package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.create
+import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.data.fakeItemDto
 import com.aowen.monolith.fakes.data.fakeItemDto2
@@ -33,7 +34,8 @@ class BuildDetailsScreenViewModelTest {
                     "buildId" to "1"
                 )
             ),
-            repository = FakeOmedaCityRepository()
+            userPreferencesDataStore = FakeUserPreferencesManager(),
+            repository = FakeOmedaCityRepository(),
         )
 
         val actual = viewModel.uiState.value
@@ -50,6 +52,7 @@ class BuildDetailsScreenViewModelTest {
                     "buildId" to "1"
                 )
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository()
         )
         viewModel.initViewModel()
@@ -75,6 +78,7 @@ class BuildDetailsScreenViewModelTest {
                     "buildId" to "1"
                 )
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository(hasBuildsError = true)
         )
         viewModel.initViewModel()
@@ -96,6 +100,7 @@ class BuildDetailsScreenViewModelTest {
                     "buildId" to "1"
                 )
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository(hasItemDetailsErrors = true)
         )
         viewModel.initViewModel()
@@ -117,6 +122,7 @@ class BuildDetailsScreenViewModelTest {
                     "buildId" to "1"
                 )
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository(
                 buildsResponse = ResponseType.SuccessNull
             )
@@ -143,6 +149,7 @@ class BuildDetailsScreenViewModelTest {
                     "buildId" to "1"
                 )
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository(
                 itemDetailsResponse = ResponseType.SuccessNull
             )
@@ -164,6 +171,7 @@ class BuildDetailsScreenViewModelTest {
                     "buildId" to "1"
                 )
             ),
+            userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository()
         )
         viewModel.initViewModel()

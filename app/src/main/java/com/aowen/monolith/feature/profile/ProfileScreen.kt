@@ -1,6 +1,7 @@
 package com.aowen.monolith.feature.profile
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -10,23 +11,30 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -34,6 +42,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -59,6 +68,7 @@ import coil.request.ImageRequest
 import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.UserInfo
 import com.aowen.monolith.feature.auth.navigation.navigateToLoginFromLogout
 import com.aowen.monolith.feature.search.navigation.navigateToSearch
@@ -70,9 +80,10 @@ import com.aowen.monolith.ui.theme.DiscordDarkBackground
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.RedDanger
 import com.aowen.monolith.ui.theme.WarmWhite
+import com.aowen.monolith.ui.theme.dropDownDefaults
+import com.aowen.monolith.ui.theme.inputFieldDefaults
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenRoute(
     navController: NavController,
@@ -114,7 +125,7 @@ fun ProfileScreenRoute(
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
-        contentWindowInsets = WindowInsets(0,0,0,0),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             MonolithTopAppBar(
                 title = "Profile",
@@ -135,6 +146,7 @@ fun ProfileScreenRoute(
         ProfileScreen(
             uiState = uiState,
             modifier = Modifier.padding(it),
+            handleSaveConsole = viewModel::saveConsole,
             handleRetry = viewModel::initViewModel,
             onLogout = viewModel::handleLogout,
             onDelete = viewModel::deleteUserAccount,
@@ -143,10 +155,12 @@ fun ProfileScreenRoute(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     uiState: ProfileScreenUiState,
     modifier: Modifier = Modifier,
+    handleSaveConsole: (Console) -> Unit,
     handleRetry: () -> Unit,
     onLogout: () -> Unit,
     onDelete: () -> Unit,
@@ -155,6 +169,8 @@ fun ProfileScreen(
     val uriHandler = LocalUriHandler.current
 
     var deleteModalOpen by remember { mutableStateOf(false) }
+
+    var consoleDropdownExpanded by remember { mutableStateOf(false) }
 
     if (deleteModalOpen) {
         MonolithAlertDialog(
@@ -186,7 +202,7 @@ fun ProfileScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(8.dp),
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -198,6 +214,75 @@ fun ProfileScreen(
                         ) {
                             Surface(shape = RoundedCornerShape(5.dp)) {
                                 ProfileCard(userInfo = uiState.userInfo)
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Console",
+                                    modifier = Modifier.weight(2f),
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                                ExposedDropdownMenuBox(
+                                    modifier = Modifier.weight(1f),
+                                    expanded = consoleDropdownExpanded,
+                                    onExpandedChange = {
+                                        consoleDropdownExpanded = it
+                                    }
+                                ) {
+                                    TextField(
+                                        value = uiState.console.name,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        textStyle = MaterialTheme.typography.bodyMedium,
+                                        colors = inputFieldDefaults(),
+                                        trailingIcon = {
+                                            AnimatedContent(
+                                                targetState = consoleDropdownExpanded,
+                                                label = ""
+                                            ) {
+                                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = it)
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .menuAnchor()
+                                    )
+
+                                    ExposedDropdownMenu(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .selectableGroup(),
+                                        expanded = consoleDropdownExpanded,
+                                        onDismissRequest = { consoleDropdownExpanded = false }
+                                    ) {
+                                        Console.entries.forEach { console ->
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                                        RadioButton(
+                                                            selected = uiState.console == console,
+                                                            colors = RadioButtonDefaults.colors(
+                                                                selectedColor = MaterialTheme.colorScheme.secondary,
+                                                            ),
+                                                            onClick = null
+                                                        )
+                                                        Spacer(modifier = Modifier.size(8.dp))
+                                                        Text(text = console.name)
+                                                    }
+                                                },
+                                                colors = dropDownDefaults(),
+                                                onClick = {
+                                                    handleSaveConsole(console)
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
                             }
                             Text(
                                 text = "FAQ",
@@ -420,6 +505,7 @@ fun ProfileCardPreview() {
                     fullName = "Test User"
                 )
             ),
+            handleSaveConsole = {},
             handleRetry = { /*TODO*/ },
             onLogout = { /*TODO*/ },
             onDelete = { /*TODO*/ }

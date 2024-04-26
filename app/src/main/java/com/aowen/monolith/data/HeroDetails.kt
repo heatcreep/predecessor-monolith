@@ -48,8 +48,14 @@ data class FavoriteHero(
     val updatedAt: String,
 )
 
-fun HeroDto.create(): HeroDetails =
-    HeroDetails(
+fun HeroDto.create(): HeroDetails {
+    val reorderedAbilities = if (abilities.isNotEmpty()) {
+        val lastElement = abilities.last()
+        abilities.dropLast(1).toMutableList().apply {
+            add(0, lastElement)
+        }
+    } else abilities
+    return HeroDetails(
         id = id,
         name = name,
         displayName = displayName,
@@ -57,11 +63,12 @@ fun HeroDto.create(): HeroDetails =
         classes = classes.toHeroClass().filterNotNull(),
         roles = roles.toHeroRole().filterNotNull(),
         imageId = Hero.entries.firstOrNull { it.heroName == displayName }?.drawableId,
-        abilities = abilities.map {
+        abilities = reorderedAbilities.map {
             it.create()
         },
         baseStats = baseStats.create()
     )
+}
 
 fun FavoriteHeroDto.create(): FavoriteHero =
     FavoriteHero(

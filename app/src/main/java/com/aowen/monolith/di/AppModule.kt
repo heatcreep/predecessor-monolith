@@ -14,6 +14,8 @@ import com.aowen.monolith.network.SupabaseAuthService
 import com.aowen.monolith.network.SupabaseAuthServiceImpl
 import com.aowen.monolith.network.SupabasePostgrestService
 import com.aowen.monolith.network.SupabasePostgrestServiceImpl
+import com.aowen.monolith.network.UserPreferencesManager
+import com.aowen.monolith.network.UserPreferencesManagerImpl
 import com.aowen.monolith.network.UserRecentSearchRepository
 import com.aowen.monolith.network.UserRecentSearchRepositoryImpl
 import com.aowen.monolith.network.UserRepository
@@ -48,6 +50,12 @@ object AppModule {
     @Singleton
     fun providesClaimedPlayerPreferencesManager(@ApplicationContext appContext: Context): ClaimedPlayerPreferencesManager {
         return ClaimedPlayerPreferencesManagerImpl(appContext)
+    }
+
+    @Provides
+    @Singleton
+    fun providesUserPreferencesManager(@ApplicationContext appContext: Context): UserPreferencesManager {
+        return UserPreferencesManagerImpl(appContext)
     }
 
     @OptIn(ExperimentalSerializationApi::class)
