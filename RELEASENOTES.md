@@ -1,6 +1,13 @@
 # Release Notes
 
-## 1.4.2 - Latest
+## 1.4.3 - Latest
+
+#### Improvements & Bug Fixes
+
+- Search has been completely reworked to be available on any top level destination (Home, Heroes, Items, Builds, Profile) and the original search screen has been changed to Home in order to show more content
+- Fixed some minor animation bugs that weren't firing
+
+## 1.4.2
 
 #### Improvements & Bug Fixes
 
