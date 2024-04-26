@@ -156,6 +156,11 @@ class SearchScreenViewModel @Inject constructor(
                 val addRecentSearchDeferred =
                     async { userRecentSearchesRepository.addRecentSearch(playerDetails) }
                 addRecentSearchDeferred.await()
+                _uiState.update {
+                    it.copy(
+                        recentSearchesList = it.recentSearchesList + playerDetails
+                    )
+                }
             } catch (e: Exception) {
                 logDebug(e.toString())
             }

@@ -7,7 +7,7 @@ import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.resetPageCount
-import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsErrors
+import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsError
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsUiState
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
@@ -80,11 +80,9 @@ class HeroDetailsViewModelTest {
         val expected = HeroDetailsUiState(
             isLoading = false,
             isLoadingBuilds = false,
-            heroDetailsErrors = HeroDetailsErrors(
-                heroErrorMessage = "Failed to fetch hero details.",
-                heroError = "Failed to fetch hero",
-                statisticsErrorMessage = "Failed to fetch hero statistics.",
-                statisticsError = null
+            heroDetailsErrors = HeroDetailsError.HeroErrorMessage(
+                errorMessage = "Failed to fetch hero details.",
+                error = "Failed to fetch hero",
             )
         )
         assertEquals(expected, actual)
@@ -110,11 +108,9 @@ class HeroDetailsViewModelTest {
         val expected = HeroDetailsUiState(
             isLoading = false,
             isLoadingBuilds = false,
-            heroDetailsErrors = HeroDetailsErrors(
-                heroErrorMessage = "Failed to fetch hero details.",
-                heroError = null,
-                statisticsErrorMessage = "Failed to fetch hero statistics.",
-                statisticsError = "Failed to fetch hero statistics"
+            heroDetailsErrors = HeroDetailsError.StatisticsErrorMessage(
+                errorMessage = "Failed to fetch hero statistics.",
+                error = "Failed to fetch hero statistics"
             )
         )
         assertEquals(expected, actual)
@@ -140,9 +136,9 @@ class HeroDetailsViewModelTest {
         val expected = HeroDetailsUiState(
             isLoading = false,
             isLoadingBuilds = false,
-            heroDetailsErrors = HeroDetailsErrors(
-                heroBuildsErrorMessage = "Failed to fetch hero builds.",
-                heroBuildsError = "Failed to fetch builds"
+            heroDetailsErrors = HeroDetailsError.HeroBuildsErrorMessage(
+                errorMessage = "Failed to fetch hero builds.",
+                error = "Failed to fetch builds"
             ),
             hero = fakeHeroDto.create(),
             statistics = fakeHeroStatisticsDto.create()
