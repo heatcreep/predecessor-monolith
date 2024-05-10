@@ -2,6 +2,7 @@ package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.create
+import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository
 import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.data.fakeItemDto
@@ -36,6 +37,7 @@ class BuildDetailsScreenViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository(),
+            userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
 
         val actual = viewModel.uiState.value
@@ -53,7 +55,8 @@ class BuildDetailsScreenViewModelTest {
                 )
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
-            repository = FakeOmedaCityRepository()
+            repository = FakeOmedaCityRepository(),
+            userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
         val actual = viewModel.uiState.value
@@ -65,7 +68,8 @@ class BuildDetailsScreenViewModelTest {
                 fakeItemDto2.create(),
                 fakeItemDto3.create(),
                 fakeItemDto4.create()
-            )
+            ),
+            isFavorited = true
         )
         assertEquals(expected, actual)
     }
@@ -79,7 +83,8 @@ class BuildDetailsScreenViewModelTest {
                 )
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
-            repository = FakeOmedaCityRepository(hasBuildsError = true)
+            repository = FakeOmedaCityRepository(hasBuildsError = true),
+            userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
         val actual = viewModel.uiState.value
@@ -87,7 +92,8 @@ class BuildDetailsScreenViewModelTest {
             isLoading = false,
             error = BuildDetailsErrors(
                 errorMessage = "Failed to fetch build details."
-            )
+            ),
+            isFavorited = true
         )
         assertEquals(expected, actual)
     }
@@ -101,7 +107,8 @@ class BuildDetailsScreenViewModelTest {
                 )
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
-            repository = FakeOmedaCityRepository(hasItemDetailsErrors = true)
+            repository = FakeOmedaCityRepository(hasItemDetailsErrors = true),
+            userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
         val actual = viewModel.uiState.value
@@ -109,7 +116,8 @@ class BuildDetailsScreenViewModelTest {
             isLoading = false,
             error = BuildDetailsErrors(
                 errorMessage = "Failed to fetch items"
-            )
+            ),
+            isFavorited = true
         )
         assertEquals(expected, actual)
     }
@@ -125,7 +133,8 @@ class BuildDetailsScreenViewModelTest {
             userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository(
                 buildsResponse = ResponseType.SuccessNull
-            )
+            ),
+            userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
         val actual = viewModel.uiState.value
@@ -136,7 +145,8 @@ class BuildDetailsScreenViewModelTest {
                 fakeItemDto2.create(),
                 fakeItemDto3.create(),
                 fakeItemDto4.create()
-            )
+            ),
+            isFavorited = true
         )
         assertEquals(expected, actual)
     }
@@ -152,13 +162,15 @@ class BuildDetailsScreenViewModelTest {
             userPreferencesDataStore = FakeUserPreferencesManager(),
             repository = FakeOmedaCityRepository(
                 itemDetailsResponse = ResponseType.SuccessNull
-            )
+            ),
+            userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
         val actual = viewModel.uiState.value
         val expected = BuildDetailsUiState(
             isLoading = false,
-            buildDetails = fakeBuildDto.create()
+            buildDetails = fakeBuildDto.create(),
+            isFavorited = true
         )
         assertEquals(expected, actual)
     }
@@ -172,7 +184,8 @@ class BuildDetailsScreenViewModelTest {
                 )
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
-            repository = FakeOmedaCityRepository()
+            repository = FakeOmedaCityRepository(),
+            userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
         viewModel.onItemClicked(1)
@@ -186,7 +199,8 @@ class BuildDetailsScreenViewModelTest {
                 fakeItemDto3.create(),
                 fakeItemDto4.create()
             ),
-            selectedItemDetails = fakeItemDto.create()
+            selectedItemDetails = fakeItemDto.create(),
+            isFavorited = true
         )
         assertEquals(expected, actual)
     }

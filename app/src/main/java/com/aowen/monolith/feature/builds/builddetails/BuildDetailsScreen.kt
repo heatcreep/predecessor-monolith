@@ -30,6 +30,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -102,6 +104,29 @@ fun BuildDetailsRoute(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "navigate up"
                         )
+                    }
+                },
+                actions = {
+                    uiState.buildDetails?.let {build ->
+                        IconButton(
+                            onClick = {
+                                if(uiState.isFavorited) {
+                                    viewModel.onRemoveBuildFromFavorites(build)
+                                } else {
+                                    viewModel.onAddBuildToFavorites(build)
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if(uiState.isFavorited) {
+                                    Icons.Filled.Favorite
+                                } else {
+                                    Icons.Outlined.FavoriteBorder
+                                },
+                                contentDescription = "Favorite"
+                            )
+
+                        }
                     }
                 }
             )

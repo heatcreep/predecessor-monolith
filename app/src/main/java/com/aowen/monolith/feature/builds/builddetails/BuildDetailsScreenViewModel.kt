@@ -7,6 +7,7 @@ import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.UserFavoriteBuildsRepository
 import com.aowen.monolith.network.UserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -23,6 +24,7 @@ data class BuildDetailsErrors(
 data class BuildDetailsUiState(
     val isLoading: Boolean = true,
     val buildDetails: BuildListItem? = null,
+    val isFavorited: Boolean = false,
     val items: List<ItemDetails> = emptyList(),
     val selectedItemDetails: ItemDetails? = null,
     val error: BuildDetailsErrors? = null
@@ -32,6 +34,7 @@ data class BuildDetailsUiState(
 class BuildDetailsScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userPreferencesDataStore: UserPreferencesManager,
+    private val userFavoriteBuildsRepository: UserFavoriteBuildsRepository,
     private val repository: OmedaCityRepository
 ) : ViewModel() {
 
@@ -49,6 +52,16 @@ class BuildDetailsScreenViewModel @Inject constructor(
             _console.emit(userPreferencesDataStore.console.first())
             val buildsDeferred = async { repository.fetchBuildById(buildId) }
             val itemsDeferred = async { repository.fetchAllItems() }
+
+            val favoritedBuilds = userFavoriteBuildsRepository.fetchFavoriteBuilds()
+
+            if (favoritedBuilds.isSuccess) {
+                val isFavorited =
+                    favoritedBuilds.getOrNull()?.any { it.buildId == buildId.toInt() } ?: false
+                _uiState.update {
+                    it.copy(isFavorited = isFavorited)
+                }
+            }
 
             val buildsResult = buildsDeferred.await()
             val itemsResult = itemsDeferred.await()
@@ -88,6 +101,24 @@ class BuildDetailsScreenViewModel @Inject constructor(
                 )
             }
 
+        }
+    }
+
+    fun onAddBuildToFavorites(build: BuildListItem) {
+        viewModelScope.launch {
+            userFavoriteBuildsRepository.addFavoriteBuild(build)
+            _uiState.update {
+                it.copy(isFavorited = true)
+            }
+        }
+    }
+
+    fun onRemoveBuildFromFavorites(build: BuildListItem) {
+        viewModelScope.launch {
+            userFavoriteBuildsRepository.removeFavoriteBuild(build.id)
+            _uiState.update {
+                it.copy(isFavorited = false)
+            }
         }
     }
 

@@ -2,11 +2,14 @@ package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.FakeClaimedPlayerPreferencesManager
+import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository
+import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository.Companion.buildListItem1
 import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
 import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
+import com.aowen.monolith.feature.home.HomeScreenError.ClaimedPlayerErrorMessage
 import com.aowen.monolith.feature.home.HomeScreenUiState
 import com.aowen.monolith.feature.home.HomeScreenViewModel
 import com.aowen.monolith.network.ClaimedUser
@@ -29,7 +32,8 @@ class HomeScreenViewModelTest {
         viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager(),
+            favoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
     }
 
@@ -45,18 +49,19 @@ class HomeScreenViewModelTest {
                 )
             ),
 
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager(),
+            favoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
 
         )
         viewModel.initViewModel()
         val expected = HomeScreenUiState(
             isLoading = false,
-            error = null,
             heroStats = fakeHeroStatisticsResult,
             claimedPlayerStats = fakePlayerStatsDto.create(),
             claimedPlayerDetails = fakePlayerDto.create(),
             topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
-            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed()
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
+            favoriteBuilds = listOf(buildListItem1)
 
         )
         val actual = viewModel.uiState.value
@@ -72,13 +77,17 @@ class HomeScreenViewModelTest {
                 error = true
             ),
 
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager(),
+            favoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
 
         )
         viewModel.initViewModel()
         val expected = HomeScreenUiState(
             isLoading = false,
-            claimedUserError = "Failed to fetch claimed user"
+            homeScreenError = ClaimedPlayerErrorMessage(
+                errorMessage = "Failed to fetch claimed user",
+                error = "Error getting claimed user."
+            )
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -91,7 +100,8 @@ class HomeScreenViewModelTest {
             repository = FakeOmedaCityRepository(),
             userRepository = FakeUserRepository(),
 
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager(),
+            favoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
 
         )
         viewModel.initViewModel()
@@ -99,7 +109,8 @@ class HomeScreenViewModelTest {
             isLoading = false,
             heroStats = fakeHeroStatisticsResult,
             topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
-            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed()
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
+            favoriteBuilds = listOf(buildListItem1)
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)

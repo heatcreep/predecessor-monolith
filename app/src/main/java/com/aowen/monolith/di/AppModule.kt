@@ -14,6 +14,8 @@ import com.aowen.monolith.network.SupabaseAuthService
 import com.aowen.monolith.network.SupabaseAuthServiceImpl
 import com.aowen.monolith.network.SupabasePostgrestService
 import com.aowen.monolith.network.SupabasePostgrestServiceImpl
+import com.aowen.monolith.network.UserFavoriteBuildsRepository
+import com.aowen.monolith.network.UserFavoriteBuildsRepositoryImpl
 import com.aowen.monolith.network.UserPreferencesManager
 import com.aowen.monolith.network.UserPreferencesManagerImpl
 import com.aowen.monolith.network.UserRecentSearchRepository
@@ -170,6 +172,17 @@ object AppModule {
         UserRecentSearchRepositoryImpl(
             postgrestService = postgrestService,
             omedaCityRepository = omedaCityRepository,
+            userRepository = repository
+        )
+
+    @Provides
+    @Singleton
+    fun provideFavoriteBuildsRepository(
+        postgrestService: SupabasePostgrestService,
+        repository: UserRepository
+    ): UserFavoriteBuildsRepository =
+        UserFavoriteBuildsRepositoryImpl(
+            postgrestService = postgrestService,
             userRepository = repository
         )
 }

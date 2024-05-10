@@ -39,7 +39,10 @@ class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<Hom
         ),
         HomeScreenUiState(
             isLoading = false,
-            error = "Error fetching player details"
+            homeScreenError = HomeScreenError.ClaimedPlayerErrorMessage(
+                errorMessage = "Error loading claimed player",
+                error = "Error"
+            ),
         ),
         HomeScreenUiState(
             isLoading = false,
@@ -77,9 +80,11 @@ fun ClaimedPlayerSection(
                     )
                 }
             } else {
-                if (uiState.error != null) {
+                val error = uiState.homeScreenError
+                val errorMessage = error?.errorMessage
+                if (errorMessage != null && error is HomeScreenError.ClaimedPlayerErrorMessage) {
                     Text(
-                        text = uiState.error,
+                        text = errorMessage,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 } else {
@@ -90,11 +95,6 @@ fun ClaimedPlayerSection(
                             navigateToPlayerDetails = {
                                 navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
                             }
-                        )
-                    } else if (uiState.claimedUserError != null) {
-                        Text(
-                            text = "There was an error fetching your claimed player. Please try again or search for your player and claim again.",
-                            color = MaterialTheme.colorScheme.secondary
                         )
                     } else {
                         Text(

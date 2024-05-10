@@ -44,7 +44,7 @@ class BuildsScreenViewModel @Inject constructor(
             heroId = uiState.value.selectedHeroFilter?.heroId,
             skillOrder = if (uiState.value.hasSkillOrderSelected) 1 else null,
             modules = if (uiState.value.hasModulesSelected) 1 else null,
-            currentVersion = if(uiState.value.hasCurrentVersionSelected) 1 else null,
+            currentVersion = if (uiState.value.hasCurrentVersionSelected) 1 else null,
             repository = repository
         ).also {
             buildsPagingSource = it

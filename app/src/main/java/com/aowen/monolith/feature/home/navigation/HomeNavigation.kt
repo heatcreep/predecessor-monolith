@@ -8,11 +8,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
+import com.aowen.monolith.feature.builds.builddetails.navigation.BuildDetailsRoute
 import com.aowen.monolith.feature.builds.navigation.BuildsRoute
 import com.aowen.monolith.feature.heroes.herodetails.navigation.HeroDetailRoute
 import com.aowen.monolith.feature.heroes.navigation.HeroesRoute
 import com.aowen.monolith.feature.home.HomeScreenRoute
 import com.aowen.monolith.feature.home.HomeScreenViewModel
+import com.aowen.monolith.feature.home.playerdetails.navigation.PlayerDetailRoute
 import com.aowen.monolith.feature.home.playerdetails.navigation.playerDetailsScreen
 import com.aowen.monolith.feature.home.winrate.navigation.HeroWinPickRateRoute
 import com.aowen.monolith.feature.home.winrate.navigation.heroWinPickRateScreen
@@ -44,6 +46,8 @@ fun NavGraphBuilder.homeScreen(
                             ItemsRoute,
                             BuildsRoute,
                             ProfileRoute,
+                            "$PlayerDetailRoute/{playerId}",
+                            "$BuildDetailsRoute/{buildId}",
                             "$HeroWinPickRateRoute/{selectedStat}",
                             "$HeroDetailRoute/{heroId}/{heroName}" -> SlideDirection.End
 

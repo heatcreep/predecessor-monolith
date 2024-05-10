@@ -8,10 +8,13 @@ import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.Inject
 
-const val TABLE_USER_ID = "id"
+const val TABLE_ID = "id"
+const val TABLE_USER_ID = "user_id"
 const val TABLE_PLAYER_ID = "player_id"
+const val TABLE_BUILD_ID = "build_id"
 const val TABLE_CREATED_AT = "created_at"
 const val TABLE_RECENT_PROFILES = "recent_profiles"
+const val TABLE_FAVORITE_BUILDS = "favorite_builds"
 const val TABLE_BUILDS = "builds"
 const val TABLE_MAX_ROWS = 10
 

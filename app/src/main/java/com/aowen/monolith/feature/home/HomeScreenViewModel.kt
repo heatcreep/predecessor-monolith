@@ -2,12 +2,13 @@ package com.aowen.monolith.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
-import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.UserFavoriteBuildsRepository
 import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -26,13 +27,34 @@ enum class TimeFrame(val value: String) {
     ONE_WEEK("1W")
 }
 
+abstract class HomeScreenError {
+    abstract val errorMessage: String?
+    abstract val error: String?
+
+    data class ClaimedPlayerErrorMessage(
+        override val errorMessage: String? = null,
+        override val error: String? = null
+    ) : HomeScreenError()
+
+    data class FavoriteBuildsErrorMessage(
+        override val errorMessage: String? = null,
+        override val error: String? = null
+    ) : HomeScreenError()
+
+    data class HeroStatsErrorMessage(
+        override val errorMessage: String? = null,
+        override val error: String? = null
+    ) : HomeScreenError()
+
+}
+
 data class HomeScreenUiState(
     val isLoading: Boolean = true,
-    val error: String? = null,
-    val claimedUserError: String? = null,
+    val homeScreenError: HomeScreenError? = null,
     val heroStats: List<HeroStatistics> = emptyList(),
     val topFiveHeroesByWinRate: List<HeroStatistics> = emptyList(),
     val topFiveHeroesByPickRate: List<HeroStatistics> = emptyList(),
+    val favoriteBuilds: List<FavoriteBuildListItem> = emptyList(),
     val claimedPlayerId: String? = null,
     val claimedPlayerStats: PlayerStats? = null,
     val claimedPlayerDetails: PlayerDetails? = null,
@@ -42,6 +64,7 @@ data class HomeScreenUiState(
 class HomeScreenViewModel @Inject constructor(
     private val repository: OmedaCityRepository,
     private val userRepository: UserRepository,
+    private val favoriteBuildsRepository: UserFavoriteBuildsRepository,
     private val claimedPlayerPreferencesManager: ClaimedPlayerPreferencesManager
 ) : ViewModel() {
 
@@ -49,58 +72,83 @@ class HomeScreenViewModel @Inject constructor(
     val uiState: StateFlow<HomeScreenUiState> = _uiState
 
 
-
     init {
         initViewModel()
     }
+
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            try {
-                val claimedUserDeferredResult =
-                    async { userRepository.getClaimedUser() }
-                val heroStatsDeferredResult =
-                    async { repository.fetchAllHeroStatistics() }
 
-                val claimedUserResult = claimedUserDeferredResult.await()
-                val heroStatsResult = heroStatsDeferredResult.await()
-                val topFiveHeroesByWinRate = heroStatsResult.getOrNull()?.sortedBy { it.winRate }?.reversed()?.take(5)
-                val topFiveHeroesByPickRate = heroStatsResult.getOrNull()?.sortedBy { it.pickRate }?.reversed()?.take(5)
-                if (claimedUserResult.isSuccess && heroStatsResult.isSuccess) {
-                    val claimedPlayerIdFromPrefs = claimedPlayerPreferencesManager.claimedPlayerId.firstOrNull()
-                    val claimedPlayerIdFromResult = claimedUserResult.getOrNull()?.playerDetails?.playerId
-                    if(claimedPlayerIdFromPrefs.isNullOrEmpty() && claimedPlayerIdFromResult != null) {
-                        claimedPlayerPreferencesManager.saveClaimedPlayerId(claimedPlayerIdFromResult)
-                    }
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = null,
-                            claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
-                            claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
-                            heroStats = heroStatsResult.getOrNull() ?: emptyList(),
-                            topFiveHeroesByWinRate = topFiveHeroesByWinRate ?: emptyList(),
-                            topFiveHeroesByPickRate = topFiveHeroesByPickRate ?: emptyList(),
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            claimedUserError = "Failed to fetch claimed user"
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                logDebug(e.toString())
+            val claimedUserDeferredResult =
+                async { userRepository.getClaimedUser() }
+            val favoriteBuildsDeferredResult =
+                async { favoriteBuildsRepository.fetchFavoriteBuilds() }
+            val heroStatsDeferredResult =
+                async { repository.fetchAllHeroStatistics() }
+
+            val claimedUserResult = claimedUserDeferredResult.await()
+            val favoriteBuildsResult = favoriteBuildsDeferredResult.await()
+            val heroStatsResult = heroStatsDeferredResult.await()
+            if (claimedUserResult.isFailure) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = e.message
+                        homeScreenError = HomeScreenError.ClaimedPlayerErrorMessage(
+                            errorMessage = "Failed to fetch claimed user",
+                            error = claimedUserResult.exceptionOrNull()?.message
+                        )
                     )
                 }
             }
+            if (favoriteBuildsResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        homeScreenError = HomeScreenError.FavoriteBuildsErrorMessage(
+                            errorMessage = "Failed to fetch favorite builds",
+                            error = favoriteBuildsResult.exceptionOrNull()?.message
+                        )
+                    )
+                }
+            }
+            if (heroStatsResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        homeScreenError = HomeScreenError.HeroStatsErrorMessage(
+                            errorMessage = "Failed to fetch hero stats",
+                            error = heroStatsResult.exceptionOrNull()?.message
+                        )
+                    )
+                }
+            }
+            if (claimedUserResult.isSuccess && heroStatsResult.isSuccess && favoriteBuildsResult.isSuccess) {
+                val topFiveHeroesByWinRate =
+                    heroStatsResult.getOrNull()?.sortedBy { it.winRate }?.reversed()?.take(5)
+                val topFiveHeroesByPickRate =
+                    heroStatsResult.getOrNull()?.sortedBy { it.pickRate }?.reversed()?.take(5)
 
+                val claimedPlayerIdFromPrefs =
+                    claimedPlayerPreferencesManager.claimedPlayerId.firstOrNull()
+                val claimedPlayerIdFromResult =
+                    claimedUserResult.getOrNull()?.playerDetails?.playerId
+                if (claimedPlayerIdFromPrefs.isNullOrEmpty() && claimedPlayerIdFromResult != null) {
+                    claimedPlayerPreferencesManager.saveClaimedPlayerId(claimedPlayerIdFromResult)
+                }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        homeScreenError = null,
+                        claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
+                        claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
+                        favoriteBuilds = favoriteBuildsResult.getOrNull() ?: emptyList(),
+                        heroStats = heroStatsResult.getOrNull() ?: emptyList(),
+                        topFiveHeroesByWinRate = topFiveHeroesByWinRate ?: emptyList(),
+                        topFiveHeroesByPickRate = topFiveHeroesByPickRate ?: emptyList(),
+                    )
+                }
+            }
         }
     }
 

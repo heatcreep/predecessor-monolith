@@ -3,6 +3,7 @@ package com.aowen.monolith.data
 
 data class BuildListItem(
     val id: Int = 0,
+    val userId: String? = null,
     val title: String = "",
     val author: String = "",
     val role: String = "unknown",

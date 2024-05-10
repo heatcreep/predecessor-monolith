@@ -1,10 +1,14 @@
 # Release Notes
 
-## 1.4.4 - Latest
 
+## 1.5.0 - Latest
+
+#### New Features
+
+- Adds Favorite Builds section to Home Screen and ability to favorite builds from the build details screen.
 - Adds new console dropdown in Profile screen to select your console. This will show hero abilities with the updated inputs based on the console you select.
 
-## 1.4.3 - Latest
+## 1.4.3
 
 #### Improvements & Bug Fixes
 

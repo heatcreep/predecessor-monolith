@@ -1,5 +1,6 @@
 package com.aowen.monolith.fakes
 
+import com.aowen.monolith.data.FavoriteBuildDto
 import com.aowen.monolith.data.PlayerSearchDto
 import com.aowen.monolith.data.UserInfo
 import com.aowen.monolith.fakes.data.fakeExistingPlayerSearchDto
@@ -59,6 +60,18 @@ class FakeSupabasePostgrestService(private val recentSearchStatus: RecentSearchS
         playerSearchDto: PlayerSearchDto
     ) {
         searchCount.value = searchCount.value + 2
+    }
+
+    override suspend fun fetchFavoriteBuilds(userId: UUID): List<FavoriteBuildDto> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun insertFavoriteBuild(favoriteBuildDto: FavoriteBuildDto) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteFavoriteBuild(userId: UUID, buildId: Int) {
+        TODO("Not yet implemented")
     }
 }
 

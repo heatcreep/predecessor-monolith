@@ -1,6 +1,8 @@
 package com.aowen.monolith.feature.home
 
 import android.content.res.Configuration
+import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,8 +22,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ThumbDown
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,22 +47,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.data.getHeroRole
+import com.aowen.monolith.data.getItemImage
+import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
 import com.aowen.monolith.feature.heroes.herodetails.navigation.navigateToHeroDetails
 import com.aowen.monolith.feature.home.playerdetails.navigation.navigateToPlayerDetails
 import com.aowen.monolith.feature.home.winrate.navigation.navigateToHeroWinPickRate
 import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.network.firebase.Feedback
+import com.aowen.monolith.ui.common.PlayerIcon
+import com.aowen.monolith.ui.components.PlayerLoadingCard
 import com.aowen.monolith.ui.components.RefreshableContainer
+import com.aowen.monolith.ui.theme.GreenHighlight
 import com.aowen.monolith.ui.theme.MonolithTheme
+import com.aowen.monolith.ui.theme.RedHighlight
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 
 @Composable
@@ -76,6 +93,7 @@ internal fun HomeScreenRoute(
         navigateToPlayerDetails = navController::navigateToPlayerDetails,
         navigateToHeroDetails = navController::navigateToHeroDetails,
         navigateToHeroWinPickRate = navController::navigateToHeroWinPickRate,
+        navigateToBuildDetails = navController::navigateToBuildDetails,
         handlePullRefresh = homeScreenViewModel::initViewModel,
         modifier = modifier
     )
@@ -89,6 +107,7 @@ fun HomeScreen(
     navigateToPlayerDetails: (String) -> Unit,
     navigateToHeroDetails: (Int, String) -> Unit,
     navigateToHeroWinPickRate: (String) -> Unit,
+    navigateToBuildDetails: (Int) -> Unit,
     handlePullRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -104,10 +123,10 @@ fun HomeScreen(
         pullRefreshState = pullRefreshState
     ) {
         Scaffold(
-            contentWindowInsets = WindowInsets(0,0,0,0),
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
                 TopAppBar(
-                    windowInsets = WindowInsets(0,0,0,0),
+                    windowInsets = WindowInsets(0, 0, 0, 0),
                     title = {
                         Text(
                             text = "Home",
@@ -132,7 +151,7 @@ fun HomeScreen(
             }
         ) {
             Column(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxSize()
                     .padding(it)
                     .padding(horizontal = 16.dp)
@@ -143,6 +162,10 @@ fun HomeScreen(
                 ClaimedPlayerSection(
                     uiState = uiState,
                     navigateToPlayerDetails = navigateToPlayerDetails
+                )
+                FavoriteBuildsSection(
+                    uiState = uiState,
+                    navigateToBuildDetails = navigateToBuildDetails
                 )
                 HeroWinRateSection(
                     isLoading = uiState.isLoading,
@@ -255,6 +278,228 @@ fun ClaimedPlayerCard(
     }
 }
 
+@Composable
+fun FavoriteBuildsSection(
+    uiState: HomeScreenUiState,
+    navigateToBuildDetails: (Int) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "Favorite Builds",
+            color = MaterialTheme.colorScheme.secondary,
+            style = MaterialTheme.typography.titleMedium
+        )
+        AnimatedContent(targetState = uiState.isLoading, label = "") {
+            if (it) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    PlayerLoadingCard(
+                        avatarSize = 64.dp,
+                        titleHeight = 16.dp,
+                        subtitleHeight = 12.dp,
+                        titleWidth = 100.dp,
+                        subtitleWidth = 200.dp,
+                    )
+                }
+            } else {
+                val error = uiState.homeScreenError
+                val errorMessage = error?.errorMessage
+                if (errorMessage != null && error is HomeScreenError.FavoriteBuildsErrorMessage) {
+                    Text(
+                        text = errorMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                } else if (
+                    uiState.favoriteBuilds.isEmpty()
+                ) {
+                    Text(
+                        text = "No favorite builds found",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                } else {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        uiState.favoriteBuilds.forEach { build ->
+                            FavoriteBuildListItem(
+                                build = build,
+                                navigateToBuildDetails = navigateToBuildDetails
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FavoriteBuildListItem(
+    modifier: Modifier = Modifier,
+    build: FavoriteBuildListItem,
+    navigateToBuildDetails: (Int) -> Unit
+) {
+
+    val context = LocalContext.current
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .border(
+                1.dp,
+                MaterialTheme.colorScheme.secondary,
+                RoundedCornerShape(4.dp)
+            )
+            .clickable {
+                navigateToBuildDetails(build.buildId)
+
+            },
+        shape = RoundedCornerShape(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                PlayerIcon(
+                    heroImageId = getHeroRole(build.heroId).drawableId,
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                shape = CircleShape
+                            )
+                            .align(Alignment.BottomEnd),
+                        contentScale = ContentScale.Crop,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                        painter = painterResource(
+                            id = getHeroRole(build.role.lowercase()).drawableId
+                        ),
+                        contentDescription = null
+                    )
+                }
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = build.title,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        ),
+                        color = MaterialTheme.colorScheme.secondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "Author: ${build.author}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        build.gameVersion.let { version ->
+                            Badge(
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.primary
+                            ) {
+                                Text(
+                                    text = version,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
+                    Row {
+                        Image(
+                            modifier = Modifier.size(24.dp),
+                            painter = painterResource(id = getItemImage(build.crestId)),
+                            contentDescription = null
+                        )
+                        build.itemIds.forEach {
+                            Image(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(id = getItemImage(it)),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+            }
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${build.upvotesCount}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    IconButton(onClick = {
+                        // TODO: Replace with actual upvote logic
+                        Toast.makeText(context, "Coming soon!", Toast.LENGTH_LONG).show()
+                    }
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            imageVector = Icons.Filled.ThumbUp,
+                            contentDescription = "thumbs up",
+                            tint = GreenHighlight
+                        )
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${build.downvotesCount}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    IconButton(onClick = {
+                        // TODO: Replace with actual downvote logic
+                        Toast.makeText(context, "Coming soon!", Toast.LENGTH_LONG).show()
+                    }) {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            imageVector = Icons.Filled.ThumbDown,
+                            contentDescription = "thumbs down",
+                            tint = RedHighlight
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
 @LightDarkPreview
 @Composable
 fun ClaimedPlayerCardPreview() {
@@ -306,6 +551,7 @@ fun SearchScreenPreview() {
                 navigateToPlayerDetails = {},
                 navigateToHeroDetails = { _, _ -> },
                 navigateToHeroWinPickRate = {},
+                navigateToBuildDetails = {},
                 handlePullRefresh = {},
             )
         }
@@ -337,6 +583,7 @@ fun SearchScreenRecentSearchPreview() {
                 navigateToPlayerDetails = {},
                 navigateToHeroDetails = { _, _ -> },
                 navigateToHeroWinPickRate = {},
+                navigateToBuildDetails = {},
                 handlePullRefresh = {}
             )
         }
