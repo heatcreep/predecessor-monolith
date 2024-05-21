@@ -2,9 +2,11 @@ package com.aowen.monolith.fakes
 
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.FavoriteBuildListItem
+import com.aowen.monolith.network.FavoriteBuildsSharedState
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 
-class FakeUserFavoriteBuildsRepository : UserFavoriteBuildsRepository {
+class FakeUserFavoriteBuildsRepository() : UserFavoriteBuildsRepository {
 
     companion object {
         val buildListItem1 = FavoriteBuildListItem(
@@ -22,6 +24,12 @@ class FakeUserFavoriteBuildsRepository : UserFavoriteBuildsRepository {
             createdAt = "2021-01-01"
         )
     }
+
+    override val favoriteBuildsState: MutableStateFlow<FavoriteBuildsSharedState>
+        get() {
+            return MutableStateFlow(FavoriteBuildsSharedState(favoriteBuilds = listOf(buildListItem1)))
+        }
+
     override suspend fun fetchFavoriteBuilds(): Result<List<FavoriteBuildListItem>> {
         return Result.success(listOf(buildListItem1))
     }

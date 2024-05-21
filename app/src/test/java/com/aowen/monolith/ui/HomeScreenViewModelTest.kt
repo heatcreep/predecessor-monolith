@@ -3,7 +3,6 @@ package com.aowen.monolith.ui
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.FakeClaimedPlayerPreferencesManager
 import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository
-import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository.Companion.buildListItem1
 import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
 import com.aowen.monolith.fakes.data.fakePlayerDto
@@ -60,8 +59,7 @@ class HomeScreenViewModelTest {
             claimedPlayerStats = fakePlayerStatsDto.create(),
             claimedPlayerDetails = fakePlayerDto.create(),
             topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
-            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
-            favoriteBuilds = listOf(buildListItem1)
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed()
 
         )
         val actual = viewModel.uiState.value
@@ -81,12 +79,13 @@ class HomeScreenViewModelTest {
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
 
         )
-        viewModel.initViewModel()
         val expected = HomeScreenUiState(
             isLoading = false,
-            homeScreenError = ClaimedPlayerErrorMessage(
-                errorMessage = "Failed to fetch claimed user",
-                error = "Error getting claimed user."
+            homeScreenError = listOf(
+                ClaimedPlayerErrorMessage(
+                    errorMessage = "Failed to fetch claimed user",
+                    error = "Error getting claimed user."
+                )
             )
         )
         val actual = viewModel.uiState.value
@@ -110,7 +109,6 @@ class HomeScreenViewModelTest {
             heroStats = fakeHeroStatisticsResult,
             topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
             topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed(),
-            favoriteBuilds = listOf(buildListItem1)
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)

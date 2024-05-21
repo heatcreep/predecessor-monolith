@@ -87,7 +87,7 @@ class UserRepositoryTest {
 
         val actual = userRepository.getClaimedUser().exceptionOrNull()
         assertEquals(
-            "No Player ID found.",
+            "No User Profile found.",
             actual?.message
         )
     }

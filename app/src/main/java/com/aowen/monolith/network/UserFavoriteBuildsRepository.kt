@@ -5,11 +5,19 @@ import com.aowen.monolith.data.FavoriteBuildDto
 import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.create
 import com.aowen.monolith.logDebug
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.Inject
 
+data class FavoriteBuildsSharedState(
+    val favoriteBuilds : List<FavoriteBuildListItem>
+)
+
 interface UserFavoriteBuildsRepository {
+
+    val favoriteBuildsState: MutableStateFlow<FavoriteBuildsSharedState>
 
     suspend fun fetchFavoriteBuilds(): Result<List<FavoriteBuildListItem>>
     suspend fun addFavoriteBuild(buildDetails: BuildListItem)
@@ -21,15 +29,23 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
     private val userRepository: UserRepository
 ) : UserFavoriteBuildsRepository {
 
+    private val _favoriteBuildsState = MutableStateFlow(FavoriteBuildsSharedState(emptyList()))
+    override val favoriteBuildsState = _favoriteBuildsState
+
     override suspend fun fetchFavoriteBuilds(): Result<List<FavoriteBuildListItem>> {
         val user = userRepository.getUser()
         return try {
             if (user?.id == null) {
                 Result.failure(Exception("User not found"))
             } else {
-                Result.success(postgrestService.fetchFavoriteBuilds(user.id).map {
+                val favBuildsResult = Result.success(postgrestService.fetchFavoriteBuilds(user.id).map {
                     it.create()
                 })
+                val favBuilds = favBuildsResult.getOrNull()
+                if(favBuilds != null) {
+                    _favoriteBuildsState.update { it.copy(favoriteBuilds = favBuilds) }
+                }
+                favBuildsResult
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -59,6 +75,9 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                     gameVersion = buildDetails.version ?: ""
                 )
                 postgrestService.insertFavoriteBuild(favoriteBuildDto)
+                _favoriteBuildsState.update {
+                    it.copy(favoriteBuilds = favoriteBuildsState.value.favoriteBuilds.plus(favoriteBuildDto.create()))
+                }
             }
         } catch (e: Exception) {
             logDebug(e.toString())
@@ -71,6 +90,14 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
             if (user?.id == null) {
                 return
             } else {
+                val buildFromState = _favoriteBuildsState.value.favoriteBuilds.find {
+                    it.buildId == buildId
+                }
+                buildFromState?.let {
+                    _favoriteBuildsState.update {
+                        it.copy(favoriteBuilds = favoriteBuildsState.value.favoriteBuilds.minus(buildFromState))
+                    }
+                }
                 postgrestService.deleteFavoriteBuild(user.id, buildId)
             }
         } catch (e: Exception) {

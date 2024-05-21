@@ -39,10 +39,12 @@ class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<Hom
         ),
         HomeScreenUiState(
             isLoading = false,
-            homeScreenError = HomeScreenError.ClaimedPlayerErrorMessage(
-                errorMessage = "Error loading claimed player",
-                error = "Error"
-            ),
+            homeScreenError = listOf(
+                HomeScreenError.ClaimedPlayerErrorMessage(
+                    errorMessage = "Error loading claimed player",
+                    error = "Error"
+                )
+            )
         ),
         HomeScreenUiState(
             isLoading = false,
@@ -80,12 +82,14 @@ fun ClaimedPlayerSection(
                     )
                 }
             } else {
-                val error = uiState.homeScreenError
+                val error =
+                    uiState.homeScreenError.firstOrNull { errorType -> errorType is HomeScreenError.ClaimedPlayerErrorMessage }
                 val errorMessage = error?.errorMessage
-                if (errorMessage != null && error is HomeScreenError.ClaimedPlayerErrorMessage) {
+                if (errorMessage != null) {
                     Text(
                         text = errorMessage,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 } else {
                     if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {

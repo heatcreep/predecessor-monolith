@@ -8,6 +8,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.Inject
@@ -56,10 +57,15 @@ class SupabasePostgrestServiceImpl @Inject constructor(
 ) : SupabasePostgrestService {
 
     override suspend fun fetchPlayer(userId: String): UserProfile? {
-        return postgrest.from(TABLE_PROFILES)
-            .select(columns = Columns.raw("player_id")) {
-                eq("id", userId)
-            }.decodeList<UserProfile>().firstOrNull()
+        return try {
+            postgrest.from(TABLE_PROFILES)
+                .select(columns = Columns.raw("player_id")) {
+                    eq("id", userId)
+                }.decodeList<UserProfile>().firstOrNull()
+        } catch (e: HttpRequestTimeoutException) {
+            logDebug("$e : the error")
+            UserProfile()
+        }
     }
 
     override suspend fun savePlayer(playerId: String, userId: String) {
@@ -75,19 +81,24 @@ class SupabasePostgrestServiceImpl @Inject constructor(
     }
 
     override suspend fun fetchUserInfo(email: String): UserInfo? {
-        return postgrest.from(TABLE_PROFILES)
-            .select(
-                columns = Columns.list(
-                    "email",
-                    "full_name",
-                    "avatar_url",
-                    "id",
-                    "updated_at",
-                    "player_id"
-                )
-            ) {
-                eq("email", email)
-            }.decodeList<UserInfo>().firstOrNull()
+        return try {
+            postgrest.from(TABLE_PROFILES)
+                .select(
+                    columns = Columns.list(
+                        "email",
+                        "full_name",
+                        "avatar_url",
+                        "id",
+                        "updated_at",
+                        "player_id"
+                    )
+                ) {
+                    eq("email", email)
+                }.decodeList<UserInfo>().firstOrNull()
+        } catch (e: HttpRequestTimeoutException) {
+            logDebug("$e : the error2")
+            UserInfo()
+        }
     }
 
     override suspend fun fetchRecentSearches(id: UUID): List<PlayerSearchDto> {

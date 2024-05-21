@@ -2,7 +2,6 @@ package com.aowen.monolith.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
@@ -50,11 +49,10 @@ abstract class HomeScreenError {
 
 data class HomeScreenUiState(
     val isLoading: Boolean = true,
-    val homeScreenError: HomeScreenError? = null,
+    val homeScreenError: List<HomeScreenError> = emptyList(),
     val heroStats: List<HeroStatistics> = emptyList(),
     val topFiveHeroesByWinRate: List<HeroStatistics> = emptyList(),
     val topFiveHeroesByPickRate: List<HeroStatistics> = emptyList(),
-    val favoriteBuilds: List<FavoriteBuildListItem> = emptyList(),
     val claimedPlayerId: String? = null,
     val claimedPlayerStats: PlayerStats? = null,
     val claimedPlayerDetails: PlayerDetails? = null,
@@ -71,6 +69,8 @@ class HomeScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState: StateFlow<HomeScreenUiState> = _uiState
 
+    val favoriteBuildsState = favoriteBuildsRepository.favoriteBuildsState
+
 
     init {
         initViewModel()
@@ -80,34 +80,26 @@ class HomeScreenViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
 
-            val claimedUserDeferredResult =
-                async { userRepository.getClaimedUser() }
             val favoriteBuildsDeferredResult =
                 async { favoriteBuildsRepository.fetchFavoriteBuilds() }
+
+            val claimedUserDeferredResult =
+                async { userRepository.getClaimedUser() }
             val heroStatsDeferredResult =
                 async { repository.fetchAllHeroStatistics() }
 
             val claimedUserResult = claimedUserDeferredResult.await()
-            val favoriteBuildsResult = favoriteBuildsDeferredResult.await()
             val heroStatsResult = heroStatsDeferredResult.await()
+            val favoriteBuildsResult = favoriteBuildsDeferredResult.await()
             if (claimedUserResult.isFailure) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        homeScreenError = HomeScreenError.ClaimedPlayerErrorMessage(
-                            errorMessage = "Failed to fetch claimed user",
-                            error = claimedUserResult.exceptionOrNull()?.message
-                        )
-                    )
-                }
-            }
-            if (favoriteBuildsResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        homeScreenError = HomeScreenError.FavoriteBuildsErrorMessage(
-                            errorMessage = "Failed to fetch favorite builds",
-                            error = favoriteBuildsResult.exceptionOrNull()?.message
+                        homeScreenError = _uiState.value.homeScreenError.plus(
+                            HomeScreenError.ClaimedPlayerErrorMessage(
+                                errorMessage = "Failed to fetch claimed user",
+                                error = claimedUserResult.exceptionOrNull()?.message
+                            )
                         )
                     )
                 }
@@ -116,14 +108,26 @@ class HomeScreenViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        homeScreenError = HomeScreenError.HeroStatsErrorMessage(
-                            errorMessage = "Failed to fetch hero stats",
-                            error = heroStatsResult.exceptionOrNull()?.message
+                        homeScreenError = _uiState.value.homeScreenError.plus(
+                            HomeScreenError.HeroStatsErrorMessage(
+                                errorMessage = "Failed to fetch hero stats",
+                                error = heroStatsResult.exceptionOrNull()?.message
+                            )
                         )
                     )
                 }
             }
-            if (claimedUserResult.isSuccess && heroStatsResult.isSuccess && favoriteBuildsResult.isSuccess) {
+            if(favoriteBuildsResult.isFailure) {
+                _uiState.update {
+                    it.copy(homeScreenError = _uiState.value.homeScreenError.plus(
+                        HomeScreenError.FavoriteBuildsErrorMessage(
+                            errorMessage = "Failed to fetch favorite builds",
+                            error = favoriteBuildsResult.exceptionOrNull()?.message
+                        )
+                    ))
+                }
+            }
+            if (claimedUserResult.isSuccess && heroStatsResult.isSuccess) {
                 val topFiveHeroesByWinRate =
                     heroStatsResult.getOrNull()?.sortedBy { it.winRate }?.reversed()?.take(5)
                 val topFiveHeroesByPickRate =
@@ -139,10 +143,9 @@ class HomeScreenViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        homeScreenError = null,
+                        homeScreenError = emptyList(),
                         claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
                         claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
-                        favoriteBuilds = favoriteBuildsResult.getOrNull() ?: emptyList(),
                         heroStats = heroStatsResult.getOrNull() ?: emptyList(),
                         topFiveHeroesByWinRate = topFiveHeroesByWinRate ?: emptyList(),
                         topFiveHeroesByPickRate = topFiveHeroesByPickRate ?: emptyList(),

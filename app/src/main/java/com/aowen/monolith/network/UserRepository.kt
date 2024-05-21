@@ -98,10 +98,10 @@ class UserRepositoryImpl @Inject constructor(
 
                     }
                 } else {
-                    return Result.success(null)
+                    return Result.failure(Exception("player Id was missing"))
                 }
             } else {
-                return Result.failure(Exception("No Player ID found."))
+                return Result.failure(Exception("No User Profile found."))
             }
         }
     }

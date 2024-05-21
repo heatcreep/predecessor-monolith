@@ -68,6 +68,7 @@ import com.aowen.monolith.feature.heroes.herodetails.navigation.navigateToHeroDe
 import com.aowen.monolith.feature.home.playerdetails.navigation.navigateToPlayerDetails
 import com.aowen.monolith.feature.home.winrate.navigation.navigateToHeroWinPickRate
 import com.aowen.monolith.feature.search.navigation.navigateToSearch
+import com.aowen.monolith.network.FavoriteBuildsSharedState
 import com.aowen.monolith.network.firebase.Feedback
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.PlayerLoadingCard
@@ -84,11 +85,13 @@ internal fun HomeScreenRoute(
     homeScreenViewModel: HomeScreenViewModel
 ) {
     val homeUiState by homeScreenViewModel.uiState.collectAsState()
+    val favoriteBuildsState by homeScreenViewModel.favoriteBuildsState.collectAsState()
 
     Feedback()
 
     HomeScreen(
         uiState = homeUiState,
+        favoriteBuildsSharedState = favoriteBuildsState,
         navigateToSearch = navController::navigateToSearch,
         navigateToPlayerDetails = navController::navigateToPlayerDetails,
         navigateToHeroDetails = navController::navigateToHeroDetails,
@@ -103,6 +106,7 @@ internal fun HomeScreenRoute(
 @Composable
 fun HomeScreen(
     uiState: HomeScreenUiState,
+    favoriteBuildsSharedState: FavoriteBuildsSharedState,
     navigateToSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
     navigateToHeroDetails: (Int, String) -> Unit,
@@ -165,6 +169,7 @@ fun HomeScreen(
                 )
                 FavoriteBuildsSection(
                     uiState = uiState,
+                    favoriteBuildsSharedState = favoriteBuildsSharedState,
                     navigateToBuildDetails = navigateToBuildDetails
                 )
                 HeroWinRateSection(
@@ -281,6 +286,7 @@ fun ClaimedPlayerCard(
 @Composable
 fun FavoriteBuildsSection(
     uiState: HomeScreenUiState,
+    favoriteBuildsSharedState: FavoriteBuildsSharedState,
     navigateToBuildDetails: (Int) -> Unit
 ) {
     Column(
@@ -306,16 +312,16 @@ fun FavoriteBuildsSection(
                     )
                 }
             } else {
-                val error = uiState.homeScreenError
+                val error = uiState.homeScreenError.firstOrNull { errorType -> errorType is HomeScreenError.FavoriteBuildsErrorMessage }
                 val errorMessage = error?.errorMessage
-                if (errorMessage != null && error is HomeScreenError.FavoriteBuildsErrorMessage) {
+                if (errorMessage != null) {
                     Text(
                         text = errorMessage,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
                 } else if (
-                    uiState.favoriteBuilds.isEmpty()
+                    favoriteBuildsSharedState.favoriteBuilds.isEmpty()
                 ) {
                     Text(
                         text = "No favorite builds found",
@@ -326,7 +332,7 @@ fun FavoriteBuildsSection(
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        uiState.favoriteBuilds.forEach { build ->
+                        favoriteBuildsSharedState.favoriteBuilds.forEach { build ->
                             FavoriteBuildListItem(
                                 build = build,
                                 navigateToBuildDetails = navigateToBuildDetails
@@ -547,6 +553,7 @@ fun SearchScreenPreview() {
                         favoriteHero = "Narbash",
                     )
                 ),
+                favoriteBuildsSharedState = FavoriteBuildsSharedState(emptyList()),
                 navigateToSearch = {},
                 navigateToPlayerDetails = {},
                 navigateToHeroDetails = { _, _ -> },
@@ -578,6 +585,9 @@ fun SearchScreenRecentSearchPreview() {
                     claimedPlayerStats = PlayerStats(
                         favoriteHero = "Narbash",
                     )
+                ),
+                favoriteBuildsSharedState = FavoriteBuildsSharedState(
+                    emptyList()
                 ),
                 navigateToSearch = {},
                 navigateToPlayerDetails = {},

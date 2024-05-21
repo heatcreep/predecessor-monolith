@@ -210,11 +210,15 @@ class OmedaCityRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchAllHeroStatistics(timeFrame: String?): Result<List<HeroStatistics>> {
-        val heroStatisticsResponse = playerApiService.getAllHeroStatistics(timeFrame)
-        return if (heroStatisticsResponse.isSuccessful) {
-            Result.success(heroStatisticsResponse.body()?.heroStatistics?.map { it.create() } ?: emptyList())
-        } else {
-            Result.failure(Exception("Failed to fetch hero statistics"))
+        return try {
+            val heroStatisticsResponse = playerApiService.getAllHeroStatistics(timeFrame)
+            if (heroStatisticsResponse.isSuccessful) {
+                Result.success(heroStatisticsResponse.body()?.heroStatistics?.map { it.create() } ?: emptyList())
+            } else {
+                Result.failure(Exception("Failed to fetch hero statistics"))
+            }
+        } catch (e: Exception) {
+            Result.failure(Exception(e.localizedMessage))
         }
     }
 
