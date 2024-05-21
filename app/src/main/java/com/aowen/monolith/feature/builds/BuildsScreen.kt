@@ -80,6 +80,7 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
+import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.addbuild.navigation.navigateToAddBuildFlow
@@ -470,27 +471,29 @@ fun BuildListItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                PlayerIcon(
-                    heroImageId = getHeroRole(build.heroId).drawableId,
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.secondary,
-                                shape = CircleShape
-                            )
-                            .align(Alignment.BottomEnd),
-                        contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                        painter = painterResource(
-                            id = getHeroRole(build.role.lowercase()).drawableId
-                        ),
-                        contentDescription = null
-                    )
+                getHeroRole(build.role)?.let { role ->
+                    PlayerIcon(
+                        heroImageId = getHeroImage(build.heroId),
+                    ) {
+                        Image(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    shape = CircleShape
+                                )
+                                .align(Alignment.BottomEnd),
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                            painter = painterResource(
+                                id = role.drawableId
+                            ),
+                            contentDescription = null
+                        )
+                    }
                 }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)

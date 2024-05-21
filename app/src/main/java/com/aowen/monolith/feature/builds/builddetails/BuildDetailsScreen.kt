@@ -69,6 +69,7 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.ItemModule
+import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.data.getLevelingAbilities
@@ -343,28 +344,30 @@ fun BuildDetailsScreen(
 fun PlayerCardWithRole(
     buildDetails: BuildListItem
 ) {
-    PlayerIcon(
-        heroImageId = getHeroRole(buildDetails.heroId).drawableId,
-        heroIconSize = 64.dp,
-    ) {
-        Image(
-            modifier = Modifier
-                .size(24.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    shape = CircleShape
-                )
-                .align(Alignment.BottomEnd),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-            painter = painterResource(
-                id = getHeroRole(buildDetails.role).drawableId
-            ),
-            contentDescription = null
-        )
+    getHeroRole(buildDetails.role)?.let { role ->
+        PlayerIcon(
+            heroImageId = getHeroImage(buildDetails.heroId),
+            heroIconSize = 64.dp,
+        ) {
+            Image(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = CircleShape
+                    )
+                    .align(Alignment.BottomEnd),
+                contentScale = ContentScale.Crop,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                painter = painterResource(
+                    id = role.drawableId
+                ),
+                contentDescription = null
+            )
+        }
     }
 }
 

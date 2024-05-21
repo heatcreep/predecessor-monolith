@@ -13,17 +13,17 @@ data class BuildDto(
     @SerialName("crest_id")
     val crestId: Int,
     @SerialName("item1_id")
-    val item1Id: Int,
+    val item1Id: Int?,
     @SerialName("item2_id")
-    val item2Id: Int,
+    val item2Id: Int?,
     @SerialName("item3_id")
-    val item3Id: Int,
+    val item3Id: Int?,
     @SerialName("item4_id")
-    val item4Id: Int,
+    val item4Id: Int?,
     @SerialName("item5_id")
-    val item5Id: Int,
+    val item5Id: Int?,
     @SerialName("item6_id")
-    val item6Id: Int,
+    val item6Id: Int?,
     @SerialName("skill_order")
     val skillOrder: List<Int>?,
     @SerialName("upvotes_count")

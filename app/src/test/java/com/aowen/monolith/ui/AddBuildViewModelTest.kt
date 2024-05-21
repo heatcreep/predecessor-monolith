@@ -1,5 +1,6 @@
 package com.aowen.monolith.ui
 
+import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
@@ -17,7 +18,7 @@ class AddBuildViewModelTest {
     fun `onRoleSelected should update the selected role in the state`() = runTest {
         // Given
         val viewModel = AddBuildViewModel(repository = FakeOmedaCityRepository())
-        val role = getHeroRole("carry")
+        val role = getHeroRole("carry") ?: HeroRole.Unknown
 
         // When
         viewModel.onRoleSelected(role)

@@ -61,6 +61,7 @@ import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
@@ -312,7 +313,8 @@ fun FavoriteBuildsSection(
                     )
                 }
             } else {
-                val error = uiState.homeScreenError.firstOrNull { errorType -> errorType is HomeScreenError.FavoriteBuildsErrorMessage }
+                val error =
+                    uiState.homeScreenError.firstOrNull { errorType -> errorType is HomeScreenError.FavoriteBuildsErrorMessage }
                 val errorMessage = error?.errorMessage
                 if (errorMessage != null) {
                     Text(
@@ -384,26 +386,28 @@ fun FavoriteBuildListItem(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 PlayerIcon(
-                    heroImageId = getHeroRole(build.heroId).drawableId,
+                    heroImageId = getHeroImage(build.heroId),
                 ) {
-                    Image(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.secondary,
-                                shape = CircleShape
-                            )
-                            .align(Alignment.BottomEnd),
-                        contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                        painter = painterResource(
-                            id = getHeroRole(build.role.lowercase()).drawableId
-                        ),
-                        contentDescription = null
-                    )
+                    getHeroRole(build.role)?.let { role ->
+                        Image(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    shape = CircleShape
+                                )
+                                .align(Alignment.BottomEnd),
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                            painter = painterResource(
+                                id = role.drawableId
+                            ),
+                            contentDescription = null
+                        )
+                    }
                 }
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)

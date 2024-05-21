@@ -36,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.Team
+import com.aowen.monolith.data.getHeroImage
+import com.aowen.monolith.data.getHeroName
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getKda
 import com.aowen.monolith.ui.common.PlayerIcon
@@ -184,31 +186,34 @@ fun MatchPlayerCard(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             PlayerIcon(
-                                heroImageId = getHeroRole(playerHero.heroId).drawableId
+                                heroImageId = getHeroImage(playerHero.heroId)
                             ) {
-                                Image(
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primaryContainer)
-                                        .border(
-                                            width = 1.dp,
-                                            color = MaterialTheme.colorScheme.secondary,
-                                            shape = CircleShape
-                                        )
-                                        .align(Alignment.BottomEnd),
-                                    contentScale = ContentScale.Crop,
-                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                                    painter = painterResource(
-                                        id = getHeroRole(playerHero.role).drawableId
-                                    ),
-                                    contentDescription = null
-                                )
+                                getHeroRole(playerHero.role)?.let { role ->
+                                    Image(
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.primaryContainer)
+                                            .border(
+                                                width = 1.dp,
+                                                color = MaterialTheme.colorScheme.secondary,
+                                                shape = CircleShape
+                                            )
+                                            .align(Alignment.BottomEnd),
+                                        contentScale = ContentScale.Crop,
+                                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                                        painter = painterResource(
+                                            id = role.drawableId
+                                        ),
+                                        contentDescription = null
+                                    )
+                                }
                             }
+
                             Spacer(modifier = Modifier.size(8.dp))
                             Column {
                                 Text(
-                                    text = getHeroRole(it.heroId).heroName,
+                                    text = getHeroName(playerHero.heroId),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.secondary
                                 )

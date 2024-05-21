@@ -73,7 +73,7 @@ import com.aowen.monolith.data.HeroClass
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.getAbilityKey
 import com.aowen.monolith.data.getAbilityName
-import com.aowen.monolith.data.getHeroRole
+import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.feature.builds.BuildListItem
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
 import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsLoadingState
@@ -233,10 +233,12 @@ fun HeroOverviewScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 PlayerIcon(
-                    heroImageId = getHeroRole(uiState.hero.id).drawableId,
+                    heroImageId = getHeroImage(uiState.hero.id),
                     heroIconSize = 64.dp
                 )
+
                 Spacer(modifier = Modifier.size(16.dp))
                 Text(
                     text = uiState.hero.displayName,

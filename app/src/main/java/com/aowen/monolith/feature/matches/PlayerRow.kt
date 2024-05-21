@@ -48,7 +48,7 @@ import coil.request.ImageRequest
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchPlayerDetails
-import com.aowen.monolith.data.getHeroRole
+import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.data.getKda
 import com.aowen.monolith.ui.common.PlayerIcon
@@ -67,7 +67,7 @@ fun PlayerRow(
 
     var expanded by rememberSaveable { mutableStateOf(false) }
 
-    val roleImage = HeroRole.entries.first {
+    val roleImage = HeroRole.entries.firstOrNull {
         it.roleName == player.role
     }
 
@@ -125,29 +125,31 @@ fun PlayerRow(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    PlayerIcon(
-                        modifier = Modifier.clickable {
-                            navigateToPlayerDetails(player.playerId)
-                        },
-                        heroImageId = getHeroRole(player.heroId).drawableId,
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    shape = CircleShape
+                        PlayerIcon(
+                            modifier = Modifier.clickable {
+                                navigateToPlayerDetails(player.playerId)
+                            },
+                            heroImageId = getHeroImage(player.heroId),
+                        ) {
+                            roleImage?.let {
+                                Image(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.primaryContainer)
+                                        .border(
+                                            width = 1.dp,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            shape = CircleShape
+                                        )
+                                        .align(Alignment.BottomEnd),
+                                    contentScale = ContentScale.Crop,
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                                    painter = painterResource(id = it.drawableId),
+                                    contentDescription = null
                                 )
-                                .align(Alignment.BottomEnd),
-                            contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                            painter = painterResource(id = roleImage.drawableId),
-                            contentDescription = null
-                        )
-                    }
+                            }
+                        }
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
                         text = player.playerName,

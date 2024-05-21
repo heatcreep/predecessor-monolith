@@ -11,9 +11,13 @@ enum class HeroRole(val roleName: String, val drawableId: Int) {
     Unknown("unknown", R.drawable.unknown),
 }
 
-fun getHeroRole(roleName: String? = "") : HeroRole = HeroRole.entries.firstOrNull {
-    it.roleName == roleName?.lowercase()
-} ?: HeroRole.Unknown
+fun getHeroName(heroId: Int) = Hero.entries.firstOrNull {
+    it.heroId == heroId
+}?.heroName ?: "Hero"
+
+fun getHeroRole(roleName: String? = "") : HeroRole? = HeroRole.entries.firstOrNull {
+    it.roleName.lowercase() == roleName?.lowercase()
+}
 
 fun getHeroImage(heroId: Int) = Hero.entries.firstOrNull {
     it.heroId == heroId
@@ -22,7 +26,7 @@ fun getHeroImage(heroId: Int) = Hero.entries.firstOrNull {
 enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     ARGUS("Argus", 49, R.drawable.argus),
     AURORA("Aurora", 53, R.drawable.aurora),
-    BELICA("Lt. Belica",  13, R.drawable.belica),
+    BELICA("Lt. Belica", 13, R.drawable.belica),
     COUNTESS("Countess", 1, R.drawable.countess),
     CRUNCH("Crunch", 2, R.drawable.crunch),
     DEKKER("Dekker", 3, R.drawable.dekker),
@@ -44,7 +48,7 @@ enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     MURDOCK("Murdock", 14, R.drawable.murdock),
     MURIEL("Muriel", 15, R.drawable.muriel),
     NARBASH("Narbash", 16, R.drawable.narbash),
-    PHASE("Phase",25, R.drawable.phase),
+    PHASE("Phase", 25, R.drawable.phase),
     RAMPAGE("Rampage", 17, R.drawable.rampage),
     REVENANT("Revenant", 22, R.drawable.revenant),
     RIKTOR("Riktor", 18, R.drawable.riktor),
@@ -58,7 +62,3 @@ enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     ZARUS("Zarus", 31, R.drawable.zarus),
     UNKNOWN("Unknown", 999, R.drawable.unknown),
 }
-
-fun getHeroRole(heroId: Int?) = Hero.entries.firstOrNull {
-    it.heroId == heroId
-} ?: Hero.UNKNOWN
