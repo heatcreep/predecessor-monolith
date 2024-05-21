@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import com.aowen.monolith.ui.theme.BlueHighlight
@@ -21,6 +22,7 @@ private const val EffectText = "EffectText"
 private const val GoldText = "GoldText"
 private const val HealthText = "HealthText"
 private const val ManaText = "ManaText"
+private const val ConditionText = "Condition"
 
 
 fun parseText(content: String): List<Triple<String, Boolean, String?>> {
@@ -121,6 +123,17 @@ fun StyledText(content: String) {
                     style = SpanStyle(
                         color = ManaBlue,
                         fontWeight = FontWeight.ExtraBold
+                    )
+                ) {
+                    append(text)
+                }
+
+                ConditionText -> withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.ExtraLight,
+                        fontStyle = FontStyle.Italic,
+
                     )
                 ) {
                     append(text)
