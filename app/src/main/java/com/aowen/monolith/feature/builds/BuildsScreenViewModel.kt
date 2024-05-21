@@ -18,7 +18,7 @@ data class BuildsUiState(
     val selectedSortOrder: String = "Popular",
     val hasSkillOrderSelected: Boolean = false,
     val hasModulesSelected: Boolean = false,
-    val hasCurrentVersionSelected: Boolean = false,
+    val hasCurrentVersionSelected: Boolean = true,
     val error: String? = null
 )
 

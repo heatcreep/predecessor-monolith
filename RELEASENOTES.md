@@ -1,7 +1,19 @@
 # Release Notes
 
+## 1.6.0 - Latest
 
-## 1.5.0 - Latest
+#### New Features
+
+- Latest items have been added to items and builds screen
+- Aurora has been added to heroes list
+- Builds support and show 6 items
+
+#### Improvements & Bug Fixes
+
+- Adding/Removing Favorite Builds is more responsively reflected on the Home Screen
+- Builds screen no longer crashes
+
+## 1.5.0
 
 #### New Features
 

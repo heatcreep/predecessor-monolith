@@ -21,6 +21,7 @@ fun getHeroImage(heroId: Int) = Hero.entries.firstOrNull {
 
 enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     ARGUS("Argus", 49, R.drawable.argus),
+    AURORA("Aurora", 53, R.drawable.aurora),
     BELICA("Lt. Belica",  13, R.drawable.belica),
     COUNTESS("Countess", 1, R.drawable.countess),
     CRUNCH("Crunch", 2, R.drawable.crunch),

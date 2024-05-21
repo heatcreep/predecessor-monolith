@@ -35,6 +35,7 @@ val fakeBuildDto = BuildDto(
     item3Id = 303,
     item4Id = 304,
     item5Id = 305,
+    item6Id = 212,
     skillOrder = listOf(1, 2, 3),
     upvotesCount = 100,
     downvotesCount = 50,

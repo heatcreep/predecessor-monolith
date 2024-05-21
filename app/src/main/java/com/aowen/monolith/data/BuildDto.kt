@@ -22,6 +22,8 @@ data class BuildDto(
     val item4Id: Int,
     @SerialName("item5_id")
     val item5Id: Int,
+    @SerialName("item6_id")
+    val item6Id: Int,
     @SerialName("skill_order")
     val skillOrder: List<Int>?,
     @SerialName("upvotes_count")

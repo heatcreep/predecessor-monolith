@@ -34,7 +34,7 @@ fun BuildDto.create(): BuildListItem {
         description = description,
         heroId = heroId,
         crest = crestId,
-        buildItems = listOf(item1Id, item2Id, item3Id, item4Id, item5Id),
+        buildItems = listOf(item1Id, item2Id, item3Id, item4Id, item5Id, item6Id),
         skillOrder = skillOrder,
         upvotes = upvotesCount,
         downvotes = downvotesCount,
