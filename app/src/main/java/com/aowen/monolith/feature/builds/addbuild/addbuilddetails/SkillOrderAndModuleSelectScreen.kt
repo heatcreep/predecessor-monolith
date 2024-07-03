@@ -23,6 +23,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ButtonDefaults
@@ -31,6 +32,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -65,6 +67,7 @@ import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation.nav
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation.navigateToSkillOrderSelect
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation.navigateToTitleAndDescription
 import com.aowen.monolith.feature.builds.builddetails.SkillOrderScrollableRow
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 import com.meetup.twain.MarkdownText
@@ -81,6 +84,7 @@ fun SkillOrderAndModuleSelectRoute(
         uiState = uiState,
         onSkillSelected = viewModel::onSkillSelected,
         onBuildTitleChanged = viewModel::onBuildTitleChanged,
+        navigateBack = navController::navigateUp,
         navigateToItemSelect = navController::navigateToItemSelect,
         navigateToSkillOrderSelect = navController::navigateToSkillOrderSelect,
         navigateToAddModule = navController::navigateToAddModule,
@@ -95,6 +99,7 @@ fun SkillOrderAndModuleSelectScreen(
     uiState: AddBuildState,
     onSkillSelected: (Int, Int) -> Unit,
     onBuildTitleChanged: (String) -> Unit,
+    navigateBack: () -> Unit,
     navigateToItemSelect: () -> Unit,
     navigateToSkillOrderSelect: () -> Unit,
     navigateToEditModuleOrder: () -> Unit = {},
@@ -104,61 +109,65 @@ fun SkillOrderAndModuleSelectScreen(
 
     var isSkillOrderEnabled by rememberSaveable { mutableStateOf(true) }
 
-    Surface {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            // Items
-            SectionWithAction(
-                title = "Items",
-                action = {
-                    IconButton(onClick = navigateToItemSelect) {
+    Scaffold(
+        topBar = {
+            MonolithTopAppBar(
+                title = "Add New Build",
+                titleStyle = MaterialTheme.typography.bodyLarge,
+                backAction = {
+                    IconButton(onClick = {
+                        navigateBack()
+                    }) {
                         Icon(
-                            imageVector = if (uiState.selectedItems.isEmpty()) Icons.Default.Add else Icons.Default.Edit,
-                            tint = MaterialTheme.colorScheme.secondary,
-                            contentDescription = if (uiState.selectedItems.isEmpty()) "Add Items" else "Edit Items"
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "navigate up"
                         )
                     }
                 }
+            )
+        }
+    ) { paddingValues ->
+        Surface {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.tertiary,
-                    thickness = 1.dp
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    if (uiState.selectedItems.isEmpty() && uiState.selectedCrest == null) {
-                        Text(text = "No items added. Tap the '+' button to add items.")
-                    } else {
-                        Box(modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize()
-                            .aspectRatio(1f)
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .clickable {
-                                // TODO:
-                            }) {
-                            uiState.selectedCrest?.let { crest ->
-                                Image(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .aspectRatio(1f),
-                                    contentScale = ContentScale.FillBounds,
-                                    painter = painterResource(id = getItemImage(crest.id)),
-                                    contentDescription = null,
-                                )
-                            }
+                // Items
+                SectionWithAction(
+                    title = "Items",
+                    action = {
+                        IconButton(onClick = navigateToItemSelect) {
+                            Icon(
+                                imageVector = if (uiState.selectedItems.isEmpty()) Icons.Default.Add else Icons.Default.Edit,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                contentDescription = if (uiState.selectedItems.isEmpty()) "Add Items" else "Edit Items"
+                            )
                         }
-                        repeat(5) {
+                    }
+                ) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        thickness = 1.dp
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if (uiState.selectedItems.isEmpty() && uiState.selectedCrest == null) {
+                            Text(
+                                text = "No items added. Tap the '+' button to add items.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontStyle = FontStyle.Italic,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        } else {
                             Box(modifier = Modifier
                                 .weight(1f)
                                 .fillMaxSize()
@@ -167,261 +176,293 @@ fun SkillOrderAndModuleSelectScreen(
                                 .clickable {
                                     // TODO:
                                 }) {
-                                val item = uiState.selectedItems.getOrNull(it)
-                                if (item != null) {
+                                uiState.selectedCrest?.let { crest ->
                                     Image(
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .aspectRatio(1f),
                                         contentScale = ContentScale.FillBounds,
-                                        painter = painterResource(id = getItemImage(item.id)),
+                                        painter = painterResource(id = getItemImage(crest.id)),
                                         contentDescription = null,
+                                    )
+                                }
+                            }
+                            repeat(5) {
+                                Box(modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxSize()
+                                    .aspectRatio(1f)
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .clickable {
+                                        // TODO:
+                                    }) {
+                                    val item = uiState.selectedItems.getOrNull(it)
+                                    if (item != null) {
+                                        Image(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .aspectRatio(1f),
+                                            contentScale = ContentScale.FillBounds,
+                                            painter = painterResource(id = getItemImage(item.id)),
+                                            contentDescription = null,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.size(16.dp))
+                }
+                // Skill Order
+                SectionWithAction(
+                    title = "Skill Order",
+                    action = {
+                        Switch(
+                            checked = isSkillOrderEnabled,
+                            onCheckedChange = { isSkillOrderEnabled = it },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.secondary,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary,
+                                checkedBorderColor = MaterialTheme.colorScheme.secondary,
+                                uncheckedThumbColor = MaterialTheme.colorScheme.tertiary,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.primary,
+                                uncheckedIconColor = MaterialTheme.colorScheme.tertiary
+                            ),
+                        )
+                    },
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        AnimatedVisibility(
+                            visible = isSkillOrderEnabled,
+                            enter = expandHorizontally(
+                                expandFrom = Alignment.CenterHorizontally
+                            ),
+                            exit = shrinkHorizontally(
+                                shrinkTowards = Alignment.CenterHorizontally
+                            )
+                        ) {
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.tertiary,
+                                thickness = 1.dp
+                            )
+                            Spacer(modifier = Modifier.size(16.dp))
+                        }
+                    }
+                    AnimatedVisibility(
+                        visible = isSkillOrderEnabled,
+                        exit = shrinkVertically(
+                            animationSpec = tween(delayMillis = 300),
+                            shrinkTowards = Alignment.CenterVertically
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            SkillOrderScrollableRow(
+                                modifier = Modifier.weight(1f),
+                                skillOrder = uiState.skillOrder,
+                                // TODO: Replace with VM value
+                                console = Console.Xbox
+                            )
+                            Row {
+                                IconButton(onClick = navigateToSkillOrderSelect) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        tint = MaterialTheme.colorScheme.secondary,
+                                        contentDescription = "Edit Skill Order"
                                     )
                                 }
                             }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.size(16.dp))
-            }
-            // Skill Order
-            SectionWithAction(
-                title = "Skill Order",
-                action = {
-                    Switch(
-                        checked = isSkillOrderEnabled,
-                        onCheckedChange = { isSkillOrderEnabled = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.secondary,
-                            checkedTrackColor = MaterialTheme.colorScheme.primary,
-                            checkedBorderColor = MaterialTheme.colorScheme.secondary,
-                            uncheckedThumbColor = MaterialTheme.colorScheme.tertiary,
-                            uncheckedTrackColor = MaterialTheme.colorScheme.primary,
-                            uncheckedIconColor = MaterialTheme.colorScheme.tertiary
-                        ),
-                    )
-                },
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    AnimatedVisibility(
-                        visible = isSkillOrderEnabled,
-                        enter = expandHorizontally(
-                            expandFrom = Alignment.CenterHorizontally
-                        ),
-                        exit = shrinkHorizontally(
-                            shrinkTowards = Alignment.CenterHorizontally
-                        )
-                    ) {
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.tertiary,
-                            thickness = 1.dp
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-                    }
-                }
-                AnimatedVisibility(
-                    visible = isSkillOrderEnabled,
-                    exit = shrinkVertically(
-                        animationSpec = tween(delayMillis = 300),
-                        shrinkTowards = Alignment.CenterVertically
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SkillOrderScrollableRow(
-                            modifier = Modifier.weight(1f),
-                            skillOrder = uiState.skillOrder,
-                            // TODO: Replace with VM value
-                            console = Console.Xbox
-                        )
+                // Modules
+                SectionWithAction(
+                    title = "Modules",
+                    action = {
                         Row {
-                            IconButton(onClick = navigateToSkillOrderSelect) {
+                            if (uiState.modules.isNotEmpty()) {
+                                IconButton(onClick = navigateToEditModuleOrder) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        tint = MaterialTheme.colorScheme.secondary,
+                                        contentDescription = "Edit Module Order"
+                                    )
+                                }
+                            }
+                            IconButton(onClick = navigateToAddModule) {
                                 Icon(
-                                    imageVector = Icons.Default.Edit,
+                                    imageVector = Icons.Filled.Add,
                                     tint = MaterialTheme.colorScheme.secondary,
-                                    contentDescription = "Edit Skill Order"
+                                    contentDescription = "Add Module"
                                 )
                             }
                         }
-                    }
-                }
-            }
-            // Modules
-            SectionWithAction(
-                title = "Modules",
-                action = {
-                    Row {
-                        if (uiState.modules.isNotEmpty()) {
-                            IconButton(onClick = navigateToEditModuleOrder) {
-                                Icon(
-                                    imageVector = Icons.Filled.Edit,
-                                    tint = MaterialTheme.colorScheme.secondary,
-                                    contentDescription = "Edit Module Order"
-                                )
-                            }
-                        }
-                        IconButton(onClick = navigateToAddModule) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                tint = MaterialTheme.colorScheme.secondary,
-                                contentDescription = "Add Module"
-                            )
-                        }
-                    }
-                },
-            ) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.tertiary,
-                    thickness = 1.dp
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                if (uiState.modules.isEmpty()) {
-                    Text(
-                        text = "No modules added.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontStyle = FontStyle.Italic
+                    },
+                ) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        thickness = 1.dp
                     )
-                } else {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                    ) {
-                        uiState.modules.forEach { module ->
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
+                    Spacer(modifier = Modifier.size(16.dp))
+                    if (uiState.modules.isEmpty()) {
+                        Text(
+                            text = "No modules added.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                        ) {
+                            uiState.modules.forEach { module ->
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(MaterialTheme.colorScheme.secondary)
-                                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                                    text = module.title,
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        fontWeight = FontWeight.ExtraBold,
-                                        fontSize = 16.sp
-                                    ),
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.size(16.dp))
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.primaryContainer),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.secondary)
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                                        text = module.title,
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 16.sp
+                                        ),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(modifier = Modifier.size(16.dp))
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
 
-                                    ) {
-                                    repeat(5) {
-                                        Box(modifier = Modifier
-                                            .weight(1f)
-                                            .fillMaxSize()
-                                            .aspectRatio(1f)
-                                            .background(MaterialTheme.colorScheme.primary)
-                                            .clickable {
-                                                // TODO:
-                                            }) {
-                                            val item = module.items.getOrNull(it)
-                                            if (item != null) {
-                                                Image(
-                                                    modifier = Modifier
-                                                        .fillMaxSize()
-                                                        .aspectRatio(1f),
-                                                    contentScale = ContentScale.FillBounds,
-                                                    painter = painterResource(id = getItemImage(item)),
-                                                    contentDescription = null,
-                                                )
+                                        ) {
+                                        repeat(5) {
+                                            Box(modifier = Modifier
+                                                .weight(1f)
+                                                .fillMaxSize()
+                                                .aspectRatio(1f)
+                                                .background(MaterialTheme.colorScheme.primary)
+                                                .clickable {
+                                                    // TODO:
+                                                }) {
+                                                val item = module.items.getOrNull(it)
+                                                if (item != null) {
+                                                    Image(
+                                                        modifier = Modifier
+                                                            .fillMaxSize()
+                                                            .aspectRatio(1f),
+                                                        contentScale = ContentScale.FillBounds,
+                                                        painter = painterResource(
+                                                            id = getItemImage(
+                                                                item
+                                                            )
+                                                        ),
+                                                        contentDescription = null,
+                                                    )
+                                                }
                                             }
                                         }
                                     }
+                                    Spacer(modifier = Modifier.size(16.dp))
                                 }
-                                Spacer(modifier = Modifier.size(16.dp))
                             }
                         }
                     }
-                }
 
-            }
-            Spacer(modifier = Modifier.size(16.dp))
-            // Title and Description
-            SectionWithAction(
-                title = "Title and Description",
-                action = {
-                    IconButton(onClick = navigateToEditTitleAndDescription) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            tint = MaterialTheme.colorScheme.secondary,
-                            contentDescription = "Edit Items"
-                        )
-                    }
                 }
-            ) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.tertiary,
-                    thickness = 1.dp
-                )
                 Spacer(modifier = Modifier.size(16.dp))
+                // Title and Description
+                SectionWithAction(
+                    title = "Title and Description",
+                    action = {
+                        IconButton(onClick = navigateToEditTitleAndDescription) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                contentDescription = "Edit Items"
+                            )
+                        }
+                    }
+                ) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        thickness = 1.dp
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
 
-                if (uiState.buildTitle.isEmpty()) {
-                    Text(text = "Tap the '+' button to add a title and description.")
-                } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.primaryContainer),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    if (uiState.buildTitle.isEmpty()) {
                         Text(
+                            text = "Tap the '+' button to add a title and description.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.secondary)
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
-                            text = uiState.buildTitle,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 16.sp
-                            ),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        uiState.buildDescription?.let {
-                            Row(
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp)
-                            ) {
-                                MarkdownText(
-                                    markdown = it,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    maxLines = 4
-                                )
+                                    .background(MaterialTheme.colorScheme.secondary)
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                text = uiState.buildTitle,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 16.sp
+                                ),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            uiState.buildDescription?.let {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                ) {
+                                    MarkdownText(
+                                        markdown = it,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        maxLines = 4
+                                    )
+                                }
                             }
                         }
                     }
+
+
                 }
-
-
-            }
-            Spacer(modifier = Modifier.size(16.dp))
-            ElevatedButton(
-                modifier = Modifier.fillMaxWidth(),
-                enabled = uiState.selectedHero != null && uiState.selectedRole != null,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    contentColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                onClick = { /*TODO*/ }
-            ) {
-                Text(text = "Save Build")
+                Spacer(modifier = Modifier.size(16.dp))
+                ElevatedButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = uiState.selectedHero != null && uiState.selectedRole != null,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        contentColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    onClick = { /*TODO*/ }
+                ) {
+                    Text(text = "Save Build")
+                }
             }
         }
     }
+
 }
 
 @Composable
@@ -438,7 +479,11 @@ fun SectionWithAction(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = title)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.secondary
+            )
             action?.let {
                 it()
             }
@@ -493,6 +538,7 @@ fun SkillOrderAndModuleSelectScreenPreview() {
                 )
             ),
             onSkillSelected = { _, _ -> },
+            navigateBack = {},
             navigateToItemSelect = { },
             onBuildTitleChanged = { },
             navigateToSkillOrderSelect = { },

@@ -13,6 +13,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface OmedaCityService {
     // Player Details
@@ -84,4 +85,16 @@ interface OmedaCityService {
     suspend fun getBuildById(
         @Path("build_id") buildId: String
     ): Response<BuildDto>
+
+    @GET("builds/new")
+    suspend fun deeplinkToNewBuild(
+        @Query("build[title]") title: String,
+        @Query("build[description]") description: String,
+        @Query("build[role]") role: String,
+        @Query("build[hero_id]") heroId: Int,
+        @Query("build[crest_id") crestId: Int,
+        @QueryMap itemIds: Map<String, Int>,
+        @QueryMap skillOrder: Map<String, Int>,
+        @QueryMap modules: Map<String, String>,
+    )
 }

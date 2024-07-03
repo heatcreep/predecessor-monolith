@@ -3,16 +3,18 @@ package com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.ModuleAddRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.ModuleEditOrderRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.SkillOrderAndModuleSelectRoute
-import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.TitleAndDescriptionRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.ItemsOverviewRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.navigation.addBuildItemSelectScreen
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.skillorder.SkillOrderRoute
+import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.titledescription.TitleAndDescriptionRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.AddBuildRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
 
@@ -32,8 +34,11 @@ fun NavController.navigateToSkillOrderSelect(navOptions: NavOptions? = null) {
     this.navigate(SkillOrderRoute, navOptions)
 }
 
-fun NavController.navigateToAddModule(navOptions: NavOptions? = null) {
-    this.navigate(ModuleAddRoute, navOptions)
+fun NavController.navigateToAddModule(
+    moduleIndex: Int? = null,
+    navOptions: NavOptions? = null
+) {
+    this.navigate("$ModuleAddRoute?moduleIndex=$moduleIndex", navOptions)
 }
 
 fun NavController.navigateToEditModuleOrder(navOptions: NavOptions? = null) {
@@ -73,13 +78,22 @@ fun NavGraphBuilder.addBuildDetailsScreen(
                 )
             SkillOrderRoute(navController, addBuildViewModel)
         }
-        composable(route = ModuleAddRoute) { backStackEntry ->
+        composable(
+            route = "$ModuleAddRoute?moduleIndex={moduleIndex}",
+            arguments = listOf(
+                navArgument("moduleIndex") {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            )
+        ) { backStackEntry ->
+            val moduleIndex = backStackEntry.arguments?.getString("moduleIndex") ?: "-1"
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
                     navController = navController,
                     parentRoute = AddBuildRoute
                 )
-            ModuleAddRoute(navController, addBuildViewModel)
+            ModuleAddRoute(navController, moduleIndex.toInt(), addBuildViewModel)
         }
         composable(route = ModuleEditRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry

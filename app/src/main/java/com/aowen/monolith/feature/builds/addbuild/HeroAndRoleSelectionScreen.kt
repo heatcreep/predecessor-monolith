@@ -26,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,6 +43,7 @@ import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.feature.builds.addbuild.navigation.navigateToAddBuildDetails
 import com.aowen.monolith.feature.heroes.HeroCard
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 import java.util.Locale
@@ -60,6 +60,7 @@ fun HeroAndRoleSelectionRoute(
         uiState = uiState,
         onHeroSelected = viewModel::onHeroSelected,
         onRoleSelected = viewModel::onRoleSelected,
+        navigateBack = navController::navigateUp,
         navigateToBuildDetails = navController::navigateToAddBuildDetails
     )
 }
@@ -70,20 +71,16 @@ fun HeroAndRoleSelectionScreen(
     uiState: AddBuildState,
     onHeroSelected: (HeroDetails) -> Unit,
     onRoleSelected: (HeroRole) -> Unit,
+    navigateBack: () -> Unit,
     navigateToBuildDetails: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Add New Build",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+            MonolithTopAppBar(
+                title = "Add New Build",
+                titleStyle = MaterialTheme.typography.bodyLarge,
+                backAction = {
+                    IconButton(onClick = navigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "navigate up"
@@ -101,16 +98,25 @@ fun HeroAndRoleSelectionScreen(
 
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(text = "Select a Role:")
+                Text(
+                    text = "Select a Role:",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary
+                )
                 RoleSelection(
                     selectedRole = uiState.selectedRole,
                     onRoleSelected = onRoleSelected
                 )
-                Text(text = "Select a Hero:")
+                Text(
+                    text = "Select a Hero:",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary
+                )
                 if (uiState.isLoadingHeroes) {
                     FullScreenLoadingIndicator("Heroes")
                 } else {
@@ -123,7 +129,7 @@ fun HeroAndRoleSelectionScreen(
                 }
                 ElevatedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = uiState.selectedHero != null && uiState.selectedRole != null,
+                    enabled = uiState.selectedHero != null,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentColor = MaterialTheme.colorScheme.primaryContainer
@@ -261,6 +267,7 @@ fun HeroAndRoleSelectionScreenPreview() {
             ),
             onHeroSelected = {},
             onRoleSelected = {},
+            navigateBack = {},
             navigateToBuildDetails = {}
         )
     }

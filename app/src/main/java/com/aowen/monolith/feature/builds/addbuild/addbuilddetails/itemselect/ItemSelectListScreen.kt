@@ -34,7 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,6 +57,7 @@ import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
 import com.aowen.monolith.feature.builds.addbuild.CrestGroupDetails
 import com.aowen.monolith.feature.builds.addbuild.CrestType
+import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.navigation.BuildSection
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.navigation.ItemType
 import com.aowen.monolith.feature.items.StatFilterDropdown
 import com.aowen.monolith.feature.items.TierFilterDropdown
@@ -65,12 +65,14 @@ import com.aowen.monolith.feature.items.defaultStats
 import com.aowen.monolith.feature.items.itemdetails.ItemDetailsBottomSheet
 import com.aowen.monolith.feature.search.SearchBar
 import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 import com.aowen.monolith.ui.utils.filterOrOriginal
 import kotlinx.coroutines.launch
 
 @Composable
 fun ItemSelectListRoute(
+    buildSection: BuildSection,
     itemType: ItemType,
     itemPosition: Int? = null,
     navController: NavController,
@@ -86,16 +88,29 @@ fun ItemSelectListRoute(
             navigateBack = navController::navigateUp
         )
 
-        ItemType.Item -> ItemSelectListScreen(
-            allItems = uiState.items,
-            itemPosition = itemPosition,
-            onAddSelectedItem = viewModel::onAddSelectedItem,
-            onReplaceSelectedItem = viewModel::onReplaceSelectedItem,
-            onSelectStatFilter = viewModel::onSelectStatFilter,
-            selectedStatFilters = uiState.selectedStatFilters,
-            onClearStatFilters = viewModel::onClearStatFilters,
-            navigateBack = navController::navigateUp
-        )
+        else -> {
+            val items = when (itemType) {
+                ItemType.Item -> uiState.items.filter { it.slotType != SlotType.CREST }
+                else -> uiState.items
+            }
+
+            val onReplaceSelectedItem = if (buildSection == BuildSection.Modules)
+                viewModel::onReplaceItemInWorkingModule
+            else
+                viewModel::onReplaceSelectedItem
+            ItemSelectListScreen(
+                buildSection = buildSection,
+                allItems = items,
+                itemPosition = itemPosition,
+                onAddSelectedItem = viewModel::onAddSelectedItem,
+                onAddSelectedItemToWorkingModule = viewModel::onAddItemToWorkingModule,
+                onReplaceSelectedItem = onReplaceSelectedItem,
+                onSelectStatFilter = viewModel::onSelectStatFilter,
+                selectedStatFilters = uiState.selectedStatFilters,
+                onClearStatFilters = viewModel::onClearStatFilters,
+                navigateBack = navController::navigateUp
+            )
+        }
     }
 }
 
@@ -108,15 +123,10 @@ fun CrestSelectListScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Select Crest",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                },
-                navigationIcon = {
+            MonolithTopAppBar(
+                title = "Select Crest",
+                titleStyle = MaterialTheme.typography.bodyLarge,
+                backAction = {
                     IconButton(onClick = navigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -253,9 +263,11 @@ fun CrestGroup(
 @LightDarkPreview
 @Composable
 fun ItemSelectListScreen(
+    buildSection: BuildSection = BuildSection.Items,
     allItems: List<ItemDetails> = emptyList(),
     itemPosition: Int? = null,
     onAddSelectedItem: (ItemDetails) -> Unit = {},
+    onAddSelectedItemToWorkingModule: (Int) -> Unit = {},
     onReplaceSelectedItem: (ItemDetails, Int) -> Unit = { _, _ -> },
     selectedStatFilters: List<String> = emptyList(),
     onSelectStatFilter: (String) -> Unit = {},
@@ -278,7 +290,7 @@ fun ItemSelectListScreen(
         skipPartiallyExpanded = true
     )
 
-    fun getFilteredItems() : List<ItemDetails> {
+    fun getFilteredItems(): List<ItemDetails> {
         val itemsByTier =
             allItems.filterOrOriginal {
                 it.rarity.value == selectedTierFilter
@@ -319,15 +331,10 @@ fun ItemSelectListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Select Item",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                },
-                navigationIcon = {
+            MonolithTopAppBar(
+                title = "Select Item",
+                titleStyle = MaterialTheme.typography.bodyLarge,
+                backAction = {
                     IconButton(onClick = navigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -420,16 +427,19 @@ fun ItemSelectListScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(getFilteredItems()
-                        .filter { it.slotType != SlotType.CREST }
-                    ) {
+                    items(getFilteredItems()) {
                         ItemSelectListItem(
                             item = it,
                             onItemClicked = { itemDetails ->
-                                if(itemPosition != null) {
+                                if (itemPosition != null) {
                                     onReplaceSelectedItem(itemDetails, itemPosition)
                                 } else {
-                                    onAddSelectedItem(itemDetails)
+                                    when (buildSection) {
+                                        BuildSection.Items -> onAddSelectedItem(itemDetails)
+                                        BuildSection.Modules -> onAddSelectedItemToWorkingModule(
+                                            itemDetails.id
+                                        )
+                                    }
                                 }
                                 navigateBack()
                             },

@@ -4,6 +4,7 @@ import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchesDetails
 import com.aowen.monolith.data.PlayerDetails
@@ -30,6 +31,7 @@ interface OmedaCityRepository {
         playerName: String? = null,
         page: Int? = 1
     ): Result<MatchesDetails?>
+
     suspend fun fetchMatchById(matchId: String): Result<MatchDetails?>
 
     // Items
@@ -56,11 +58,22 @@ interface OmedaCityRepository {
         modules: Int? = null,
         page: Int? = 1,
 
-    ): Result<List<BuildListItem>?>
+        ): Result<List<BuildListItem>?>
 
     suspend fun fetchBuildById(
         buildId: String
     ): Result<BuildListItem?>
+
+    suspend fun deeplinkToNewBuild(
+        title: String,
+        description: String,
+        role: String,
+        heroId: Int,
+        crestId: Int,
+        itemIds: List<Int>,
+        skillOrder: List<Int>,
+        modules: List<ItemModule>
+    )
 }
 
 class OmedaCityRepositoryImpl @Inject constructor(
@@ -213,7 +226,8 @@ class OmedaCityRepositoryImpl @Inject constructor(
         return try {
             val heroStatisticsResponse = playerApiService.getAllHeroStatistics(timeFrame)
             if (heroStatisticsResponse.isSuccessful) {
-                Result.success(heroStatisticsResponse.body()?.heroStatistics?.map { it.create() } ?: emptyList())
+                Result.success(heroStatisticsResponse.body()?.heroStatistics?.map { it.create() }
+                    ?: emptyList())
             } else {
                 Result.failure(Exception("Failed to fetch hero statistics"))
             }
@@ -280,6 +294,54 @@ class OmedaCityRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun deeplinkToNewBuild(
+        title: String,
+        description: String,
+        role: String,
+        heroId: Int,
+        crestId: Int,
+        itemIds: List<Int>,
+        skillOrder: List<Int>,
+        modules: List<ItemModule>
+    ) {
+
+        val itemIdMap = mutableMapOf<String, Int>()
+        val skillOrderMap = mutableMapOf<String, Int>()
+        val modulesMap = mutableMapOf<String, String>()
+
+        // Add item ids to map
+        itemIds.mapIndexed { index, id ->
+            itemIdMap["build[item${index + 1}_id]"] = id
+        }
+
+        // Add skill order to map
+        skillOrder.mapIndexed { index, order ->
+            skillOrderMap["build[skill_order][${index + 1}]"] = order
+        }
+
+        // Add modules to map
+        modules.mapIndexed { index, itemModule ->
+            modulesMap["build[modules_attributes][$index][title]"] = itemModule.title
+            itemModule.items.mapIndexed { itemIndex, itemId ->
+                modulesMap["build[modules_attributes][$index][item${itemIndex + 1}_id]"] = itemId.toString()
+            }
+        }
+
+
+
+
+        playerApiService.deeplinkToNewBuild(
+            title = title,
+            description = description,
+            role = role,
+            heroId = heroId,
+            crestId = crestId,
+            itemIds = itemIdMap,
+            skillOrder = skillOrderMap,
+            modules = modulesMap
+        )
     }
 }
 

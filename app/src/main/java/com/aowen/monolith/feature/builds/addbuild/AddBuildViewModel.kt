@@ -24,7 +24,7 @@ data class AddBuildState(
     val items: List<ItemDetails> = emptyList(),
     val crestsList: List<CrestGroupDetails> = emptyList(),
     val selectedHero: HeroDetails? = null,
-    val selectedRole: HeroRole? = null,
+    val selectedRole: HeroRole = HeroRole.Unknown,
     val selectedCrest: ItemDetails? = null,
     val currentSelectedItems: PersistentList<ItemDetails> = persistentListOf(),
     val selectedStatFilters: PersistentList<String> = persistentListOf(),
@@ -50,8 +50,9 @@ data class AddBuildState(
         -1
     ),
     val modules: List<ItemModule> = emptyList(),
+    val workingModule: ItemModule = ItemModule(),
     val buildTitle: String = "",
-    val buildDescription: String? = null,
+    val buildDescription: String = "",
     val selectedSkill: AbilityDetails? = null
 )
 
@@ -142,7 +143,7 @@ class AddBuildViewModel @Inject constructor(
 
     fun onSelectStatFilter(stat: String) {
         _uiState.value = _uiState.value.copy(
-            selectedStatFilters = if(uiState.value.selectedStatFilters.contains(stat)) {
+            selectedStatFilters = if (uiState.value.selectedStatFilters.contains(stat)) {
                 _uiState.value.selectedStatFilters.remove(stat)
             } else {
                 _uiState.value.selectedStatFilters.add(stat)
@@ -165,7 +166,7 @@ class AddBuildViewModel @Inject constructor(
     fun onReplaceSelectedItem(newItem: ItemDetails, itemPosition: Int) {
         val newItemOrder = _uiState.value.selectedItems.toMutableList().apply {
             removeAt(itemPosition)
-            add(itemPosition,newItem)
+            add(itemPosition, newItem)
         }.toPersistentList()
         _uiState.value = _uiState.value.copy(selectedItems = newItemOrder)
     }
@@ -184,15 +185,62 @@ class AddBuildViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(selectedItems = newItemOrder)
     }
 
-    fun onCreateNewModule(title: String, itemIds: List<Int>) {
+    fun initWorkingModule(itemModule: ItemModule) {
+        _uiState.value = _uiState.value.copy(
+            workingModule = itemModule
+        )
+    }
+
+    fun onChangeWorkingModuleTitle(title: String) {
+        _uiState.value = _uiState.value.copy(
+            workingModule = uiState.value.workingModule.copy(title = title)
+        )
+    }
+
+    fun onAddItemToWorkingModule(itemId: Int) {
+        _uiState.value = _uiState.value.copy(
+            workingModule = _uiState.value.workingModule.copy(
+                items = uiState.value.workingModule.items.plus(itemId)
+            )
+        )
+    }
+
+    fun onReplaceItemInWorkingModule(itemDetails: ItemDetails, itemPosition: Int) {
+        val newItemOrder = _uiState.value.workingModule.items.toMutableList().apply {
+            removeAt(itemPosition)
+            add(itemPosition, itemDetails.id)
+        }.toPersistentList()
+        _uiState.value = _uiState.value.copy(
+            workingModule = uiState.value.workingModule.copy(items = newItemOrder)
+        )
+    }
+
+    fun clearWorkingModule() {
+        _uiState.value = _uiState.value.copy(
+            workingModule = ItemModule()
+        )
+    }
+
+    fun onCreateNewModule() {
         _uiState.value = _uiState.value.copy(
             modules = _uiState.value.modules.plus(
                 ItemModule(
-                    title = title,
-                    items = itemIds
+                    title = uiState.value.workingModule.title,
+                    items = uiState.value.workingModule.items
                 )
             )
         )
+
+    }
+
+    fun onChangeModuleItemOrder(fromIndex: Int, toIndex: Int) {
+        val selectedModule = uiState.value.workingModule
+        val newItemOrder = selectedModule.items.toMutableList().apply {
+            val item = removeAt(fromIndex)
+            add(toIndex, item)
+        }.toPersistentList()
+        _uiState.value =
+            _uiState.value.copy(workingModule = selectedModule.copy(items = newItemOrder))
     }
 
     fun onBuildTitleChanged(title: String) {
@@ -203,6 +251,25 @@ class AddBuildViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(buildDescription = description)
     }
 
+    fun onSubmitNewBuild() {
+        submitToOmedaCity()
+    }
+
+    private fun submitToOmedaCity() {
+        viewModelScope.launch {
+            repository.deeplinkToNewBuild(
+                title = uiState.value.buildTitle,
+                description = uiState.value.buildDescription,
+                role = uiState.value.selectedRole.roleName,
+                heroId = uiState.value.selectedHero?.id ?: -1,
+                crestId = uiState.value.selectedCrest?.id ?: -1,
+                itemIds = uiState.value.selectedItems.map { it.id },
+                skillOrder = uiState.value.skillOrder,
+                modules = uiState.value.modules
+            )
+        }
+    }
+
     private fun groupCrests(items: List<ItemDetails>): List<CrestGroupDetails> {
         val crestDetailsList = mutableListOf<CrestGroupDetails>()
 
@@ -211,7 +278,7 @@ class AddBuildViewModel @Inject constructor(
 
         baseCrests.forEach { baseCrest ->
             val secondCrest = allCrests.first { it.requirements.contains(baseCrest.name) }
-            val finalCrests = allCrests.filter { it.requirements.contains(secondCrest.name)}
+            val finalCrests = allCrests.filter { it.requirements.contains(secondCrest.name) }
             crestDetailsList.add(
                 CrestGroupDetails(
                     crestType = CrestType.valueOf(baseCrest.heroClass ?: "Unknown"),

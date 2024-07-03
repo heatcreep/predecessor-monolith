@@ -28,20 +28,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
-import androidx.compose.material3.TooltipState
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,15 +64,16 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.addbuild.AddBuildState
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
+import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.navigation.BuildSection
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.navigation.ItemType
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.navigation.navigateToItemDetailsSelect
 import com.aowen.monolith.feature.items.itemdetails.ItemDetailsBottomSheet
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 import com.aowen.monolith.ui.utils.DragDropState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.launch
 
 @Composable
 fun ItemsOverviewRoute(
@@ -106,51 +101,14 @@ fun ItemsOverviewScreen(
     changeItemOrder: (Int, Int) -> Unit,
     onReplaceSelectedItem: (ItemDetails, Int) -> Unit,
     onRemoveSelectedItem: (ItemDetails) -> Unit,
-    navigateToItemDetailsSelect: (String, Int?) -> Unit
+    navigateToItemDetailsSelect: (String, String, Int?) -> Unit
 ) {
-
-    val coroutineScope = rememberCoroutineScope()
-    val selectedItemsTooltipState = remember { TooltipState() }
-
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Select Items",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        TooltipBox(
-                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                            tooltip = {
-                                PlainTooltip {
-                                    Text(text = "Tap to remove item from build. Long press and drag to reorder.")
-                                }
-                            },
-                            state = selectedItemsTooltipState,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        ) {
-                            IconButton(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        selectedItemsTooltipState.show()
-                                    }
-                                },
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Info,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        }
-                    }
-                },
-                navigationIcon = {
+            MonolithTopAppBar(
+                title = "Select Items",
+                titleStyle = MaterialTheme.typography.bodyLarge,
+                backAction = {
                     IconButton(onClick = { navigateBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -211,7 +169,7 @@ fun ItemsList(
     onItemDetailClicked: (ItemDetails) -> Unit = {},
     changeItemOrder: (Int, Int) -> Unit,
     onReplaceSelectedItem: (ItemDetails, Int) -> Unit,
-    navigateToItemDetailsSelect: (String, Int?) -> Unit
+    navigateToItemDetailsSelect: (String, String, Int?) -> Unit
 ) {
 
     val hapticFeedback = LocalHapticFeedback.current
@@ -242,7 +200,7 @@ fun ItemsList(
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .size(buttonSize)
                         .clickable {
-                            navigateToItemDetailsSelect(ItemType.Crest.name, null)
+                            navigateToItemDetailsSelect(BuildSection.Items.name, ItemType.Crest.name, null)
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -267,7 +225,7 @@ fun ItemsList(
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .size(buttonSize)
                         .clickable {
-                            navigateToItemDetailsSelect(ItemType.Crest.name, null)
+                            navigateToItemDetailsSelect(BuildSection.Items.name, ItemType.Crest.name, null)
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -297,6 +255,7 @@ fun ItemsList(
                     modifier = Modifier
                         .dragContainer(
                             dragDropState,
+                            dragDirection = DragDirection.Horizontal,
                             onStart = {
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             },
@@ -331,7 +290,11 @@ fun ItemsList(
                                             .background(MaterialTheme.colorScheme.primaryContainer)
                                             .size(buttonSize)
                                             .clickable {
-                                                       navigateToItemDetailsSelect(ItemType.Item.name, index)
+                                                       navigateToItemDetailsSelect(
+                                                           BuildSection.Items.name,
+                                                           ItemType.Item.name,
+                                                           index
+                                                       )
                                             },
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -366,7 +329,11 @@ fun ItemsList(
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .size(buttonSize)
                             .clickable {
-                                navigateToItemDetailsSelect(ItemType.Item.name, null)
+                                navigateToItemDetailsSelect(
+                                    BuildSection.Items.name,
+                                    ItemType.Item.name,
+                                    null
+                                )
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -459,6 +426,7 @@ fun rememberDragDropState(
 
 fun Modifier.dragContainer(
     dragDropState: DragDropState,
+    dragDirection: DragDirection,
     onStart: () -> Unit = {},
     onChange: () -> Unit = {},
     onEnd: () -> Unit = {}
@@ -471,10 +439,10 @@ fun Modifier.dragContainer(
             detectDragGesturesAfterLongPress(
                 onDrag = { change, offset ->
                     change.consume()
-                    dragDropState.onDrag(offset = offset, onFeedback = onChange)
+                    dragDropState.onDrag(offset = offset, dragDirection = dragDirection, onFeedback = onChange)
                 },
                 onDragStart = { offset ->
-                    dragDropState.onDragStart(offset)
+                    dragDropState.onDragStart(offset, dragDirection)
                     onStart()
                 },
                 onDragEnd = {
@@ -505,7 +473,7 @@ fun SelectedItemsRowPreview() {
                     ),
                     changeItemOrder = { _, _ -> },
                     onReplaceSelectedItem = { _, _ -> },
-                    navigateToItemDetailsSelect = {_, _ ->}
+                    navigateToItemDetailsSelect = {_, _, _ ->}
                 )
             }
         }

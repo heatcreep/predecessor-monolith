@@ -4,6 +4,7 @@ import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchesDetails
 import com.aowen.monolith.data.PlayerDetails
@@ -239,5 +240,18 @@ class FakeOmedaCityRepository(
                 fakeBuildDto.create()
             )
         }
+    }
+
+    override suspend fun deeplinkToNewBuild(
+        title: String,
+        description: String,
+        role: String,
+        heroId: Int,
+        crestId: Int,
+        itemIds: List<Int>,
+        skillOrder: List<Int>,
+        modules: List<ItemModule>
+    ) {
+        TODO("Not yet implemented")
     }
 }

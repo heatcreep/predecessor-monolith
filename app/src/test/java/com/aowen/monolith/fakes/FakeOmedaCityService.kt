@@ -178,4 +178,17 @@ class FakeOmedaCityService(private val resCode: Int? = null) : OmedaCityService 
             else -> throw Exception("Something went wrong")
         }
     }
+
+    override suspend fun deeplinkToNewBuild(
+        title: String,
+        description: String,
+        role: String,
+        heroId: Int,
+        crestId: Int,
+        itemIds: Map<String, Int>,
+        skillOrder: Map<String, Int>,
+        modules: Map<String, String>
+    ) {
+        TODO("Not yet implemented")
+    }
 }

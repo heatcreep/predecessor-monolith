@@ -15,23 +15,33 @@ const val ItemDetailSelectRoute = "add-build-item-select"
 
 enum class ItemType {
     Crest,
-    Item
+    Item,
+    All
+}
+
+enum class BuildSection {
+    Items,
+    Modules
 }
 
 fun NavController.navigateToItemDetailsSelect(
+    buildSection: String,
     itemType: String,
     itemPosition: Int? = null,
     navOptions: NavOptions? = null
 ) {
-    this.navigate("$ItemDetailSelectRoute/$itemType?itemPosition=${itemPosition.toString()}", navOptions)
+    this.navigate("$ItemDetailSelectRoute/$buildSection/$itemType?itemPosition=${itemPosition.toString()}", navOptions)
 }
 
 fun NavGraphBuilder.addBuildItemSelectScreen(
     navController: NavController,
 ) {
     composable(
-        route = "$ItemDetailSelectRoute/{itemType}?itemPosition={itemPosition}",
+        route = "$ItemDetailSelectRoute/{buildSection}/{itemType}?itemPosition={itemPosition}",
         arguments = listOf(
+            navArgument("buildSection") {
+                type = NavType.StringType
+            },
             navArgument("itemType") {
                 type = NavType.StringType
             },
@@ -41,6 +51,7 @@ fun NavGraphBuilder.addBuildItemSelectScreen(
             }
         )
     ) { backStackEntry ->
+        val buildSection = backStackEntry.arguments?.getString("buildSection")
         val itemType = backStackEntry.arguments?.getString("itemType")
         val itemPosition = backStackEntry.arguments?.getString("itemPosition")
         val addBuildViewModel = backStackEntry
@@ -49,6 +60,7 @@ fun NavGraphBuilder.addBuildItemSelectScreen(
                 parentRoute = AddBuildRoute
             )
         ItemSelectListRoute(
+            buildSection = BuildSection.valueOf(buildSection ?: "Items"),
             itemType = ItemType.valueOf(itemType ?: "Item"),
             itemPosition = itemPosition?.toInt(),
             navController = navController,

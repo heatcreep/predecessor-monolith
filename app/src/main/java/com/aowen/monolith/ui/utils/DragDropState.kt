@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.itemselect.DragDirection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -41,10 +42,11 @@ class DragDropState internal constructor(
     internal var previousItemOffset = Animatable(0f)
         private set
 
-    internal fun onDragStart(offset: Offset) {
+    internal fun onDragStart(offset: Offset, dragDirection: DragDirection) {
+        val offsetVector = if(dragDirection == DragDirection.Horizontal) offset.x else offset.y
         state.layoutInfo.visibleItemsInfo
             .firstOrNull { item ->
-                offset.x.toInt() in item.offset..(item.offset + item.size)
+                offsetVector.toInt() in item.offset..(item.offset + item.size)
             }?.also {
                 draggingItemIndex = it.index
                 draggingItemInitialOffset = it.offset
@@ -72,8 +74,9 @@ class DragDropState internal constructor(
         draggingItemInitialOffset = 0
     }
 
-    internal fun onDrag(offset: Offset, onFeedback:() -> Unit = {}) {
-        draggingItemDraggedDelta += offset.x
+    internal fun onDrag(offset: Offset, dragDirection: DragDirection, onFeedback:() -> Unit = {}) {
+        val offsetVector = if(dragDirection == DragDirection.Horizontal) offset.x else offset.y
+        draggingItemDraggedDelta += offsetVector
 
         val draggingItem = draggingItemLayoutInfo ?: return
         val startOffset = draggingItem.offset + draggingItemOffset
