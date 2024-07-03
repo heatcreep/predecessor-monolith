@@ -113,7 +113,8 @@ class HeroDetailsViewModel @Inject constructor(
                 val heroBuildsDeferred = async {
                     omedaCityRepository.fetchAllBuilds(
                         heroId = heroId.toInt(),
-                        order = "popular"
+                        order = "popular",
+                        currentVersion = 1
                     )
                 }
                 val heroBuildsResult = heroBuildsDeferred.await()

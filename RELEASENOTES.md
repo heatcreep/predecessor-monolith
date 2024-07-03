@@ -1,6 +1,11 @@
 # Release Notes
 
-## 1.6.0 - Latest
+## 1.7.0 - Latest
+
+- Adds image for Terra
+- Filters builds on Hero Details by latest game version
+
+## 1.6.0
 
 #### New Features
 
