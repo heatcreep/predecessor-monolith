@@ -2,6 +2,7 @@ package com.aowen.monolith.network
 
 import com.aowen.monolith.fakes.FakeSupabaseAuthService
 import com.aowen.monolith.fakes.FakeSupabasePostgrestService
+import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -16,7 +17,8 @@ class AuthRepositoryTest {
     fun `signInWithDiscord calls authService loginWithDiscord()`() = runTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(),
-            postgrestService = FakeSupabasePostgrestService()
+            postgrestService = FakeSupabasePostgrestService(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val result = authRepository.signInWithDiscord()
@@ -27,7 +29,8 @@ class AuthRepositoryTest {
     fun `signInWithDiscord returns failure result on timeout`() = runTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 408),
-            postgrestService = FakeSupabasePostgrestService()
+            postgrestService = FakeSupabasePostgrestService(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = authRepository.signInWithDiscord().exceptionOrNull()
@@ -38,7 +41,8 @@ class AuthRepositoryTest {
     fun `signInWithDiscord returns failure result on rest exception`() = runTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 400),
-            postgrestService = FakeSupabasePostgrestService()
+            postgrestService = FakeSupabasePostgrestService(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = authRepository.signInWithDiscord().exceptionOrNull()
@@ -49,7 +53,8 @@ class AuthRepositoryTest {
     fun `signInWithDiscord returns failure result on http exception`() = runTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 500),
-            postgrestService = FakeSupabasePostgrestService()
+            postgrestService = FakeSupabasePostgrestService(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = authRepository.signInWithDiscord().exceptionOrNull()
@@ -60,7 +65,8 @@ class AuthRepositoryTest {
     fun `getPlayer returns user session on 200`() = runTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 200),
-            postgrestService = FakeSupabasePostgrestService()
+            postgrestService = FakeSupabasePostgrestService(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = authRepository.getPlayer()
@@ -71,7 +77,8 @@ class AuthRepositoryTest {
     fun `getPlayer returns null on not 200`() = runTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(),
-            postgrestService = FakeSupabasePostgrestService()
+            postgrestService = FakeSupabasePostgrestService(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = authRepository.getPlayer()
@@ -82,7 +89,8 @@ class AuthRepositoryTest {
     fun `deleteUserAccount returns success on 200`() = runTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 200),
-            postgrestService = FakeSupabasePostgrestService()
+            postgrestService = FakeSupabasePostgrestService(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = authRepository.deleteUserAccount("fake-user-id")
@@ -93,7 +101,8 @@ class AuthRepositoryTest {
     fun `deleteUserAccount returns failure on not 200`() = runTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(),
-            postgrestService = FakeSupabasePostgrestService()
+            postgrestService = FakeSupabasePostgrestService(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = authRepository.deleteUserAccount("fake-user-id").exceptionOrNull()

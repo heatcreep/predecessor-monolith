@@ -5,6 +5,7 @@ import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.FakeOmedaCityService
 import com.aowen.monolith.fakes.FakeSupabaseAuthService
 import com.aowen.monolith.fakes.FakeSupabasePostgrestService
+import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import kotlinx.coroutines.test.runTest
@@ -24,7 +25,8 @@ class UserRepositoryTest {
             postgrestService = FakeSupabasePostgrestService(),
             omedaCityRepository = OmedaCityRepositoryImpl(
                 playerApiService = FakeOmedaCityService(),
-            )
+            ),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = userRepository.getUser()
@@ -46,7 +48,8 @@ class UserRepositoryTest {
             postgrestService = FakeSupabasePostgrestService(),
             omedaCityRepository = OmedaCityRepositoryImpl(
                 playerApiService = FakeOmedaCityService(),
-            )
+            ),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = userRepository.getUser()
@@ -60,7 +63,8 @@ class UserRepositoryTest {
             postgrestService = FakeSupabasePostgrestService(),
             omedaCityRepository = OmedaCityRepositoryImpl(
                 playerApiService = FakeOmedaCityService(200),
-            )
+            ),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = userRepository.getClaimedUser().getOrNull()
@@ -82,7 +86,8 @@ class UserRepositoryTest {
             postgrestService = FakeSupabasePostgrestService(),
             omedaCityRepository = OmedaCityRepositoryImpl(
                 playerApiService = FakeOmedaCityService(200),
-            )
+            ),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = userRepository.getClaimedUser().exceptionOrNull()
@@ -99,7 +104,8 @@ class UserRepositoryTest {
             postgrestService = FakeSupabasePostgrestService(),
             omedaCityRepository = OmedaCityRepositoryImpl(
                 playerApiService = FakeOmedaCityService(400),
-            )
+            ),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val actual = userRepository.getClaimedUser().exceptionOrNull()
@@ -116,7 +122,8 @@ class UserRepositoryTest {
             postgrestService = FakeSupabasePostgrestService(),
             omedaCityRepository = OmedaCityRepositoryImpl(
                 playerApiService = FakeOmedaCityService(200),
-            )
+            ),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
 
         val expectedPlayerDetails = fakePlayerDto.create()

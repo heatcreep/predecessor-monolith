@@ -29,6 +29,7 @@ interface UserRepository {
 class UserRepositoryImpl @Inject constructor(
     private val authService: SupabaseAuthService,
     private val postgrestService: SupabasePostgrestService,
+    private val userPreferencesManager: UserPreferencesManager,
     private val omedaCityRepository: OmedaCityRepository,
 
 ) : UserRepository {
@@ -114,6 +115,7 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
+        userPreferencesManager.clearAccessToken()
         authService.logout()
     }
 }

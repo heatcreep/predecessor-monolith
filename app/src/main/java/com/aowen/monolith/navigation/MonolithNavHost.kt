@@ -26,7 +26,7 @@ fun MonolithNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        loginScreen()
+        loginScreen(navController = navController)
         searchScreen(navController = navController)
         homeScreen(navController = navController)
         heroesScreen(navController = navController)

@@ -42,6 +42,10 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
         }
     }
 
+    override suspend fun currentAccessToken(): String? {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun currentSession(): UserSession? {
         return when (resCode) {
             200 -> fakeUserSession
@@ -53,10 +57,18 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
         TODO("Not yet implemented")
     }
 
+    override suspend fun refreshCurrentSession() {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun deleteUserAccount(userId: String): Response<ResponseBody> {
         return when (resCode) {
             200 -> Response.success(200, "OK".toResponseBody(null))
             else -> Response.error(400, "Bad Request".toResponseBody())
         }
+    }
+
+    override suspend fun getUser(token: String): UserInfo? {
+        TODO("Not yet implemented")
     }
 }

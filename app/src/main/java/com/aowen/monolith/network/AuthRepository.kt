@@ -1,6 +1,7 @@
 package com.aowen.monolith.network
 
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
@@ -12,19 +13,39 @@ data class UserProfile(
 )
 
 interface AuthRepository {
+
+    val accessTokenFlow: Flow<String?>
+
+    suspend fun saveAccessTokenOnSuccessfulLogin()
+
     suspend fun signInWithDiscord(): Result<Unit?>
 
     suspend fun getPlayer(): Result<UserProfile?>
     suspend fun handleSavePlayer(playerId: String): Result<Unit>
 
     suspend fun deleteUserAccount(userId: String): Result<String>
+    suspend fun refreshCurrentSessionOnLogin()
 }
 
 
 class AuthRepositoryImpl @Inject constructor(
     private val authService: SupabaseAuthService,
     private val postgrestService: SupabasePostgrestService,
+    private val userPreferencesManager: UserPreferencesManager
 ) : AuthRepository {
+
+    override val accessTokenFlow: Flow<String?> = userPreferencesManager.accessToken
+
+    override suspend fun saveAccessTokenOnSuccessfulLogin() {
+        val accessToken = authService.currentAccessToken()
+        accessToken?.let {
+            userPreferencesManager.saveAccessToken(it)
+        }
+    }
+
+    override suspend fun refreshCurrentSessionOnLogin() {
+        authService.refreshCurrentSession()
+    }
 
     override suspend fun signInWithDiscord(): Result<Unit?> {
 

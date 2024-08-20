@@ -2,12 +2,14 @@ package com.aowen.monolith.fakes
 
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.UserProfile
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeAuthRepository(
     private val hasGetPlayerError: Boolean = false,
     private val hasHandleSavePlayerError: Boolean = false,
-    private val hasDeleteUserAccountError: Boolean = false
+    private val hasDeleteUserAccountError: Boolean = false,
+    override val accessTokenFlow: Flow<String?> = MutableStateFlow(null),
 ) : AuthRepository {
 
     private val _deleteUserAccountCounter: MutableStateFlow<Int> = MutableStateFlow(0)
@@ -16,6 +18,11 @@ class FakeAuthRepository(
     companion object {
         const val GetPlayerError = "Failed to get player"
     }
+
+    override suspend fun saveAccessTokenOnSuccessfulLogin() {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun signInWithDiscord(): Result<Unit?> {
         return Result.success(Unit)
     }
@@ -43,5 +50,9 @@ class FakeAuthRepository(
         } else {
             Result.success("User account deleted")
         }
+    }
+
+    override suspend fun refreshCurrentSessionOnLogin() {
+        TODO("Not yet implemented")
     }
 }

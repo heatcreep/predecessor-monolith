@@ -6,6 +6,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.providers.Discord
+import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.http.Headers
@@ -18,15 +19,14 @@ import retrofit2.Response
 import javax.inject.Inject
 
 interface SupabaseAuthService {
-    suspend fun loginWithDiscord(): Response<Unit>
-
+    suspend fun currentAccessToken(): String?
     suspend fun currentSession(): UserSession?
-
-    suspend fun logout()
-
     suspend fun deleteUserAccount(userId: String): Response<ResponseBody>
+    suspend fun getUser(token: String): UserInfo?
+    suspend fun loginWithDiscord(): Response<Unit>
+    suspend fun logout()
+    suspend fun refreshCurrentSession()
 }
-
 class SupabaseAuthServiceImpl @Inject constructor(
     private val goTrue: GoTrue,
     private val functions: Functions
@@ -43,12 +43,24 @@ class SupabaseAuthServiceImpl @Inject constructor(
         }
     }
 
+    override suspend fun getUser(token: String): UserInfo {
+        return goTrue.retrieveUser(token)
+    }
+
+    override suspend fun refreshCurrentSession() {
+        goTrue.refreshCurrentSession()
+    }
 
     override suspend fun currentSession(): UserSession? =
         goTrue.currentSessionOrNull()
 
-    override suspend fun logout() =
+    override suspend fun currentAccessToken(): String? =
+        goTrue.currentAccessTokenOrNull()
+
+    override suspend fun logout() {
         goTrue.logout()
+    }
+
 
     override suspend fun deleteUserAccount(userId: String): Response<ResponseBody> =
         try {
@@ -79,3 +91,4 @@ class SupabaseAuthServiceImpl @Inject constructor(
         }
 
 }
+

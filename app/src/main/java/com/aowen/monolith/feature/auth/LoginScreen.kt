@@ -10,12 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -25,18 +29,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.aowen.monolith.R
+import com.aowen.monolith.feature.home.navigation.navigateToHome
+import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.WarmWhite
 
 @Composable
 internal fun LoginRoute(
+    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
 
+    val uiState by viewModel.uiState.collectAsState(LoginUiState())
+
+    LaunchedEffect(Unit) {
+        viewModel.initViewModel()
+    }
+
+    LaunchedEffect(uiState) {
+        val userState = uiState.userState
+        if(userState is UserState.Authenticated) {
+            navController.navigateToHome()
+            logDebug("User can sign in with access token: ${userState.accessToken}", "LoginScreen")
+
+        } else {
+            logDebug("User is not signed in", "LoginScreen")
+        }
+    }
+
     LoginScreen(
         modifier = modifier,
+        uiState = uiState,
         submitLogin = viewModel::submitLogin
     )
 }
@@ -44,6 +70,7 @@ internal fun LoginRoute(
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
+    uiState: LoginUiState,
     submitLogin: () -> Unit = {}
 ) {
     Box(
@@ -57,22 +84,31 @@ fun LoginScreen(
             )
             .padding(horizontal = 16.dp),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Monolith",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight.ExtraBold
-            )
-            Spacer(modifier = Modifier.size(40.dp))
-            SignInDiscordButton(
-                submitLogin = submitLogin
-            )
+        if(uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Monolith",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Spacer(modifier = Modifier.size(40.dp))
+                SignInDiscordButton(
+                    submitLogin = submitLogin
+                )
+            }
         }
         Column(
             modifier = Modifier
@@ -130,7 +166,7 @@ fun LoginScreenPreview() {
         Surface(
             modifier = Modifier.fillMaxSize(),
         ) {
-            LoginScreen()
+            LoginScreen(uiState = LoginUiState())
         }
     }
 }

@@ -5,7 +5,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
 import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
 import com.aowen.monolith.feature.builds.builddetails.navigation.BuildDetailsRoute
@@ -64,8 +63,7 @@ fun NavGraphBuilder.homeScreen(
                 } else {
                     slideOutOfContainer(SlideDirection.Start)
                 }
-            },
-            deepLinks = listOf(navDeepLink { uriPattern = "monolith://login" })
+            }
         ) { backStackEntry ->
             val homeScreenViewModel = backStackEntry
                 .sharedViewModel<HomeScreenViewModel>(

@@ -6,26 +6,45 @@ import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
+abstract class UserState {
+    object Unauthenticated : UserState()
+    data class Authenticated(val accessToken: String) : UserState()
+}
+
 data class LoginUiState(
-    val isLoading: Boolean = false,
-    val userId: String? = null
+    val isLoading: Boolean = true,
+    val userState: UserState = UserState.Unauthenticated,
 )
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepo: AuthRepository
+    private val authRepo: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState
+    val uiState = _uiState
 
-    var callback: (String) -> Unit = { userId ->
-        _uiState.update { it.copy(userId = userId) }
+    fun initViewModel() {
+        viewModelScope.launch {
+            val accessToken = withTimeoutOrNull(3000) {
+                authRepo.accessTokenFlow.filterNotNull().firstOrNull()
+            }
+            if (accessToken != null) {
+                logDebug("Access token: $accessToken", "AuthViewModel")
+                authRepo.refreshCurrentSessionOnLogin()
+                _uiState.update { it.copy(userState = UserState.Authenticated(accessToken)) }
+            } else {
+                logDebug("No access token found", "AuthViewModel")
+                _uiState.update { it.copy(isLoading = false, userState = UserState.Unauthenticated) }
+            }
+        }
     }
 
     fun submitLogin() {

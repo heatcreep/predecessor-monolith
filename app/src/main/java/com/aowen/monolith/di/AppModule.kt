@@ -149,18 +149,20 @@ object AppModule {
     @Singleton
     fun provideAuthRepository(
         authService: SupabaseAuthService,
-        postgrestService: SupabasePostgrestService
+        postgrestService: SupabasePostgrestService,
+        userPreferencesManager: UserPreferencesManager
     ): AuthRepository =
-        AuthRepositoryImpl(authService, postgrestService)
+        AuthRepositoryImpl(authService,postgrestService, userPreferencesManager)
 
     @Provides
     @Singleton
     fun provideUserRepository(
         authService: SupabaseAuthService,
         postgrest: SupabasePostgrestService,
+        userPreferencesManager: UserPreferencesManager,
         repository: OmedaCityRepository
     ): UserRepository =
-        UserRepositoryImpl(authService, postgrest, repository)
+        UserRepositoryImpl(authService, postgrest,userPreferencesManager, repository)
 
     @Provides
     @Singleton

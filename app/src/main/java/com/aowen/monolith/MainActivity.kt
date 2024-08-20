@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,12 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.aowen.monolith.feature.auth.AuthViewModel
+import androidx.lifecycle.lifecycleScope
+import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.ui.MonolithApp
 import com.aowen.monolith.ui.theme.MonolithTheme
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.handleDeeplinks
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -33,7 +34,8 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var supabaseClient: SupabaseClient
 
-    private val viewModel: AuthViewModel by viewModels()
+    @Inject
+    lateinit var authRepository: AuthRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -41,7 +43,9 @@ class MainActivity : ComponentActivity() {
         supabaseClient.handleDeeplinks(intent = intent,
             onSessionSuccess = { userSession ->
                 userSession.user?.apply {
-                    viewModel.callback(this.id)
+                    lifecycleScope.launch {
+                        authRepository.saveAccessTokenOnSuccessfulLogin()
+                    }
                 }
             }
         )
@@ -52,9 +56,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MonolithApp(
-                        userId = viewModel.uiState.value.userId ?: ""
-                    )
+                    MonolithApp()
                 }
 
             }
