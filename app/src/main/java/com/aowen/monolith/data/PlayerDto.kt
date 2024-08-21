@@ -17,12 +17,10 @@ data class PlayerDto(
     val displayName: String,
     val region: String?,
     val rank: Int,
-    @SerialName("rank_title")
-    val rankTitle: String,
-    @SerialName("rank_image")
-    val rankImage: String,
-    @SerialName("is_ranked")
-    val isRanked: Boolean,
+    @SerialName("vp_total")
+    val vpTotal: Int?,
+    @SerialName("vp_current")
+    val vpCurrent: Int?,
     val mmr: Float?,
     val flags: List<PlayerFlagDto?>? = null
 )

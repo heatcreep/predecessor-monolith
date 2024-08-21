@@ -73,8 +73,7 @@ class PlayerDetailsViewModelTest {
                 fakeHeroDto2.create()
             ),
             playerId = "validPlayerId",
-            isClaimed = true,
-            playerRankUrl = "https://omeda.city/test"
+            isClaimed = true
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -245,8 +244,7 @@ class PlayerDetailsViewModelTest {
             heroStats = emptyList(),
             stats = PlayerStats(),
             matches = emptyList(),
-            heroes = emptyList(),
-            playerRankUrl = "no image"
+            heroes = emptyList()
 
         )
         val actual = viewModel.uiState.value

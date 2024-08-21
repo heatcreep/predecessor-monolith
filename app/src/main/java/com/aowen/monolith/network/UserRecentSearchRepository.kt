@@ -58,11 +58,8 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                     id = user.id,
                     playerId = UUID.fromString(playerDetails.playerId),
                     displayName = playerDetails.playerName,
-                    isRanked = playerDetails.isRanked,
                     region = playerDetails.region,
                     rank = playerDetails.rank,
-                    rankTitle = playerDetails.rankTitle,
-                    rankImage = playerDetails.rankImage,
                     mmr = playerDetails.mmr?.toFloat(),
                 )
                 val recentSearches = postgrestService.fetchRecentSearches(user.id)
@@ -74,7 +71,6 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                         postgrestService.updateRecentSearch(
                             userId = user.id,
                             recentPlayerId = playerSearchDto.playerId,
-                            rankImage = playerSearchDto.rankImage,
                             playerSearchDto
                         )
                     }
@@ -84,11 +80,9 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                     val updatedPlayerDetailsResult = omedaCityRepository.fetchPlayerInfo(playerDetails.playerId)
                     val updatedPlayerDetails = updatedPlayerDetailsResult.getOrNull()
                     val updatedPlayerId = updatedPlayerDetails?.playerDetails?.playerId
-                    val updatedPlayerRank = updatedPlayerDetails?.playerDetails?.rankImage
                     postgrestService.updateRecentSearch(
                         userId = user.id,
                         recentPlayerId = UUID.fromString(updatedPlayerId) ?: playerSearchDto.playerId,
-                        rankImage = updatedPlayerRank ?: playerSearchDto.rankImage,
                         playerSearchDto
                     )
                 }

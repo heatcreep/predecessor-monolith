@@ -85,61 +85,69 @@ fun HeroWinRateSection(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    heroStatsList.forEach { heroStats ->
-                        Card(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    navigateToHeroDetails(heroStats.heroId, heroStats.name)
-                                }
-                                .border(
-                                    1.dp,
-                                    MaterialTheme.colorScheme.secondary,
-                                    RoundedCornerShape(4.dp)
-                                ),
-                            shape = RoundedCornerShape(4.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-
-                                )
-                        ) {
-                            Row(
-                                modifier = Modifier
+                    if (heroStatsList.isEmpty()) {
+                        Text(
+                            text = "There was an error loading the data",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    } else {
+                        heroStatsList.forEach { heroStats ->
+                            Card(
+                                modifier = modifier
                                     .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                    .clickable {
+                                        navigateToHeroDetails(heroStats.heroId, heroStats.name)
+                                    }
+                                    .border(
+                                        1.dp,
+                                        MaterialTheme.colorScheme.secondary,
+                                        RoundedCornerShape(4.dp)
+                                    ),
+                                shape = RoundedCornerShape(4.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+
+                                    )
                             ) {
                                 Row(
-                                    modifier = Modifier.weight(1f),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // Player Favorite Hero
-                                    Image(
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .clip(CircleShape)
-                                            .border(
-                                                width = 1.dp,
-                                                color = MaterialTheme.colorScheme.secondary,
-                                                shape = CircleShape
-                                            ),
-                                        contentScale = ContentScale.Crop,
-                                        painter = painterResource(id = getHeroImage(heroStats.heroId)),
-                                        contentDescription = null
-                                    )
-                                    Text(
-                                        text = heroStats.name,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
+                                    Row(
+                                        modifier = Modifier.weight(1f),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        // Player Favorite Hero
+                                        Image(
+                                            modifier = Modifier
+                                                .size(48.dp)
+                                                .clip(CircleShape)
+                                                .border(
+                                                    width = 1.dp,
+                                                    color = MaterialTheme.colorScheme.secondary,
+                                                    shape = CircleShape
+                                                ),
+                                            contentScale = ContentScale.Crop,
+                                            painter = painterResource(id = getHeroImage(heroStats.heroId)),
+                                            contentDescription = null
+                                        )
+                                        Text(
+                                            text = heroStats.name,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
 
+                                    }
+                                    HeroInlineStatsRateBar(
+                                        modifier = Modifier.weight(1f),
+                                        rate = heroStats.winRate
+                                    )
                                 }
-                                HeroInlineStatsRateBar(
-                                    modifier = Modifier.weight(1f),
-                                    rate = heroStats.winRate
-                                )
                             }
                         }
                     }

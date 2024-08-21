@@ -86,7 +86,10 @@ class HomeScreenViewModelTest {
                     errorMessage = "Failed to fetch claimed user",
                     error = "Error getting claimed user."
                 )
-            )
+            ),
+            heroStats = fakeHeroStatisticsResult,
+            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
+            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed()
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)

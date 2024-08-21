@@ -165,12 +165,13 @@ fun MatchPlayerCard(
                             text = if (isWinner) "Victory" else "Defeat",
                         )
                     }
-                    playerHero?.mmrChange?.let {
+                    Spacer(modifier = Modifier.size(4.dp))
+                    playerHero?.vpChange?.let { change ->
                         Text(
                             textAlign = TextAlign.Start,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.tertiary,
-                            text = "${if (isWinner) "+${it}" else it}MMR"
+                            text = "$change VP"
                         )
                     }
                     Text(
@@ -284,7 +285,7 @@ fun MatchesListPreview() {
                                     heroId = 14,
                                     role = "offlane",
                                     performanceScore = "94.6",
-                                    mmrChange = "11.4",
+                                    vpChange = "11.4",
                                     kills = 7,
                                     deaths = 2,
                                     assists = 12,
@@ -314,7 +315,7 @@ fun MatchesListPreview() {
                                     heroId = 13,
                                     role = "jungle",
                                     performanceScore = "140.8",
-                                    mmrChange = "11.4",
+                                    vpChange = "11.4",
                                     kills = 7,
                                     deaths = 2,
                                     assists = 12,
@@ -343,7 +344,7 @@ fun MatchesListPreview() {
                                     heroId = 15,
                                     role = "midlane",
                                     performanceScore = "78.2",
-                                    mmrChange = "111.4",
+                                    vpChange = "111.4",
                                     kills = 7,
                                     deaths = 2,
                                     assists = 12,
@@ -388,7 +389,7 @@ fun MatchesListPreviewLightMode() {
                                     playerName = "heatcreep.tv",
                                     heroId = 16,
                                     role = "offlane",
-                                    mmrChange = "11.4",
+                                    vpChange = "11.4",
                                     performanceScore = "94.6",
                                     kills = 7,
                                     deaths = 2,
@@ -416,7 +417,7 @@ fun MatchesListPreviewLightMode() {
                                     playerName = "heatcreep.tv",
                                     heroId = 14,
                                     role = "support",
-                                    mmrChange = "11.4",
+                                    vpChange = "11.4",
                                     performanceScore = "140.8",
                                     kills = 7,
                                     deaths = 2,
@@ -444,7 +445,7 @@ fun MatchesListPreviewLightMode() {
                                     playerName = "heatcreep.tv",
                                     heroId = 14,
                                     role = "midlane",
-                                    mmrChange = "111.4",
+                                    vpChange = "111.4",
                                     performanceScore = "78.2",
                                     kills = 7,
                                     deaths = 2,

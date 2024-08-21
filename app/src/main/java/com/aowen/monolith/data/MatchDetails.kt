@@ -1,13 +1,11 @@
 package com.aowen.monolith.data
 
-import com.aowen.monolith.network.RetrofitHelper
-
 data class MatchPlayerDetails(
     val playerId: String = "",
     val playerName: String = "",
-    val mmr: String = "",
-    val mmrChange: String = "",
-    val rankedImage: String = "",
+    val vpTotal: Int = 0,
+    val vpChange: String = "",
+    val rankDetails: RankDetails = RankDetails.UNRANKED,
     val heroId: Int = 0,
     val role: String = "",
     val performanceScore: String = "",
@@ -61,13 +59,9 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
     return MatchPlayerDetails(
         playerId = this.id,
         playerName = this.displayName,
-        mmr = if (this.mmr == null) {
-            "0"
-        } else {
-            this.mmr.toFloat().toDecimal()
-        },
-        mmrChange = this.mmrChange.toDecimal(),
-        rankedImage = RetrofitHelper.getRankImageUrl(this.rankImage),
+        vpTotal = this.vpTotal ?: 0,
+        vpChange = this.vpChange.toString(),
+        rankDetails = this.rank.toRankedDetailsOrNull(),
         heroId = this.heroId,
         role = this.role ?: "role unknown",
         performanceScore = this.performanceScore.toFloat().toDecimal(),

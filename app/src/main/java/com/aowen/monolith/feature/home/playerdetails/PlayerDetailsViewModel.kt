@@ -52,8 +52,7 @@ data class PlayerDetailsUiState(
     val matches: List<MatchDetails> = emptyList(),
     val heroes: List<HeroDetails> = emptyList(),
     val playerId: String = "",
-    val isClaimed: Boolean = false,
-    val playerRankUrl: String? = "no image"
+    val isClaimed: Boolean = false
 )
 
 @HiltViewModel
@@ -156,8 +155,7 @@ class PlayerDetailsViewModel @Inject constructor(
                         heroStats = playerHeroStats ?: emptyList(),
                         stats = playerInfo?.playerStats ?: PlayerStats(),
                         matches = matchesResult.getOrNull()?.matches ?: emptyList(),
-                        heroes = heroes ?: emptyList(),
-                        playerRankUrl = playerInfo?.playerDetails?.rankImage ?: "no image"
+                        heroes = heroes ?: emptyList()
                     )
                 }
             } else {

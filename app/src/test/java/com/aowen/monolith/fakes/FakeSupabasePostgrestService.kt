@@ -56,7 +56,6 @@ class FakeSupabasePostgrestService(private val recentSearchStatus: RecentSearchS
     override suspend fun updateRecentSearch(
         userId: UUID,
         recentPlayerId: UUID,
-        rankImage: String,
         playerSearchDto: PlayerSearchDto
     ) {
         searchCount.value = searchCount.value + 2

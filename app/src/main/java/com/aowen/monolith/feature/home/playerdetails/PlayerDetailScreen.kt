@@ -556,7 +556,6 @@ fun HomeScreenPreview() {
                 isLoading = false,
                 player = PlayerDetails(
                     playerName = "heatcreep.tv",
-                    rankTitle = "Platinum I"
                 ),
                 stats = PlayerStats(
                     favoriteHero = "Narbash"

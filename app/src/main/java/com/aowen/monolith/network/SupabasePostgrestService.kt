@@ -39,7 +39,6 @@ interface SupabasePostgrestService {
     suspend fun updateRecentSearch(
         userId: UUID,
         recentPlayerId: UUID,
-        rankImage: String,
         playerSearchDto: PlayerSearchDto
     )
 
@@ -133,15 +132,11 @@ class SupabasePostgrestServiceImpl @Inject constructor(
     override suspend fun updateRecentSearch(
         userId: UUID,
         recentPlayerId: UUID,
-        rankImage: String,
         playerSearchDto: PlayerSearchDto
     ) {
         postgrest[TABLE_RECENT_PROFILES].update(update = {
             set(TABLE_CREATED_AT, Timestamp(System.currentTimeMillis()).toString())
             set(COLUMN_RANK, playerSearchDto.rank)
-            set(COLUMN_RANK_TITLE, playerSearchDto.rankTitle)
-            set(COLUMN_RANK_IMAGE, rankImage)
-            set(COLUMN_IS_RANKED, playerSearchDto.isRanked)
             set(COLUMN_MMR, playerSearchDto.mmr)
         }) {
             eq(TABLE_ID, userId)

@@ -52,7 +52,7 @@ class FakeAuthRepository(
         }
     }
 
-    override suspend fun refreshCurrentSessionOnLogin() {
+    override suspend fun refreshCurrentSessionOnLogin(accessToken: String) {
         TODO("Not yet implemented")
     }
 }

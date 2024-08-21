@@ -139,7 +139,7 @@ class UpdatePlayerStatsWorker @AssistedInject constructor(
                     setWidgetState(
                         PlayerStatsState.Success(
                             playerInfo = playerInfo,
-                            playerRankUri = getRankImage(playerInfo.playerDetails.rankImage, force)
+                            playerRankUri = ""
                         )
                     )
                 } else {

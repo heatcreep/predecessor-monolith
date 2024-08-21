@@ -5,33 +5,30 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,16 +41,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.GlanceAppWidgetManager
-import coil.compose.AsyncImagePainter
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
-import coil.request.ImageRequest
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.data.RankDetails
 import com.aowen.monolith.glance.PlayerStatsAppWidget
 import com.aowen.monolith.glance.worker.UpdatePlayerStatsWorker
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -116,7 +111,6 @@ fun UnclaimPlayerDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlayerCard(
     player: PlayerDetails?,
@@ -131,9 +125,6 @@ fun PlayerCard(
 
     var isDialogOpen by remember { mutableStateOf(false) }
     val rotationAngle = remember { Animatable(0f) }
-
-    var openBottomSheetState by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(isClaimed) {
         rotationAngle.animateTo(
@@ -154,59 +145,12 @@ fun PlayerCard(
         )
     }
 
-    if (openBottomSheetState) {
-        ModalBottomSheet(
-            onDismissRequest = { openBottomSheetState = false },
-            sheetState = bottomSheetState,
-        ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxWidth()
-                    .padding(24.dp)
-            ) {
-                Text(
-                    text = "Player Rank & MMR",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.tertiary
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(
-                    text = "All statistics are calculated based on PVP & ranked matches.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(
-                    text = "MMR is calculated by Omeda.city; it may not be the exact MMR used in internal matchmaking. " +
-                            "Our rating system uses an unbiased Bayesian rating algorithm based on factor graphs to model player skill. " +
-                            "Rating changes may appear unintuitive due to the algorithm's complexity, but the ratings demonstrate a high level of accuracy.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(
-                    text = "Performance Score is calculated by Omeda.city; it may not be the exact Performance Score used in internal matchmaking. " +
-                            "Our performance score is calculated by a proprietary algorithm that takes into account a player's KDA, damage dealt, healing done, and other factors. " +
-                            "The performance score is a good indicator of a player's skill, but it is not a perfect metric.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-        }
-    }
-
     Column(
         modifier = modifier
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (player != null && stats != null) {
-            val model = ImageRequest.Builder(context)
-                .data(player.rankImage)
-                .crossfade(true)
-                .build()
-
             // Player Name
             Text(
                 style = MaterialTheme.typography.titleLarge,
@@ -214,36 +158,32 @@ fun PlayerCard(
                 text = player.playerName
             )
             Spacer(modifier = Modifier.size(16.dp))
-            SubcomposeAsyncImage(
-                model = model,
-                contentDescription = player.rankTitle
+            Box(
+                contentAlignment = Alignment.Center
             ) {
-                val state = painter.state
-                if (state is AsyncImagePainter.State.Success) {
-                    SubcomposeAsyncImageContent()
-                }
+                Text(
+                    modifier = Modifier.offset(y = (-8).dp),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.secondary,
+                    text = player.vpTotal.toString(),
+                )
+                Image(
+                    modifier = Modifier
+                        .size(200.dp),
+                    painter = painterResource(id = player.rankDetails.rankImageAssetId),
+                    contentDescription = null
+                )
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
                 Text(
-                    text = player.rankTitle,
-                    color = MaterialTheme.colorScheme.secondary,
+                    text = player.rankDetails.rankText,
+                    color = player.rankDetails.rankColor,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
-                IconButton(
-                    onClick = {
-                        openBottomSheetState = true
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
             }
             Spacer(modifier = Modifier.size(16.dp))
             Row(
@@ -292,30 +232,6 @@ fun PlayerCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Rank
-                StatListItem(
-                    modifier = modifier,
-                    statLabel = "Rank:",
-                    statValue = {
-                        Text(
-                            text = player.rankTitle,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                )
-                // MMR
-                StatListItem(
-                    modifier = modifier,
-                    statLabel = "MMR:",
-                    statValue = {
-                        Text(
-                            text = player.mmr ?: "0.0",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                )
                 // WinRate
                 StatListItem(
                     modifier = modifier,
@@ -431,7 +347,8 @@ fun PlayerCardPreview() {
             PlayerCard(
                 player = PlayerDetails(
                     playerName = "heatcreep.tv",
-                    rankTitle = "Gold IV",
+                    rankDetails = RankDetails.GOLD_I,
+                    vpTotal = 476
                 ),
                 stats = PlayerStats(
                     favoriteHero = "Narbash",

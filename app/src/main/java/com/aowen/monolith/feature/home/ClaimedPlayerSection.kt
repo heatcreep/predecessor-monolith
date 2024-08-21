@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.data.RankDetails
 import com.aowen.monolith.ui.components.PlayerLoadingCard
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
@@ -28,8 +29,8 @@ class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<Hom
             claimedPlayerDetails = PlayerDetails(
                 playerId = "1",
                 playerName = "Player 1",
+                rankDetails = RankDetails.GOLD_I,
                 rank = 1,
-                rankTitle = "Gold II",
                 region = "naeast",
                 mmr = "1000",
             ),

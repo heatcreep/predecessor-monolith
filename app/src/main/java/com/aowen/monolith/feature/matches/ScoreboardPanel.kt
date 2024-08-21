@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchPlayerDetails
+import com.aowen.monolith.data.RankDetails
 import com.aowen.monolith.ui.theme.DarkGreenHighlight35
 import com.aowen.monolith.ui.theme.DarkRedHighlight
 import com.aowen.monolith.ui.theme.GreenHighlight
@@ -119,8 +120,9 @@ fun ScoreboardPanelPreview() {
                 isWinningTeam = true,
                 teamDetails = listOf(
                     MatchPlayerDetails(
-                        mmr = "1234.5",
-                        mmrChange = "+11.1",
+                        rankDetails = RankDetails.GOLD_I,
+                        vpTotal = 475,
+                        vpChange = "25",
                         playerName = "Player 1",
                         heroId = 14,
                         role = "support",

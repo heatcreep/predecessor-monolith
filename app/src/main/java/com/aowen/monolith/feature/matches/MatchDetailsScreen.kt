@@ -60,6 +60,7 @@ import com.aowen.monolith.R
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
+import com.aowen.monolith.data.RankDetails
 import com.aowen.monolith.data.Team
 import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.feature.home.playerdetails.navigation.navigateToPlayerDetails
@@ -617,8 +618,9 @@ fun MatchDetailsScreenPreview() {
                     dusk = Team.Dusk(
                         players = listOf(
                             MatchPlayerDetails(
-                                mmr = "1234.5",
-                                mmrChange = "+11.1",
+                                rankDetails = RankDetails.BRONZE_III,
+                                vpChange = "12",
+                                vpTotal = 123,
                                 playerName = "Player 1",
                                 heroId = 14,
                                 role = "support",
@@ -635,8 +637,9 @@ fun MatchDetailsScreenPreview() {
                     dawn = Team.Dawn(
                         players = listOf(
                             MatchPlayerDetails(
-                                mmr = "1234.5",
-                                mmrChange = "-11.1",
+                                rankDetails = RankDetails.BRONZE_III,
+                                vpChange = "-12",
+                                vpTotal = 123,
                                 playerName = "Player 2",
                                 heroId = 13,
                                 role = "carry",
@@ -669,8 +672,9 @@ fun MatchStatsTabPreview() {
                 selectedTeam = Team.Dawn(
                     players = listOf(
                         MatchPlayerDetails(
-                            mmr = "1234.5",
-                            mmrChange = "+11.1",
+                            rankDetails = RankDetails.DIAMOND_II,
+                            vpChange = "45",
+                            vpTotal = 456,
                             playerName = "Player 1",
                             heroId = 14,
                             role = "support",
@@ -683,8 +687,9 @@ fun MatchStatsTabPreview() {
                             goldEarned = 15434
                         ),
                         MatchPlayerDetails(
-                            mmr = "1234.5",
-                            mmrChange = "-11.1",
+                            rankDetails = RankDetails.BRONZE_III,
+                            vpChange = "12",
+                            vpTotal = 123,
                             playerName = "Player 4567",
                             kills = 4,
                             deaths = 13,
@@ -696,8 +701,9 @@ fun MatchStatsTabPreview() {
                             performanceScore = "104.6",
                         ),
                         MatchPlayerDetails(
-                            mmr = "1234.5",
-                            mmrChange = "-11.1",
+                            rankDetails = RankDetails.BRONZE_III,
+                            vpChange = "12",
+                            vpTotal = 123,
                             playerName = "Player 2",
                             heroId = 31,
                             kills = 2,
@@ -709,8 +715,9 @@ fun MatchStatsTabPreview() {
                             performanceScore = "104.6",
                         ),
                         MatchPlayerDetails(
-                            mmr = "1234.5",
-                            mmrChange = "-11.1",
+                            rankDetails = RankDetails.BRONZE_III,
+                            vpChange = "12",
+                            vpTotal = 123,
                             playerName = "Player 2",
                             heroId = 12,
                             kills = 2,
@@ -722,8 +729,9 @@ fun MatchStatsTabPreview() {
                             performanceScore = "104.6",
                         ),
                         MatchPlayerDetails(
-                            mmr = "1234.5",
-                            mmrChange = "-11.1",
+                            rankDetails = RankDetails.BRONZE_III,
+                            vpChange = "12",
+                            vpTotal = 123,
                             playerName = "Player 2",
                             heroId = 7,
                             kills = 2,

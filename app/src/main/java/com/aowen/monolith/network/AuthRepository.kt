@@ -24,7 +24,7 @@ interface AuthRepository {
     suspend fun handleSavePlayer(playerId: String): Result<Unit>
 
     suspend fun deleteUserAccount(userId: String): Result<String>
-    suspend fun refreshCurrentSessionOnLogin()
+    suspend fun refreshCurrentSessionOnLogin(accessToken: String)
 }
 
 
@@ -43,7 +43,8 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshCurrentSessionOnLogin() {
+    override suspend fun refreshCurrentSessionOnLogin(accessToken: String) {
+        authService.getUser(accessToken)
         authService.refreshCurrentSession()
     }
 

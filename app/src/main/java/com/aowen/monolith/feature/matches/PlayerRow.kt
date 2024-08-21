@@ -41,10 +41,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImagePainter
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
-import coil.request.ImageRequest
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchPlayerDetails
@@ -53,6 +49,8 @@ import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.data.getKda
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.KDAText
+import com.aowen.monolith.ui.theme.GreenHighlight
+import com.aowen.monolith.ui.theme.RedHighlight
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -88,31 +86,25 @@ fun PlayerRow(
                     .width(68.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val model = ImageRequest.Builder(context)
-                    .data(player.rankedImage)
-                    .crossfade(true)
-                    .build()
-                SubcomposeAsyncImage(
-                    model = model,
-                    contentDescription = null
-                ) {
-                    val state = painter.state
-                    if (state is AsyncImagePainter.State.Success) {
-                        SubcomposeAsyncImageContent(
-                            modifier = Modifier.size(36.dp)
-                        )
-                    }
-                }
+                // Rank title
                 Text(
-                    text = "${player.mmr} MMR",
+                    text = player.rankDetails.rankText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = player.rankDetails.rankColor,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                // VP Total
+                Text(
+                    text = "${player.vpTotal} VP",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.ExtraBold
                 )
+                // VP Change
                 Text(
-                    text = "${player.mmrChange} MMR",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.secondary,
+                    text = "${player.vpChange} VP",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if(player.vpChange.contains("-")) RedHighlight else GreenHighlight,
                     fontWeight = FontWeight.ExtraBold
                 )
             }

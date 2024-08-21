@@ -53,7 +53,7 @@ fun SmallPlayerStatsSuccess(
             contentDescription = null
         )
         Text(
-            text = playerDetails?.rankTitle ?: "No Rank",
+            text = "No Rank",
             style = TextDefaults.defaultTextStyle.copy(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,

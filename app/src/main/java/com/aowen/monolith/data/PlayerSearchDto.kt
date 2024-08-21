@@ -20,12 +20,6 @@ data class PlayerSearchDto(
     val region: String?,
     @SerialName("rank")
     val rank: Int,
-    @SerialName("rank_title")
-    val rankTitle: String,
-    @SerialName("rank_image")
-    val rankImage: String,
-    @SerialName("is_ranked")
-    val isRanked: Boolean,
     @SerialName("mmr")
     val mmr: Float?
 )
@@ -35,10 +29,7 @@ fun PlayerSearchDto.create(): PlayerDetails =
         playerId = this.playerId.toString(),
         playerName = this.displayName,
         region = this.region,
-        isRanked = this.isRanked,
         rank = this.rank,
-        rankTitle = this.rankTitle,
-        rankImage = this.rankImage,
         mmr = this.mmr?.toDecimal(),
         isMmrDisabled = false,
         isCheater = false

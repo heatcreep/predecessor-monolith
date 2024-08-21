@@ -33,12 +33,12 @@ class AuthViewModel @Inject constructor(
 
     fun initViewModel() {
         viewModelScope.launch {
-            val accessToken = withTimeoutOrNull(3000) {
+            val accessToken = withTimeoutOrNull(1000) {
                 authRepo.accessTokenFlow.filterNotNull().firstOrNull()
             }
             if (accessToken != null) {
                 logDebug("Access token: $accessToken", "AuthViewModel")
-                authRepo.refreshCurrentSessionOnLogin()
+                authRepo.refreshCurrentSessionOnLogin(accessToken)
                 _uiState.update { it.copy(userState = UserState.Authenticated(accessToken)) }
             } else {
                 logDebug("No access token found", "AuthViewModel")

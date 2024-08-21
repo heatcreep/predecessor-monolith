@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,12 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImagePainter
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
-import coil.request.ImageRequest
 import com.aowen.monolith.data.PlayerDetails
 
 @Composable
@@ -36,14 +29,6 @@ fun PlayerResultCard(
     navigateToPlayerDetails: (String) -> Unit,
     handleClearSingleSearch: (() -> Unit)? = null
 ) {
-
-    val context = LocalContext.current
-
-    val model = ImageRequest.Builder(context)
-        .data(playerDetails.rankImage)
-        .crossfade(true)
-        .build()
-
 
     Card(
         modifier = modifier
@@ -73,24 +58,6 @@ fun PlayerResultCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Player Rank
-                SubcomposeAsyncImage(
-                    model = model,
-                    contentDescription = playerDetails.rankTitle
-                ) {
-                    val state = painter.state
-                    if (state is AsyncImagePainter.State.Success) {
-                        SubcomposeAsyncImageContent(
-                            modifier = Modifier.size(32.dp)
-                        )
-                    } else {
-                        Icon(
-                            modifier = Modifier.size(32.dp),
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null
-                        )
-                    }
-                }
                 Column {
                     Text(
                         text = playerDetails.playerName,

@@ -61,6 +61,7 @@ import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.data.RankDetails
 import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getHeroRole
 import com.aowen.monolith.data.getItemImage
@@ -248,10 +249,10 @@ fun ClaimedPlayerCard(
                 )
                 Row {
                     Text(
-                        text = playerDetails.rankTitle,
+                        text = playerDetails.rankDetails.rankText,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.ExtraBold,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = playerDetails.rankDetails.rankColor
                     )
                     Text(
                         text = " | ",
@@ -259,7 +260,7 @@ fun ClaimedPlayerCard(
                         color = MaterialTheme.colorScheme.secondary
                     )
                     Text(
-                        text = "MMR: ${playerDetails.mmr ?: "Unranked"}",
+                        text = "VP: ${playerDetails.vpTotal}",
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.secondary
@@ -525,7 +526,6 @@ fun ClaimedPlayerCardPreview() {
                     playerName = "heatcreep.tv",
                     region = "naeast",
                     mmr = "1379",
-                    rankTitle = "Silver III"
                 ),
                 navigateToPlayerDetails = {},
                 playerStats = PlayerStats(
@@ -551,7 +551,6 @@ fun SearchScreenPreview() {
                         playerName = "heatcreep.tv",
                         region = "naeast",
                         mmr = "1379",
-                        rankTitle = "Silver III"
                     ),
                     claimedPlayerStats = PlayerStats(
                         favoriteHero = "Narbash",
@@ -583,8 +582,9 @@ fun SearchScreenRecentSearchPreview() {
                     claimedPlayerDetails = PlayerDetails(
                         playerName = "heatcreep.tv",
                         region = "naeast",
+                        rank = 31,
+                        rankDetails = RankDetails.PARAGON,
                         mmr = "1379",
-                        rankTitle = "Silver III"
                     ),
                     claimedPlayerStats = PlayerStats(
                         favoriteHero = "Narbash",

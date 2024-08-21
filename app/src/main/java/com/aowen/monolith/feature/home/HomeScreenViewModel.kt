@@ -13,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -127,28 +126,26 @@ class HomeScreenViewModel @Inject constructor(
                     ))
                 }
             }
-            if (claimedUserResult.isSuccess && heroStatsResult.isSuccess) {
+            if (heroStatsResult.isSuccess) {
                 val topFiveHeroesByWinRate =
                     heroStatsResult.getOrNull()?.sortedBy { it.winRate }?.reversed()?.take(5)
                 val topFiveHeroesByPickRate =
                     heroStatsResult.getOrNull()?.sortedBy { it.pickRate }?.reversed()?.take(5)
 
-                val claimedPlayerIdFromPrefs =
-                    claimedPlayerPreferencesManager.claimedPlayerId.firstOrNull()
-                val claimedPlayerIdFromResult =
-                    claimedUserResult.getOrNull()?.playerDetails?.playerId
-                if (claimedPlayerIdFromPrefs.isNullOrEmpty() && claimedPlayerIdFromResult != null) {
-                    claimedPlayerPreferencesManager.saveClaimedPlayerId(claimedPlayerIdFromResult)
-                }
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        homeScreenError = emptyList(),
-                        claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
-                        claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
                         heroStats = heroStatsResult.getOrNull() ?: emptyList(),
                         topFiveHeroesByWinRate = topFiveHeroesByWinRate ?: emptyList(),
                         topFiveHeroesByPickRate = topFiveHeroesByPickRate ?: emptyList(),
+                    )
+                }
+            }
+            if(claimedUserResult.isSuccess) {
+                _uiState.update {
+                    it.copy(
+                        claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
+                        claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
                     )
                 }
             }

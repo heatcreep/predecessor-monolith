@@ -9,10 +9,7 @@ val fakeExistingPlayerSearchDto = PlayerSearchDto(
     playerId = UUID.fromString("addc8bb3-20ad-462a-a9f8-8b32bbf57515"),
     displayName = "displayName",
     rank = 123,
-    rankTitle = "Gold IV",
-    rankImage = "",
     mmr = 123.45f,
-    isRanked = true,
     region = "naeast"
 )
 
@@ -22,9 +19,6 @@ val fakeNewPlayerSearchDto = PlayerSearchDto(
     playerId = UUID.fromString("addc8bb3-20ad-462a-a9f8-8b32bbf5751a"),
     displayName = "displayName",
     rank = 123,
-    rankTitle = "Gold IV",
-    rankImage = "",
     mmr = 123.45f,
-    isRanked = true,
     region = "naeast"
 )
