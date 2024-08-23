@@ -61,5 +61,6 @@ enum class Hero(val heroName: String, val heroId: Int, val drawableId: Int) {
     TERRA("Terra", 54, R.drawable.terra),
     WRAITH("Wraith", 41, R.drawable.wraith),
     ZARUS("Zarus", 31, R.drawable.zarus),
+    ZINX("Zinx", 55, R.drawable.zinx),
     UNKNOWN("Unknown", 999, R.drawable.unknown),
 }
