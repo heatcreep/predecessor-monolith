@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.flowOf
 class FakeUserPreferencesManager : UserPreferencesManager {
     override val console = flowOf(Console.PC)
     override val accessToken: Flow<String?> = flowOf(null)
+    override val hasSkippedOnboarding: Flow<Boolean>
+        get() = TODO("Not yet implemented")
+
     override suspend fun saveConsole(console: Console) {
         // no-op
     }
@@ -17,6 +20,10 @@ class FakeUserPreferencesManager : UserPreferencesManager {
     }
 
     override suspend fun clearAccessToken() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setHasSkippedOnboarding(hasSkippedOnboarding: Boolean) {
         TODO("Not yet implemented")
     }
 }

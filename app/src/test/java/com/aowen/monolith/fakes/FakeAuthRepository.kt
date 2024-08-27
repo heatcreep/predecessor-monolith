@@ -2,8 +2,10 @@ package com.aowen.monolith.fakes
 
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.UserProfile
+import com.aowen.monolith.network.UserState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class FakeAuthRepository(
     private val hasGetPlayerError: Boolean = false,
@@ -19,7 +21,20 @@ class FakeAuthRepository(
         const val GetPlayerError = "Failed to get player"
     }
 
+    override val hasSkippedOnboardingFlow: Flow<Boolean>
+        get() = TODO("Not yet implemented")
+    override val userState: StateFlow<UserState>
+        get() = TODO("Not yet implemented")
+
+    override fun setUserState(userState: UserState) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun saveAccessTokenOnSuccessfulLogin() {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setSkippedOnboarding() {
         TODO("Not yet implemented")
     }
 

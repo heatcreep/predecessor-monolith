@@ -221,7 +221,7 @@ class UpdatePlayerStatsWorker @AssistedInject constructor(
             }
         }
 
-        val path = context.imageLoader.diskCache?.get(url)?.use { snapshot ->
+        val path = context.imageLoader.diskCache?.openSnapshot(url)?.use { snapshot ->
             val imageFile = snapshot.data.toFile()
 
             val contentUri = getUriForFile(
