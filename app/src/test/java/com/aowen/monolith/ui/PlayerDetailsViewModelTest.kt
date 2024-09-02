@@ -1,9 +1,12 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.create
+import com.aowen.monolith.fakes.AuthErrorScenario
 import com.aowen.monolith.fakes.FakeAuthRepository
 import com.aowen.monolith.fakes.FakeClaimedPlayerPreferencesManager
 import com.aowen.monolith.fakes.FakeUserRepository
@@ -21,7 +24,10 @@ import com.aowen.monolith.feature.home.playerdetails.PlayerErrors
 import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 import com.aowen.monolith.utils.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -39,7 +45,7 @@ class PlayerDetailsViewModelTest {
 
     private lateinit var viewModel: PlayerDetailsViewModel
 
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     .withZone(ZoneId.of("UTC"))
 
     @Before
@@ -59,9 +65,9 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set uiState to correct state`() {
+    fun `initViewModel() should set uiState to correct state`() = runTest {
         viewModel.initViewModel()
-
+        advanceUntilIdle()
         val expected = PlayerDetailsUiState(
             isLoading = false,
             player = fakePlayerDto.create(),
@@ -80,7 +86,7 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set UiState to error if playerId fails`() {
+    fun `initViewModel() should set UiState to error if playerId fails`() = runTest {
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -88,11 +94,12 @@ class PlayerDetailsViewModelTest {
                 )
             ),
             repository = FakeOmedaCityRepository(),
-            authRepository = FakeAuthRepository(hasGetPlayerError = true),
+            authRepository = FakeAuthRepository(errorScenario = AuthErrorScenario.NoPlayerFound),
             userRepository = FakeUserRepository(),
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
@@ -105,7 +112,7 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set UiState to error if player info fails`() {
+    fun `initViewModel() should set UiState to error if player info fails`() = runTest {
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -121,6 +128,7 @@ class PlayerDetailsViewModelTest {
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
@@ -134,7 +142,7 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set UiState to error if player hero stats fails`() {
+    fun `initViewModel() should set UiState to error if player hero stats fails`() = runTest {
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -150,6 +158,7 @@ class PlayerDetailsViewModelTest {
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
@@ -162,7 +171,7 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set UiState to error if matches fails`() {
+    fun `initViewModel() should set UiState to error if matches fails`() = runTest {
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -178,6 +187,7 @@ class PlayerDetailsViewModelTest {
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
@@ -190,7 +200,7 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set UiState to error if heroes fails`() {
+    fun `initViewModel() should set UiState to error if heroes fails`() = runTest {
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -206,6 +216,7 @@ class PlayerDetailsViewModelTest {
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
@@ -218,7 +229,7 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() sets proper values if all repo calls return null`() {
+    fun `initViewModel() sets proper values if all repo calls return null`() = runTest {
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -235,6 +246,7 @@ class PlayerDetailsViewModelTest {
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
@@ -252,7 +264,7 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `handleSavePlayer() should call setClaimedUser`() = runBlocking {
+    fun `handleSavePlayer() should call setClaimedUser`() = runTest {
         val fakeUserRepository = FakeUserRepository()
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
@@ -267,6 +279,7 @@ class PlayerDetailsViewModelTest {
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.handleSavePlayer()
+        advanceUntilIdle()
 
         val expected = ClaimedUser(
             playerStats = fakePlayerStatsDto.create(),
@@ -297,7 +310,7 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `handleSavePlayer() should not set isClaimed if get userInfo fails`() = runBlocking {
+    fun `handleSavePlayer() should not set isClaimed if get userInfo fails`() = runTest {
         val fakeUserRepository = FakeUserRepository()
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
@@ -308,18 +321,19 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(
-                hasHandleSavePlayerError = true
+                errorScenario = AuthErrorScenario.SavePlayerError
             ),
             userRepository = fakeUserRepository,
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.handleSavePlayer()
+        advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.isClaimed)
     }
 
     @Test
-    fun `handleSavePlayer() should clear claimedUser if isRemoving is true`() = runBlocking {
+    fun `handleSavePlayer() should clear claimedUser if isRemoving is true`() = runTest {
         val fakeUserRepository = FakeUserRepository()
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
@@ -334,6 +348,7 @@ class PlayerDetailsViewModelTest {
             claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
         )
         viewModel.handleSavePlayer(isRemoving = true)
+        advanceUntilIdle()
 
         val expected = ClaimedUser(null, null)
         val actual = fakeUserRepository.claimedUser.value
@@ -405,9 +420,9 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `handlePlayerHeroStatsSelect() should update state if heroId matches a heroId in heroStats`() {
+    fun `handlePlayerHeroStatsSelect() should update state if heroId matches a heroId in heroStats`() = runTest {
         viewModel.initViewModel()
-
+        advanceUntilIdle()
         viewModel.handlePlayerHeroStatsSelect(1)
 
         val expected = fakePlayerHeroStatsDto.create()

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.create
@@ -13,6 +15,8 @@ import com.aowen.monolith.feature.home.HomeScreenUiState
 import com.aowen.monolith.feature.home.HomeScreenViewModel
 import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.utils.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -53,6 +57,7 @@ class HomeScreenViewModelTest {
 
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val expected = HomeScreenUiState(
             isLoading = false,
             heroStats = fakeHeroStatisticsResult,
@@ -79,6 +84,7 @@ class HomeScreenViewModelTest {
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
 
         )
+        advanceUntilIdle()
         val expected = HomeScreenUiState(
             isLoading = false,
             homeScreenError = listOf(
@@ -96,7 +102,7 @@ class HomeScreenViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set top five heroes by win rate`() {
+    fun `initViewModel() should set top five heroes by win rate`() = runTest {
 
         viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
@@ -107,6 +113,7 @@ class HomeScreenViewModelTest {
 
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val expected = HomeScreenUiState(
             isLoading = false,
             heroStats = fakeHeroStatisticsResult,

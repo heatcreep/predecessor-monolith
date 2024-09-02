@@ -1,7 +1,12 @@
 package com.aowen.monolith.network
 
-import kotlinx.coroutines.delay
+import com.aowen.monolith.logDebug
+import io.github.jan.supabase.gotrue.SessionStatus
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
@@ -12,11 +17,19 @@ data class UserProfile(
     val playerId: String? = null
 )
 
+abstract class UserState {
+    object Loading: UserState()
+    object Unauthenticated : UserState()
+    object Authenticated : UserState()
+}
+
 interface AuthRepository {
 
     val accessTokenFlow: Flow<String?>
 
-    suspend fun saveAccessTokenOnSuccessfulLogin()
+    val userState: StateFlow<UserState>
+
+    suspend fun handleSuccessfulLoginFromDiscord()
 
     suspend fun signInWithDiscord(): Result<Unit?>
 
@@ -24,7 +37,7 @@ interface AuthRepository {
     suspend fun handleSavePlayer(playerId: String): Result<Unit>
 
     suspend fun deleteUserAccount(userId: String): Result<String>
-    suspend fun refreshCurrentSessionOnLogin(accessToken: String)
+    suspend fun getCurrentSessionStatus()
 }
 
 
@@ -34,18 +47,32 @@ class AuthRepositoryImpl @Inject constructor(
     private val userPreferencesManager: UserPreferencesManager
 ) : AuthRepository {
 
+    private val _userState = MutableStateFlow<UserState>(UserState.Loading)
+    override val userState: StateFlow<UserState> = _userState
+
     override val accessTokenFlow: Flow<String?> = userPreferencesManager.accessToken
 
-    override suspend fun saveAccessTokenOnSuccessfulLogin() {
-        val accessToken = authService.currentAccessToken()
-        accessToken?.let {
-            userPreferencesManager.saveAccessToken(it)
-        }
+    override suspend fun handleSuccessfulLoginFromDiscord() {
+        _userState.update { UserState.Authenticated }
     }
 
-    override suspend fun refreshCurrentSessionOnLogin(accessToken: String) {
-        authService.getUser(accessToken)
-        authService.refreshCurrentSession()
+    override suspend fun getCurrentSessionStatus() {
+        try {
+            val sessionStatus = authService.awaitAuthService()
+            sessionStatus.collect { status ->
+                logDebug("Session status: $status", "AuthViewModel")
+                when (status) {
+                    is SessionStatus.LoadingFromStorage -> _userState.update { UserState.Loading }
+                    is SessionStatus.Authenticated -> _userState.update { UserState.Authenticated }
+                    is SessionStatus.NotAuthenticated -> _userState.update { UserState.Unauthenticated }
+                    else -> {
+                        throw Exception("Network error")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     override suspend fun signInWithDiscord(): Result<Unit?> {
@@ -60,12 +87,8 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun getPlayer(): Result<UserProfile?> {
         return try {
-            var session = authService.currentSession()
-            var retryCount = 3
-            while (session == null && retryCount > 0) {
-                delay(500)
-                session = authService.currentSession()
-                retryCount--
+            val session = withTimeoutOrNull(1000) {
+                authService.currentSession()
             }
             session?.let {
                 if (it.user?.id != null) {
@@ -93,7 +116,7 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun deleteUserAccount(userId: String): Result<String> {
         val response = authService.deleteUserAccount(userId = userId)
-        return if(response.isSuccessful) {
+        return if (response.isSuccessful) {
             Result.success("Your account has been deleted.")
         } else {
             Result.failure(Exception("Error ${response.code()}: ${response.message()}"))

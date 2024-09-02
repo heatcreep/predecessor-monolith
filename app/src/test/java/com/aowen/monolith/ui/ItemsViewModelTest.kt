@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.create
@@ -9,6 +11,8 @@ import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.items.ItemsUiState
 import com.aowen.monolith.feature.items.ItemsViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -60,6 +64,7 @@ class ItemsViewModelTest {
                 hasItemDetailsErrors = true
             )
         )
+        advanceUntilIdle()
 
         // Then
         val expected = ItemsUiState(

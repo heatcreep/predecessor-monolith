@@ -1,10 +1,13 @@
 package com.aowen.monolith.fakes
 
 import com.aowen.monolith.network.SupabaseAuthService
-import io.github.jan.supabase.gotrue.user.AppMetadata
+import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
@@ -21,9 +24,11 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
             tokenType = "fakeTokenType",
             user = UserInfo(
                 id = "fakeId",
-                appMetadata = AppMetadata(
-                    provider = "fakeProvider",
-                    providers = listOf("fakeRole")
+                appMetadata = JsonObject(
+                    mapOf(
+                        "provider" to JsonPrimitive("fakeProvider"),
+                        "roles" to JsonPrimitive("fakeRoles"),
+                    )
                 ),
                 aud = "fakeAud",
                 email = "fakeEmail",
@@ -42,6 +47,10 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
         }
     }
 
+    override suspend fun awaitAuthService(): StateFlow<SessionStatus> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun currentAccessToken(): String? {
         TODO("Not yet implemented")
     }
@@ -53,7 +62,7 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
         }
     }
 
-    override suspend fun logout() {
+    override suspend fun signOut() {
         TODO("Not yet implemented")
     }
 

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
@@ -13,6 +15,8 @@ import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsError
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsUiState
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -51,6 +55,7 @@ class HeroDetailsViewModelTest {
     @Test
     fun `calling initViewModel() should update uiState with hero statistics and first five builds`() = runTest {
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val actualConsole = viewModel.console.value
         val expected = HeroDetailsUiState(
@@ -82,6 +87,7 @@ class HeroDetailsViewModelTest {
         )
 
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = HeroDetailsUiState(
             isLoading = false,
@@ -111,6 +117,7 @@ class HeroDetailsViewModelTest {
         )
 
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = HeroDetailsUiState(
             isLoading = false,
@@ -140,6 +147,7 @@ class HeroDetailsViewModelTest {
         )
 
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = HeroDetailsUiState(
             isLoading = false,

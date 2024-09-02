@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.Console
+import com.aowen.monolith.fakes.AuthErrorScenario
 import com.aowen.monolith.fakes.FakeAuthRepository
 import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.FakeUserRepository
@@ -12,6 +15,7 @@ import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -36,7 +40,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `when initViewModel is called, then uiState is updated with userInfo`() {
+    fun `when initViewModel is called, then uiState is updated with userInfo`() = runTest {
 
         val expected = ProfileScreenUiState(
             isLoading = false,
@@ -44,19 +48,23 @@ class ProfileViewModelTest {
             userInfo = fakeUserInfo,
             console = Console.PC
         )
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
+
 
         assertEquals(expected, actual)
     }
 
     @Test
-    fun `when initViewModel is called, then uiState is error when getUser returns null`() {
+    fun `when initViewModel is called, then uiState is error when getUser returns null`() = runTest {
 
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = FakeUserRepository(error = true),
             authRepository = FakeAuthRepository()
         )
+
+        advanceUntilIdle()
 
         val expected = ProfileScreenUiState(
             isLoading = false,
@@ -69,17 +77,18 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `handleLogout() calls userRepository logout`() {
+    fun `handleLogout() calls userRepository logout`() = runTest {
         val userRepository = FakeUserRepository()
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,
             authRepository = FakeAuthRepository()
         )
-
+        advanceUntilIdle()
         assertTrue(userRepository.logoutCounter.value == 0)
 
         viewModel.handleLogout()
+        advanceUntilIdle()
 
         val expected = 1
         val actual = userRepository.logoutCounter.value
@@ -100,13 +109,14 @@ class ProfileViewModelTest {
         }
 
         viewModel.handleLogout()
+        advanceUntilIdle()
         job.cancel()
 
         assertEquals(expected, actual)
     }
 
     @Test
-    fun `deleteUserAccount() calls userRepository logout`() {
+    fun `deleteUserAccount() calls userRepository logout`() = runTest {
         val userRepository = FakeUserRepository()
         val authRepository = FakeAuthRepository()
         viewModel = ProfileViewModel(
@@ -115,9 +125,13 @@ class ProfileViewModelTest {
             authRepository = authRepository
         )
 
+        advanceUntilIdle()
+
         assertTrue(userRepository.logoutCounter.value == 0)
 
         viewModel.deleteUserAccount()
+
+        advanceUntilIdle()
 
         val expected = 1
         val actual = userRepository.logoutCounter.value
@@ -126,7 +140,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `deleteUserAccount() calls authRepository deleteUserAccount`() {
+    fun `deleteUserAccount() calls authRepository deleteUserAccount`() = runTest {
         val userRepository = FakeUserRepository()
         val authRepository = FakeAuthRepository()
         viewModel = ProfileViewModel(
@@ -138,6 +152,8 @@ class ProfileViewModelTest {
         assertTrue(authRepository.deleteUserAccountCounter.value == 0)
 
         viewModel.deleteUserAccount()
+
+        advanceUntilIdle()
 
         val expected = 1
         val actual = authRepository.deleteUserAccountCounter.value
@@ -159,6 +175,8 @@ class ProfileViewModelTest {
         }
 
         viewModel.deleteUserAccount()
+
+        advanceUntilIdle()
         job.cancel()
 
         assertEquals(expected, actual)
@@ -186,6 +204,8 @@ class ProfileViewModelTest {
         }
 
         viewModel.deleteUserAccount()
+
+        advanceUntilIdle()
         job.cancel()
 
         assertEquals(expected, actual)
@@ -201,18 +221,22 @@ class ProfileViewModelTest {
         val actual = mutableListOf<ProfileToastState>()
 
         val userRepository = FakeUserRepository()
-        val authRepository = FakeAuthRepository(hasDeleteUserAccountError = true)
+        val authRepository = FakeAuthRepository(errorScenario = AuthErrorScenario.DeleteUserAccountError)
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,
             authRepository = authRepository
         )
 
+        advanceUntilIdle()
+
         val job = launch(UnconfinedTestDispatcher()) {
             viewModel.showProfileToast.collect { state -> actual.add(state) }
         }
 
         viewModel.deleteUserAccount()
+
+        advanceUntilIdle()
         job.cancel()
 
         assertEquals(expected, actual)

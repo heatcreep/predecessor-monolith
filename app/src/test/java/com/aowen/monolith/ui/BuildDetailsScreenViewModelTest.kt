@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
@@ -16,6 +18,8 @@ import com.aowen.monolith.feature.builds.builddetails.BuildDetailsScreenViewMode
 import com.aowen.monolith.feature.builds.builddetails.BuildDetailsUiState
 import com.aowen.monolith.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -59,6 +63,7 @@ class BuildDetailsScreenViewModelTest {
             userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = BuildDetailsUiState(
             isLoading = false,
@@ -87,6 +92,7 @@ class BuildDetailsScreenViewModelTest {
             userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = BuildDetailsUiState(
             isLoading = false,
@@ -111,6 +117,7 @@ class BuildDetailsScreenViewModelTest {
             userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = BuildDetailsUiState(
             isLoading = false,
@@ -137,6 +144,7 @@ class BuildDetailsScreenViewModelTest {
             userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = BuildDetailsUiState(
             isLoading = false,
@@ -166,6 +174,7 @@ class BuildDetailsScreenViewModelTest {
             userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = BuildDetailsUiState(
             isLoading = false,
@@ -176,7 +185,7 @@ class BuildDetailsScreenViewModelTest {
     }
 
     @Test
-    fun `onItemClicked should update uiState with the selected item`() {
+    fun `onItemClicked should update uiState with the selected item`() = runTest {
         viewModel = BuildDetailsScreenViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -188,6 +197,7 @@ class BuildDetailsScreenViewModelTest {
             userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         viewModel.onItemClicked(1)
         val actual = viewModel.uiState.value
         val expected = BuildDetailsUiState(

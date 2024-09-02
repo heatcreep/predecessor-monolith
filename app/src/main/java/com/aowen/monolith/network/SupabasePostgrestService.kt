@@ -59,7 +59,9 @@ class SupabasePostgrestServiceImpl @Inject constructor(
         return try {
             postgrest.from(TABLE_PROFILES)
                 .select(columns = Columns.raw("player_id")) {
-                    eq("id", userId)
+                    filter {
+                        eq("id", userId)
+                    }
                 }.decodeList<UserProfile>().firstOrNull()
         } catch (e: HttpRequestTimeoutException) {
             logDebug("$e : the error")
@@ -72,7 +74,9 @@ class SupabasePostgrestServiceImpl @Inject constructor(
             postgrest[TABLE_PROFILES].update({
                 set("player_id", playerId)
             }) {
-                eq("id", userId)
+                filter {
+                    eq("id", userId)
+                }
             }
         } catch (e: RestException) {
             logDebug(e.localizedMessage ?: "Error saving player")
@@ -92,7 +96,9 @@ class SupabasePostgrestServiceImpl @Inject constructor(
                         "player_id"
                     )
                 ) {
-                    eq("email", email)
+                    filter {
+                        eq("email", email)
+                    }
                 }.decodeList<UserInfo>().firstOrNull()
         } catch (e: HttpRequestTimeoutException) {
             logDebug("$e : the error2")
@@ -103,7 +109,9 @@ class SupabasePostgrestServiceImpl @Inject constructor(
     override suspend fun fetchRecentSearches(id: UUID): List<PlayerSearchDto> {
 
         return postgrest[TABLE_RECENT_PROFILES].select {
-            eq(TABLE_ID, id)
+            filter {
+                eq(TABLE_ID, id)
+            }
             order(TABLE_CREATED_AT, Order.DESCENDING)
         }.decodeList()
     }
@@ -111,7 +119,9 @@ class SupabasePostgrestServiceImpl @Inject constructor(
     override suspend fun deleteAllRecentSearches(userId: UUID) {
         try {
             postgrest[TABLE_RECENT_PROFILES].delete {
-                eq(TABLE_ID, userId)
+                filter {
+                    eq(TABLE_ID, userId)
+                }
             }
         } catch (e: Exception) {
             logDebug(e.localizedMessage ?: "Error deleting all recent searches")
@@ -120,8 +130,10 @@ class SupabasePostgrestServiceImpl @Inject constructor(
 
     override suspend fun deleteRecentSearch(userId: UUID, recentPlayerId: UUID) {
         postgrest[TABLE_RECENT_PROFILES].delete {
-            eq(TABLE_ID, userId)
-            eq(TABLE_PLAYER_ID, recentPlayerId)
+            filter {
+                eq(TABLE_ID, userId)
+                eq(TABLE_PLAYER_ID, recentPlayerId)
+            }
         }
     }
 
@@ -139,14 +151,18 @@ class SupabasePostgrestServiceImpl @Inject constructor(
             set(COLUMN_RANK, playerSearchDto.rank)
             set(COLUMN_MMR, playerSearchDto.mmr)
         }) {
-            eq(TABLE_ID, userId)
-            eq(TABLE_PLAYER_ID, recentPlayerId)
+            filter {
+                eq(TABLE_ID, userId)
+                eq(TABLE_PLAYER_ID, recentPlayerId)
+            }
         }
     }
 
     override suspend fun fetchFavoriteBuilds(userId: UUID): List<FavoriteBuildDto> {
         return postgrest[TABLE_FAVORITE_BUILDS].select {
-            eq(TABLE_USER_ID, userId)
+            filter {
+                eq(TABLE_USER_ID, userId)
+            }
             order(TABLE_CREATED_AT, Order.DESCENDING)
         }.decodeList()
     }
@@ -157,8 +173,10 @@ class SupabasePostgrestServiceImpl @Inject constructor(
 
     override suspend fun deleteFavoriteBuild(userId: UUID, buildId: Int) {
         postgrest[TABLE_FAVORITE_BUILDS].delete {
-            eq(TABLE_USER_ID, userId)
-            eq(TABLE_BUILD_ID, buildId)
+            filter {
+                eq(TABLE_USER_ID, userId)
+                eq(TABLE_BUILD_ID, buildId)
+            }
         }
     }
 

@@ -4,13 +4,15 @@ import com.aowen.monolith.BuildConfig
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.functions.Functions
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.providers.Discord
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import okhttp3.ResponseBody
@@ -19,21 +21,22 @@ import retrofit2.Response
 import javax.inject.Inject
 
 interface SupabaseAuthService {
+    suspend fun awaitAuthService(): StateFlow<SessionStatus>
     suspend fun currentAccessToken(): String?
     suspend fun currentSession(): UserSession?
     suspend fun deleteUserAccount(userId: String): Response<ResponseBody>
     suspend fun getUser(token: String): UserInfo?
     suspend fun loginWithDiscord(): Response<Unit>
-    suspend fun logout()
+    suspend fun signOut()
     suspend fun refreshCurrentSession()
 }
 class SupabaseAuthServiceImpl @Inject constructor(
-    private val goTrue: GoTrue,
+    private val auth: Auth,
     private val functions: Functions
 ) : SupabaseAuthService {
     override suspend fun loginWithDiscord(): Response<Unit> {
         return try {
-            Response.success(goTrue.loginWith(Discord))
+            Response.success(auth.signInWith(Discord))
         } catch (e: RestException) {
             Response.error(400, "Bad Request".toResponseBody(null))
         } catch (ioException: HttpRequestTimeoutException) {
@@ -43,22 +46,27 @@ class SupabaseAuthServiceImpl @Inject constructor(
         }
     }
 
+    override suspend fun awaitAuthService(): StateFlow<SessionStatus> {
+        auth.awaitInitialization()
+        return auth.sessionStatus
+    }
+
     override suspend fun getUser(token: String): UserInfo {
-        return goTrue.retrieveUser(token)
+        return auth.retrieveUser(token)
     }
 
     override suspend fun refreshCurrentSession() {
-        goTrue.refreshCurrentSession()
+        auth.refreshCurrentSession()
     }
 
     override suspend fun currentSession(): UserSession? =
-        goTrue.currentSessionOrNull()
+        auth.currentSessionOrNull()
 
     override suspend fun currentAccessToken(): String? =
-        goTrue.currentAccessTokenOrNull()
+        auth.currentAccessTokenOrNull()
 
-    override suspend fun logout() {
-        goTrue.logout()
+    override suspend fun signOut() {
+        auth.signOut()
     }
 
 

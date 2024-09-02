@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
@@ -12,6 +14,9 @@ import com.aowen.monolith.feature.matches.MatchDetailsErrors
 import com.aowen.monolith.feature.matches.MatchDetailsUiState
 import com.aowen.monolith.feature.matches.MatchDetailsViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -25,7 +30,7 @@ class MatchDetailsViewModelTest {
     private lateinit var viewModel: MatchDetailsViewModel
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -36,11 +41,13 @@ class MatchDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository()
         )
+        advanceUntilIdle()
     }
 
     @Test
-    fun `initViewModel() should set uiState to correct state`() {
+    fun `initViewModel() should set uiState to correct state`() = runTest {
         viewModel.initViewModel()
+        advanceUntilIdle()
 
         val expected = MatchDetailsUiState(
             isLoading = false,
@@ -53,7 +60,7 @@ class MatchDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set empty constructors if match and items are null`() {
+    fun `initViewModel() should set empty constructors if match and items are null`() = runTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -67,6 +74,7 @@ class MatchDetailsViewModelTest {
             )
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
 
         val expected = MatchDetailsUiState(
             isLoading = false,
@@ -79,7 +87,7 @@ class MatchDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set uiState to correct state when matchDetails has errors`() {
+    fun `initViewModel() should set uiState to correct state when matchDetails has errors`() = runTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -91,7 +99,7 @@ class MatchDetailsViewModelTest {
             repository = FakeOmedaCityRepository(hasMatchDetailsError = true)
         )
         viewModel.initViewModel()
-
+        advanceUntilIdle()
         val expected = MatchDetailsUiState(
             isLoading = false,
             matchDetailsErrors = MatchDetailsErrors(
@@ -103,7 +111,7 @@ class MatchDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set uiState to correct state when items has errors`() {
+    fun `initViewModel() should set uiState to correct state when items has errors`() = runTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -116,7 +124,7 @@ class MatchDetailsViewModelTest {
             )
         )
         viewModel.initViewModel()
-
+        advanceUntilIdle()
         val expected = MatchDetailsUiState(
             isLoading = false,
             match = MatchDetails(),
@@ -139,25 +147,27 @@ class MatchDetailsViewModelTest {
     }
 
     @Test
-    fun `getCreepScorePerMinute() should return correct value`() {
+    fun `getCreepScorePerMinute() should return correct value`() = runTest {
         val expected = "0.4"
         val actual = viewModel.getCreepScorePerMinute(25)
+        advanceUntilIdle()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun `getGoldEarnedPerMinute() should return correct value`() {
+    fun `getGoldEarnedPerMinute() should return correct value`() = runTest {
         val expected = "0.4"
         val actual = viewModel.getGoldEarnedPerMinute(25)
+        advanceUntilIdle()
         assertEquals(expected, actual)
     }
 
     @Test
-    fun `onTeamSelected() should set uiState to correct state when duskTeamSelected is false`() {
+    fun `onTeamSelected() should set uiState to correct state when duskTeamSelected is false`() = runTest {
         viewModel.onTeamSelected(
             duskTeamSelected = false
         )
-
+        advanceUntilIdle()
         val actual = viewModel.uiState.value.selectedTeam
         assertEquals(fakeDawnTeam, actual)
     }

@@ -33,8 +33,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.functions.functions
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.ktor.client.HttpClient
@@ -95,7 +95,7 @@ object AppModule {
         ) {
             httpEngine = httpClient.engine
             install(Postgrest)
-            install(GoTrue) {
+            install(Auth) {
                 scheme = "monolith"
                 host = "login"
             }
@@ -112,8 +112,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSupabaseGoTrue(client: SupabaseClient): GoTrue {
-        return client.gotrue
+    fun provideSupabaseAuth(client: SupabaseClient): Auth {
+        return client.auth
     }
 
     @Provides
@@ -124,8 +124,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSupabaseAuthService(goTrue: GoTrue, functions: Functions): SupabaseAuthService {
-        return SupabaseAuthServiceImpl(goTrue, functions)
+    fun provideSupabaseAuthService(auth: Auth, functions: Functions): SupabaseAuthService {
+        return SupabaseAuthServiceImpl(auth, functions)
     }
 
     @Provides

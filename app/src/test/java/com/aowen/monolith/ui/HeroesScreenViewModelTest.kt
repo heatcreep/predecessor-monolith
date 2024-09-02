@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.HeroRole
@@ -8,6 +10,8 @@ import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.heroes.HeroesScreenUiState
 import com.aowen.monolith.feature.heroes.HeroesScreenViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -67,6 +71,7 @@ class HeroesScreenViewModelTest {
             repository = FakeOmedaCityRepository()
         )
         viewModel.updateRoleOption(HeroRole.Carry, true)
+        advanceUntilIdle()
         viewModel.getFilteredHeroes()
 
         val expected = listOf(fakeHeroDto2.create())
@@ -82,8 +87,8 @@ class HeroesScreenViewModelTest {
         )
         viewModel.updateRoleOption(HeroRole.Carry, true)
         viewModel.setSearchValue("test")
+        advanceUntilIdle()
         viewModel.getFilteredHeroes()
-
         val expected = listOf(fakeHeroDto2.create())
         val actual = viewModel.uiState.value.currentHeroes
 
@@ -99,6 +104,7 @@ class HeroesScreenViewModelTest {
         )
 
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = HeroesScreenUiState(
             isLoading = false,
@@ -114,6 +120,7 @@ class HeroesScreenViewModelTest {
         )
 
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = HeroesScreenUiState(
             isLoading = false,

@@ -26,13 +26,16 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.R
 import com.aowen.monolith.feature.home.navigation.navigateToHome
 import com.aowen.monolith.logDebug
+import com.aowen.monolith.network.UserState
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.WarmWhite
 
@@ -40,23 +43,28 @@ import com.aowen.monolith.ui.theme.WarmWhite
 internal fun LoginRoute(
     navController: NavController,
     modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
 
     val uiState by viewModel.uiState.collectAsState(LoginUiState())
+    val userState = viewModel.userState.collectAsState().value
 
     LaunchedEffect(Unit) {
         viewModel.initViewModel()
     }
 
-    LaunchedEffect(uiState) {
-        val userState = uiState.userState
-        if(userState is UserState.Authenticated) {
-            navController.navigateToHome()
-            logDebug("User can sign in with access token: ${userState.accessToken}", "LoginScreen")
-
-        } else {
-            logDebug("User is not signed in", "LoginScreen")
+    LaunchedEffect(userState) {
+        when(userState) {
+            UserState.Loading -> {
+                logDebug("Loading user state", "LoginScreen")
+            }
+            UserState.Authenticated -> {
+                navController.navigateToHome()
+            }
+            UserState.Unauthenticated -> {
+                logDebug("User is not signed in", "LoginScreen")
+                viewModel.setLoading(false)
+            }
         }
     }
 
@@ -89,7 +97,9 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
         } else {
             Column(
@@ -108,6 +118,15 @@ fun LoginScreen(
                 SignInDiscordButton(
                     submitLogin = submitLogin
                 )
+                uiState.errorMessage?.let { errorMessage ->
+                    Spacer(modifier = Modifier.size(16.dp))
+                    Text(
+                        text = errorMessage,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
         Column(
@@ -120,7 +139,7 @@ fun LoginScreen(
             Text(
                 text = "Powered by Omeda.city",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary
+                color = MaterialTheme.colorScheme.secondary,
             )
         }
     }
@@ -161,12 +180,15 @@ fun SignInDiscordButton(
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-fun LoginScreenPreview() {
+fun LoginScreenPreview(
+    @PreviewParameter(LoginScreenPreviewParameterProvider::class) previewState: LoginUiState
+) {
     MonolithTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
         ) {
-            LoginScreen(uiState = LoginUiState())
+            LoginScreen(uiState = previewState)
         }
     }
 }
+

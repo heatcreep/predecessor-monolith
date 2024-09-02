@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
             onSessionSuccess = { userSession ->
                 userSession.user?.apply {
                     lifecycleScope.launch {
-                        authRepository.saveAccessTokenOnSuccessfulLogin()
+                        authRepository.handleSuccessfulLoginFromDiscord()
                     }
                 }
             }

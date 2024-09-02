@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.PlayerDetails
@@ -16,6 +18,8 @@ import com.aowen.monolith.fakes.repo.ResponseType
 import com.aowen.monolith.feature.search.SearchScreenUiState
 import com.aowen.monolith.feature.search.SearchScreenViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -35,6 +39,7 @@ class SearchScreenViewModelTest {
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = SearchScreenUiState(
             isLoading = false,
@@ -65,6 +70,7 @@ class SearchScreenViewModelTest {
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = SearchScreenUiState(
             isLoading = false,
@@ -90,6 +96,7 @@ class SearchScreenViewModelTest {
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = SearchScreenUiState(
             isLoading = false,
@@ -114,6 +121,7 @@ class SearchScreenViewModelTest {
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = SearchScreenUiState(
             isLoading = false,
@@ -141,6 +149,7 @@ class SearchScreenViewModelTest {
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.initViewModel()
+        advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = SearchScreenUiState(
             isLoading = false,
@@ -186,12 +195,14 @@ class SearchScreenViewModelTest {
     }
 
     @Test
-    fun `handleClearSingleRecentSearch updates state properly`() {
+    fun `handleClearSingleRecentSearch updates state properly`() = runTest {
         viewModel = SearchScreenViewModel(
             omedaCityRepository = FakeOmedaCityRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
+        advanceUntilIdle()
         viewModel.handleClearSingleRecentSearch(fakePlayerDetails.playerId)
+        advanceUntilIdle()
         val actual = viewModel.uiState.value.recentSearchesList
         val expected = listOf(fakePlayerDetails2)
         assertEquals(expected, actual)
@@ -210,12 +221,13 @@ class SearchScreenViewModelTest {
     }
 
     @Test
-    fun `handleAddToRecentSearch updates state properly`() {
+    fun `handleAddToRecentSearch updates state properly`() = runTest {
         viewModel = SearchScreenViewModel(
             omedaCityRepository = FakeOmedaCityRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.handleAddToRecentSearch(fakePlayerDetails)
+        advanceUntilIdle()
         val actual = viewModel.uiState.value.recentSearchesList
         val expected = listOf(fakePlayerDetails, fakePlayerDetails2, fakePlayerDetails)
         assertEquals(expected, actual)

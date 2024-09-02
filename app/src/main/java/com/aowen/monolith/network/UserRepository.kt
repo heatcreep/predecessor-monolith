@@ -116,6 +116,6 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun logout() {
         userPreferencesManager.clearAccessToken()
-        authService.logout()
+        authService.signOut()
     }
 }
