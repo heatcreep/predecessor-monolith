@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.7.5 - Latest
+
+#### Improvements & Bug Fixes
+
+- Fixes Auth Flow signing peoplem out and crashing the app
+
 ## 1.7.0 - Latest
 
 - Adds image for Terra
