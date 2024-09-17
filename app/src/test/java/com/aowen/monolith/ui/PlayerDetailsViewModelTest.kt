@@ -6,10 +6,9 @@ import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.create
-import com.aowen.monolith.fakes.AuthErrorScenario
+import com.aowen.monolith.fakes.AuthScenario
 import com.aowen.monolith.fakes.FakeAuthRepository
-import com.aowen.monolith.fakes.FakeClaimedPlayerPreferencesManager
-import com.aowen.monolith.fakes.FakeUserRepository
+import com.aowen.monolith.fakes.FakeUserClaimedPlayerRepository
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroDto2
 import com.aowen.monolith.fakes.data.fakeMatchDto
@@ -21,7 +20,6 @@ import com.aowen.monolith.fakes.repo.ResponseType
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsUiState
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsViewModel
 import com.aowen.monolith.feature.home.playerdetails.PlayerErrors
-import com.aowen.monolith.network.ClaimedUser
 import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,7 +44,7 @@ class PlayerDetailsViewModelTest {
     private lateinit var viewModel: PlayerDetailsViewModel
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    .withZone(ZoneId.of("UTC"))
+        .withZone(ZoneId.of("UTC"))
 
     @Before
     fun setup() {
@@ -59,8 +57,7 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository(),
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
     }
 
@@ -94,9 +91,8 @@ class PlayerDetailsViewModelTest {
                 )
             ),
             repository = FakeOmedaCityRepository(),
-            authRepository = FakeAuthRepository(errorScenario = AuthErrorScenario.NoPlayerFound),
-            userRepository = FakeUserRepository(),
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            authRepository = FakeAuthRepository(errorScenario = AuthScenario.NoPlayerFound),
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -124,8 +120,7 @@ class PlayerDetailsViewModelTest {
                 hasPlayerInfoError = true
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository(),
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -154,8 +149,7 @@ class PlayerDetailsViewModelTest {
                 hasPlayerHeroStatsError = true
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository(),
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -183,8 +177,7 @@ class PlayerDetailsViewModelTest {
                 hasMatchDetailsError = true
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository(),
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -212,8 +205,7 @@ class PlayerDetailsViewModelTest {
                 hasHeroDetailsErrors = true
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository(),
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -242,8 +234,7 @@ class PlayerDetailsViewModelTest {
                 heroDetailsResponse = ResponseType.Empty
             ),
             authRepository = FakeAuthRepository(),
-            userRepository = FakeUserRepository(),
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -265,7 +256,7 @@ class PlayerDetailsViewModelTest {
 
     @Test
     fun `handleSavePlayer() should call setClaimedUser`() = runTest {
-        val fakeUserRepository = FakeUserRepository()
+        val fakeUserClaimedPlayerRepository = FakeUserClaimedPlayerRepository()
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -275,23 +266,17 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
-            userRepository = fakeUserRepository,
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = fakeUserClaimedPlayerRepository,
         )
         viewModel.handleSavePlayer()
         advanceUntilIdle()
 
-        val expected = ClaimedUser(
-            playerStats = fakePlayerStatsDto.create(),
-            playerDetails = fakePlayerDto.create()
-        )
-        val actual = fakeUserRepository.claimedUser.value
-        assertEquals(expected, actual)
+
+        assertTrue(fakeUserClaimedPlayerRepository.setClaimedPlayerCounter.value == 1)
     }
 
     @Test
     fun `handleSavePlayer() should call isClaimed to opposite current value`() = runBlocking {
-        val fakeUserRepository = FakeUserRepository()
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -301,8 +286,7 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
-            userRepository = fakeUserRepository,
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
         viewModel.handleSavePlayer()
 
@@ -311,7 +295,6 @@ class PlayerDetailsViewModelTest {
 
     @Test
     fun `handleSavePlayer() should not set isClaimed if get userInfo fails`() = runTest {
-        val fakeUserRepository = FakeUserRepository()
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -321,38 +304,14 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(
-                errorScenario = AuthErrorScenario.SavePlayerError
+                errorScenario = AuthScenario.SavePlayerError
             ),
-            userRepository = fakeUserRepository,
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
+            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
         )
         viewModel.handleSavePlayer()
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.isClaimed)
-    }
-
-    @Test
-    fun `handleSavePlayer() should clear claimedUser if isRemoving is true`() = runTest {
-        val fakeUserRepository = FakeUserRepository()
-        viewModel = PlayerDetailsViewModel(
-            savedStateHandle = SavedStateHandle(
-                mapOf(
-                    "playerId" to "validPlayerId"
-                )
-
-            ),
-            repository = FakeOmedaCityRepository(),
-            authRepository = FakeAuthRepository(),
-            userRepository = fakeUserRepository,
-            claimedPlayerPreferencesManager = FakeClaimedPlayerPreferencesManager()
-        )
-        viewModel.handleSavePlayer(isRemoving = true)
-        advanceUntilIdle()
-
-        val expected = ClaimedUser(null, null)
-        val actual = fakeUserRepository.claimedUser.value
-        assertEquals(expected, actual)
     }
 
     @Test
@@ -420,13 +379,14 @@ class PlayerDetailsViewModelTest {
     }
 
     @Test
-    fun `handlePlayerHeroStatsSelect() should update state if heroId matches a heroId in heroStats`() = runTest {
-        viewModel.initViewModel()
-        advanceUntilIdle()
-        viewModel.handlePlayerHeroStatsSelect(1)
+    fun `handlePlayerHeroStatsSelect() should update state if heroId matches a heroId in heroStats`() =
+        runTest {
+            viewModel.initViewModel()
+            advanceUntilIdle()
+            viewModel.handlePlayerHeroStatsSelect(1)
 
-        val expected = fakePlayerHeroStatsDto.create()
-        val actual = viewModel.uiState.value.selectedHeroStats
-        assertEquals(expected, actual)
-    }
+            val expected = fakePlayerHeroStatsDto.create()
+            val actual = viewModel.uiState.value.selectedHeroStats
+            assertEquals(expected, actual)
+        }
 }

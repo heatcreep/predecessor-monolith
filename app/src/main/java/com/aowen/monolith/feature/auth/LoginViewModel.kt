@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
+import com.aowen.monolith.network.UserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,6 +19,7 @@ data class LoginUiState(
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepo: AuthRepository,
+    private val userPreferencesManager: UserPreferencesManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -30,7 +32,12 @@ class LoginViewModel @Inject constructor(
             try {
                 authRepo.getCurrentSessionStatus()
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "There was an issue signing you in. Please try again.") }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "There was an issue signing you in. Please try again."
+                    )
+                }
             }
 
         }
@@ -50,5 +57,11 @@ class LoginViewModel @Inject constructor(
             logDebug(e.toString())
         }
         _uiState.update { it.copy(isLoading = false) }
+    }
+
+    fun handleSkipOnboarding() {
+        viewModelScope.launch {
+            userPreferencesManager.setSkippedOnboarding()
+        }
     }
 }

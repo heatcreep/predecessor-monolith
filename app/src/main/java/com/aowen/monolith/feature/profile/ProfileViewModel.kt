@@ -4,17 +4,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.UserInfo
+import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.UserPreferencesManager
 import com.aowen.monolith.network.UserRepository
+import com.aowen.monolith.network.UserState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+abstract class ProfileScreenState {
+
+    data object Loading : ProfileScreenState()
+    data class Error(val console: Console, val message: String) :
+        ProfileScreenState()
+
+    data class UserInfoLoaded(val console: Console, val userInfo: UserInfo?) :
+        ProfileScreenState()
+}
 
 data class ProfileScreenUiState(
     val isLoading: Boolean = true,
@@ -37,8 +48,9 @@ class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ProfileScreenUiState())
-    val uiState: StateFlow<ProfileScreenUiState> = _uiState
+    private val _uiState: MutableStateFlow<ProfileScreenState> =
+        MutableStateFlow(ProfileScreenState.Loading)
+    val uiState: StateFlow<ProfileScreenState> = _uiState
 
     private val _showProfileToast = MutableStateFlow(ProfileToastState.NONE)
     val showProfileToast = _showProfileToast
@@ -55,29 +67,26 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun initViewModel() {
-        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val userInfoDeferred = async { userRepository.getUser() }
-
             val console = userPreferencesDataStore.console.first()
-
-            val userInfo = userInfoDeferred.await()
-
-            if (userInfo != null) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = null,
-                        userInfo = userInfo,
-                        console = console
-                    )
+            when (authRepository.userState.value) {
+                is UserState.Unauthenticated -> {
+                    _uiState.update {
+                        ProfileScreenState.UserInfoLoaded(console, null)
+                    }
                 }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Error getting user info.",
-                    )
+
+                is UserState.Authenticated -> {
+                    val user = userRepository.getUser()
+                    if (user != null) {
+                        _uiState.update {
+                            ProfileScreenState.UserInfoLoaded(console, user)
+                        }
+                    } else {
+                        _uiState.update {
+                            ProfileScreenState.Error(console, "Error loading user info")
+                        }
+                    }
                 }
             }
         }
@@ -86,7 +95,47 @@ class ProfileViewModel @Inject constructor(
     fun saveConsole(console: Console) {
         viewModelScope.launch {
             userPreferencesDataStore.saveConsole(console)
-            _uiState.update { it.copy(console = console) }
+            _uiState.update { currentState ->
+                when (currentState) {
+                    is ProfileScreenState.UserInfoLoaded -> {
+                        currentState.copy(console = console)
+                    }
+
+                    is ProfileScreenState.Error -> {
+                        currentState.copy(console = console)
+                    }
+
+                    else -> {
+                        currentState
+                    }
+                }
+            }
+        }
+    }
+
+    fun submitLogin() {
+        _uiState.update { ProfileScreenState.Loading }
+        try {
+            viewModelScope.launch {
+                authRepository.signInWithDiscord()
+            }
+        } catch (e: Exception) {
+            logDebug(e.toString())
+            _uiState.update { currentState ->
+                when (currentState) {
+                    is ProfileScreenState.Error -> {
+                        ProfileScreenState.Error(
+                            console = currentState.console,
+                            message = "There was an issue signing you in. Please try again."
+                        )
+                    }
+
+                    else -> {
+                        currentState
+                    }
+
+                }
+            }
         }
     }
 

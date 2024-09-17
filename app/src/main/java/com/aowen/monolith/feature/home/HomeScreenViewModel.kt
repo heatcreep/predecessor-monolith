@@ -3,12 +3,9 @@ package com.aowen.monolith.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroStatistics
-import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerStats
-import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.UserClaimedPlayerRepository
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
-import com.aowen.monolith.network.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,23 +49,20 @@ data class HomeScreenUiState(
     val heroStats: List<HeroStatistics> = emptyList(),
     val topFiveHeroesByWinRate: List<HeroStatistics> = emptyList(),
     val topFiveHeroesByPickRate: List<HeroStatistics> = emptyList(),
-    val claimedPlayerId: String? = null,
-    val claimedPlayerStats: PlayerStats? = null,
-    val claimedPlayerDetails: PlayerDetails? = null,
 )
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val repository: OmedaCityRepository,
-    private val userRepository: UserRepository,
     private val favoriteBuildsRepository: UserFavoriteBuildsRepository,
-    private val claimedPlayerPreferencesManager: ClaimedPlayerPreferencesManager
+    private val claimedPlayerRepository: UserClaimedPlayerRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState: StateFlow<HomeScreenUiState> = _uiState
 
     val favoriteBuildsState = favoriteBuildsRepository.favoriteBuildsState
+    val claimedPlayerState = claimedPlayerRepository.claimedPlayerState
 
 
     init {
@@ -83,7 +77,7 @@ class HomeScreenViewModel @Inject constructor(
                 async { favoriteBuildsRepository.fetchFavoriteBuilds() }
 
             val claimedUserDeferredResult =
-                async { userRepository.getClaimedUser() }
+                async { claimedPlayerRepository.getClaimedPlayer() }
             val heroStatsDeferredResult =
                 async { repository.fetchAllHeroStatistics() }
 
@@ -138,14 +132,6 @@ class HomeScreenViewModel @Inject constructor(
                         heroStats = heroStatsResult.getOrNull() ?: emptyList(),
                         topFiveHeroesByWinRate = topFiveHeroesByWinRate ?: emptyList(),
                         topFiveHeroesByPickRate = topFiveHeroesByPickRate ?: emptyList(),
-                    )
-                }
-            }
-            if(claimedUserResult.isSuccess) {
-                _uiState.update {
-                    it.copy(
-                        claimedPlayerStats = claimedUserResult.getOrNull()?.playerStats,
-                        claimedPlayerDetails = claimedUserResult.getOrNull()?.playerDetails,
                     )
                 }
             }

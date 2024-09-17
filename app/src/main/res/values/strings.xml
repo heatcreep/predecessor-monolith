@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Monolith</string>
+    <string name="app_name">PredCompanion</string>
     <string name="icon_home">Home</string>
     <string name="icon_heroes">Heroes</string>
     <string name="icon_items">Items</string>

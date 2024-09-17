@@ -24,6 +24,9 @@ interface SupabasePostgrestService {
 
     suspend fun fetchPlayer(userId: String): UserProfile?
 
+    /**
+     * Links a player to a user in supabase as their claimed player
+     */
     suspend fun savePlayer(playerId: String, userId: String)
 
     suspend fun fetchUserInfo(email: String): UserInfo?
@@ -93,7 +96,8 @@ class SupabasePostgrestServiceImpl @Inject constructor(
                         "avatar_url",
                         "id",
                         "updated_at",
-                        "player_id"
+                        "player_id",
+                        "onboarded"
                     )
                 ) {
                     filter {

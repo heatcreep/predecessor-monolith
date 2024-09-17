@@ -1,5 +1,9 @@
 package com.aowen.monolith.data
 
+import com.aowen.monolith.data.database.model.FavoriteBuildListEntity
+import java.sql.Timestamp
+import java.util.UUID
+
 
 data class BuildListItem(
     val id: Int = 0,
@@ -49,5 +53,41 @@ fun ModuleDto.create(): ItemModule {
     return ItemModule(
         title = title,
         items = listOfNotNull(item1Id, item2Id, item3Id, item4Id, item5Id, item6Id),
+    )
+}
+
+fun BuildListItem.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
+    return FavoriteBuildListEntity(
+        buildId = id,
+        heroId = heroId,
+        role = role,
+        title = title,
+        description = description,
+        author = author,
+        crestId = crest,
+        itemIds = buildItems,
+        upvotesCount = upvotes,
+        downvotesCount = downvotes,
+        createdAt = createdAt,
+        gameVersion = version ?: ""
+    )
+}
+
+fun BuildListItem.asFavoriteBuildDto(userId: UUID): FavoriteBuildDto {
+    return FavoriteBuildDto(
+        id = UUID.randomUUID(),
+        createdAt = Timestamp(System.currentTimeMillis()).toString(),
+        userId = userId,
+        buildId = id,
+        heroId = heroId,
+        role = role,
+        title = title,
+        description = description,
+        author = author,
+        crestId = crest,
+        itemIds = buildItems,
+        upvotesCount = upvotes,
+        downvotesCount = downvotes,
+        gameVersion = version ?: ""
     )
 }

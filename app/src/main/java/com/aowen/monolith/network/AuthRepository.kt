@@ -1,10 +1,12 @@
 package com.aowen.monolith.network
 
+import com.aowen.monolith.data.database.dao.ClaimedPlayerDao
 import com.aowen.monolith.logDebug
 import io.github.jan.supabase.gotrue.SessionStatus
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.SerialName
@@ -18,14 +20,12 @@ data class UserProfile(
 )
 
 abstract class UserState {
-    object Loading: UserState()
-    object Unauthenticated : UserState()
+    object Loading : UserState()
+    data class Unauthenticated(val hasSkippedOnboarding: Boolean) : UserState()
     object Authenticated : UserState()
 }
 
 interface AuthRepository {
-
-    val accessTokenFlow: Flow<String?>
 
     val userState: StateFlow<UserState>
 
@@ -43,6 +43,7 @@ interface AuthRepository {
 
 class AuthRepositoryImpl @Inject constructor(
     private val authService: SupabaseAuthService,
+    private val claimedPlayerDao: ClaimedPlayerDao,
     private val postgrestService: SupabasePostgrestService,
     private val userPreferencesManager: UserPreferencesManager
 ) : AuthRepository {
@@ -50,26 +51,29 @@ class AuthRepositoryImpl @Inject constructor(
     private val _userState = MutableStateFlow<UserState>(UserState.Loading)
     override val userState: StateFlow<UserState> = _userState
 
-    override val accessTokenFlow: Flow<String?> = userPreferencesManager.accessToken
-
     override suspend fun handleSuccessfulLoginFromDiscord() {
         _userState.update { UserState.Authenticated }
     }
 
     override suspend fun getCurrentSessionStatus() {
+        val hasSkippedOnboarding = userPreferencesManager.hasSkippedOnboarding.first()
         try {
-            val sessionStatus = authService.awaitAuthService()
-            sessionStatus.collect { status ->
-                logDebug("Session status: $status", "AuthViewModel")
-                when (status) {
-                    is SessionStatus.LoadingFromStorage -> _userState.update { UserState.Loading }
-                    is SessionStatus.Authenticated -> _userState.update { UserState.Authenticated }
-                    is SessionStatus.NotAuthenticated -> _userState.update { UserState.Unauthenticated }
-                    else -> {
-                        throw Exception("Network error")
+            val sessionStatus = authService.awaitAuthService().first()
+            logDebug("Session status: $sessionStatus", "AuthViewModel")
+            when (sessionStatus) {
+                is SessionStatus.LoadingFromStorage -> _userState.update { UserState.Loading }
+                is SessionStatus.Authenticated -> _userState.update { UserState.Authenticated }
+                is SessionStatus.NotAuthenticated -> {
+                    _userState.update {
+                        UserState.Unauthenticated(hasSkippedOnboarding = hasSkippedOnboarding)
                     }
                 }
+
+                else -> {
+                    throw Exception("Network error")
+                }
             }
+
         } catch (e: Exception) {
             throw e
         }
@@ -86,19 +90,30 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getPlayer(): Result<UserProfile?> {
-        return try {
-            val session = withTimeoutOrNull(1000) {
-                authService.currentSession()
+        when (userState.value) {
+            is UserState.Unauthenticated -> {
+                val playerId = claimedPlayerDao.getClaimedPlayerIds().firstOrNull()?.firstOrNull()
+                return Result.success(UserProfile(playerId))
             }
-            session?.let {
-                if (it.user?.id != null) {
-                    Result.success(
-                        postgrestService.fetchPlayer(it.user?.id!!)
-                    )
-                } else Result.failure(Exception("No user id"))
-            } ?: Result.failure(Exception("No current session"))
-        } catch (e: Exception) {
-            return Result.failure(e)
+
+            is UserState.Authenticated -> {
+                return try {
+                    val session = withTimeoutOrNull(1000) {
+                        authService.currentSession()
+                    }
+                    session?.let {
+                        if (it.user?.id != null) {
+                            Result.success(
+                                postgrestService.fetchPlayer(it.user?.id!!)
+                            )
+                        } else Result.failure(Exception("No user id"))
+                    } ?: Result.failure(Exception("No current session"))
+                } catch (e: Exception) {
+                    return Result.failure(e)
+                }
+            }
+
+            else -> return Result.success(null)
         }
     }
 

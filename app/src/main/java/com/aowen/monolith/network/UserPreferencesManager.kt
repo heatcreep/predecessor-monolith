@@ -12,18 +12,17 @@ val Context.userPreferencesDataStore by preferencesDataStore(name = "user_prefer
 
 interface UserPreferencesManager {
     val console: Flow<Console>
-    val accessToken: Flow<String?>
+    val hasSkippedOnboarding: Flow<Boolean>
     suspend fun saveConsole(console: Console)
-    suspend fun saveAccessToken(accessToken: String)
-    suspend fun clearAccessToken()
-
+    suspend fun setSkippedOnboarding()
 }
 
 class UserPreferencesManagerImpl(private val context: Context) : UserPreferencesManager {
 
     companion object {
         private val CONSOLE_KEY = stringPreferencesKey("console")
-        private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
+        private val SKIPPED_ONBOARDING_KEY = stringPreferencesKey("skipped_onboarding")
+        private val SYNCED_SAVED_CONTENT_KEY = stringPreferencesKey("synced_saved_content")
     }
 
     override val console: Flow<Console> = context.userPreferencesDataStore.data
@@ -31,9 +30,9 @@ class UserPreferencesManagerImpl(private val context: Context) : UserPreferences
             prefs[CONSOLE_KEY]?.let { Console.valueOf(it) } ?: Console.PC
         }
 
-    override val accessToken: Flow<String?> = context.userPreferencesDataStore.data
+    override val hasSkippedOnboarding: Flow<Boolean> = context.userPreferencesDataStore.data
         .map { prefs ->
-            prefs[ACCESS_TOKEN_KEY]
+            prefs[SKIPPED_ONBOARDING_KEY]?.let { it.toBoolean() } ?: false
         }
 
     override suspend fun saveConsole(console: Console) {
@@ -42,15 +41,9 @@ class UserPreferencesManagerImpl(private val context: Context) : UserPreferences
         }
     }
 
-    override suspend fun saveAccessToken(accessToken: String) {
+    override suspend fun setSkippedOnboarding() {
         context.userPreferencesDataStore.edit { prefs ->
-            prefs[ACCESS_TOKEN_KEY] = accessToken
-        }
-    }
-
-    override suspend fun clearAccessToken() {
-        context.userPreferencesDataStore.edit { prefs ->
-            prefs.remove(ACCESS_TOKEN_KEY)
+            prefs[SKIPPED_ONBOARDING_KEY] = true.toString()
         }
     }
 }

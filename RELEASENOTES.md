@@ -1,6 +1,18 @@
 # Release Notes
 
-## 1.7.5 - Latest
+## 1.8.0 - Latest
+
+#### New Features
+
+- App can now be used without an account
+- User can sign in or create an account from the profile screen
+- App has been renamed to "PredCompanion"
+
+#### Improvements & Bug Fixes
+
+- Auth continues to stabilize
+
+## 1.7.5
 
 #### Improvements & Bug Fixes
 

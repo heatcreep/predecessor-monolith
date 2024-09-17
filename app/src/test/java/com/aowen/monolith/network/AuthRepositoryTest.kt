@@ -1,14 +1,21 @@
 package com.aowen.monolith.network
 
+import com.aowen.monolith.data.database.dao.FakeClaimedPlayerDao
 import com.aowen.monolith.fakes.FakeSupabaseAuthService
 import com.aowen.monolith.fakes.FakeSupabasePostgrestService
 import com.aowen.monolith.fakes.FakeUserPreferencesManager
+import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 
 class AuthRepositoryTest {
+
+
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var authRepository: AuthRepository
 
@@ -18,7 +25,8 @@ class AuthRepositoryTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(),
             postgrestService = FakeSupabasePostgrestService(),
-            userPreferencesManager = FakeUserPreferencesManager()
+            userPreferencesManager = FakeUserPreferencesManager(),
+            claimedPlayerDao = FakeClaimedPlayerDao()
         )
 
         val result = authRepository.signInWithDiscord()
@@ -30,7 +38,8 @@ class AuthRepositoryTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 408),
             postgrestService = FakeSupabasePostgrestService(),
-            userPreferencesManager = FakeUserPreferencesManager()
+            userPreferencesManager = FakeUserPreferencesManager(),
+            claimedPlayerDao = FakeClaimedPlayerDao()
         )
 
         val actual = authRepository.signInWithDiscord().exceptionOrNull()
@@ -42,7 +51,8 @@ class AuthRepositoryTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 400),
             postgrestService = FakeSupabasePostgrestService(),
-            userPreferencesManager = FakeUserPreferencesManager()
+            userPreferencesManager = FakeUserPreferencesManager(),
+            claimedPlayerDao = FakeClaimedPlayerDao()
         )
 
         val actual = authRepository.signInWithDiscord().exceptionOrNull()
@@ -54,7 +64,8 @@ class AuthRepositoryTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 500),
             postgrestService = FakeSupabasePostgrestService(),
-            userPreferencesManager = FakeUserPreferencesManager()
+            userPreferencesManager = FakeUserPreferencesManager(),
+            claimedPlayerDao = FakeClaimedPlayerDao()
         )
 
         val actual = authRepository.signInWithDiscord().exceptionOrNull()
@@ -64,11 +75,15 @@ class AuthRepositoryTest {
     @Test
     fun `getPlayer returns user session on 200`() = runTest {
         authRepository = AuthRepositoryImpl(
-            authService = FakeSupabaseAuthService(resCode = 200),
+            authService = FakeSupabaseAuthService(
+                resCode = 200
+            ),
             postgrestService = FakeSupabasePostgrestService(),
-            userPreferencesManager = FakeUserPreferencesManager()
+            userPreferencesManager = FakeUserPreferencesManager(),
+            claimedPlayerDao = FakeClaimedPlayerDao()
         )
 
+        authRepository.getCurrentSessionStatus()
         val actual = authRepository.getPlayer()
         assertEquals(UserProfile("fake-player-id"), actual.getOrNull())
     }
@@ -78,7 +93,8 @@ class AuthRepositoryTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(),
             postgrestService = FakeSupabasePostgrestService(),
-            userPreferencesManager = FakeUserPreferencesManager()
+            userPreferencesManager = FakeUserPreferencesManager(),
+            claimedPlayerDao = FakeClaimedPlayerDao()
         )
 
         val actual = authRepository.getPlayer()
@@ -90,7 +106,8 @@ class AuthRepositoryTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(resCode = 200),
             postgrestService = FakeSupabasePostgrestService(),
-            userPreferencesManager = FakeUserPreferencesManager()
+            userPreferencesManager = FakeUserPreferencesManager(),
+            claimedPlayerDao = FakeClaimedPlayerDao()
         )
 
         val actual = authRepository.deleteUserAccount("fake-user-id")
@@ -102,7 +119,8 @@ class AuthRepositoryTest {
         authRepository = AuthRepositoryImpl(
             authService = FakeSupabaseAuthService(),
             postgrestService = FakeSupabasePostgrestService(),
-            userPreferencesManager = FakeUserPreferencesManager()
+            userPreferencesManager = FakeUserPreferencesManager(),
+            claimedPlayerDao = FakeClaimedPlayerDao()
         )
 
         val actual = authRepository.deleteUserAccount("fake-user-id").exceptionOrNull()

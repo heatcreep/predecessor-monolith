@@ -148,6 +148,14 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.okhttp)
 
+    // Room DB
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+
+    ksp(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.room.ktx)
+
     implementation(libs.androidx.work)
 
     testImplementation(libs.junit4)

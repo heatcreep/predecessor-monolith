@@ -5,6 +5,7 @@ import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.FakeSupabasePostgrestService
 import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.RecentSearchStatus
+import com.aowen.monolith.fakes.UserScenario
 import com.aowen.monolith.fakes.data.fakeExistingPlayerSearchDto
 import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
@@ -36,7 +37,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityRepository = FakeOmedaCityRepository(),
-            userRepository = FakeUserRepository(true)
+            userRepository = FakeUserRepository(UserScenario.UserNotFound)
         )
         val actual = userRecentSearchRepository.getRecentSearches()
         val expected  = emptyList<PlayerDetails>()
@@ -76,7 +77,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityRepository = FakeOmedaCityRepository(),
-            userRepository = FakeUserRepository(true)
+            userRepository = FakeUserRepository(UserScenario.UserNotFound)
         )
         userRecentSearchRepository.removeRecentSearch("addc8bb3-20ad-462a-a9f8-8b32bbf57514")
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
@@ -127,7 +128,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = UserRecentSearchRepositoryImpl(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityRepository = FakeOmedaCityRepository(),
-            userRepository = FakeUserRepository(true)
+            userRepository = FakeUserRepository(UserScenario.UserNotFound)
         )
         userRecentSearchRepository.addRecentSearch(fakePlayerDto.create())
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)

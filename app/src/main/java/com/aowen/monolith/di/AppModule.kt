@@ -2,6 +2,8 @@ package com.aowen.monolith.di
 
 import android.content.Context
 import com.aowen.monolith.BuildConfig
+import com.aowen.monolith.data.database.dao.ClaimedPlayerDao
+import com.aowen.monolith.data.database.dao.FavoriteBuildDao
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.AuthRepositoryImpl
 import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
@@ -14,6 +16,8 @@ import com.aowen.monolith.network.SupabaseAuthService
 import com.aowen.monolith.network.SupabaseAuthServiceImpl
 import com.aowen.monolith.network.SupabasePostgrestService
 import com.aowen.monolith.network.SupabasePostgrestServiceImpl
+import com.aowen.monolith.network.UserClaimedPlayerRepository
+import com.aowen.monolith.network.UserClaimedPlayerRepositoryImpl
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
 import com.aowen.monolith.network.UserFavoriteBuildsRepositoryImpl
 import com.aowen.monolith.network.UserPreferencesManager
@@ -149,20 +153,41 @@ object AppModule {
     @Singleton
     fun provideAuthRepository(
         authService: SupabaseAuthService,
+        claimedPlayerDao: ClaimedPlayerDao,
         postgrestService: SupabasePostgrestService,
         userPreferencesManager: UserPreferencesManager
     ): AuthRepository =
-        AuthRepositoryImpl(authService,postgrestService, userPreferencesManager)
+        AuthRepositoryImpl(
+            authService = authService,
+            claimedPlayerDao = claimedPlayerDao,
+            postgrestService = postgrestService,
+            userPreferencesManager = userPreferencesManager
+        )
 
     @Provides
     @Singleton
     fun provideUserRepository(
         authService: SupabaseAuthService,
-        postgrest: SupabasePostgrestService,
-        userPreferencesManager: UserPreferencesManager,
-        repository: OmedaCityRepository
+        postgrest: SupabasePostgrestService
     ): UserRepository =
-        UserRepositoryImpl(authService, postgrest,userPreferencesManager, repository)
+        UserRepositoryImpl(authService, postgrest)
+
+    @Provides
+    @Singleton
+    fun providesUserClaimedPlayerRepository(
+        authRepository: AuthRepository,
+        userRepository: UserRepository,
+        postgrestService: SupabasePostgrestService,
+        claimedPlayerDao: ClaimedPlayerDao,
+        omedaCityRepository: OmedaCityRepository
+    ): UserClaimedPlayerRepository =
+        UserClaimedPlayerRepositoryImpl(
+            authRepository = authRepository,
+            userRepository = userRepository,
+            postgrestService = postgrestService,
+            claimedPlayerDao = claimedPlayerDao,
+            omedaCityRepository = omedaCityRepository
+        )
 
     @Provides
     @Singleton
@@ -181,10 +206,14 @@ object AppModule {
     @Singleton
     fun provideFavoriteBuildsRepository(
         postgrestService: SupabasePostgrestService,
-        repository: UserRepository
+        userRepository: UserRepository,
+        authRepository: AuthRepository,
+        favoriteBuildDao: FavoriteBuildDao
     ): UserFavoriteBuildsRepository =
         UserFavoriteBuildsRepositoryImpl(
             postgrestService = postgrestService,
-            userRepository = repository
+            userRepository = userRepository,
+            authRepository = authRepository,
+            favoriteBuildDao = favoriteBuildDao
         )
 }

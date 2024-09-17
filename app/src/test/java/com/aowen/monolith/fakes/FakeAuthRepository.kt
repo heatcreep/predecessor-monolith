@@ -3,21 +3,23 @@ package com.aowen.monolith.fakes
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.UserProfile
 import com.aowen.monolith.network.UserState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-abstract class AuthErrorScenario {
-    object LoginError : AuthErrorScenario()
-    object NoUserFound : AuthErrorScenario()
-    object NoPlayerFound : AuthErrorScenario()
-    object NoCurrentSession : AuthErrorScenario()
-    object FailedCurrentSession : AuthErrorScenario()
-    object NoUserId : AuthErrorScenario()
-    object SavePlayerError : AuthErrorScenario()
-    object NoAccessTokenError : AuthErrorScenario()
-    object DeleteUserAccountError : AuthErrorScenario()
+abstract class AuthScenario {
+    object LoginError : AuthScenario()
+    object Unauthenticated : AuthScenario()
+    object UnauthenticatedSkipOnboarding : AuthScenario()
+    object SessionStatusError : AuthScenario()
+    object NoPlayerFound : AuthScenario()
+    object NoCurrentSession : AuthScenario()
+    object NetworkSessionError : AuthScenario()
+    object FailedCurrentSession : AuthScenario()
+    object NoUserId : AuthScenario()
+    object SavePlayerError : AuthScenario()
+    object NoAccessTokenError : AuthScenario()
+    object DeleteUserAccountError : AuthScenario()
 }
 
 abstract class AuthTokenScenario {
@@ -26,20 +28,12 @@ abstract class AuthTokenScenario {
 }
 
 class FakeAuthRepository(
-    private val errorScenario: AuthErrorScenario? = null,
-    private val tokenScenario: AuthTokenScenario? = null,
+    private val startingUser: UserState = UserState.Unauthenticated(false),
+    private val errorScenario: AuthScenario? = null,
 ) : AuthRepository {
 
-    private val _fakeUserState = MutableStateFlow<UserState>(UserState.Unauthenticated)
+    private val _fakeUserState: MutableStateFlow<UserState> = MutableStateFlow(startingUser)
     override val userState: StateFlow<UserState> = _fakeUserState
-
-    override val accessTokenFlow: Flow<String?>
-        get() {
-            return when (tokenScenario) {
-                AuthTokenScenario.ValidAccessToken -> MutableStateFlow("validAccessToken")
-                else -> MutableStateFlow(null)
-            }
-        }
 
     private val _deleteUserAccountCounter: MutableStateFlow<Int> = MutableStateFlow(0)
     val deleteUserAccountCounter: MutableStateFlow<Int> = _deleteUserAccountCounter
@@ -56,7 +50,7 @@ class FakeAuthRepository(
 
     override suspend fun handleSuccessfulLoginFromDiscord() {
         _saveAccessTokenCounter.value++
-        if (errorScenario == AuthErrorScenario.NoAccessTokenError) {
+        if (errorScenario == AuthScenario.NoAccessTokenError) {
             // Do nothing
         } else {
             _fakeUserState.update {
@@ -66,7 +60,7 @@ class FakeAuthRepository(
     }
 
     override suspend fun signInWithDiscord(): Result<Unit?> {
-        return if (errorScenario == AuthErrorScenario.LoginError) {
+        return if (errorScenario == AuthScenario.LoginError) {
             Result.failure(Exception("Failed to login"))
         } else {
             Result.success(Unit)
@@ -75,18 +69,18 @@ class FakeAuthRepository(
 
     override suspend fun getPlayer(): Result<UserProfile?> {
         return when (errorScenario) {
-            AuthErrorScenario.NoCurrentSession -> Result.failure(Exception("No current session"))
-            AuthErrorScenario.NoUserId -> Result.failure(Exception("No user id"))
-            AuthErrorScenario.NoPlayerFound -> Result.failure(Exception(GetPlayerError))
+            AuthScenario.NoCurrentSession -> Result.failure(Exception("No current session"))
+            AuthScenario.NoUserId -> Result.failure(Exception("No user id"))
+            AuthScenario.NoPlayerFound -> Result.failure(Exception(GetPlayerError))
             else -> Result.success(UserProfile("validPlayerId"))
         }
     }
 
     override suspend fun handleSavePlayer(playerId: String): Result<Unit> {
         return when (errorScenario) {
-            AuthErrorScenario.NoCurrentSession -> Result.failure(Exception("No current session"))
-            AuthErrorScenario.NoUserId -> Result.failure(Exception("No user id"))
-            AuthErrorScenario.SavePlayerError -> Result.failure(Exception("Failed to save player"))
+            AuthScenario.NoCurrentSession -> Result.failure(Exception("No current session"))
+            AuthScenario.NoUserId -> Result.failure(Exception("No user id"))
+            AuthScenario.SavePlayerError -> Result.failure(Exception("Failed to save player"))
             else -> Result.success(Unit)
         }
     }
@@ -94,7 +88,7 @@ class FakeAuthRepository(
     override suspend fun deleteUserAccount(userId: String): Result<String> {
         _deleteUserAccountCounter.value++
         return when (errorScenario) {
-            AuthErrorScenario.DeleteUserAccountError -> Result.failure(Exception("Failed to delete user account"))
+            AuthScenario.DeleteUserAccountError -> Result.failure(Exception("Failed to delete user account"))
             else -> Result.success("User account deleted")
         }
     }
@@ -102,10 +96,14 @@ class FakeAuthRepository(
     override suspend fun getCurrentSessionStatus() {
         _getCurrentSessionStatusCounter.value++
         when (errorScenario) {
-            AuthErrorScenario.NoCurrentSession -> _fakeUserState.update {
-                UserState.Unauthenticated
+            AuthScenario.Unauthenticated -> _fakeUserState.update {
+                UserState.Unauthenticated(false)
             }
-            AuthErrorScenario.FailedCurrentSession -> throw Exception("Failed to get current session")
+            AuthScenario.UnauthenticatedSkipOnboarding -> _fakeUserState.update {
+                UserState.Unauthenticated(true)
+            }
+            AuthScenario.SessionStatusError -> throw Exception("Something went wrong fetching session status.")
+            AuthScenario.NetworkSessionError -> throw Exception("Failed to get current session, Network Error")
             else -> {
                 _fakeUserState.update {
                     UserState.Authenticated

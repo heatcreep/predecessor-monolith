@@ -10,9 +10,8 @@ import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
-import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
 import com.aowen.monolith.network.OmedaCityRepository
-import com.aowen.monolith.network.UserRepository
+import com.aowen.monolith.network.UserClaimedPlayerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,8 +59,7 @@ class PlayerDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: OmedaCityRepository,
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository,
-    private val claimedPlayerPreferencesManager: ClaimedPlayerPreferencesManager,
+    private val userClaimedPlayerRepository: UserClaimedPlayerRepository,
 ) : ViewModel() {
 
     companion object {
@@ -88,27 +86,18 @@ class PlayerDetailsViewModel @Inject constructor(
     }
 
     suspend fun handleSavePlayer(isRemoving: Boolean = false) {
-        val id = if (isRemoving) "" else playerId
         viewModelScope.launch {
             try {
-                val userInfoDeferred = async { authRepository.handleSavePlayer(id) }
-                val userInfo = userInfoDeferred.await()
-
-                if (userInfo.isSuccess) {
-                    if (isRemoving) {
-                        userRepository.setClaimedUser(null, null)
-                    } else {
-                        userRepository.setClaimedUser(uiState.value.stats, uiState.value.player)
-                        claimedPlayerPreferencesManager.saveClaimedPlayerId(uiState.value.player.playerId)
-
-                    }
-                    _uiState.update {
-                        it.copy(
-                            isClaimed = !uiState.value.isClaimed
-                        )
-                    }
+                userClaimedPlayerRepository.setClaimedUser(
+                    isRemoving = isRemoving,
+                    uiState.value.stats,
+                    uiState.value.player
+                )
+                _uiState.update {
+                    it.copy(
+                        isClaimed = !uiState.value.isClaimed
+                    )
                 }
-
             } catch (e: Exception) {
                 logDebug(e.toString())
             }

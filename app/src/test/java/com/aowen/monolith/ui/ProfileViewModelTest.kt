@@ -3,14 +3,16 @@
 package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.Console
-import com.aowen.monolith.fakes.AuthErrorScenario
+import com.aowen.monolith.fakes.AuthScenario
 import com.aowen.monolith.fakes.FakeAuthRepository
 import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.FakeUserRepository
+import com.aowen.monolith.fakes.UserScenario
 import com.aowen.monolith.fakes.data.fakeUserInfo
-import com.aowen.monolith.feature.profile.ProfileScreenUiState
+import com.aowen.monolith.feature.profile.ProfileScreenState
 import com.aowen.monolith.feature.profile.ProfileToastState
 import com.aowen.monolith.feature.profile.ProfileViewModel
+import com.aowen.monolith.network.UserState
 import com.aowen.monolith.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -40,37 +42,41 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `when initViewModel is called, then uiState is updated with userInfo`() = runTest {
+    fun `Unauthenticated - when initViewModel is called, then uiState is set properly`() = runTest {
 
-        val expected = ProfileScreenUiState(
-            isLoading = false,
-            error = null,
-            userInfo = fakeUserInfo,
-            console = Console.PC
-        )
-        advanceUntilIdle()
+        val expected = ProfileScreenState.UserInfoLoaded(Console.PC, null)
         val actual = viewModel.uiState.value
-
 
         assertEquals(expected, actual)
     }
 
     @Test
-    fun `when initViewModel is called, then uiState is error when getUser returns null`() = runTest {
-
+    fun `Authenticated = when initViewModel is called, and user is null, then uiState is set properly`() = runTest {
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
-            userRepository = FakeUserRepository(error = true),
-            authRepository = FakeAuthRepository()
+            userRepository = FakeUserRepository(userScenario = UserScenario.UserNotFound),
+            authRepository = FakeAuthRepository(startingUser = UserState.Authenticated)
         )
 
         advanceUntilIdle()
 
-        val expected = ProfileScreenUiState(
-            isLoading = false,
-            error = "Error getting user info.",
-            console = Console.PC
+        val expected = ProfileScreenState.Error(Console.PC, "Error loading user info")
+        val actual = viewModel.uiState.value
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `Authenticated = when initViewModel is called, and user is found, then uiState is set properly`() = runTest {
+        viewModel = ProfileViewModel(
+            userPreferencesDataStore = FakeUserPreferencesManager(),
+            userRepository = FakeUserRepository(),
+            authRepository = FakeAuthRepository(startingUser = UserState.Authenticated)
         )
+
+        advanceUntilIdle()
+
+        val expected = ProfileScreenState.UserInfoLoaded(Console.PC, fakeUserInfo)
         val actual = viewModel.uiState.value
 
         assertEquals(expected, actual)
@@ -191,8 +197,10 @@ class ProfileViewModelTest {
         )
         val actual = mutableListOf<ProfileToastState>()
 
-        val userRepository = FakeUserRepository(error = true)
-        val authRepository = FakeAuthRepository()
+        val userRepository = FakeUserRepository()
+        val authRepository = FakeAuthRepository(
+            errorScenario = AuthScenario.DeleteUserAccountError
+        )
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,
@@ -221,7 +229,7 @@ class ProfileViewModelTest {
         val actual = mutableListOf<ProfileToastState>()
 
         val userRepository = FakeUserRepository()
-        val authRepository = FakeAuthRepository(errorScenario = AuthErrorScenario.DeleteUserAccountError)
+        val authRepository = FakeAuthRepository(errorScenario = AuthScenario.DeleteUserAccountError)
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
             userRepository = userRepository,

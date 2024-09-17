@@ -35,4 +35,6 @@ data class UserInfo(
     val avatarUrl: String = "",
     @SerialName("player_id")
     val playerId: String? = "",
+    @SerialName("onboarded")
+    val isOnboarded: Boolean = false
 )

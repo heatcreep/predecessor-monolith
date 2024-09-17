@@ -8,17 +8,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 
 abstract class Scenario {
-    object ValidAccessToken : Scenario()
-    object NoAccessToken : Scenario()
+    object SkippedOnboarding : Scenario()
 }
 
 class FakeUserPreferencesManager(
-    scenario: Scenario? = null
-) : UserPreferencesManager {
+    scenario: Scenario? = null,
+
+    ) : UserPreferencesManager {
     override val console = flowOf(Console.PC)
-    override val accessToken: Flow<String?> = when(scenario) {
-        is Scenario.ValidAccessToken -> flowOf("validAccessToken")
-        else -> flowOf(null)
+    override val hasSkippedOnboarding: Flow<Boolean> = when (scenario) {
+        Scenario.SkippedOnboarding -> flowOf(true)
+        else -> flowOf(false)
     }
 
     val _saveConsoleCoutner = MutableStateFlow(0)
@@ -34,11 +34,7 @@ class FakeUserPreferencesManager(
         _saveConsoleCoutner.value++
     }
 
-    override suspend fun saveAccessToken(accessToken: String) {
-        _saveAccessTokenCounter.value++
-    }
-
-    override suspend fun clearAccessToken() {
-        _clearAccessTokenCounter.value++
+    override suspend fun setSkippedOnboarding() {
+        TODO("Not yet implemented")
     }
 }

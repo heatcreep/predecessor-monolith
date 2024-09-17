@@ -14,9 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerStats
-import com.aowen.monolith.data.RankDetails
+import com.aowen.monolith.network.ClaimedPlayerState
 import com.aowen.monolith.ui.components.PlayerLoadingCard
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
@@ -26,17 +24,6 @@ class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<Hom
         HomeScreenUiState(),
         HomeScreenUiState(
             isLoading = false,
-            claimedPlayerDetails = PlayerDetails(
-                playerId = "1",
-                playerName = "Player 1",
-                rankDetails = RankDetails.GOLD_I,
-                rank = 1,
-                region = "naeast",
-                mmr = "1000",
-            ),
-            claimedPlayerStats = PlayerStats(
-                favoriteHero = "Narbash",
-            )
         ),
         HomeScreenUiState(
             isLoading = false,
@@ -56,6 +43,7 @@ class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<Hom
 @Composable
 fun ClaimedPlayerSection(
     uiState: HomeScreenUiState,
+    claimedPlayerState: ClaimedPlayerState,
     modifier: Modifier = Modifier,
     navigateToPlayerDetails: (String) -> Unit = {}
 ) {
@@ -93,20 +81,27 @@ fun ClaimedPlayerSection(
                         style = MaterialTheme.typography.bodyMedium
                     )
                 } else {
-                    if (uiState.claimedPlayerStats != null && uiState.claimedPlayerDetails != null) {
-                        ClaimedPlayerCard(
-                            playerDetails = uiState.claimedPlayerDetails,
-                            playerStats = uiState.claimedPlayerStats,
-                            navigateToPlayerDetails = {
-                                navigateToPlayerDetails(uiState.claimedPlayerDetails.playerId)
+                    when (claimedPlayerState) {
+                        is ClaimedPlayerState.NoClaimedPlayer -> {
+                            Text(
+                                text = "No player claimed! Navigate to a player's profile and click the" +
+                                        " 'Claim Player' button to claim a player.",
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+
+                        is ClaimedPlayerState.Claimed -> {
+                            val claimedPlayer = claimedPlayerState.claimedPlayer
+                            if (claimedPlayer.playerStats != null && claimedPlayer.playerDetails != null) {
+                                ClaimedPlayerCard(
+                                    playerDetails = claimedPlayer.playerDetails,
+                                    playerStats = claimedPlayer.playerStats,
+                                    navigateToPlayerDetails = {
+                                        navigateToPlayerDetails(claimedPlayer.playerDetails.playerId)
+                                    }
+                                )
                             }
-                        )
-                    } else {
-                        Text(
-                            text = "No player claimed! Navigate to a player's profile and click the" +
-                                    " 'Claim Player' button to claim a player.",
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                        }
                     }
                 }
             }
@@ -122,7 +117,8 @@ fun ClaimedPlayerSectionPreview(
     MonolithTheme {
         Surface {
             ClaimedPlayerSection(
-                uiState = uiState
+                uiState = uiState,
+                claimedPlayerState = ClaimedPlayerState.NoClaimedPlayer
             )
         }
     }

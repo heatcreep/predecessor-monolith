@@ -4,6 +4,7 @@ import com.aowen.monolith.network.SupabaseAuthService
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonObject
@@ -12,7 +13,15 @@ import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 
-class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthService {
+abstract class SessionStatusScenario {
+    object Authenticated : SessionStatusScenario()
+    object NotAuthenticated : SessionStatusScenario()
+}
+
+class FakeSupabaseAuthService(
+    private val resCode: Int? = null,
+    private val sessionStatusScenario: SessionStatusScenario? = SessionStatusScenario.Authenticated,
+) : SupabaseAuthService {
 
     companion object {
         val fakeUserSession = UserSession(
@@ -48,7 +57,10 @@ class FakeSupabaseAuthService(private val resCode: Int? = null) : SupabaseAuthSe
     }
 
     override suspend fun awaitAuthService(): StateFlow<SessionStatus> {
-        TODO("Not yet implemented")
+        return when(sessionStatusScenario) {
+            SessionStatusScenario.Authenticated -> MutableStateFlow(SessionStatus.Authenticated(fakeUserSession))
+            else -> MutableStateFlow(SessionStatus.NotAuthenticated(isSignOut = false))
+        }
     }
 
     override suspend fun currentAccessToken(): String? {

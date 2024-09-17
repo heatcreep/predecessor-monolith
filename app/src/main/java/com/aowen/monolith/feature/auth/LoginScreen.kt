@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,7 +63,10 @@ internal fun LoginRoute(
             UserState.Authenticated -> {
                 navController.navigateToHome()
             }
-            UserState.Unauthenticated -> {
+            is UserState.Unauthenticated -> {
+                if(userState.hasSkippedOnboarding) {
+                    navController.navigateToHome()
+                }
                 logDebug("User is not signed in", "LoginScreen")
                 viewModel.setLoading(false)
             }
@@ -71,7 +76,11 @@ internal fun LoginRoute(
     LoginScreen(
         modifier = modifier,
         uiState = uiState,
-        submitLogin = viewModel::submitLogin
+        submitLogin = viewModel::submitLogin,
+        handleSkipOnboarding = {
+            viewModel.handleSkipOnboarding()
+            navController.navigateToHome()
+        }
     )
 }
 
@@ -79,7 +88,8 @@ internal fun LoginRoute(
 fun LoginScreen(
     modifier: Modifier = Modifier,
     uiState: LoginUiState,
-    submitLogin: () -> Unit = {}
+    submitLogin: () -> Unit = {},
+    handleSkipOnboarding: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
@@ -109,7 +119,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Monolith",
+                    text = stringResource(id = R.string.app_name),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.ExtraBold
@@ -125,6 +135,16 @@ fun LoginScreen(
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error
+                    )
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                TextButton(
+                    onClick = handleSkipOnboarding
+                ) {
+                    Text(
+                        text = "Skip for now",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
