@@ -137,7 +137,7 @@ fun HeroWinRateSection(
                                             contentDescription = null
                                         )
                                         Text(
-                                            text = heroStats.name,
+                                            text = heroStats.heroName,
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.secondary
                                         )
@@ -170,13 +170,13 @@ fun HeroWinRateSectionPreview() {
                 heroStatsList = listOf(
                     HeroStatistics(
                         heroId = 1,
-                        name = "Countess",
+                        heroName = "Countess",
                         winRate = 60.12f,
                         pickRate = 10f
                     ),
                     HeroStatistics(
                         heroId = 2,
-                        name = "Crunch",
+                        heroName = "Crunch",
                         winRate = 49.12f,
                         pickRate = 10f
                     ),

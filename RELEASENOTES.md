@@ -1,6 +1,19 @@
 # Release Notes
 
-## 1.8.0 - Latest
+## 1.8.1 - Latest
+
+## 1.8.0
+
+#### New Features
+
+- Users can now override the device settings for light/dark mode in the profile tab.
+
+#### Improvements & Bug Fixes
+
+- Fixes match history being broken after the 10th match
+- Fixes some visual padding in the Profile menu
+- Improves VP gain/loss in ranked vs unranked matches
+- Fixes broken links to heroes from the Home Screen under "Top Heroes by Win Rate" and "Top Heroes by Pick Rate"
 
 #### New Features
 

@@ -92,7 +92,7 @@ fun HeroPickRateSection(
                                 modifier = modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        navigateToHeroDetails(heroStats.heroId, heroStats.name)
+                                        navigateToHeroDetails(heroStats.heroId, heroStats.heroName)
                                     }
                                     .border(
                                         1.dp,
@@ -132,7 +132,7 @@ fun HeroPickRateSection(
                                             contentDescription = null
                                         )
                                         Text(
-                                            text = heroStats.name,
+                                            text = heroStats.heroName,
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.secondary
                                         )

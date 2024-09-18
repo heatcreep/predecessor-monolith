@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +51,7 @@ import com.aowen.monolith.data.getKda
 import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.KDAText
 import com.aowen.monolith.ui.theme.GreenHighlight
+import com.aowen.monolith.ui.theme.NeroLightGrey
 import com.aowen.monolith.ui.theme.RedHighlight
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -102,9 +104,9 @@ fun PlayerRow(
                 )
                 // VP Change
                 Text(
-                    text = "${player.vpChange} VP",
+                    text = player.vpChange,
                     style = MaterialTheme.typography.labelSmall,
-                    color = if(player.vpChange.contains("-")) RedHighlight else GreenHighlight,
+                    color = player.vpChange.handleVpChangeColor(),
                     fontWeight = FontWeight.ExtraBold
                 )
             }
@@ -293,5 +295,14 @@ fun PlayerRow(
             }
 
         }
+    }
+}
+
+@Composable
+private fun String.handleVpChangeColor(): Color {
+    return when {
+        this.contains("-") -> RedHighlight
+        this == "Unranked" -> NeroLightGrey
+        else -> GreenHighlight
     }
 }

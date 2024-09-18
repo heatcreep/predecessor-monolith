@@ -4,6 +4,8 @@ import android.content.Context
 import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.data.database.dao.ClaimedPlayerDao
 import com.aowen.monolith.data.database.dao.FavoriteBuildDao
+import com.aowen.monolith.data.datastore.ThemePreferences
+import com.aowen.monolith.data.datastore.ThemePreferencesImpl
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.AuthRepositoryImpl
 import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
@@ -62,6 +64,12 @@ object AppModule {
     @Singleton
     fun providesUserPreferencesManager(@ApplicationContext appContext: Context): UserPreferencesManager {
         return UserPreferencesManagerImpl(appContext)
+    }
+
+    @Provides
+    @Singleton
+    fun providesThemePreferences(@ApplicationContext appContext: Context): ThemePreferences {
+        return ThemePreferencesImpl(appContext)
     }
 
     @OptIn(ExperimentalSerializationApi::class)

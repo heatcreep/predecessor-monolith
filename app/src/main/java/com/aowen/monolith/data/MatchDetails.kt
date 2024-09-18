@@ -60,7 +60,7 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
         playerId = this.id,
         playerName = this.displayName,
         vpTotal = this.vpTotal ?: 0,
-        vpChange = this.vpChange.toString(),
+        vpChange = if(this.vpChange != null) "${this.vpChange.toString()} VP" else "Unranked",
         rankDetails = this.rank.toRankedDetailsOrNull(),
         heroId = this.heroId,
         role = this.role ?: "role unknown",

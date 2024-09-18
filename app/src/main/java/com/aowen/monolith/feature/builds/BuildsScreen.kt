@@ -163,7 +163,7 @@ fun BuildsScreen(
 
 
     Scaffold(
-        contentWindowInsets = WindowInsets(0,0,0,0),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             MonolithTopAppBar(
                 title = "Builds",
@@ -237,7 +237,8 @@ fun BuildsScreen(
                             )
                             FilterDropdown(
                                 dropdownTitle = "Hero",
-                                filterOptions = Hero.entries.map { hero -> hero.heroName },
+                                filterOptions = Hero.entries.filter { hero -> hero != Hero.UNKNOWN }
+                                    .map { hero -> hero.heroName },
                                 selectedFilter = uiState.selectedHeroFilter?.heroName,
                                 onSelectOption = onSelectHeroFilter,
                                 onClearOption = onClearHeroFilter

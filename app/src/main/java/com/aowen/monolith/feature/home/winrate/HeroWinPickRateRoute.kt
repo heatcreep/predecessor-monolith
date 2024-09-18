@@ -226,7 +226,7 @@ fun HeroWinPickRateScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                navigateToHeroDetails(heroStats.heroId, heroStats.name)
+                                navigateToHeroDetails(heroStats.heroId, heroStats.heroName)
                             }
                             .border(
                                 1.dp,
@@ -266,7 +266,7 @@ fun HeroWinPickRateScreen(
                                     contentDescription = null
                                 )
                                 Text(
-                                    text = heroStats.name,
+                                    text = heroStats.heroName,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.secondary
                                 )
@@ -304,11 +304,13 @@ fun HeroWinRateScreenPreview() {
                     HeroStatistics(
                         1,
                         "Countess",
+                        "Countess",
                         56.45f,
                         18.56f
                     ),
                     HeroStatistics(
                         23,
+                        "Iggy & Scorch",
                         "Iggy & Scorch",
                         12.45f,
                         72.56f

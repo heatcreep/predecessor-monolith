@@ -10,7 +10,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -63,9 +62,11 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.UserInfo
+import com.aowen.monolith.data.datastore.Theme
 import com.aowen.monolith.feature.auth.SignInDiscordButton
 import com.aowen.monolith.feature.auth.navigation.navigateToLoginFromLogout
 import com.aowen.monolith.feature.profile.ui.ConsoleDropdownMenu
+import com.aowen.monolith.feature.profile.ui.ThemeDropdownMenu
 import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.MonolithAlertDialog
@@ -119,7 +120,6 @@ fun ProfileScreenRoute(
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             MonolithTopAppBar(
                 title = "Profile",
@@ -139,9 +139,10 @@ fun ProfileScreenRoute(
     ) {
         ProfileScreen(
             uiState = uiState,
-            modifier = Modifier.padding(it),
+            modifier = Modifier.padding(it).padding(horizontal = 16.dp),
             submitLogin = viewModel::submitLogin,
             handleSaveConsole = viewModel::saveConsole,
+            handleSaveTheme = viewModel::saveTheme,
             handleRetry = viewModel::initViewModel,
             onLogout = viewModel::handleLogout,
             onDelete = viewModel::deleteUserAccount,
@@ -157,6 +158,7 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     submitLogin: () -> Unit,
     handleSaveConsole: (Console) -> Unit,
+    handleSaveTheme: (Theme) -> Unit,
     handleRetry: () -> Unit,
     onLogout: () -> Unit,
     onDelete: () -> Unit,
@@ -209,6 +211,10 @@ fun ProfileScreen(
                         ConsoleDropdownMenu(
                             console = uiState.console,
                             handleSaveConsole = handleSaveConsole
+                        )
+                        ThemeDropdownMenu(
+                            theme = uiState.theme,
+                            handleSaveTheme = handleSaveTheme
                         )
                         Text(
                             text = "FAQ",
@@ -280,6 +286,10 @@ fun ProfileScreen(
                         ConsoleDropdownMenu(
                             console = uiState.console,
                             handleSaveConsole = handleSaveConsole
+                        )
+                        ThemeDropdownMenu(
+                            theme = uiState.theme,
+                            handleSaveTheme = handleSaveTheme
                         )
                         Text(
                             text = "Sign in to create a profile and save your claimed player, favorite builds, and recent searches to the cloud!",
@@ -416,6 +426,7 @@ fun FaqPanel(
         ) {
             Text(
                 text = questionText,
+                modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
@@ -454,6 +465,7 @@ fun ProfileCardPreview() {
         ProfileScreen(
             uiState = ProfileScreenState.UserInfoLoaded(
                 console = Console.PC,
+                theme = Theme.SYSTEM,
                 userInfo = UserInfo(
                     email = "test@gmail.com",
                     avatarUrl = "https://cdn.discordapp.com/avatars/1234567890/abcdef1234567890.png",
@@ -462,6 +474,7 @@ fun ProfileCardPreview() {
             ),
             submitLogin = {},
             handleSaveConsole = {},
+            handleSaveTheme = {},
             handleRetry = { /*TODO*/ },
             onLogout = { /*TODO*/ },
             onDelete = { /*TODO*/ }

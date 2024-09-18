@@ -50,7 +50,7 @@ class MatchDetailsViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.value = MatchDetailsUiState(isLoading = true)
         viewModelScope.launch {
-            val matchDeferred = async { repository.fetchMatchesById(playerId) }
+            val matchDeferred = async { repository.fetchMatchById(matchId) }
             val itemsDeferred = async { repository.fetchAllItems() }
 
             val matchResult = matchDeferred.await()
@@ -75,7 +75,7 @@ class MatchDetailsViewModel @Inject constructor(
                     )
                 }
             } else {
-                val match = matchResult.getOrNull()?.matches?.firstOrNull { it.matchId == matchId }
+                val match = matchResult.getOrNull()
                 val allItems = itemsResult.getOrNull()
                 val newMatch = match?.copy(
                     dusk = Team.Dusk(

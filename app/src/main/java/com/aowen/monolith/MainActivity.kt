@@ -14,10 +14,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.aowen.monolith.data.datastore.Theme
+import com.aowen.monolith.data.datastore.ThemePreferences
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.ui.MonolithApp
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -27,7 +31,6 @@ import io.github.jan.supabase.gotrue.handleDeeplinks
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -36,6 +39,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var authRepository: AuthRepository
+
+    @Inject
+    lateinit var themePreferences: ThemePreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -50,7 +56,10 @@ class MainActivity : ComponentActivity() {
             }
         )
         setContent {
-            MonolithTheme {
+            val localTheme by themePreferences.theme.collectAsState(initial = Theme.SYSTEM)
+            MonolithTheme(
+                localTheme = localTheme,
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

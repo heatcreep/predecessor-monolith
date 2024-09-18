@@ -166,14 +166,12 @@ fun MatchPlayerCard(
                         )
                     }
                     Spacer(modifier = Modifier.size(4.dp))
-                    playerHero?.vpChange?.let { change ->
-                        Text(
-                            textAlign = TextAlign.Start,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.tertiary,
-                            text = "$change VP"
-                        )
-                    }
+                    Text(
+                        textAlign = TextAlign.Start,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        text = "${playerHero?.vpChange}"
+                    )
                     Text(
                         textAlign = TextAlign.Start,
                         style = MaterialTheme.typography.bodySmall,

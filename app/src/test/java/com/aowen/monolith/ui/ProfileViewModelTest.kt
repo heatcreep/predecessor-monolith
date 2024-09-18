@@ -3,8 +3,10 @@
 package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.Console
+import com.aowen.monolith.data.datastore.Theme
 import com.aowen.monolith.fakes.AuthScenario
 import com.aowen.monolith.fakes.FakeAuthRepository
+import com.aowen.monolith.fakes.FakeThemePreferences
 import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.FakeUserRepository
 import com.aowen.monolith.fakes.UserScenario
@@ -36,6 +38,7 @@ class ProfileViewModelTest {
     fun setup() {
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
+            themePreferences = FakeThemePreferences(),
             userRepository = FakeUserRepository(),
             authRepository = FakeAuthRepository()
         )
@@ -44,7 +47,7 @@ class ProfileViewModelTest {
     @Test
     fun `Unauthenticated - when initViewModel is called, then uiState is set properly`() = runTest {
 
-        val expected = ProfileScreenState.UserInfoLoaded(Console.PC, null)
+        val expected = ProfileScreenState.UserInfoLoaded(Console.PC, Theme.LIGHT, null)
         val actual = viewModel.uiState.value
 
         assertEquals(expected, actual)
@@ -54,13 +57,14 @@ class ProfileViewModelTest {
     fun `Authenticated = when initViewModel is called, and user is null, then uiState is set properly`() = runTest {
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
+            themePreferences = FakeThemePreferences(),
             userRepository = FakeUserRepository(userScenario = UserScenario.UserNotFound),
             authRepository = FakeAuthRepository(startingUser = UserState.Authenticated)
         )
 
         advanceUntilIdle()
 
-        val expected = ProfileScreenState.Error(Console.PC, "Error loading user info")
+        val expected = ProfileScreenState.Error(Console.PC, Theme.LIGHT, "Error loading user info")
         val actual = viewModel.uiState.value
 
         assertEquals(expected, actual)
@@ -70,13 +74,14 @@ class ProfileViewModelTest {
     fun `Authenticated = when initViewModel is called, and user is found, then uiState is set properly`() = runTest {
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
+            themePreferences = FakeThemePreferences(),
             userRepository = FakeUserRepository(),
             authRepository = FakeAuthRepository(startingUser = UserState.Authenticated)
         )
 
         advanceUntilIdle()
 
-        val expected = ProfileScreenState.UserInfoLoaded(Console.PC, fakeUserInfo)
+        val expected = ProfileScreenState.UserInfoLoaded(Console.PC, Theme.LIGHT, fakeUserInfo)
         val actual = viewModel.uiState.value
 
         assertEquals(expected, actual)
@@ -87,6 +92,7 @@ class ProfileViewModelTest {
         val userRepository = FakeUserRepository()
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
+            themePreferences = FakeThemePreferences(),
             userRepository = userRepository,
             authRepository = FakeAuthRepository()
         )
@@ -127,6 +133,7 @@ class ProfileViewModelTest {
         val authRepository = FakeAuthRepository()
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
+            themePreferences = FakeThemePreferences(),
             userRepository = userRepository,
             authRepository = authRepository
         )
@@ -151,6 +158,7 @@ class ProfileViewModelTest {
         val authRepository = FakeAuthRepository()
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
+            themePreferences = FakeThemePreferences(),
             userRepository = userRepository,
             authRepository = authRepository
         )
@@ -203,6 +211,7 @@ class ProfileViewModelTest {
         )
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
+            themePreferences = FakeThemePreferences(),
             userRepository = userRepository,
             authRepository = authRepository
         )
@@ -232,6 +241,7 @@ class ProfileViewModelTest {
         val authRepository = FakeAuthRepository(errorScenario = AuthScenario.DeleteUserAccountError)
         viewModel = ProfileViewModel(
             userPreferencesDataStore = FakeUserPreferencesManager(),
+            themePreferences = FakeThemePreferences(),
             userRepository = userRepository,
             authRepository = authRepository
         )

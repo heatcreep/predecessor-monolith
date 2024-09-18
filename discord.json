@@ -1,5 +1,5 @@
 {
-  "username": "Monolith Bot",
+  "username": "PredCompanion Bot",
   "avatar_url": "https://i.imgur.com/JtdvhXz.png",
   "embeds": [
     {
@@ -7,9 +7,9 @@
         "name": "Heat Creep",
         "icon_url": "https://avatars.githubusercontent.com/u/95059383?v=4"
       },
-      "title": "New Monolith Version $VERSION_NAME",
+      "title": "New PredCompanion Version $VERSION_NAME",
       "url": "https://github.com/heatcreep/predecessor-monolith/releases/tag/$VERSION_NAME",
-      "description": "New Monolith version $VERSION_NAME has been released and will be available in the Play Store shortly. Please check the release notes for more information.",
+      "description": "New PredCompanion version $VERSION_NAME has been released and will be available in the Play Store shortly. Please check the release notes for more information.",
       "color": 15130310,
       "image": {
         "url": "https://i.imgur.com/LrdeuS8.png"
