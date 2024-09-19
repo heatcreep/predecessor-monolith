@@ -63,6 +63,7 @@ class HomeScreenViewModel @Inject constructor(
 
     val favoriteBuildsState = favoriteBuildsRepository.favoriteBuildsState
     val claimedPlayerState = claimedPlayerRepository.claimedPlayerState
+    val claimedPlayerName = claimedPlayerRepository.claimedPlayerName
 
 
     init {
@@ -73,6 +74,7 @@ class HomeScreenViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
 
+            claimedPlayerRepository.getClaimedPlayerName()
             val favoriteBuildsDeferredResult =
                 async { favoriteBuildsRepository.fetchFavoriteBuilds() }
 

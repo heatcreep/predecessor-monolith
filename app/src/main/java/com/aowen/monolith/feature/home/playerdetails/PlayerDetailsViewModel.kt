@@ -12,10 +12,12 @@ import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserClaimedPlayerRepository
+import com.aowen.monolith.network.UserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,6 +45,9 @@ data class PlayerErrors(
 
 data class PlayerDetailsUiState(
     val isLoading: Boolean = true,
+    val claimedPlayerName: String? = null,
+    val isEditingPlayerName: Boolean = false,
+    val playerNameField: String = "",
     val playerErrors: PlayerErrors? = null,
     val player: PlayerDetails = PlayerDetails(),
     val heroStats: List<PlayerHeroStats> = emptyList(),
@@ -58,6 +63,7 @@ data class PlayerDetailsUiState(
 class PlayerDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: OmedaCityRepository,
+    private val userPreferencesManager: UserPreferencesManager,
     private val authRepository: AuthRepository,
     private val userClaimedPlayerRepository: UserClaimedPlayerRepository,
 ) : ViewModel() {
@@ -75,6 +81,36 @@ class PlayerDetailsViewModel @Inject constructor(
 
     private val playerId: String = checkNotNull(savedStateHandle["playerId"])
 
+    fun onEditPlayerName() {
+        _uiState.update {
+            it.copy(
+                isEditingPlayerName = !uiState.value.isEditingPlayerName
+            )
+        }
+    }
+
+    fun handlePlayerNameFieldChange(playerName: String) {
+        _uiState.update {
+            it.copy(
+                playerNameField = playerName
+            )
+        }
+    }
+
+    fun handleSaveClaimedPlayerName() {
+        val playerName = uiState.value.playerNameField.ifEmpty { null }
+        viewModelScope.launch {
+            userPreferencesManager.saveClaimedPlayerName(playerName)
+            userClaimedPlayerRepository.setClaimedPlayerName(playerName)
+            _uiState.update {
+                it.copy(
+                    claimedPlayerName = uiState.value.playerNameField,
+                    isEditingPlayerName = false
+                )
+            }
+        }
+    }
+
     fun handlePlayerHeroStatsSelect(heroId: Int) {
         _uiState.update {
             it.copy(
@@ -85,7 +121,7 @@ class PlayerDetailsViewModel @Inject constructor(
         }
     }
 
-    suspend fun handleSavePlayer(isRemoving: Boolean = false) {
+   fun handleSavePlayer(isRemoving: Boolean = false) {
         viewModelScope.launch {
             try {
                 userClaimedPlayerRepository.setClaimedUser(
@@ -93,6 +129,7 @@ class PlayerDetailsViewModel @Inject constructor(
                     uiState.value.stats,
                     uiState.value.player
                 )
+                userClaimedPlayerRepository.setClaimedPlayerName(null)
                 _uiState.update {
                     it.copy(
                         isClaimed = !uiState.value.isClaimed
@@ -111,6 +148,8 @@ class PlayerDetailsViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
+
+            val claimedPlayerName = userPreferencesManager.claimedPlayerName.firstOrNull()
             val playerIdDeferred = async { authRepository.getPlayer() }
             val playerInfoDeferred = async { repository.fetchPlayerInfo(playerId) }
             val playerHeroStatsDeferred = async { repository.fetchAllPlayerHeroStats(playerId) }
@@ -137,6 +176,7 @@ class PlayerDetailsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
+                        claimedPlayerName = claimedPlayerName,
                         playerErrors = null,
                         playerId = playerId,
                         isClaimed = isClaimed,

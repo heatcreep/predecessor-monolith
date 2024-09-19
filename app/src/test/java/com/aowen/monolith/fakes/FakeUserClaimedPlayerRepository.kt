@@ -21,8 +21,17 @@ class FakeUserClaimedPlayerRepository(
     private val _claimedPlayerState: MutableStateFlow<ClaimedPlayerState> = MutableStateFlow(ClaimedPlayerState.NoClaimedPlayer)
     override val claimedPlayerState = _claimedPlayerState
 
+    private val _claimedPlayerName = MutableStateFlow<String?>(null)
+    override val claimedPlayerName = _claimedPlayerName
+    override suspend fun getClaimedPlayerName() {
+        _claimedPlayerName.update { "heatcreep.tv" }
+    }
+
     private val _setClaimedPlayerCounter: MutableStateFlow<Int> = MutableStateFlow(0)
     val setClaimedPlayerCounter: MutableStateFlow<Int> = _setClaimedPlayerCounter
+
+    private val _setClaimedPlayerNameCounter: MutableStateFlow<Int> = MutableStateFlow(0)
+    val setClaimedPlayerNameCounter: MutableStateFlow<Int> = _setClaimedPlayerNameCounter
 
     override suspend fun getClaimedPlayer(): Result<ClaimedPlayer?> {
         return when (claimedPlayerScenario) {
@@ -42,6 +51,10 @@ class FakeUserClaimedPlayerRepository(
             }
         }
 
+    }
+
+    override suspend fun setClaimedPlayerName(playerName: String?) {
+        _setClaimedPlayerNameCounter.value++
     }
 
     override suspend fun setClaimedUser(

@@ -10,23 +10,32 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,8 +50,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -52,6 +64,7 @@ import com.aowen.monolith.data.RankDetails
 import com.aowen.monolith.glance.PlayerStatsAppWidget
 import com.aowen.monolith.glance.worker.UpdatePlayerStatsWorker
 import com.aowen.monolith.ui.theme.MonolithTheme
+import com.aowen.monolith.ui.theme.inputFieldDefaults
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
@@ -114,13 +127,20 @@ fun UnclaimPlayerDialog(
 @Composable
 fun PlayerCard(
     player: PlayerDetails?,
+    playerNameField: String,
+    claimedPlayerName: String?,
+    isEditingPlayerName: Boolean,
     stats: PlayerStats?,
     modifier: Modifier = Modifier,
     isClaimed: Boolean = false,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
+    onPlayerNameChange: (String) -> Unit = {},
+    handleSavePlayerName: () -> Unit = {},
+    onEditPlayerName: () -> Unit = {}
 ) {
 
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val coroutineScope = rememberCoroutineScope()
 
     var isDialogOpen by remember { mutableStateOf(false) }
@@ -152,11 +172,75 @@ fun PlayerCard(
     ) {
         if (player != null && stats != null) {
             // Player Name
-            Text(
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.secondary,
-                text = player.playerName
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (isEditingPlayerName) {
+                    OutlinedTextField(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .height(intrinsicSize = IntrinsicSize.Min),
+                        shape = RoundedCornerShape(12.dp),
+                        placeholder = {
+                            Text(
+                                text = claimedPlayerName ?: player.playerName,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontStyle = FontStyle.Italic,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboardController?.hide()
+                            }
+                        ),
+                        value = playerNameField,
+                        colors = inputFieldDefaults(),
+                        singleLine = true,
+                        maxLines = 1,
+                        onValueChange = onPlayerNameChange,
+                        trailingIcon = {
+                            IconButton(onClick = handleSavePlayerName) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "Save Player Name",
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
+                            }
+                        },
+                    )
+                } else {
+                    Text(
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                        text = if (isClaimed && player.isConsolePlayer) {
+                            claimedPlayerName ?: player.playerName
+                        } else {
+                            player.playerName
+                        }
+                    )
+                }
+                if (isClaimed && player.isConsolePlayer) {
+                    IconButton(onClick = onEditPlayerName) {
+                        if(isEditingPlayerName) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Edit Player Name",
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit Player Name",
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+                }
+            }
             Spacer(modifier = Modifier.size(16.dp))
             Box(
                 contentAlignment = Alignment.Center
@@ -198,7 +282,9 @@ fun PlayerCard(
                                 isDialogOpen = true
                             } else {
                                 async { handleSavePlayer(false) }.await()
-                                val glanceId = GlanceAppWidgetManager(context).getGlanceIds(PlayerStatsAppWidget::class.java).firstOrNull()
+                                val glanceId = GlanceAppWidgetManager(context).getGlanceIds(
+                                    PlayerStatsAppWidget::class.java
+                                ).firstOrNull()
                                 if (glanceId != null) {
                                     UpdatePlayerStatsWorker.enqueue(context, glanceId, force = true)
                                 }
@@ -350,6 +436,9 @@ fun PlayerCardPreview() {
                     rankDetails = RankDetails.GOLD_I,
                     vpTotal = 476
                 ),
+                isEditingPlayerName = false,
+                playerNameField = "heatcreep.tv",
+                claimedPlayerName = "heatcreep.tv",
                 stats = PlayerStats(
                     favoriteHero = "Narbash",
                     favoriteRole = "Support",

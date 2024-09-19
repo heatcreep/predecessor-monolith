@@ -185,12 +185,14 @@ object AppModule {
     fun providesUserClaimedPlayerRepository(
         authRepository: AuthRepository,
         userRepository: UserRepository,
+        userPreferencesManager: UserPreferencesManager,
         postgrestService: SupabasePostgrestService,
         claimedPlayerDao: ClaimedPlayerDao,
         omedaCityRepository: OmedaCityRepository
     ): UserClaimedPlayerRepository =
         UserClaimedPlayerRepositoryImpl(
             authRepository = authRepository,
+            userPreferencesManager = userPreferencesManager,
             userRepository = userRepository,
             postgrestService = postgrestService,
             claimedPlayerDao = claimedPlayerDao,

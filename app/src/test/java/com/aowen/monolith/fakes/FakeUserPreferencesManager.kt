@@ -20,6 +20,8 @@ class FakeUserPreferencesManager(
         Scenario.SkippedOnboarding -> flowOf(true)
         else -> flowOf(false)
     }
+    override val claimedPlayerName: Flow<String?>
+        get() = flowOf("heatcreep.tv")
 
     val _saveConsoleCoutner = MutableStateFlow(0)
     val saveConsoleCounter: StateFlow<Int> = _saveConsoleCoutner
@@ -32,6 +34,10 @@ class FakeUserPreferencesManager(
 
     override suspend fun saveConsole(console: Console) {
         _saveConsoleCoutner.value++
+    }
+
+    override suspend fun saveClaimedPlayerName(playerName: String?) {
+        TODO("Not yet implemented")
     }
 
     override suspend fun setSkippedOnboarding() {

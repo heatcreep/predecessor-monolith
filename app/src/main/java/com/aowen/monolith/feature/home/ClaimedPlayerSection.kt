@@ -1,6 +1,8 @@
 package com.aowen.monolith.feature.home
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -44,7 +47,9 @@ class SampleSearchScreenUiStateProvider : CollectionPreviewParameterProvider<Hom
 fun ClaimedPlayerSection(
     uiState: HomeScreenUiState,
     claimedPlayerState: ClaimedPlayerState,
+    claimedPlayerName: String?,
     modifier: Modifier = Modifier,
+    onOpenBottomSheet: () -> Unit = {},
     navigateToPlayerDetails: (String) -> Unit = {}
 ) {
     Column(
@@ -83,17 +88,34 @@ fun ClaimedPlayerSection(
                 } else {
                     when (claimedPlayerState) {
                         is ClaimedPlayerState.NoClaimedPlayer -> {
-                            Text(
-                                text = "No player claimed! Navigate to a player's profile and click the" +
-                                        " 'Claim Player' button to claim a player.",
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Text(
+                                    text = """
+                                    No player claimed! Navigate to a player's profile and click the 'Claim Player' button 
+                                    to claim a player.
+                                """.trimIndent(),
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                                Text(
+                                    text = "Info: Console Players",
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    textDecoration = TextDecoration.Underline,
+                                    modifier = Modifier.clickable {
+                                        onOpenBottomSheet()
+                                    }
+                                )
+
+                            }
                         }
 
                         is ClaimedPlayerState.Claimed -> {
                             val claimedPlayer = claimedPlayerState.claimedPlayer
                             if (claimedPlayer.playerStats != null && claimedPlayer.playerDetails != null) {
                                 ClaimedPlayerCard(
+                                    claimedPlayerName = claimedPlayerName,
                                     playerDetails = claimedPlayer.playerDetails,
                                     playerStats = claimedPlayer.playerStats,
                                     navigateToPlayerDetails = {
@@ -118,6 +140,7 @@ fun ClaimedPlayerSectionPreview(
         Surface {
             ClaimedPlayerSection(
                 uiState = uiState,
+                claimedPlayerName = "Player Name",
                 claimedPlayerState = ClaimedPlayerState.NoClaimedPlayer
             )
         }

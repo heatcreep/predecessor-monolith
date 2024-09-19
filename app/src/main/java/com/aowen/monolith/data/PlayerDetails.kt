@@ -56,8 +56,9 @@ data class PlayerDetails(
     val mmr: String? = null,
     val isMmrDisabled: Boolean = false,
     val isCheater: Boolean = false,
-
-    )
+    ) {
+    val isConsolePlayer = playerName.contains("\uD83C\uDFAE user-")
+}
 
 fun PlayerDto.create(): PlayerDetails {
     return PlayerDetails(

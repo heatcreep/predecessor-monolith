@@ -33,16 +33,20 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -91,6 +95,7 @@ internal fun HomeScreenRoute(
     val homeUiState by homeScreenViewModel.uiState.collectAsState()
     val favoriteBuildsState by homeScreenViewModel.favoriteBuildsState.collectAsState()
     val claimedPlayerState by homeScreenViewModel.claimedPlayerState.collectAsState()
+    val claimedPlayerName by homeScreenViewModel.claimedPlayerName.collectAsState()
 
     Feedback()
 
@@ -98,6 +103,7 @@ internal fun HomeScreenRoute(
         uiState = homeUiState,
         favoriteBuildsSharedState = favoriteBuildsState,
         claimedPlayerState  = claimedPlayerState,
+        claimedPlayerName = claimedPlayerName,
         navigateToSearch = navController::navigateToSearch,
         navigateToPlayerDetails = navController::navigateToPlayerDetails,
         navigateToHeroDetails = navController::navigateToHeroDetails,
@@ -114,6 +120,7 @@ fun HomeScreen(
     uiState: HomeScreenUiState,
     favoriteBuildsSharedState: FavoriteBuildsState,
     claimedPlayerState: ClaimedPlayerState,
+    claimedPlayerName: String?,
     navigateToSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
     navigateToHeroDetails: (Int, String) -> Unit,
@@ -127,6 +134,12 @@ fun HomeScreen(
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = handlePullRefresh
+    )
+
+    var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val closeBottomSheet = { openBottomSheet = false }
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
     )
 
     RefreshableContainer(
@@ -161,6 +174,38 @@ fun HomeScreen(
                 )
             }
         ) {
+            if(openBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = closeBottomSheet,
+                    sheetState = bottomSheetState
+                ) {
+                    Column(
+                        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Claim Player on Console",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Text(
+                            text = """
+                        Because of privacy issues, Omeda.city is not able to expose the PSN and Xbox usernames of players. To claim your player:
+                        
+                        - In game, go to replays and find a recent match
+                        - Copy the match id
+                        - In the app, search for the match by id
+                        - Find your player in the match details
+                        - Tap on the player and then tap 'Claim Player'
+                        
+                        After you've claimed your player, you can locally change the display name on the player details page.
+                    """.trimIndent(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+            }
             Column(
                 modifier = modifier
                     .fillMaxSize()
@@ -173,7 +218,11 @@ fun HomeScreen(
                 ClaimedPlayerSection(
                     uiState = uiState,
                     claimedPlayerState = claimedPlayerState,
-                    navigateToPlayerDetails = navigateToPlayerDetails
+                    claimedPlayerName = claimedPlayerName,
+                    navigateToPlayerDetails = navigateToPlayerDetails,
+                    onOpenBottomSheet = {
+                        openBottomSheet = true
+                    }
                 )
                 FavoriteBuildsSection(
                     uiState = uiState,
@@ -202,7 +251,8 @@ fun ClaimedPlayerCard(
     playerDetails: PlayerDetails,
     playerStats: PlayerStats,
     navigateToPlayerDetails: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    claimedPlayerName: String? = null
 ) {
 
     val heroImage = Hero.entries.firstOrNull {
@@ -249,7 +299,7 @@ fun ClaimedPlayerCard(
             )
             Column {
                 Text(
-                    text = playerDetails.playerName,
+                    text = claimedPlayerName ?: playerDetails.playerName,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary
                 )
@@ -564,6 +614,7 @@ fun SearchScreenPreview() {
                 uiState = HomeScreenUiState(
                     isLoading = false
                 ),
+                claimedPlayerName = "heatcreep.tv",
                 favoriteBuildsSharedState = FavoriteBuildsState.Success(emptyList()),
                 claimedPlayerState = ClaimedPlayerState.NoClaimedPlayer,
                 navigateToSearch = {},
@@ -606,6 +657,7 @@ fun SearchScreenRecentSearchPreview() {
                         )
                     )
                 ),
+                claimedPlayerName = "heatcreep.tv",
                 navigateToSearch = {},
                 navigateToPlayerDetails = {},
                 navigateToHeroDetails = { _, _ -> },

@@ -149,6 +149,7 @@ data class MatchDetails(
     val startTime: String = "",
     val endTime: String = "",
     val gameDuration: Int = 0,
+    val gameMode: String = "",
     val region: String = "",
     val winningTeam: String = "",
     val dawn: Team = Team.Dawn(emptyList()),
@@ -170,6 +171,7 @@ fun MatchDto.create(): MatchDetails {
         startTime = this.startTime,
         endTime = this.endTime,
         gameDuration = this.gameDuration,
+        gameMode = this.gameMode,
         region = this.region,
         winningTeam = this.winningTeam.replaceFirstChar { it.uppercase() },
         dawn = this.players.filter { player ->

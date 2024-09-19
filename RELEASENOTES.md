@@ -1,8 +1,13 @@
 # Release Notes
 
-## 1.8.1 - Latest
+## 1.8.2 - Latest
 
-## 1.8.0
+#### New Features
+
+- Console users can now edit their display name for their claimed player
+- Users can search for matches now by match ID
+
+## 1.8.1
 
 #### New Features
 

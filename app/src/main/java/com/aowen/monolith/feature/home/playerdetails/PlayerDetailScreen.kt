@@ -88,9 +88,12 @@ internal fun PlayerDetailsRoute(
         handleRetry = viewModel::initViewModel,
         modifier = modifier,
         handleSavePlayer = viewModel::handleSavePlayer,
+        handleSavePlayerName = viewModel::handleSaveClaimedPlayerName,
+        handlePlayerNameChange = viewModel::handlePlayerNameFieldChange,
         handlePlayerHeroStatsSelect = viewModel::handlePlayerHeroStatsSelect,
         navigateToMatchDetails = navController::navigateToMatchDetails,
-        navigateToMoreMatches = navController::navigateToMoreMatches
+        navigateToMoreMatches = navController::navigateToMoreMatches,
+        onEditPlayerName = viewModel::onEditPlayerName
     )
 }
 
@@ -101,9 +104,12 @@ fun PlayerDetailScreen(
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
     handleSavePlayer: suspend (Boolean) -> Unit = {},
+    handleSavePlayerName: () -> Unit = {},
+    handlePlayerNameChange: (String) -> Unit = {},
     handlePlayerHeroStatsSelect: (Int) -> Unit = { },
     navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
-    navigateToMoreMatches: (String) -> Unit = { }
+    navigateToMoreMatches: (String) -> Unit = { },
+    onEditPlayerName: () -> Unit = { }
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -186,7 +192,10 @@ fun PlayerDetailScreen(
                                     uiState = uiState,
                                     handleSavePlayer = handleSavePlayer,
                                     navigateToMatchDetails = navigateToMatchDetails,
-                                    navigateToMoreMatches = navigateToMoreMatches
+                                    handleSavePlayerName = handleSavePlayerName,
+                                    handlePlayerNameChange = handlePlayerNameChange,
+                                    navigateToMoreMatches = navigateToMoreMatches,
+                                    onEditPlayerName = onEditPlayerName
                                 )
 
                                 1 -> PlayerHeroStatsTab(
@@ -210,8 +219,11 @@ fun PlayerStatsTab(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
     handleSavePlayer: suspend (Boolean) -> Unit = {},
+    handlePlayerNameChange: (String) -> Unit = {},
+    handleSavePlayerName: () -> Unit = {},
     navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
-    navigateToMoreMatches: (String) -> Unit = { }
+    navigateToMoreMatches: (String) -> Unit = { },
+    onEditPlayerName: () -> Unit = { }
 ) {
 
     Column(
@@ -222,9 +234,15 @@ fun PlayerStatsTab(
         uiState.player.let { playerDetails ->
             PlayerCard(
                 player = playerDetails,
+                claimedPlayerName = uiState.claimedPlayerName,
+                playerNameField = uiState.playerNameField,
+                isEditingPlayerName = uiState.isEditingPlayerName,
                 isClaimed = uiState.isClaimed,
                 handleSavePlayer = handleSavePlayer,
-                stats = uiState.stats
+                stats = uiState.stats,
+                onPlayerNameChange = handlePlayerNameChange,
+                handleSavePlayerName = handleSavePlayerName,
+                onEditPlayerName = onEditPlayerName
             )
             Spacer(modifier = Modifier.size(32.dp))
             MatchesList(

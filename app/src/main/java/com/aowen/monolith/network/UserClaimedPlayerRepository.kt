@@ -10,14 +10,20 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 abstract class ClaimedPlayerState {
-    data class Claimed(val claimedPlayer: ClaimedPlayer) : ClaimedPlayerState()
+    data class Claimed(
+        val claimedPlayer: ClaimedPlayer,
+    ) : ClaimedPlayerState()
+
     data object NoClaimedPlayer : ClaimedPlayerState()
     data class Error(val message: String) : ClaimedPlayerState()
 }
 
 interface UserClaimedPlayerRepository {
     val claimedPlayerState: MutableStateFlow<ClaimedPlayerState>
+    val claimedPlayerName: MutableStateFlow<String?>
+    suspend fun getClaimedPlayerName()
     suspend fun getClaimedPlayer(): Result<ClaimedPlayer?>
+    suspend fun setClaimedPlayerName(playerName: String?)
     suspend fun setClaimedUser(
         isRemoving: Boolean,
         playerStats: PlayerStats?,
@@ -28,6 +34,7 @@ interface UserClaimedPlayerRepository {
 class UserClaimedPlayerRepositoryImpl @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
+    private val userPreferencesManager: UserPreferencesManager,
     private val postgrestService: SupabasePostgrestService,
     private val claimedPlayerDao: ClaimedPlayerDao,
     private val omedaCityRepository: OmedaCityRepository,
@@ -35,6 +42,13 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
     private val _claimedPlayerState: MutableStateFlow<ClaimedPlayerState> =
         MutableStateFlow(ClaimedPlayerState.NoClaimedPlayer)
     override val claimedPlayerState = _claimedPlayerState
+
+    private val _claimedPlayerName: MutableStateFlow<String?> = MutableStateFlow(null)
+    override val claimedPlayerName = _claimedPlayerName
+
+    override suspend fun getClaimedPlayerName() {
+        _claimedPlayerName.update { userPreferencesManager.claimedPlayerName.firstOrNull() }
+    }
 
     override suspend fun getClaimedPlayer(): Result<ClaimedPlayer?> {
         val playerId = when (authRepository.userState.value) {
@@ -69,7 +83,7 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
                             playerStats = playerInfoResponse.getOrNull()?.playerStats,
                             playerDetails = playerInfoResponse.getOrNull()?.playerDetails
 
-                        )
+                        ),
                     )
                 } else {
                     Result.failure(Exception("Player not found"))
@@ -103,6 +117,7 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
                 }
 
             }
+
             else -> {
                 playerDetails?.playerId?.let {
                     if (isRemoving) {
@@ -118,5 +133,10 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
             }
         }
 
+    }
+
+    override suspend fun setClaimedPlayerName(playerName: String?) {
+        userPreferencesManager.saveClaimedPlayerName(playerName)
+        _claimedPlayerName.value = playerName
     }
 }

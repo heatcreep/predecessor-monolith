@@ -9,6 +9,7 @@ import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.AuthScenario
 import com.aowen.monolith.fakes.FakeAuthRepository
 import com.aowen.monolith.fakes.FakeUserClaimedPlayerRepository
+import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroDto2
 import com.aowen.monolith.fakes.data.fakeMatchDto
@@ -58,6 +59,7 @@ class PlayerDetailsViewModelTest {
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
     }
 
@@ -68,6 +70,7 @@ class PlayerDetailsViewModelTest {
         val expected = PlayerDetailsUiState(
             isLoading = false,
             player = fakePlayerDto.create(),
+            claimedPlayerName="heatcreep.tv",
             heroStats = listOf(fakePlayerHeroStatsDto.create()),
             stats = fakePlayerStatsDto.create(),
             matches = listOf(fakeMatchDto.create()),
@@ -93,6 +96,7 @@ class PlayerDetailsViewModelTest {
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(errorScenario = AuthScenario.NoPlayerFound),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -121,6 +125,7 @@ class PlayerDetailsViewModelTest {
             ),
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -150,6 +155,7 @@ class PlayerDetailsViewModelTest {
             ),
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -178,6 +184,7 @@ class PlayerDetailsViewModelTest {
             ),
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -206,6 +213,7 @@ class PlayerDetailsViewModelTest {
             ),
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -235,6 +243,7 @@ class PlayerDetailsViewModelTest {
             ),
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -242,6 +251,7 @@ class PlayerDetailsViewModelTest {
         val expected = PlayerDetailsUiState(
             isLoading = false,
             playerId = "Empty",
+            claimedPlayerName="heatcreep.tv",
             isClaimed = false,
             player = PlayerDetails(),
             heroStats = emptyList(),
@@ -267,6 +277,7 @@ class PlayerDetailsViewModelTest {
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = fakeUserClaimedPlayerRepository,
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.handleSavePlayer()
         advanceUntilIdle()
@@ -287,6 +298,7 @@ class PlayerDetailsViewModelTest {
             repository = FakeOmedaCityRepository(),
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.handleSavePlayer()
 
@@ -307,6 +319,7 @@ class PlayerDetailsViewModelTest {
                 errorScenario = AuthScenario.SavePlayerError
             ),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            userPreferencesManager = FakeUserPreferencesManager()
         )
         viewModel.handleSavePlayer()
         advanceUntilIdle()

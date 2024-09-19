@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.OmedaCityRepository
@@ -33,7 +34,9 @@ data class SearchScreenUiState(
     val heroesError: String? = null,
     val filteredBuilds: List<BuildListItem> = emptyList(),
     val buildsError: String? = null,
-    val initPlayersListText: String? = "Search a user to get started",
+    val isLoadingMatchSearch: Boolean = true,
+    val foundMatch: MatchDetails? = null,
+    val matchesError: String? = null,
     val playersList: List<PlayerDetails?> = emptyList(),
     val recentSearchesList: List<PlayerDetails?> = emptyList(),
 )
@@ -168,7 +171,7 @@ class SearchScreenViewModel @Inject constructor(
     }
 
     fun handleSubmitSearch() {
-        _uiState.update { it.copy(isLoadingSearch = true) }
+        _uiState.update { it.copy(isLoadingSearch = true, isLoadingMatchSearch = true) }
         val fieldValue = uiState.value.searchFieldValue.trim()
         val itemsList = uiState.value.allItems.filter { item ->
             item.displayName.contains(fieldValue, ignoreCase = true)
@@ -188,9 +191,11 @@ class SearchScreenViewModel @Inject constructor(
             val buildsListDeferredResult = async { omedaCityRepository.fetchAllBuilds(
                 name = fieldValue
             ) }
+            val matchesListDeferredResult = async { omedaCityRepository.fetchMatchById(fieldValue) }
 
             val playersListResult = playersListDeferredResult.await()
             val buildsListResult = buildsListDeferredResult.await()
+            val matchesListResult = matchesListDeferredResult.await()
             if (playersListResult.isFailure) {
                 _uiState.update {
                     it.copy(
@@ -205,13 +210,24 @@ class SearchScreenViewModel @Inject constructor(
                     )
                 }
             }
+            if(matchesListResult.isFailure) {
+                _uiState.update {
+                    it.copy(
+                        matchesError = matchesListResult.exceptionOrNull()?.message,
+                        isLoadingMatchSearch = false
+                    )
+                }
+            }
             val filteredPlayersList = playersListResult.getOrNull()?.filter {
                 !it.isCheater && !it.isMmrDisabled
             }
             _uiState.update {
                 it.copy(
                     isLoadingSearch = false,
+                    isLoadingMatchSearch = false,
+                    matchesError = null,
                     playersList = filteredPlayersList ?: emptyList(),
+                    foundMatch = matchesListResult.getOrNull(),
                     filteredBuilds = buildsListResult.getOrNull() ?: emptyList()
                 )
             }
