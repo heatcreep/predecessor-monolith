@@ -28,7 +28,11 @@ fun ItemEffectRow(effect: EffectDetails) {
             modifier = Modifier.fillMaxWidth()
         ) {
             StyledText(
-                content = "${effect.name}${effect.condition?.let { " - $it" }}",
+                content = if(effect.condition != null) {
+                    "${effect.name} - ${effect.condition}"
+                } else {
+                    effect.name
+                }
             )
         }
         StyledText(content = effect.menuDescription ?: "")
@@ -47,6 +51,25 @@ fun ItemEffectRowPreview() {
                 effect = EffectDetails(
                     name = "Elation",
                     condition = "\u003CCondition\u003EAfter\u003C/Condition\u003E \u003CManaText\u003ELevel 6\u003C/ManaText\u003E\u003CCondition\u003E\u003C/Condition\u003E",
+                    menuDescription = "Healing or Shielding Allied Heroes grants you both 40 magical power and 20 ability haste for 5s."
+                )
+            )
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ItemEffectRowNoConditionPreview() {
+    MonolithTheme {
+        Surface {
+            ItemEffectRow(
+                effect = EffectDetails(
+                    name = "Elation",
+                    condition = null,
                     menuDescription = "Healing or Shielding Allied Heroes grants you both 40 magical power and 20 ability haste for 5s."
                 )
             )

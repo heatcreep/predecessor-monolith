@@ -62,6 +62,7 @@ enum class Hero(
     SHINBI("Shinbi", "Shinbi", 23, R.drawable.shinbi),
     SPARROW("Sparrow", "Sparrow", 20, R.drawable.sparrow),
     STEEL("Steel", "Steel", 21, R.drawable.steel),
+    SKYLAR("Skylar", "Boost", 57, R.drawable.skylar),
     TWINBLAST("TwinBlast", "TwinBlast", 30, R.drawable.twinblast),
     TERRA("Terra", "Terra", 54, R.drawable.terra),
     WRAITH("Wraith", "Wraith", 41, R.drawable.wraith),

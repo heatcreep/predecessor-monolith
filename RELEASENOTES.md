@@ -1,6 +1,14 @@
 # Release Notes
 
-## 1.8.2 - Latest
+## 1.8.3 - Latest
+
+#### Improvements & Bug Fixes
+
+- Add photo for Skyler
+- Add photo for new items
+- fix some font colors and null references
+
+## 1.8.2
 
 #### New Features
 

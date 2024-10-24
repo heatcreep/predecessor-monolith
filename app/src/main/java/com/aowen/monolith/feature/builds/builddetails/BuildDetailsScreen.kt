@@ -318,7 +318,11 @@ fun BuildDetailsScreen(
                     Spacer(modifier = Modifier.size(16.dp))
                     // Notes Row
                     uiState.buildDetails.description?.let {
-                        Text(text = "Notes", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            text = "Notes",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
                         Spacer(modifier = Modifier.size(8.dp))
                         MarkdownText(
                             markdown = it
