@@ -1,6 +1,14 @@
 # Release Notes
 
-## 1.8.3 - Latest
+## 1.8.5 - Latest
+
+#### Improvements & Bug Fixes
+
+- Add photo for Yin
+- Add photo for Mourn
+- Add photo for new items
+
+## 1.8.3
 
 #### Improvements & Bug Fixes
 
