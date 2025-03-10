@@ -3,10 +3,9 @@ package com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.ModuleAddRoute
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.ModuleEditOrderRoute
@@ -17,12 +16,12 @@ import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.skillorder.Ski
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.titledescription.TitleAndDescriptionRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.AddBuildRoute
 import com.aowen.monolith.feature.builds.addbuild.navigation.sharedViewModel
+import kotlinx.serialization.Serializable
 
 const val AddBuildDetailsRoute = "add-build-details"
 const val SkillOrderAndModuleMenuRoute = "skill-order-and-module-menu"
 const val SkillOrderRoute = "skill-order"
 const val ItemsOverviewRoute = "item-overview"
-const val ModuleAddRoute = "module-add"
 const val ModuleEditRoute = "module-edit"
 const val TitleAndDescriptionRoute = "title-and-description"
 
@@ -35,10 +34,10 @@ fun NavController.navigateToSkillOrderSelect(navOptions: NavOptions? = null) {
 }
 
 fun NavController.navigateToAddModule(
-    moduleIndex: Int? = null,
+    moduleId: String? = null,
     navOptions: NavOptions? = null
 ) {
-    this.navigate("$ModuleAddRoute?moduleIndex=$moduleIndex", navOptions)
+    this.navigate(ModuleAddRoute(moduleId), navOptions)
 }
 
 fun NavController.navigateToEditModuleOrder(navOptions: NavOptions? = null) {
@@ -78,22 +77,14 @@ fun NavGraphBuilder.addBuildDetailsScreen(
                 )
             SkillOrderRoute(navController, addBuildViewModel)
         }
-        composable(
-            route = "$ModuleAddRoute?moduleIndex={moduleIndex}",
-            arguments = listOf(
-                navArgument("moduleIndex") {
-                    type = NavType.StringType
-                    nullable = true
-                }
-            )
-        ) { backStackEntry ->
-            val moduleIndex = backStackEntry.arguments?.getString("moduleIndex") ?: "-1"
+        composable<ModuleAddRoute>{ backStackEntry ->
+            val moduleId = backStackEntry.toRoute<ModuleAddRoute>().moduleId
             val addBuildViewModel = backStackEntry
                 .sharedViewModel<AddBuildViewModel>(
                     navController = navController,
                     parentRoute = AddBuildRoute
                 )
-            ModuleAddRoute(navController, moduleIndex.toInt(), addBuildViewModel)
+            ModuleAddRoute(navController, moduleId, addBuildViewModel)
         }
         composable(route = ModuleEditRoute) { backStackEntry ->
             val addBuildViewModel = backStackEntry
@@ -113,3 +104,8 @@ fun NavGraphBuilder.addBuildDetailsScreen(
         }
     }
 }
+
+@Serializable
+data class ModuleAddRoute(
+    val moduleId: String? = null,
+)

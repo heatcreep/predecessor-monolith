@@ -42,6 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,16 +78,20 @@ import com.aowen.monolith.ui.theme.inputFieldDefaults
 @Composable
 fun ModuleAddRoute(
     navController: NavController,
-    moduleIndex: Int = -1,
+    moduleId: String?,
     viewModel: AddBuildViewModel
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
-    val itemModule = remember { uiState.modules.getOrNull(moduleIndex) }
+    val itemModule = remember { uiState.modules.firstOrNull { it.id == moduleId } }
+    var isEditing by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if (itemModule != null) {
-            viewModel.initWorkingModule(itemModule)
+        if(itemModule != null) {
+            if(!isEditing) {
+                viewModel.initWorkingModule(itemModule)
+                isEditing = true
+            }
         }
     }
 
@@ -117,6 +122,7 @@ fun ModuleAddRoute(
             viewModel.onCreateNewModule()
             navController.navigateUp()
             viewModel.clearWorkingModule()
+            isEditing = false
         },
         changeItemOrder = viewModel::onChangeModuleItemOrder,
         changeModuleTitle = viewModel::onChangeWorkingModuleTitle,
@@ -215,7 +221,7 @@ fun ModuleAddScreen(
                             keyboardController?.hide()
                         }
                     ),
-                    value = uiState.workingModule.title,
+                    value = uiState.workingModule?.title ?: "",
                     colors = inputFieldDefaults(),
                     singleLine = true,
                     maxLines = 1,

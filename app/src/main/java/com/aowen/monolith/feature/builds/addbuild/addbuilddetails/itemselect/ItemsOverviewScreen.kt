@@ -200,7 +200,11 @@ fun ItemsList(
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .size(buttonSize)
                         .clickable {
-                            navigateToItemDetailsSelect(BuildSection.Items.name, ItemType.Crest.name, null)
+                            navigateToItemDetailsSelect(
+                                BuildSection.Items.name,
+                                ItemType.Crest.name,
+                                null
+                            )
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -225,7 +229,11 @@ fun ItemsList(
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .size(buttonSize)
                         .clickable {
-                            navigateToItemDetailsSelect(BuildSection.Items.name, ItemType.Crest.name, null)
+                            navigateToItemDetailsSelect(
+                                BuildSection.Items.name,
+                                ItemType.Crest.name,
+                                null
+                            )
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -290,11 +298,11 @@ fun ItemsList(
                                             .background(MaterialTheme.colorScheme.primaryContainer)
                                             .size(buttonSize)
                                             .clickable {
-                                                       navigateToItemDetailsSelect(
-                                                           BuildSection.Items.name,
-                                                           ItemType.Item.name,
-                                                           index
-                                                       )
+                                                navigateToItemDetailsSelect(
+                                                    BuildSection.Items.name,
+                                                    ItemType.Item.name,
+                                                    index
+                                                )
                                             },
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -439,7 +447,11 @@ fun Modifier.dragContainer(
             detectDragGesturesAfterLongPress(
                 onDrag = { change, offset ->
                     change.consume()
-                    dragDropState.onDrag(offset = offset, dragDirection = dragDirection, onFeedback = onChange)
+                    dragDropState.onDrag(
+                        offset = offset,
+                        dragDirection = dragDirection,
+                        onFeedback = onChange
+                    )
                 },
                 onDragStart = { offset ->
                     dragDropState.onDragStart(offset, dragDirection)
@@ -473,7 +485,7 @@ fun SelectedItemsRowPreview() {
                     ),
                     changeItemOrder = { _, _ -> },
                     onReplaceSelectedItem = { _, _ -> },
-                    navigateToItemDetailsSelect = {_, _, _ ->}
+                    navigateToItemDetailsSelect = { _, _, _ -> }
                 )
             }
         }

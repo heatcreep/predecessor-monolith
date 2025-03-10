@@ -3,20 +3,28 @@ package com.aowen.monolith.feature.builds.addbuild
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.AbilityDetails
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.SlotType
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.UserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed interface ModuleState {
+    data object Create : ModuleState
+    data object Edit : ModuleState
+}
 
 data class AddBuildState(
     val isLoadingHeroes: Boolean = true,
@@ -75,11 +83,15 @@ data class CrestGroupDetails(
 
 @HiltViewModel
 class AddBuildViewModel @Inject constructor(
-    val repository: OmedaCityRepository
+    val repository: OmedaCityRepository,
+    val userPreferencesDataStore: UserPreferencesManager
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<AddBuildState> = MutableStateFlow(AddBuildState())
     val uiState = _uiState
+
+    private val _console = MutableStateFlow(Console.PC)
+    val console = _console
 
     init {
         initViewModel()
@@ -87,6 +99,7 @@ class AddBuildViewModel @Inject constructor(
 
     fun initViewModel() {
         viewModelScope.launch {
+            _console.emit(userPreferencesDataStore.console.first())
             val heroesResultDeferred = async { repository.fetchAllHeroes() }
             val itemsResultDeferred = async { repository.fetchAllItems() }
             val heroesResult = heroesResultDeferred.await()
@@ -222,15 +235,20 @@ class AddBuildViewModel @Inject constructor(
     }
 
     fun onCreateNewModule() {
-        _uiState.value = _uiState.value.copy(
-            modules = _uiState.value.modules.plus(
-                ItemModule(
-                    title = uiState.value.workingModule.title,
-                    items = uiState.value.workingModule.items
-                )
+        val isExistingModule = uiState.value.modules.any { it.id == uiState.value.workingModule.id }
+        _uiState.value = if (isExistingModule) {
+            _uiState.value.copy(
+                modules = uiState.value.modules.toMutableList().apply {
+                    val index = indexOfFirst { it.id == uiState.value.workingModule.id }
+                    removeAt(index)
+                    add(index, uiState.value.workingModule)
+                }
             )
-        )
-
+        } else {
+            _uiState.value.copy(
+                modules = uiState.value.modules.plus(uiState.value.workingModule)
+            )
+        }
     }
 
     fun onChangeModuleItemOrder(fromIndex: Int, toIndex: Int) {
@@ -251,8 +269,42 @@ class AddBuildViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(buildDescription = description)
     }
 
-    fun onSubmitNewBuild() {
-        submitToOmedaCity()
+    fun onSubmitNewBuild(): String {
+        return parseNewBuildUrl()
+    }
+
+    private fun parseNewBuildUrl(): String {
+        val itemIdMap = mutableMapOf<String, Int>()
+        val skillOrderMap = mutableMapOf<String, Int>()
+        val modulesMap = mutableMapOf<String, String>()
+
+        // Add item ids to map
+        uiState.value.selectedItems.mapIndexed { index, item ->
+            itemIdMap["build%5Bitem${index + 1}_id%5D"] = item.id
+        }
+
+        // Add skill order to map
+        uiState.value.skillOrder.mapIndexed { index, order ->
+            skillOrderMap["build[skill_order][${index + 1}]"] = order
+        }
+
+        // Add modules to map
+        uiState.value.modules.mapIndexed { index, itemModule ->
+            modulesMap["build[modules_attributes][$index][title]"] = itemModule.title
+            itemModule.items.mapIndexed { itemIndex, itemId ->
+                modulesMap["build[modules_attributes][$index][item${itemIndex + 1}_id]"] =
+                    itemId.toString()
+            }
+        }
+
+        return "https://omeda.city/builds/new?build[title]=${uiState.value.buildTitle}&" +
+                "build[description]=${uiState.value.buildDescription}&" +
+                "build[role]=${uiState.value.selectedRole.roleName}&" +
+                "build[hero_id]=${uiState.value.selectedHero?.id ?: -1}&" +
+                "build[crest_id]=${uiState.value.selectedCrest?.id ?: -1}&" +
+                itemIdMap.map { "${it.key}=${it.value}" }.joinToString("&") + "&" +
+                skillOrderMap.map { "${it.key}=${it.value}" }.joinToString("&") + "&" +
+                modulesMap.map { "${it.key}=${it.value}" }.joinToString("&")
     }
 
     private fun submitToOmedaCity() {

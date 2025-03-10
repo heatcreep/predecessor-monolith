@@ -54,7 +54,9 @@ import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.R
 import com.aowen.monolith.data.AbilityDetails
+import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.HeroDetails
+import com.aowen.monolith.data.getLevelingAbilities
 import com.aowen.monolith.feature.builds.addbuild.AddBuildState
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
 import com.aowen.monolith.ui.components.MonolithAlertDialog
@@ -68,8 +70,10 @@ fun SkillOrderRoute(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val console by viewModel.console.collectAsState()
     SkillOrderScreen(
         uiState = uiState,
+        console = console,
         onSkillDetailsSelected = viewModel::onSkillDetailsSelected,
         onSaveSkillOrder = viewModel::onSaveSkillOrder,
         navigateBack = navController::navigateUp
@@ -80,6 +84,7 @@ fun SkillOrderRoute(
 @Composable
 fun SkillOrderScreen(
     uiState: AddBuildState,
+    console: Console,
     onSaveSkillOrder: (List<Int>) -> Unit,
     onSkillDetailsSelected: (AbilityDetails) -> Unit = {},
     navigateBack: () -> Unit
@@ -172,6 +177,7 @@ fun SkillOrderScreen(
             }
             BuildOrderPicker(
                 selectedHeroAbilities = uiState.selectedHero?.abilities,
+                console = console,
                 skillOrder = currentSkillOrder,
                 onSkillSelected = { index, skill ->
                     currentSkillOrder = currentSkillOrder.toMutableList().apply {
@@ -190,6 +196,7 @@ fun SkillOrderScreen(
 fun BuildOrderPicker(
     modifier: Modifier = Modifier,
     selectedHeroAbilities: List<AbilityDetails>?,
+    console: Console,
     skillOrder: List<Int>,
     openSkillBottomSheet: (AbilityDetails) -> Unit,
     onSkillSelected: (Int, Int) -> Unit,
@@ -206,25 +213,26 @@ fun BuildOrderPicker(
             Arrangement.SpaceEvenly,
         ) {
             if(selectedHeroAbilities != null) {
+                val abilityKey = getLevelingAbilities(console)
                 BuilderHeaderRowItem(
                     onClick = openSkillBottomSheet,
                     ability = selectedHeroAbilities[2],
-                    text = "Q"
+                    text = abilityKey[1]
                 )
                 BuilderHeaderRowItem(
                     onClick = openSkillBottomSheet,
                     ability = selectedHeroAbilities[3],
-                    text = "E"
+                    text = abilityKey[2]
                 )
                 BuilderHeaderRowItem(
                     onClick = openSkillBottomSheet,
                     ability = selectedHeroAbilities[4],
-                    text = "R"
+                    text = abilityKey[3]
                 )
                 BuilderHeaderRowItem(
                     onClick = openSkillBottomSheet,
                     ability = selectedHeroAbilities[1],
-                    text = "RMB"
+                    text = abilityKey[0]
                 )
             }
         }
@@ -303,6 +311,7 @@ fun RowScope.BuilderHeaderRowItem(
         }
         Text(
             text = text,
+            color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.ExtraBold)
         )
     }
@@ -431,6 +440,7 @@ fun SkillOrderPickerScreenPreview() {
                     -1
                 )
             ),
+            console = Console.Xbox,
             onSaveSkillOrder = { /*TODO*/ },
             navigateBack = { /*TODO*/ })
 

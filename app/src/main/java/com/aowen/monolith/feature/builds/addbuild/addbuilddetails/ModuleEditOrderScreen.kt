@@ -55,7 +55,7 @@ fun ModuleEditOrderScreen(
     uiState: AddBuildState,
     onModuleChangeOrder: (Int, Int) -> Unit,
     navigateBack: () -> Unit,
-    navigateToAddModule: () -> Unit
+    navigateToAddModule: (String?) -> Unit
 ) {
 
     val hapticFeedback = LocalHapticFeedback.current
@@ -79,7 +79,7 @@ fun ModuleEditOrderScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { navigateToAddModule() }
+                        onClick = { navigateToAddModule(null) }
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -117,11 +117,17 @@ fun ModuleEditOrderScreen(
             ) {
                 itemsIndexed(uiState.modules) { index, module ->
                     DraggableItem(
+                        modifier = Modifier.padding(horizontal = 16.dp),
                         dragDropState = dragDropState,
                         dragDirection = DragDirection.Vertical,
                         index = index
                     ) {
-                        ModuleItemCard(module)
+                        ModuleItemCard(
+                            itemModule = module,
+                            onEdit = {
+                                navigateToAddModule(module.id)
+                            }
+                        )
                     }
                 }
             }

@@ -1,5 +1,7 @@
 package com.aowen.monolith.feature.builds.addbuild.addbuilddetails
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
@@ -48,9 +50,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,6 +72,7 @@ import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation.nav
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation.navigateToSkillOrderSelect
 import com.aowen.monolith.feature.builds.addbuild.addbuilddetails.navigation.navigateToTitleAndDescription
 import com.aowen.monolith.feature.builds.builddetails.SkillOrderScrollableRow
+import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
@@ -80,8 +86,10 @@ fun SkillOrderAndModuleSelectRoute(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val console by viewModel.console.collectAsState()
     SkillOrderAndModuleSelectScreen(
         uiState = uiState,
+        console = console,
         onSkillSelected = viewModel::onSkillSelected,
         onBuildTitleChanged = viewModel::onBuildTitleChanged,
         navigateBack = navController::navigateUp,
@@ -89,7 +97,8 @@ fun SkillOrderAndModuleSelectRoute(
         navigateToSkillOrderSelect = navController::navigateToSkillOrderSelect,
         navigateToAddModule = navController::navigateToAddModule,
         navigateToEditModuleOrder = navController::navigateToEditModuleOrder,
-        navigateToEditTitleAndDescription = navController::navigateToTitleAndDescription
+        navigateToEditTitleAndDescription = navController::navigateToTitleAndDescription,
+        onSubmitToOmeda = viewModel::onSubmitNewBuild,
     )
 }
 
@@ -97,6 +106,7 @@ fun SkillOrderAndModuleSelectRoute(
 @Composable
 fun SkillOrderAndModuleSelectScreen(
     uiState: AddBuildState,
+    console: Console,
     onSkillSelected: (Int, Int) -> Unit,
     onBuildTitleChanged: (String) -> Unit,
     navigateBack: () -> Unit,
@@ -104,15 +114,20 @@ fun SkillOrderAndModuleSelectScreen(
     navigateToSkillOrderSelect: () -> Unit,
     navigateToEditModuleOrder: () -> Unit = {},
     navigateToAddModule: () -> Unit = {},
-    navigateToEditTitleAndDescription: () -> Unit = {}
+    navigateToEditTitleAndDescription: () -> Unit = {},
+    onSubmitToOmeda: () -> String,
 ) {
-
+    val context = LocalContext.current
     var isSkillOrderEnabled by rememberSaveable { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
             MonolithTopAppBar(
-                title = "Add New Build",
+                title = "Add New ${uiState.selectedHero?.displayName} ${
+                    uiState.selectedRole.roleName.capitalize(
+                        Locale.current
+                    )
+                } Build",
                 titleStyle = MaterialTheme.typography.bodyLarge,
                 backAction = {
                     IconButton(onClick = {
@@ -136,6 +151,71 @@ fun SkillOrderAndModuleSelectScreen(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                // Title and Description
+                SectionWithAction(
+                    title = "Title and Description",
+                    action = {
+                        IconButton(onClick = navigateToEditTitleAndDescription) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                contentDescription = "Edit Items"
+                            )
+                        }
+                    }
+                ) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        thickness = 1.dp
+                    )
+                    Spacer(modifier = Modifier.size(16.dp))
+
+                    if (uiState.buildTitle.isEmpty()) {
+                        Text(
+                            text = "Tap the '+' button to add a title and description.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.secondary)
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                text = uiState.buildTitle,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontSize = 16.sp
+                                ),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            uiState.buildDescription.let {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                ) {
+                                    MarkdownText(
+                                        markdown = it,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        maxLines = 4
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+                Spacer(modifier = Modifier.size(16.dp))
                 // Items
                 SectionWithAction(
                     title = "Items",
@@ -265,8 +345,7 @@ fun SkillOrderAndModuleSelectScreen(
                             SkillOrderScrollableRow(
                                 modifier = Modifier.weight(1f),
                                 skillOrder = uiState.skillOrder,
-                                // TODO: Replace with VM value
-                                console = Console.Xbox
+                                console = console
                             )
                             Row {
                                 IconButton(onClick = navigateToSkillOrderSelect) {
@@ -383,71 +462,6 @@ fun SkillOrderAndModuleSelectScreen(
 
                 }
                 Spacer(modifier = Modifier.size(16.dp))
-                // Title and Description
-                SectionWithAction(
-                    title = "Title and Description",
-                    action = {
-                        IconButton(onClick = navigateToEditTitleAndDescription) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                tint = MaterialTheme.colorScheme.secondary,
-                                contentDescription = "Edit Items"
-                            )
-                        }
-                    }
-                ) {
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.tertiary,
-                        thickness = 1.dp
-                    )
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    if (uiState.buildTitle.isEmpty()) {
-                        Text(
-                            text = "Tap the '+' button to add a title and description.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    } else {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.secondary)
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                                text = uiState.buildTitle,
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    fontWeight = FontWeight.ExtraBold,
-                                    fontSize = 16.sp
-                                ),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            uiState.buildDescription?.let {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp)
-                                ) {
-                                    MarkdownText(
-                                        markdown = it,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                        maxLines = 4
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-
-                }
-                Spacer(modifier = Modifier.size(16.dp))
                 ElevatedButton(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = uiState.selectedHero != null && uiState.selectedRole != null,
@@ -455,7 +469,15 @@ fun SkillOrderAndModuleSelectScreen(
                         containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentColor = MaterialTheme.colorScheme.primaryContainer
                     ),
-                    onClick = { /*TODO*/ }
+                    onClick = {
+                        val string = onSubmitToOmeda()
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(string))
+                        try {
+                           context.startActivity(intent)
+                        } catch (e: Exception) {
+                            logDebug("Error opening URL: ${e.message}")
+                        }
+                    }
                 ) {
                     Text(text = "Save Build")
                 }
@@ -537,6 +559,7 @@ fun SkillOrderAndModuleSelectScreenPreview() {
                     )
                 )
             ),
+            console = Console.PC,
             onSkillSelected = { _, _ -> },
             navigateBack = {},
             navigateToItemSelect = { },
@@ -544,7 +567,8 @@ fun SkillOrderAndModuleSelectScreenPreview() {
             navigateToSkillOrderSelect = { },
             navigateToEditModuleOrder = { },
             navigateToAddModule = { },
-            navigateToEditTitleAndDescription = { }
+            navigateToEditTitleAndDescription = { },
+            onSubmitToOmeda = { "" }
         )
 
     }

@@ -12,10 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -69,7 +74,8 @@ fun ModuleTitleCard(
 
 @Composable
 fun ModuleItemCard(
-    itemModule: ItemModule
+    itemModule: ItemModule,
+    onEdit: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -78,28 +84,42 @@ fun ModuleItemCard(
             .background(MaterialTheme.colorScheme.primaryContainer),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth()
                 .background(MaterialTheme.colorScheme.secondary)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            text = itemModule.title,
-            style = MaterialTheme.typography.bodySmall.copy(
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 16.sp
-            ),
-            color = MaterialTheme.colorScheme.primary
-        )
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = itemModule.title,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 16.sp
+                ),
+                color = MaterialTheme.colorScheme.primary
+            )
+            IconButton(
+                onClick = onEdit,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             repeat(6) {
                 Box(modifier = Modifier
                     .weight(1f)
                     .aspectRatio(1f)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(MaterialTheme.colorScheme.primary)
                     .clickable {
                         // TODO:
                     }) {
@@ -129,7 +149,7 @@ fun ModuleItemCardPreview() {
                 itemModule = ItemModule(
                     title = "Items",
                     items = listOf(
-                        1, 2, 3, 4, 5, 6
+                        1, 2, 3, 4, 5
                     )
                 )
             )

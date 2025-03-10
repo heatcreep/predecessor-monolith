@@ -25,6 +25,7 @@ data class BuildListItem(
 )
 
 data class ItemModule(
+    val id: String = UUID.randomUUID().toString(),
     val title: String = "",
     val items: List<Int> = emptyList(),
 )
