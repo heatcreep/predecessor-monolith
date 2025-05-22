@@ -8,6 +8,7 @@ fun getItemImage(itemId: Int) = ItemImage.entries.firstOrNull {
 
 enum class ItemImage(val itemId: Int, val drawableId: Int) {
     ABSOLUTION(160, R.drawable.absolution),
+    AEGIS_OF_AGAWAR(249, R.drawable.aegisofagawar),
     ALCHEMICAL_ROD(91, R.drawable.alchemicalrod),
     ASHBRINGER(105, R.drawable.ashbringer),
     ASSASSIN_CREST(6, R.drawable.assassincrest),

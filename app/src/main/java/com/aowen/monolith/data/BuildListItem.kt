@@ -25,7 +25,7 @@ data class BuildListItem(
 )
 
 data class ItemModule(
-    val id: String = UUID.randomUUID().toString(),
+    val id: String? = UUID.randomUUID().toString(),
     val title: String = "",
     val items: List<Int> = emptyList(),
 )
@@ -52,6 +52,7 @@ fun BuildDto.create(): BuildListItem {
 
 fun ModuleDto.create(): ItemModule {
     return ItemModule(
+        id = id,
         title = title,
         items = listOfNotNull(item1Id, item2Id, item3Id, item4Id, item5Id, item6Id),
     )

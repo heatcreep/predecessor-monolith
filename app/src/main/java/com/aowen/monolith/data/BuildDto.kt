@@ -42,6 +42,7 @@ data class BuildDto(
 
 @Serializable
 data class ModuleDto(
+    val id: String?,
     val title: String,
     @SerialName("item1_id")
     val item1Id: Int?,

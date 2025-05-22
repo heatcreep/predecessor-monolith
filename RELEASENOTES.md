@@ -1,5 +1,13 @@
 # Release Notes
 
+## 1.8.6 - Latest
+
+#### Improvements & Bug Fixes
+
+- Add photo for Boris
+- Add photo for Wukong
+- Add photo for Aegis of Agawar
+
 ## 1.8.5 - Latest
 
 #### Improvements & Bug Fixes

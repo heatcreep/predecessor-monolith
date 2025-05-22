@@ -2,6 +2,7 @@ package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.getHeroRole
+import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
 import com.aowen.monolith.utils.MainDispatcherRule
@@ -17,7 +18,10 @@ class AddBuildViewModelTest {
     @Test
     fun `onRoleSelected should update the selected role in the state`() = runTest {
         // Given
-        val viewModel = AddBuildViewModel(repository = FakeOmedaCityRepository())
+        val viewModel = AddBuildViewModel(
+            repository = FakeOmedaCityRepository(),
+            userPreferencesDataStore = FakeUserPreferencesManager()
+        )
         val role = getHeroRole("carry") ?: HeroRole.Unknown
 
         // When

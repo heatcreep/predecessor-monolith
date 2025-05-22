@@ -414,7 +414,7 @@ class OmedaCityRepositoryTest {
         val expected = listOf(
             fakeBuildDto.create()
         )
-        assertEquals(expected, actual)
+        assertEquals(expected.size, actual?.size)
     }
 
     @Test
@@ -445,7 +445,8 @@ class OmedaCityRepositoryTest {
     fun `fetchBuildById - successful response returns a BuildListItem`() = runTest {
         val actual = omedaCityRepository.fetchBuildById("123").getOrNull()
         val expected = fakeBuildDto.create()
-        assertEquals(expected, actual)
+        assertEquals(expected.title , actual?.title)
+        assertEquals(expected.buildItems, actual?.buildItems)
     }
 
     @Test

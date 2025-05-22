@@ -5,6 +5,7 @@ import com.aowen.monolith.data.GameVersionDto
 import com.aowen.monolith.data.ModuleDto
 
 val fakeModuleDto = ModuleDto(
+    id = "123",
     title = "Module Title",
     item1Id = 301,
     item2Id = 302,
