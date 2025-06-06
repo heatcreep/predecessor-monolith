@@ -1,7 +1,6 @@
 package com.aowen.monolith.feature.builds.addbuild.addbuilddetails
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
@@ -59,6 +58,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.ItemDetails
@@ -464,16 +464,16 @@ fun SkillOrderAndModuleSelectScreen(
                 Spacer(modifier = Modifier.size(16.dp))
                 ElevatedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = uiState.selectedHero != null && uiState.selectedRole != null,
+                    enabled = uiState.selectedHero != null,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
                         contentColor = MaterialTheme.colorScheme.primaryContainer
                     ),
                     onClick = {
                         val string = onSubmitToOmeda()
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(string))
+                        val intent = Intent(Intent.ACTION_VIEW, string.toUri())
                         try {
-                           context.startActivity(intent)
+                            context.startActivity(intent)
                         } catch (e: Exception) {
                             logDebug("Error opening URL: ${e.message}")
                         }

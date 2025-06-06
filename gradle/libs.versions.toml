@@ -31,6 +31,7 @@ kotlinTest = "1.7.3"
 kotlinImmutableCollections = "0.3.7"
 ksp = "2.0.20-1.0.24"
 meetupMarkdown = "0.2.2"
+mockk = "1.14.2"
 supabaseBom = "2.6.0"
 ktorClientAndroid = "2.3.2"
 junit4 = "4.13.2"
@@ -93,6 +94,9 @@ supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
 supabase-gotrue = { module = "io.github.jan-tennert.supabase:gotrue-kt" }
 supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 supabase-functions = { module = "io.github.jan-tennert.supabase:functions-kt" }
+
+# Test Libraries
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 
 
 [plugins]

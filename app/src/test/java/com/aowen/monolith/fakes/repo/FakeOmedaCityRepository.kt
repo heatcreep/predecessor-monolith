@@ -1,8 +1,6 @@
 package com.aowen.monolith.fakes.repo
 
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.HeroDetails
-import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.MatchDetails
@@ -12,10 +10,6 @@ import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.data.fakeBuildDto
-import com.aowen.monolith.fakes.data.fakeHeroDto
-import com.aowen.monolith.fakes.data.fakeHeroDto2
-import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
-import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
 import com.aowen.monolith.fakes.data.fakeItemDto
 import com.aowen.monolith.fakes.data.fakeItemDto2
 import com.aowen.monolith.fakes.data.fakeItemDto3
@@ -161,46 +155,6 @@ class FakeOmedaCityRepository(
         } else when (itemName) {
             "Empty" -> Result.success(null)
             else -> Result.success(fakeItemDto.create())
-        }
-    }
-
-    override suspend fun fetchAllHeroes(): Result<List<HeroDetails>?> {
-        return if (hasHeroDetailsErrors) {
-            Result.failure(Exception(FetchHeroesError))
-        } else when (heroDetailsResponse) {
-            ResponseType.Empty -> Result.success(null)
-            else -> Result.success(
-                listOf(
-                    fakeHeroDto.create(),
-                    fakeHeroDto2.create()
-                )
-            )
-        }
-    }
-
-    override suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?> {
-        return if (hasHeroDetailsErrors) {
-            Result.failure(Exception(FetchHeroError))
-        } else when (heroName) {
-            "Empty" -> Result.success(null)
-            else -> Result.success(fakeHeroDto.create())
-        }
-    }
-
-    override suspend fun fetchAllHeroStatistics(timeFrame: String?): Result<List<HeroStatistics>> {
-        return if (hasHeroStatisticsErrors) {
-            Result.failure(Exception(FetchHeroStatsError))
-        } else Result.success(
-            fakeHeroStatisticsResult
-        )
-    }
-
-    override suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?> {
-        return if (hasHeroStatisticsErrors) {
-            Result.failure(Exception(FetchHeroStatsError))
-        } else when (heroId) {
-            "Empty" -> Result.success(null)
-            else -> Result.success(fakeHeroStatisticsDto.create())
         }
     }
 

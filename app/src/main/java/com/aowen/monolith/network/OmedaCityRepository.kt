@@ -1,8 +1,6 @@
 package com.aowen.monolith.network
 
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.HeroDetails
-import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.MatchDetails
@@ -38,15 +36,6 @@ interface OmedaCityRepository {
     suspend fun fetchAllItems(): Result<List<ItemDetails>?>
 
     suspend fun fetchItemByName(itemName: String): Result<ItemDetails?>
-
-    // Heroes
-    suspend fun fetchAllHeroes(): Result<List<HeroDetails>?>
-
-    suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?>
-
-    suspend fun fetchAllHeroStatistics(timeFrame: String? = "1M"): Result<List<HeroStatistics>>
-
-    suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?>
 
     suspend fun fetchAllBuilds(
         name: String? = null,
@@ -155,6 +144,7 @@ class OmedaCityRepositoryImpl @Inject constructor(
         }
     }
 
+    // Search Players
     override suspend fun fetchPlayersByName(playerName: String): Result<List<PlayerDetails>?> {
         return try {
             val playersResponse = playerApiService.getPlayersByName(playerName)
@@ -168,19 +158,6 @@ class OmedaCityRepositoryImpl @Inject constructor(
         }
     }
 
-
-    override suspend fun fetchAllHeroes(): Result<List<HeroDetails>?> {
-        return try {
-            val heroesResponse = playerApiService.getAllHeroes()
-            if (heroesResponse.isSuccessful) {
-                Result.success(heroesResponse.body()?.map { it.create() })
-            } else {
-                Result.failure(Exception("Failed to fetch heroes"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 
     override suspend fun fetchAllItems(): Result<List<ItemDetails>?> {
         return try {
@@ -202,47 +179,6 @@ class OmedaCityRepositoryImpl @Inject constructor(
                 Result.success(itemResponse.body()?.create())
             } else {
                 Result.failure(Exception("Failed to fetch item"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-
-    override suspend fun fetchHeroByName(heroName: String): Result<HeroDetails?> {
-        return try {
-            val heroResponse = playerApiService.getHeroByName(heroName)
-            if (heroResponse.isSuccessful) {
-                Result.success(heroResponse.body()?.create())
-            } else {
-                Result.failure(Exception("Failed to fetch hero"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun fetchAllHeroStatistics(timeFrame: String?): Result<List<HeroStatistics>> {
-        return try {
-            val heroStatisticsResponse = playerApiService.getAllHeroStatistics(timeFrame)
-            if (heroStatisticsResponse.isSuccessful) {
-                Result.success(heroStatisticsResponse.body()?.heroStatistics?.map { it.create() }
-                    ?: emptyList())
-            } else {
-                Result.failure(Exception("Failed to fetch hero statistics"))
-            }
-        } catch (e: Exception) {
-            Result.failure(Exception(e.localizedMessage))
-        }
-    }
-
-    override suspend fun fetchHeroStatisticsById(heroId: String): Result<HeroStatistics?> {
-        return try {
-            val heroStatisticsResponse = playerApiService.getHeroStatisticsById(heroId)
-            if (heroStatisticsResponse.isSuccessful) {
-                Result.success(heroStatisticsResponse.body()?.heroStatistics?.first()?.create())
-            } else {
-                Result.failure(Exception("Failed to fetch hero statistics"))
             }
         } catch (e: Exception) {
             Result.failure(e)

@@ -7,6 +7,7 @@ import com.aowen.monolith.fakes.FakeUserClaimedPlayerRepository
 import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository
 import com.aowen.monolith.fakes.data.fakeClaimedPlayer
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
+import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.home.HomeScreenError.ClaimedPlayerErrorMessage
 import com.aowen.monolith.feature.home.HomeScreenUiState
@@ -32,6 +33,7 @@ class HomeScreenViewModelTest {
     fun setup() {
         viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository()
         )
@@ -42,6 +44,7 @@ class HomeScreenViewModelTest {
 
         viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository()
 
@@ -60,22 +63,25 @@ class HomeScreenViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should update state successfully with ClaimedPlayer if playerId is valid`() = runTest {
-        viewModel = HomeScreenViewModel(
-            repository = FakeOmedaCityRepository(),
-            favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
-            claimedPlayerRepository = FakeUserClaimedPlayerRepository()
-        )
-        advanceUntilIdle()
-        val actual = viewModel.claimedPlayerState.value
-        assertEquals(ClaimedPlayerState.Claimed(fakeClaimedPlayer), actual)
-    }
+    fun `initViewModel() should update state successfully with ClaimedPlayer if playerId is valid`() =
+        runTest {
+            viewModel = HomeScreenViewModel(
+                repository = FakeOmedaCityRepository(),
+                omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+                favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
+                claimedPlayerRepository = FakeUserClaimedPlayerRepository()
+            )
+            advanceUntilIdle()
+            val actual = viewModel.claimedPlayerState.value
+            assertEquals(ClaimedPlayerState.Claimed(fakeClaimedPlayer), actual)
+        }
 
     @Test
     fun `initViewModel() should update state successfully if playerId is null`() = runTest {
 
         viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
                 claimedPlayerScenario = ClaimedPlayerScenario.PlayerNullOrEmpty
@@ -92,6 +98,7 @@ class HomeScreenViewModelTest {
 
         viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
                 claimedPlayerScenario = ClaimedPlayerScenario.PlayerInfoResponseFailure
@@ -120,6 +127,7 @@ class HomeScreenViewModelTest {
 
         viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
                 claimedPlayerScenario = ClaimedPlayerScenario.PlayerInfoError
@@ -148,6 +156,7 @@ class HomeScreenViewModelTest {
 
         viewModel = HomeScreenViewModel(
             repository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository()
 

@@ -3,9 +3,11 @@ package com.aowen.monolith.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroStatistics
+import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserClaimedPlayerRepository
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
+import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,6 +56,7 @@ data class HomeScreenUiState(
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val repository: OmedaCityRepository,
+    private val omedaCityHeroRepository: HeroRepository,
     private val favoriteBuildsRepository: UserFavoriteBuildsRepository,
     private val claimedPlayerRepository: UserClaimedPlayerRepository
 ) : ViewModel() {
@@ -81,11 +84,11 @@ class HomeScreenViewModel @Inject constructor(
             val claimedUserDeferredResult =
                 async { claimedPlayerRepository.getClaimedPlayer() }
             val heroStatsDeferredResult =
-                async { repository.fetchAllHeroStatistics() }
+                async { omedaCityHeroRepository.fetchAllHeroStatistics() }
 
             val claimedUserResult = claimedUserDeferredResult.await()
-            val heroStatsResult = heroStatsDeferredResult.await()
             val favoriteBuildsResult = favoriteBuildsDeferredResult.await()
+            val heroStatsResult = heroStatsDeferredResult.await().getOrThrow()
             if (claimedUserResult.isFailure) {
                 _uiState.update {
                     it.copy(
@@ -94,19 +97,6 @@ class HomeScreenViewModel @Inject constructor(
                             HomeScreenError.ClaimedPlayerErrorMessage(
                                 errorMessage = "Failed to fetch claimed user",
                                 error = claimedUserResult.exceptionOrNull()?.message
-                            )
-                        )
-                    )
-                }
-            }
-            if (heroStatsResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        homeScreenError = _uiState.value.homeScreenError.plus(
-                            HomeScreenError.HeroStatsErrorMessage(
-                                errorMessage = "Failed to fetch hero stats",
-                                error = heroStatsResult.exceptionOrNull()?.message
                             )
                         )
                     )
@@ -122,33 +112,52 @@ class HomeScreenViewModel @Inject constructor(
                     ))
                 }
             }
-            if (heroStatsResult.isSuccess) {
+            try {
                 val topFiveHeroesByWinRate =
-                    heroStatsResult.getOrNull()?.sortedBy { it.winRate }?.reversed()?.take(5)
+                    heroStatsResult.sortedBy { it.winRate }.reversed().take(5)
                 val topFiveHeroesByPickRate =
-                    heroStatsResult.getOrNull()?.sortedBy { it.pickRate }?.reversed()?.take(5)
+                    heroStatsResult.sortedBy { it.pickRate }.reversed().take(5)
 
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        heroStats = heroStatsResult.getOrNull() ?: emptyList(),
-                        topFiveHeroesByWinRate = topFiveHeroesByWinRate ?: emptyList(),
-                        topFiveHeroesByPickRate = topFiveHeroesByPickRate ?: emptyList(),
+                        heroStats = heroStatsResult,
+                        topFiveHeroesByWinRate = topFiveHeroesByWinRate,
+                        topFiveHeroesByPickRate = topFiveHeroesByPickRate,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        homeScreenError = _uiState.value.homeScreenError.plus(
+                            HomeScreenError.HeroStatsErrorMessage(
+                                errorMessage = "Failed to fetch hero stats",
+                                error = e.message
+                            )
+                        )
                     )
                 }
             }
+
         }
     }
 
     fun updateHeroStatsByTime(timeFrame: TimeFrame) {
         viewModelScope.launch {
-            val heroStatsDeferredResult =
-                async { repository.fetchAllHeroStatistics(timeFrame = timeFrame.value) }
-            val heroStatsResult = heroStatsDeferredResult.await().getOrDefault(emptyList())
-            _uiState.update {
-                it.copy(
-                    heroStats = heroStatsResult
-                )
+            try {
+                val heroStatsResult = omedaCityHeroRepository.fetchAllHeroStatistics(timeFrame = timeFrame.value).getOrThrow()
+                _uiState.update {
+                    it.copy(
+                        heroStats = heroStatsResult
+                    )
+                }
+            } catch ( _: Exception) {
+                _uiState.update {
+                    it.copy(
+                       heroStats = emptyList()
+                    )
+                }
             }
         }
     }

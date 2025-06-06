@@ -48,7 +48,7 @@ data class FavoriteHero(
     val updatedAt: String,
 )
 
-fun HeroDto.create(): HeroDetails {
+fun HeroDto.asHeroDetails(): HeroDetails {
     val reorderedAbilities = if (abilities.isNotEmpty()) {
         val lastElement = abilities.last()
         abilities.dropLast(1).toMutableList().apply {

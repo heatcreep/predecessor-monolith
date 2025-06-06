@@ -8,11 +8,13 @@ import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserClaimedPlayerRepository
 import com.aowen.monolith.network.UserPreferencesManager
+import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,6 +65,7 @@ data class PlayerDetailsUiState(
 class PlayerDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: OmedaCityRepository,
+    private val omedaCityHeroRepository: HeroRepository,
     private val userPreferencesManager: UserPreferencesManager,
     private val authRepository: AuthRepository,
     private val userClaimedPlayerRepository: UserClaimedPlayerRepository,
@@ -121,7 +124,7 @@ class PlayerDetailsViewModel @Inject constructor(
         }
     }
 
-   fun handleSavePlayer(isRemoving: Boolean = false) {
+    fun handleSavePlayer(isRemoving: Boolean = false) {
         viewModelScope.launch {
             try {
                 userClaimedPlayerRepository.setClaimedUser(
@@ -148,60 +151,68 @@ class PlayerDetailsViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
+            try {
+                val claimedPlayerName = userPreferencesManager.claimedPlayerName.firstOrNull()
+                val playerIdDeferred = async { authRepository.getPlayer() }
+                val playerInfoDeferred = async { repository.fetchPlayerInfo(playerId) }
+                val playerHeroStatsDeferred = async { repository.fetchAllPlayerHeroStats(playerId) }
+                val matchesDeferred = async { repository.fetchMatchesById(playerId) }
+                val heroesDeferred = async { omedaCityHeroRepository.fetchAllHeroes() }
 
-            val claimedPlayerName = userPreferencesManager.claimedPlayerName.firstOrNull()
-            val playerIdDeferred = async { authRepository.getPlayer() }
-            val playerInfoDeferred = async { repository.fetchPlayerInfo(playerId) }
-            val playerHeroStatsDeferred = async { repository.fetchAllPlayerHeroStats(playerId) }
-            val matchesDeferred = async { repository.fetchMatchesById(playerId) }
-            val heroesDeferred = async { repository.fetchAllHeroes() }
+                val playerIdResult = playerIdDeferred.await()
+                val playerInfoResult = playerInfoDeferred.await()
+                val playerHeroStatsResult = playerHeroStatsDeferred.await()
+                val matchesResult = matchesDeferred.await()
+                val heroes = heroesDeferred.await().getOrThrow()
 
-            val playerIdResult = playerIdDeferred.await()
-            val playerInfoResult = playerInfoDeferred.await()
-            val playerHeroStatsResult = playerHeroStatsDeferred.await()
-            val matchesResult = matchesDeferred.await()
-            val heroesResult = heroesDeferred.await()
-
-            if (playerInfoResult.isSuccess &&
-                playerHeroStatsResult.isSuccess &&
-                matchesResult.isSuccess &&
-                playerIdResult.isSuccess &&
-                heroesResult.isSuccess
-            ) {
-                val playerInfo = playerInfoResult.getOrNull()
-                val playerHeroStats = playerHeroStatsResult.getOrNull()
-                val heroes = heroesResult.getOrNull()
-                val userPlayerId = playerIdResult.getOrNull()?.playerId ?: ""
-                val isClaimed = userPlayerId == playerId
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        claimedPlayerName = claimedPlayerName,
-                        playerErrors = null,
-                        playerId = playerId,
-                        isClaimed = isClaimed,
-                        player = playerInfo?.playerDetails ?: PlayerDetails(),
-                        heroStats = playerHeroStats ?: emptyList(),
-                        stats = playerInfo?.playerStats ?: PlayerStats(),
-                        matches = matchesResult.getOrNull()?.matches ?: emptyList(),
-                        heroes = heroes ?: emptyList()
-                    )
+                if (playerInfoResult.isSuccess &&
+                    playerHeroStatsResult.isSuccess &&
+                    matchesResult.isSuccess &&
+                    playerIdResult.isSuccess
+                ) {
+                    val playerInfo = playerInfoResult.getOrNull()
+                    val playerHeroStats = playerHeroStatsResult.getOrNull()
+                    val userPlayerId = playerIdResult.getOrNull()?.playerId ?: ""
+                    val isClaimed = userPlayerId == playerId
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            claimedPlayerName = claimedPlayerName,
+                            playerErrors = null,
+                            playerId = playerId,
+                            isClaimed = isClaimed,
+                            player = playerInfo?.playerDetails ?: PlayerDetails(),
+                            heroStats = playerHeroStats ?: emptyList(),
+                            stats = playerInfo?.playerStats ?: PlayerStats(),
+                            matches = matchesResult.getOrNull()?.matches ?: emptyList(),
+                            heroes = heroes
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            playerErrors = PlayerErrors(
+                                playerIdError = playerIdResult.exceptionOrNull()?.message,
+                                playerInfoError = playerInfoResult.exceptionOrNull()?.message,
+                                heroStatsError = playerHeroStatsResult.exceptionOrNull()?.message,
+                                matchesError = matchesResult.exceptionOrNull()?.message,
+                                statsError = playerInfoResult.exceptionOrNull()?.message,
+                            )
+                        )
+                    }
                 }
-            } else {
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         playerErrors = PlayerErrors(
-                            playerIdError = playerIdResult.exceptionOrNull()?.message,
-                            playerInfoError = playerInfoResult.exceptionOrNull()?.message,
-                            heroStatsError = playerHeroStatsResult.exceptionOrNull()?.message,
-                            matchesError = matchesResult.exceptionOrNull()?.message,
-                            statsError = playerInfoResult.exceptionOrNull()?.message,
-                            heroesError = heroesResult.exceptionOrNull()?.message
+                            heroesError = e.message
                         )
                     )
                 }
             }
+
         }
     }
 }

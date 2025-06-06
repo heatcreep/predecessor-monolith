@@ -150,8 +150,6 @@ dependencies {
 
     // Room DB
     implementation(libs.androidx.room.runtime)
-    annotationProcessor(libs.androidx.room.compiler)
-
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.room.ktx)
@@ -161,6 +159,7 @@ dependencies {
     testImplementation(libs.junit4)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.paging.testing)
+    testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)

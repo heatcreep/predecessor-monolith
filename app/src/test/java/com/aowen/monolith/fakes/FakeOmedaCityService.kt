@@ -105,7 +105,7 @@ class FakeOmedaCityService(private val resCode: Int? = null) : OmedaCityService 
 
     override suspend fun getHeroByName(heroName: String): Response<HeroDto> {
         return when (resCode) {
-            404 -> Response.error(404, "Not Found".toResponseBody(null))
+            404 -> Response.error(404, "Not Found".toResponseBody())
             200 -> Response.success(fakeHeroDto)
             else -> throw Exception("Something went wrong")
         }

@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.data.repository.heroes.HeroRepository
+import com.aowen.monolith.network.getOrThrow
 import com.aowen.monolith.ui.utils.filterOrOriginal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,7 @@ data class HeroesScreenUiState(
 
 @HiltViewModel
 class HeroesScreenViewModel @Inject constructor(
-    private val repository: OmedaCityRepository
+    private val omedaCityHeroRepository: HeroRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HeroesScreenUiState())
@@ -74,23 +75,22 @@ class HeroesScreenViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-
-            val heroesResult = repository.fetchAllHeroes()
-            if (heroesResult.isSuccess) {
-                val heroes = heroesResult.getOrNull()?.sortedBy { it.displayName } ?: emptyList()
+            try {
+                val heroesResource = omedaCityHeroRepository.fetchAllHeroes().getOrThrow()
+                val heroesSortedByName = heroesResource?.sortedBy { it.displayName } ?: emptyList()
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         error = null,
-                        allHeroes = heroes,
-                        currentHeroes = heroes
+                        allHeroes = heroesSortedByName,
+                        currentHeroes = heroesSortedByName
                     )
                 }
-            } else {
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = "Failed to fetch heroes."
+                        error = e.message
                     )
                 }
             }

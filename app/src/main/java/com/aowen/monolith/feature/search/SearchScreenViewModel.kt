@@ -7,9 +7,11 @@ import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserRecentSearchRepository
+import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +46,7 @@ data class SearchScreenUiState(
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
     private val omedaCityRepository: OmedaCityRepository,
+    private val omedaCityHeroRepository: HeroRepository,
     private val userRecentSearchesRepository: UserRecentSearchRepository
 ) : ViewModel() {
 
@@ -57,45 +60,50 @@ class SearchScreenViewModel @Inject constructor(
     fun initViewModel() {
         viewModelScope.launch {
 
-            val recentSearchesDeferredResult =
-                async { userRecentSearchesRepository.getRecentSearches() }
+            try {
+                val recentSearchesDeferredResult =
+                    async { userRecentSearchesRepository.getRecentSearches() }
 
-            val itemsDeferredResult =
-                async { omedaCityRepository.fetchAllItems() }
+                val itemsDeferredResult =
+                    async { omedaCityRepository.fetchAllItems() }
 
-            val heroesDeferredResult =
-                async { omedaCityRepository.fetchAllHeroes() }
+                val heroesDeferredResult =
+                    async { omedaCityHeroRepository.fetchAllHeroes() }
 
-            val recentSearches = recentSearchesDeferredResult.await()
-            val itemsResult = itemsDeferredResult.await()
-            val heroesResult = heroesDeferredResult.await()
+                val recentSearches = recentSearchesDeferredResult.await()
+                val itemsResult = itemsDeferredResult.await()
+                val heroes = heroesDeferredResult.await()
 
 
-            if (itemsResult.isFailure) {
+                if (itemsResult.isFailure) {
+                    _uiState.update {
+                        it.copy(
+                            itemsError = itemsResult.exceptionOrNull()?.message
+                        )
+                    }
+                }
+
                 _uiState.update {
                     it.copy(
-                        itemsError = itemsResult.exceptionOrNull()?.message
+                        isLoading = false,
+                        isLoadingRecentSearches = false,
+                        recentSearchesList = recentSearches,
+                        allItems = itemsResult.getOrNull() ?: emptyList(),
+                        allHeroes = heroes.getOrThrow()
+                    )
+                }
+            } catch (e: Exception) {
+                logDebug(e.toString())
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        heroesError = e.message,
+                        isLoadingRecentSearches = false,
+                        isLoadingItemsAndHeroes = false
                     )
                 }
             }
 
-            if (heroesResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        heroesError = heroesResult.exceptionOrNull()?.message
-                    )
-                }
-            }
-
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    isLoadingRecentSearches = false,
-                    recentSearchesList = recentSearches,
-                    allItems = itemsResult.getOrNull() ?: emptyList(),
-                    allHeroes = heroesResult.getOrNull() ?: emptyList()
-                )
-            }
         }
     }
 

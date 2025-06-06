@@ -143,9 +143,8 @@ fun HeroDetailsRoute(
             if (uiState.isLoading) {
                 FullScreenLoadingIndicator("Hero Details")
             } else {
-                when (uiState.heroDetailsErrors) {
-                    is HeroDetailsError.HeroErrorMessage,
-                    is HeroDetailsError.StatisticsErrorMessage -> {
+                when {
+                    uiState.heroDetailsErrors != null -> {
                         val errorMessage = uiState.heroDetailsErrors?.errorMessage
                         FullScreenErrorWithRetry(
                             errorMessage = errorMessage
@@ -153,7 +152,6 @@ fun HeroDetailsRoute(
                             viewModel.initViewModel()
                         }
                     }
-
                     else -> {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             TabRow(
@@ -290,7 +288,7 @@ fun HeroOverviewScreen(
                         )
                     }
                 } else {
-                    if (uiState.heroDetailsErrors is HeroDetailsError.HeroBuildsErrorMessage) {
+                    if (uiState.heroDetailsErrors != null) {
                         Text(
                             text = uiState.heroDetailsErrors.errorMessage
                                 ?: "Failed to fetch hero builds.",

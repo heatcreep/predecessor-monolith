@@ -3,7 +3,9 @@
 package com.aowen.monolith.ui
 
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.asHeroDetails
 import com.aowen.monolith.data.create
+import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.fakes.FakeUserRecentSearchesRepository
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroDto2
@@ -13,11 +15,15 @@ import com.aowen.monolith.fakes.data.fakeItemDto3
 import com.aowen.monolith.fakes.data.fakeItemDto4
 import com.aowen.monolith.fakes.data.fakePlayerDetails
 import com.aowen.monolith.fakes.data.fakePlayerDetails2
+import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.ResponseType
 import com.aowen.monolith.feature.search.SearchScreenUiState
 import com.aowen.monolith.feature.search.SearchScreenViewModel
+import com.aowen.monolith.network.Resource
 import com.aowen.monolith.utils.MainDispatcherRule
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -32,147 +38,129 @@ class SearchScreenViewModelTest {
 
     private lateinit var viewModel: SearchScreenViewModel
 
+    private var heroRepository: HeroRepository = FakeOmedaCityHeroRepository()
+
     @Test
-    fun `calling initViewModel() should update uiState with recent searches and all items and heroes`() = runTest {
-        viewModel = SearchScreenViewModel(
-            omedaCityRepository = FakeOmedaCityRepository(),
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        )
-        viewModel.initViewModel()
-        advanceUntilIdle()
-        val actual = viewModel.uiState.value
-        val expected = SearchScreenUiState(
-            isLoading = false,
-            isLoadingRecentSearches = false,
-            recentSearchesList = listOf(
-                fakePlayerDetails,
-                fakePlayerDetails2
-            ),
-            allItems = listOf(
-                fakeItemDto.create(),
-                fakeItemDto2.create(),
-                fakeItemDto3.create(),
-                fakeItemDto4.create()
-            ),
-            allHeroes = listOf(
-                fakeHeroDto.create(),
-                fakeHeroDto2.create()
+    fun `calling initViewModel() should update uiState with recent searches and all items and heroes`() =
+        runTest {
+            viewModel = SearchScreenViewModel(
+                omedaCityRepository = FakeOmedaCityRepository(),
+                omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+                userRecentSearchesRepository = FakeUserRecentSearchesRepository()
             )
-        )
-        assertEquals(expected, actual)
-
-    }
-
-    @Test
-    fun `Items Fail - initViewModel() should update error state properly if items fail to load`() = runTest {
-        viewModel = SearchScreenViewModel(
-            omedaCityRepository = FakeOmedaCityRepository(hasItemDetailsErrors = true),
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        )
-        viewModel.initViewModel()
-        advanceUntilIdle()
-        val actual = viewModel.uiState.value
-        val expected = SearchScreenUiState(
-            isLoading = false,
-            itemsError = "Failed to fetch items",
-            isLoadingRecentSearches = false,
-            recentSearchesList = listOf(
-                fakePlayerDetails,
-                fakePlayerDetails2
-            ),
-            allItems = emptyList(),
-            allHeroes = listOf(
-                fakeHeroDto.create(),
-                fakeHeroDto2.create()
+            viewModel.initViewModel()
+            advanceUntilIdle()
+            val actual = viewModel.uiState.value
+            val expected = SearchScreenUiState(
+                isLoading = false,
+                isLoadingRecentSearches = false,
+                recentSearchesList = listOf(
+                    fakePlayerDetails,
+                    fakePlayerDetails2
+                ),
+                allItems = listOf(
+                    fakeItemDto.create(),
+                    fakeItemDto2.create(),
+                    fakeItemDto3.create(),
+                    fakeItemDto4.create()
+                ),
+                allHeroes = listOf(
+                    fakeHeroDto.asHeroDetails(),
+                    fakeHeroDto2.asHeroDetails()
+                )
             )
-        )
-        assertEquals(expected, actual)
-    }
+            assertEquals(expected, actual)
+
+        }
 
     @Test
-    fun `Items Empty - initViewModel() should update state properly if items are empty`() = runTest {
-        viewModel = SearchScreenViewModel(
-            omedaCityRepository = FakeOmedaCityRepository(itemDetailsResponse = ResponseType.Empty),
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        )
-        viewModel.initViewModel()
-        advanceUntilIdle()
-        val actual = viewModel.uiState.value
-        val expected = SearchScreenUiState(
-            isLoading = false,
-            isLoadingRecentSearches = false,
-            recentSearchesList = listOf(
-                fakePlayerDetails,
-                fakePlayerDetails2
-            ),
-            allItems = emptyList(),
-            allHeroes = listOf(
-                fakeHeroDto.create(),
-                fakeHeroDto2.create()
+    fun `Items Fail - initViewModel() should update error state properly if items fail to load`() =
+        runTest {
+            viewModel = SearchScreenViewModel(
+                omedaCityRepository = FakeOmedaCityRepository(hasItemDetailsErrors = true),
+                omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+                userRecentSearchesRepository = FakeUserRecentSearchesRepository()
             )
-        )
-        assertEquals(expected, actual)
-    }
+            viewModel.initViewModel()
+            advanceUntilIdle()
+            val actual = viewModel.uiState.value
+            val expected = SearchScreenUiState(
+                isLoading = false,
+                itemsError = "Failed to fetch items",
+                isLoadingRecentSearches = false,
+                recentSearchesList = listOf(
+                    fakePlayerDetails,
+                    fakePlayerDetails2
+                ),
+                allItems = emptyList(),
+                allHeroes = listOf(
+                    fakeHeroDto.asHeroDetails(),
+                    fakeHeroDto2.asHeroDetails()
+                )
+            )
+            assertEquals(expected, actual)
+        }
 
     @Test
-    fun `Heroes Fail - initViewModel() should update error state properly if heroes fail to load`() = runTest {
-        viewModel = SearchScreenViewModel(
-            omedaCityRepository = FakeOmedaCityRepository(hasHeroDetailsErrors = true),
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        )
-        viewModel.initViewModel()
-        advanceUntilIdle()
-        val actual = viewModel.uiState.value
-        val expected = SearchScreenUiState(
-            isLoading = false,
-            heroesError = "Failed to fetch heroes",
-            isLoadingRecentSearches = false,
-            recentSearchesList = listOf(
-                fakePlayerDetails,
-                fakePlayerDetails2
-            ),
-            allItems = listOf(
-                fakeItemDto.create(),
-                fakeItemDto2.create(),
-                fakeItemDto3.create(),
-                fakeItemDto4.create()
-            ),
-            allHeroes = emptyList()
-        )
-        assertEquals(expected, actual)
-    }
+    fun `Items Empty - initViewModel() should update state properly if items are empty`() =
+        runTest {
+            viewModel = SearchScreenViewModel(
+                omedaCityRepository = FakeOmedaCityRepository(itemDetailsResponse = ResponseType.Empty),
+                omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+                userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+            )
+            viewModel.initViewModel()
+            advanceUntilIdle()
+            val actual = viewModel.uiState.value
+            val expected = SearchScreenUiState(
+                isLoading = false,
+                isLoadingRecentSearches = false,
+                recentSearchesList = listOf(
+                    fakePlayerDetails,
+                    fakePlayerDetails2
+                ),
+                allItems = emptyList(),
+                allHeroes = listOf(
+                    fakeHeroDto.asHeroDetails(),
+                    fakeHeroDto2.asHeroDetails()
+                )
+            )
+            assertEquals(expected, actual)
+        }
 
     @Test
-    fun `Heroes Empty - initViewModel() should update state properly if heroes are empty`() = runTest {
-        viewModel = SearchScreenViewModel(
-            omedaCityRepository = FakeOmedaCityRepository(heroDetailsResponse = ResponseType.Empty),
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
-        )
-        viewModel.initViewModel()
-        advanceUntilIdle()
-        val actual = viewModel.uiState.value
-        val expected = SearchScreenUiState(
-            isLoading = false,
-            isLoadingRecentSearches = false,
-            recentSearchesList = listOf(
-                fakePlayerDetails,
-                fakePlayerDetails2
-            ),
-            allItems = listOf(
-                fakeItemDto.create(),
-                fakeItemDto2.create(),
-                fakeItemDto3.create(),
-                fakeItemDto4.create()
-            ),
-            allHeroes = emptyList()
-        )
-        assertEquals(expected, actual)
-    }
+    fun `Heroes Fail - initViewModel() should update error state properly if heroes fail to load`() =
+        runTest {
+            val networkErrorMessage = "Failed to fetch heroes"
+            heroRepository = mockk<HeroRepository>()
+            coEvery { heroRepository.fetchAllHeroes() } returns Resource.NetworkError(
+                404,
+                networkErrorMessage
+            )
+            viewModel = SearchScreenViewModel(
+                omedaCityRepository = FakeOmedaCityRepository(hasHeroDetailsErrors = true),
+                omedaCityHeroRepository = heroRepository,
+                userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+            )
+            advanceUntilIdle()
+            val actual = viewModel.uiState.value
+            val expected = SearchScreenUiState(
+                isLoading = false,
+                heroesError = "Network error: $networkErrorMessage (Code: 404)",
+                isLoadingRecentSearches = false,
+                isLoadingItemsAndHeroes = false,
+                recentSearchesList = emptyList(),
+                allItems = emptyList(),
+                allHeroes = emptyList()
+            )
+            assertEquals(expected, actual)
+        }
 
     @Test
     fun `setSearchValue updates state properly`() {
         viewModel = SearchScreenViewModel(
             omedaCityRepository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.setSearchValue("test")
@@ -185,6 +173,7 @@ class SearchScreenViewModelTest {
     fun `handleClearSearch updates state properly`() {
         viewModel = SearchScreenViewModel(
             omedaCityRepository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.setSearchValue("test")
@@ -198,6 +187,7 @@ class SearchScreenViewModelTest {
     fun `handleClearSingleRecentSearch updates state properly`() = runTest {
         viewModel = SearchScreenViewModel(
             omedaCityRepository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         advanceUntilIdle()
@@ -212,6 +202,7 @@ class SearchScreenViewModelTest {
     fun `handleClearAllRecentSearches updates state properly`() {
         viewModel = SearchScreenViewModel(
             omedaCityRepository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.handleClearAllRecentSearches()
@@ -224,6 +215,7 @@ class SearchScreenViewModelTest {
     fun `handleAddToRecentSearch updates state properly`() = runTest {
         viewModel = SearchScreenViewModel(
             omedaCityRepository = FakeOmedaCityRepository(),
+            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.handleAddToRecentSearch(fakePlayerDetails)

@@ -9,7 +9,9 @@ import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.SlotType
+import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.Resource
 import com.aowen.monolith.network.UserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
@@ -84,6 +86,7 @@ data class CrestGroupDetails(
 @HiltViewModel
 class AddBuildViewModel @Inject constructor(
     val repository: OmedaCityRepository,
+    val omedaCityHeroRepository: HeroRepository,
     val userPreferencesDataStore: UserPreferencesManager
 ) : ViewModel() {
 
@@ -100,14 +103,14 @@ class AddBuildViewModel @Inject constructor(
     fun initViewModel() {
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
-            val heroesResultDeferred = async { repository.fetchAllHeroes() }
+            val heroesResultDeferred = async { omedaCityHeroRepository.fetchAllHeroes() }
             val itemsResultDeferred = async { repository.fetchAllItems() }
             val heroesResult = heroesResultDeferred.await()
             val itemsResult = itemsResultDeferred.await()
-            if (heroesResult.isSuccess && itemsResult.isSuccess) {
+            if (heroesResult is Resource.Success && itemsResult.isSuccess) {
                 _uiState.value = _uiState.value.copy(
                     isLoadingHeroes = false,
-                    heroes = heroesResult.getOrNull() ?: emptyList(),
+                    heroes = heroesResult.data ?: emptyList(),
                     items = itemsResult.getOrNull() ?: emptyList(),
                     crestsList = groupCrests(itemsResult.getOrNull() ?: emptyList())
                 )
