@@ -195,7 +195,7 @@ data class ItemDetails(
     val buildPath: List<String?> = emptyList(),
 )
 
-fun ItemDto.create(): ItemDetails {
+fun ItemDto.asItemDetails(): ItemDetails {
 
     val rarity = when (this.rarity) {
         "Common" -> Rarity.COMMON

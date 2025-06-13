@@ -2,15 +2,18 @@
 
 package com.aowen.monolith.ui
 
-import com.aowen.monolith.data.create
+import com.aowen.monolith.data.asItemDetails
 import com.aowen.monolith.fakes.data.fakeItemDto
 import com.aowen.monolith.fakes.data.fakeItemDto2
 import com.aowen.monolith.fakes.data.fakeItemDto3
 import com.aowen.monolith.fakes.data.fakeItemDto4
-import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
+import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
 import com.aowen.monolith.feature.items.ItemsUiState
 import com.aowen.monolith.feature.items.ItemsViewModel
+import com.aowen.monolith.network.Resource
 import com.aowen.monolith.utils.MainDispatcherRule
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -25,12 +28,16 @@ class ItemsViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private var itemRepository = FakeOmedaCityItemRepository()
+
     private lateinit var viewModel: ItemsViewModel
+
+
 
     @Before
     fun setUp() {
         viewModel = ItemsViewModel(
-            repository = FakeOmedaCityRepository()
+            itemRepository = itemRepository
         )
     }
 
@@ -41,16 +48,16 @@ class ItemsViewModelTest {
         val expected = ItemsUiState(
             isLoading = false,
             allItems = listOf(
-                fakeItemDto2.create(),
-                fakeItemDto.create(),
-                fakeItemDto3.create(),
-                fakeItemDto4.create()
+                fakeItemDto2.asItemDetails(),
+                fakeItemDto.asItemDetails(),
+                fakeItemDto3.asItemDetails(),
+                fakeItemDto4.asItemDetails()
             ),
             filteredItems = listOf(
-                fakeItemDto2.create(),
-                fakeItemDto.create(),
-                fakeItemDto3.create(),
-                fakeItemDto4.create()
+                fakeItemDto2.asItemDetails(),
+                fakeItemDto.asItemDetails(),
+                fakeItemDto3.asItemDetails(),
+                fakeItemDto4.asItemDetails()
             ),
         )
         val actual = viewModel.uiState.value
@@ -59,17 +66,17 @@ class ItemsViewModelTest {
 
     @Test
     fun `initViewModel() should set uiState to ItemsUiState with error`() = runTest {
+        itemRepository = mockk()
+        coEvery { itemRepository.fetchAllItems() } returns Resource.NetworkError(404, "Failed to fetch items")
         viewModel = ItemsViewModel(
-            repository = FakeOmedaCityRepository(
-                hasItemDetailsErrors = true
-            )
+            itemRepository = itemRepository
         )
         advanceUntilIdle()
 
         // Then
         val expected = ItemsUiState(
             isLoading = false,
-            itemsError = "Failed to fetch items"
+            itemsError = "Network error: Failed to fetch items (Code: 404)"
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -178,10 +185,10 @@ class ItemsViewModelTest {
 
         assertEquals(
             listOf(
-                fakeItemDto2.create(),
-                fakeItemDto.create(),
-                fakeItemDto3.create(),
-                fakeItemDto4.create()
+                fakeItemDto2.asItemDetails(),
+                fakeItemDto.asItemDetails(),
+                fakeItemDto3.asItemDetails(),
+                fakeItemDto4.asItemDetails()
             ),
             viewModel.uiState.value.filteredItems
         )
@@ -191,9 +198,9 @@ class ItemsViewModelTest {
 
         assertEquals(
             listOf(
-                fakeItemDto2.create(),
-                fakeItemDto3.create(),
-                fakeItemDto4.create()
+                fakeItemDto2.asItemDetails(),
+                fakeItemDto3.asItemDetails(),
+                fakeItemDto4.asItemDetails()
             ),
             viewModel.uiState.value.filteredItems
         )
@@ -209,8 +216,8 @@ class ItemsViewModelTest {
 
         assertEquals(
             listOf(
-                fakeItemDto2.create(),
-                fakeItemDto3.create(),
+                fakeItemDto2.asItemDetails(),
+                fakeItemDto3.asItemDetails(),
             ),
             viewModel.uiState.value.filteredItems
         )
@@ -225,7 +232,7 @@ class ItemsViewModelTest {
 
         assertEquals(
             listOf(
-                fakeItemDto3.create(),
+                fakeItemDto3.asItemDetails(),
             ),
             viewModel.uiState.value.filteredItems
         )

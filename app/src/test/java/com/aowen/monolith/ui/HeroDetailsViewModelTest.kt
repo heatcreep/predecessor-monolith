@@ -103,9 +103,7 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = heroRepository,
-            omedaCityRepository = FakeOmedaCityRepository(
-                hasHeroDetailsErrors = true
-            )
+            omedaCityRepository = FakeOmedaCityRepository()
         )
 
         advanceUntilIdle()
@@ -140,9 +138,7 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = heroRepository,
-            omedaCityRepository = FakeOmedaCityRepository(
-                hasHeroStatisticsErrors = true
-            )
+            omedaCityRepository = FakeOmedaCityRepository()
         )
         advanceUntilIdle()
         val actual = viewModel.uiState.value

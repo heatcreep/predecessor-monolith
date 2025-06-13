@@ -7,8 +7,10 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.Team
 import com.aowen.monolith.data.getDetailsWithItems
+import com.aowen.monolith.data.repository.items.ItemRepository
 import com.aowen.monolith.data.toDecimal
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +35,8 @@ data class MatchDetailsUiState(
 @HiltViewModel
 class MatchDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: OmedaCityRepository
+    private val repository: OmedaCityRepository,
+    private val itemRepository: ItemRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MatchDetailsUiState())
@@ -51,11 +54,8 @@ class MatchDetailsViewModel @Inject constructor(
         _uiState.value = MatchDetailsUiState(isLoading = true)
         viewModelScope.launch {
             val matchDeferred = async { repository.fetchMatchById(matchId) }
-            val itemsDeferred = async { repository.fetchAllItems() }
-
+            val itemsDeferred = async { itemRepository.fetchAllItems() }
             val matchResult = matchDeferred.await()
-            val itemsResult = itemsDeferred.await()
-
             if (matchResult.isFailure) {
                 _uiState.update {
                     it.copy(
@@ -65,27 +65,21 @@ class MatchDetailsViewModel @Inject constructor(
                         )
                     )
                 }
-            } else if (itemsResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        matchDetailsErrors = MatchDetailsErrors(
-                            errorMessage = itemsResult.exceptionOrNull()?.message
-                        )
-                    )
-                }
-            } else {
+            }
+
+            try {
+                val itemsResult = itemsDeferred.await().getOrThrow()
                 val match = matchResult.getOrNull()
-                val allItems = itemsResult.getOrNull()
+                val allItems = itemsResult
                 val newMatch = match?.copy(
                     dusk = Team.Dusk(
                         players = match.dusk.players.map {
-                            player -> player.getDetailsWithItems(allItems)
+                                player -> player.getDetailsWithItems(allItems)
                         }
                     ),
                     dawn = Team.Dawn(
                         players = match.dawn.players.map {
-                            player -> player.getDetailsWithItems(allItems)
+                                player -> player.getDetailsWithItems(allItems)
                         }
                     )
                 )
@@ -95,7 +89,16 @@ class MatchDetailsViewModel @Inject constructor(
                         isLoading = false,
                         match = newMatch ?: MatchDetails(),
                         selectedTeam = newMatch?.dawn ?: Team.Dawn(emptyList()),
-                        items = allItems ?: emptyList()
+                        items = allItems
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        matchDetailsErrors = MatchDetailsErrors(
+                            errorMessage = e.message
+                        )
                     )
                 }
             }

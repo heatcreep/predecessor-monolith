@@ -1,7 +1,6 @@
 package com.aowen.monolith.network
 
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchesDetails
@@ -31,11 +30,6 @@ interface OmedaCityRepository {
     ): Result<MatchesDetails?>
 
     suspend fun fetchMatchById(matchId: String): Result<MatchDetails?>
-
-    // Items
-    suspend fun fetchAllItems(): Result<List<ItemDetails>?>
-
-    suspend fun fetchItemByName(itemName: String): Result<ItemDetails?>
 
     suspend fun fetchAllBuilds(
         name: String? = null,
@@ -152,33 +146,6 @@ class OmedaCityRepositoryImpl @Inject constructor(
                 Result.success(playersResponse.body()?.map { it.create() })
             } else {
                 Result.failure(Exception("Failed to fetch players"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-
-    override suspend fun fetchAllItems(): Result<List<ItemDetails>?> {
-        return try {
-            val itemsResponse = playerApiService.getAllItems()
-            if (itemsResponse.isSuccessful) {
-                Result.success(itemsResponse.body()?.map { it.create() })
-            } else {
-                Result.failure(Exception("Failed to fetch items"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun fetchItemByName(itemName: String): Result<ItemDetails?> {
-        return try {
-            val itemResponse = playerApiService.getItemByName(itemName)
-            if (itemResponse.isSuccessful) {
-                Result.success(itemResponse.body()?.create())
-            } else {
-                Result.failure(Exception("Failed to fetch item"))
             }
         } catch (e: Exception) {
             Result.failure(e)

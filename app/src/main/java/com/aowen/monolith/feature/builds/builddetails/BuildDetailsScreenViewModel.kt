@@ -6,9 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.repository.items.ItemRepository
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
 import com.aowen.monolith.network.UserPreferencesManager
+import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +37,8 @@ class BuildDetailsScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userPreferencesDataStore: UserPreferencesManager,
     private val userFavoriteBuildsRepository: UserFavoriteBuildsRepository,
-    private val repository: OmedaCityRepository
+    private val repository: OmedaCityRepository,
+    private val omedaCityItemRepository: ItemRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BuildDetailsUiState())
@@ -51,20 +54,19 @@ class BuildDetailsScreenViewModel @Inject constructor(
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
             val buildsDeferred = async { repository.fetchBuildById(buildId) }
-            val itemsDeferred = async { repository.fetchAllItems() }
+            val itemsDeferred = async { omedaCityItemRepository.fetchAllItems() }
 
             val favoritedBuilds = userFavoriteBuildsRepository.fetchFavoriteBuilds()
 
             if (favoritedBuilds.isSuccess) {
                 val isFavorited =
-                    favoritedBuilds.getOrNull()?.any { it.buildId == buildId.toInt() } ?: false
+                    favoritedBuilds.getOrNull()?.any { it.buildId == buildId.toInt() } == true
                 _uiState.update {
                     it.copy(isFavorited = isFavorited)
                 }
             }
 
             val buildsResult = buildsDeferred.await()
-            val itemsResult = itemsDeferred.await()
 
             if (buildsResult.isFailure) {
                 _uiState.update {
@@ -78,29 +80,27 @@ class BuildDetailsScreenViewModel @Inject constructor(
                 return@launch
             }
 
-            if (itemsResult.isFailure) {
+            try {
+                val buildDetails = buildsResult.getOrNull()
+                val allItems = itemsDeferred.await().getOrThrow()
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        buildDetails = buildDetails,
+                        items = allItems,
+                    )
+                }
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         error = BuildDetailsErrors(
-                            errorMessage = itemsResult.exceptionOrNull()?.message
+                            errorMessage = e.message
                         )
                     )
                 }
-                return@launch
             }
-
-            val buildDetails = buildsResult.getOrNull()
-            val allItems = itemsResult.getOrNull()
-
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    buildDetails = buildDetails,
-                    items = allItems ?: emptyList(),
-                )
-            }
-
         }
     }
 

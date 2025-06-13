@@ -61,26 +61,27 @@ fun ItemDetailsScreen(
     modifier: Modifier = Modifier
 ) {
 
-    if (uiState.isLoading) {
-        FullScreenLoadingIndicator()
-    } else {
-        if (uiState.error != null) {
+    when (uiState) {
+        is ItemDetailsUiState.Loading -> {
+            FullScreenLoadingIndicator()
+        }
+
+        is ItemDetailsUiState.Error -> {
             Column(
                 modifier = modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = uiState.error)
+                Text(text = uiState.message ?: "Something went wrong")
             }
+        }
 
-        } else {
+        is ItemDetailsUiState.Loaded -> {
             ItemDetailsContent(
                 modifier = modifier.padding(16.dp),
                 itemDetails = uiState.item
             )
         }
-
     }
-
 }
 

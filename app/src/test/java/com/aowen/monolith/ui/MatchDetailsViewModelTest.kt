@@ -8,12 +8,15 @@ import com.aowen.monolith.fakes.data.fakeAllItems
 import com.aowen.monolith.fakes.data.fakeDawnTeam
 import com.aowen.monolith.fakes.data.fakeDuskTeam
 import com.aowen.monolith.fakes.data.fakeMatchDetailsWithItems
+import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.fakes.repo.ResponseType
 import com.aowen.monolith.feature.matches.MatchDetailsErrors
 import com.aowen.monolith.feature.matches.MatchDetailsUiState
 import com.aowen.monolith.feature.matches.MatchDetailsViewModel
+import com.aowen.monolith.network.Resource
 import com.aowen.monolith.utils.MainDispatcherRule
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -27,6 +30,8 @@ class MatchDetailsViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private var itemRepository = FakeOmedaCityItemRepository()
+
     private lateinit var viewModel: MatchDetailsViewModel
 
     @Before
@@ -39,7 +44,8 @@ class MatchDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository()
+            repository = FakeOmedaCityRepository(),
+            itemRepository = itemRepository
         )
         advanceUntilIdle()
     }
@@ -60,33 +66,6 @@ class MatchDetailsViewModelTest {
     }
 
     @Test
-    fun `initViewModel() should set empty constructors if match and items are null`() = runTest {
-        viewModel = MatchDetailsViewModel(
-            savedStateHandle = SavedStateHandle(
-                mapOf(
-                    "playerId" to "validPlayerId",
-                    "matchId" to "No Match"
-                )
-
-            ),
-            repository = FakeOmedaCityRepository(
-                itemDetailsResponse = ResponseType.Empty
-            )
-        )
-        viewModel.initViewModel()
-        advanceUntilIdle()
-
-        val expected = MatchDetailsUiState(
-            isLoading = false,
-            match = MatchDetails(),
-            items = emptyList()
-        )
-        val actual = viewModel.uiState.value
-        assertEquals(expected, actual)
-
-    }
-
-    @Test
     fun `initViewModel() should set uiState to correct state when matchDetails has errors`() = runTest {
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
@@ -96,7 +75,8 @@ class MatchDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(hasMatchDetailsError = true)
+            repository = FakeOmedaCityRepository(hasMatchDetailsError = true),
+            itemRepository = itemRepository
         )
         viewModel.initViewModel()
         advanceUntilIdle()
@@ -104,7 +84,8 @@ class MatchDetailsViewModelTest {
             isLoading = false,
             matchDetailsErrors = MatchDetailsErrors(
                 errorMessage = "Failed to fetch match"
-            )
+            ),
+            items = FakeOmedaCityItemRepository.FAKE_ITEM_LIST
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -112,6 +93,8 @@ class MatchDetailsViewModelTest {
 
     @Test
     fun `initViewModel() should set uiState to correct state when items has errors`() = runTest {
+        itemRepository = mockk()
+        coEvery { itemRepository.fetchAllItems() } returns Resource.NetworkError(404, "Failed to fetch item details")
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -121,16 +104,16 @@ class MatchDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(
                 hasItemDetailsErrors = true
-            )
+            ),
+            itemRepository = itemRepository
         )
-        viewModel.initViewModel()
         advanceUntilIdle()
         val expected = MatchDetailsUiState(
             isLoading = false,
             match = MatchDetails(),
             items = emptyList(),
             matchDetailsErrors = MatchDetailsErrors(
-                errorMessage = "Failed to fetch items"
+                errorMessage = "Network error: Failed to fetch item details (Code: 404)"
             )
         )
         val actual = viewModel.uiState.value

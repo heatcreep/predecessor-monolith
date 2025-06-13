@@ -8,16 +8,31 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.repository.heroes.HeroRepository
+import com.aowen.monolith.data.repository.items.ItemRepository
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.Resource
 import com.aowen.monolith.network.UserRecentSearchRepository
-import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed interface AllItemsState {
+    data class Success(val items: List<ItemDetails>) : AllItemsState
+    data class Error(val errorMessage: String?) : AllItemsState
+    data object Empty : AllItemsState
+    data object Loading : AllItemsState
+}
+
+sealed interface AllHeroesState {
+    data class Success(val heroes: List<HeroDetails>) : AllHeroesState
+    data class Error(val errorMessage: String?) : AllHeroesState
+    data object Empty : AllHeroesState
+    data object Loading : AllHeroesState
+}
 
 data class SearchScreenUiState(
     val isLoading: Boolean = true,
@@ -28,10 +43,10 @@ data class SearchScreenUiState(
     val isLoadingRecentSearches: Boolean = true,
     val searchFieldValue: String = "",
     val isLoadingItemsAndHeroes: Boolean = true,
-    val allItems: List<ItemDetails> = emptyList(),
+    val allItems: AllItemsState = AllItemsState.Loading,
     val filteredItems: List<ItemDetails> = emptyList(),
     val itemsError: String? = null,
-    val allHeroes: List<HeroDetails> = emptyList(),
+    val allHeroes: AllHeroesState = AllHeroesState.Loading,
     val filteredHeroes: List<HeroDetails> = emptyList(),
     val heroesError: String? = null,
     val filteredBuilds: List<BuildListItem> = emptyList(),
@@ -47,6 +62,7 @@ data class SearchScreenUiState(
 class SearchScreenViewModel @Inject constructor(
     private val omedaCityRepository: OmedaCityRepository,
     private val omedaCityHeroRepository: HeroRepository,
+    private val omedaCityItemRepository: ItemRepository,
     private val userRecentSearchesRepository: UserRecentSearchRepository
 ) : ViewModel() {
 
@@ -59,51 +75,65 @@ class SearchScreenViewModel @Inject constructor(
 
     fun initViewModel() {
         viewModelScope.launch {
+            val recentSearchesDeferredResult =
+                async { userRecentSearchesRepository.getRecentSearches() }
 
-            try {
-                val recentSearchesDeferredResult =
-                    async { userRecentSearchesRepository.getRecentSearches() }
+            val itemsDeferredResult =
+                async { omedaCityItemRepository.fetchAllItems() }
 
-                val itemsDeferredResult =
-                    async { omedaCityRepository.fetchAllItems() }
+            val heroesDeferredResult =
+                async { omedaCityHeroRepository.fetchAllHeroes() }
 
-                val heroesDeferredResult =
-                    async { omedaCityHeroRepository.fetchAllHeroes() }
+            val recentSearches = recentSearchesDeferredResult.await()
+            val itemsResult = itemsDeferredResult.await()
+            val heroesResource = heroesDeferredResult.await()
 
-                val recentSearches = recentSearchesDeferredResult.await()
-                val itemsResult = itemsDeferredResult.await()
-                val heroes = heroesDeferredResult.await()
-
-
-                if (itemsResult.isFailure) {
-                    _uiState.update {
-                        it.copy(
-                            itemsError = itemsResult.exceptionOrNull()?.message
-                        )
+            val heroesState = when (heroesResource) {
+                is Resource.Success -> {
+                    if (heroesResource.data.isEmpty()) {
+                        AllHeroesState.Empty
+                    } else {
+                        AllHeroesState.Success(heroesResource.data)
                     }
                 }
 
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isLoadingRecentSearches = false,
-                        recentSearchesList = recentSearches,
-                        allItems = itemsResult.getOrNull() ?: emptyList(),
-                        allHeroes = heroes.getOrThrow()
-                    )
+                is Resource.NetworkError -> {
+                    AllHeroesState.Error(heroesResource.errorMessage)
                 }
-            } catch (e: Exception) {
-                logDebug(e.toString())
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        heroesError = e.message,
-                        isLoadingRecentSearches = false,
-                        isLoadingItemsAndHeroes = false
-                    )
+
+                is Resource.GenericError -> {
+                    AllHeroesState.Error(heroesResource.errorMessage)
                 }
             }
 
+            val itemsState = when (itemsResult) {
+                is Resource.Success -> {
+                    if (itemsResult.data.isEmpty()) {
+                        AllItemsState.Empty
+                    } else {
+                        AllItemsState.Success(itemsResult.data)
+                    }
+                }
+
+                is Resource.NetworkError -> {
+                    AllItemsState.Error(itemsResult.errorMessage)
+                }
+
+                is Resource.GenericError -> {
+                    AllItemsState.Error(itemsResult.errorMessage)
+                }
+            }
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isLoadingRecentSearches = false,
+                    isLoadingItemsAndHeroes = false,
+                    recentSearchesList = recentSearches,
+                    allItems = itemsState,
+                    allHeroes = heroesState
+                )
+            }
         }
     }
 
@@ -180,11 +210,13 @@ class SearchScreenViewModel @Inject constructor(
 
     fun handleSubmitSearch() {
         _uiState.update { it.copy(isLoadingSearch = true, isLoadingMatchSearch = true) }
+        val itemsState = (uiState.value.allItems as AllItemsState.Success)
+        val heroesState = (uiState.value.allHeroes as AllHeroesState.Success)
         val fieldValue = uiState.value.searchFieldValue.trim()
-        val itemsList = uiState.value.allItems.filter { item ->
+        val itemsList = itemsState.items.filter { item ->
             item.displayName.contains(fieldValue, ignoreCase = true)
         }
-        val heroesList = uiState.value.allHeroes.filter { hero ->
+        val heroesList = heroesState.heroes.filter { hero ->
             hero.displayName.contains(fieldValue, ignoreCase = true)
         }
         _uiState.update {
@@ -195,10 +227,13 @@ class SearchScreenViewModel @Inject constructor(
             )
         }
         viewModelScope.launch {
-            val playersListDeferredResult = async { omedaCityRepository.fetchPlayersByName(fieldValue) }
-            val buildsListDeferredResult = async { omedaCityRepository.fetchAllBuilds(
-                name = fieldValue
-            ) }
+            val playersListDeferredResult =
+                async { omedaCityRepository.fetchPlayersByName(fieldValue) }
+            val buildsListDeferredResult = async {
+                omedaCityRepository.fetchAllBuilds(
+                    name = fieldValue
+                )
+            }
             val matchesListDeferredResult = async { omedaCityRepository.fetchMatchById(fieldValue) }
 
             val playersListResult = playersListDeferredResult.await()
@@ -211,14 +246,14 @@ class SearchScreenViewModel @Inject constructor(
                     )
                 }
             }
-            if(buildsListResult.isFailure) {
+            if (buildsListResult.isFailure) {
                 _uiState.update {
                     it.copy(
                         buildsError = buildsListResult.exceptionOrNull()?.message
                     )
                 }
             }
-            if(matchesListResult.isFailure) {
+            if (matchesListResult.isFailure) {
                 _uiState.update {
                     it.copy(
                         matchesError = matchesListResult.exceptionOrNull()?.message,

@@ -3,7 +3,8 @@ package com.aowen.monolith.feature.items
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.ItemDetails
-import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.data.repository.items.ItemRepository
+import com.aowen.monolith.network.getOrThrow
 import com.aowen.monolith.ui.utils.filterOrOriginal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,44 +48,37 @@ data class ItemsUiState(
 
 @HiltViewModel
 class ItemsViewModel @Inject constructor(
-    val repository: OmedaCityRepository
+    val itemRepository: ItemRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ItemsUiState())
     val uiState: StateFlow<ItemsUiState> = _uiState
 
     init {
-        viewModelScope.launch {
-            initViewModel()
-        }
+        initViewModel()
     }
 
-    suspend fun initViewModel() {
-
-
-        val allItemsResponse = repository.fetchAllItems()
-
-        if (allItemsResponse.isSuccess) {
-
-            val allItems = allItemsResponse.getOrNull() ?: emptyList()
-
-            val sortedItems = allItems.sortedBy {
-                it.displayName
-            }
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    allItems = sortedItems,
-                    filteredItems = sortedItems,
-                )
-            }
-
-        } else {
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    itemsError = "Failed to fetch items"
-                )
+    private fun initViewModel() {
+        viewModelScope.launch {
+            try {
+                val allItems = itemRepository.fetchAllItems().getOrThrow()
+                val sortedItems = allItems.sortedBy {
+                    it.displayName
+                }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        allItems = sortedItems,
+                        filteredItems = sortedItems,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        itemsError = e.message
+                    )
+                }
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.aowen.monolith.fakes.repo
 
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchesDetails
@@ -10,10 +9,6 @@ import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.data.fakeBuildDto
-import com.aowen.monolith.fakes.data.fakeItemDto
-import com.aowen.monolith.fakes.data.fakeItemDto2
-import com.aowen.monolith.fakes.data.fakeItemDto3
-import com.aowen.monolith.fakes.data.fakeItemDto4
 import com.aowen.monolith.fakes.data.fakeMatchDto
 import com.aowen.monolith.fakes.data.fakePlayerDetails
 import com.aowen.monolith.fakes.data.fakePlayerDetails2
@@ -40,10 +35,6 @@ class FakeOmedaCityRepository(
     private val hasPlayerHeroStatsError: Boolean = false,
     private val hasMatchDetailsError: Boolean = false,
     private val hasItemDetailsErrors: Boolean = false,
-    private val itemDetailsResponse: ResponseType = ResponseType.Success,
-    private val hasHeroDetailsErrors: Boolean = false,
-    private val heroDetailsResponse: ResponseType = ResponseType.Success,
-    private val hasHeroStatisticsErrors: Boolean = false,
     private val hasBuildsError: Boolean = false,
     private val buildsResponse: ResponseType = ResponseType.Success,
 ) : OmedaCityRepository {
@@ -55,10 +46,6 @@ class FakeOmedaCityRepository(
         const val FetchMatchesError = "Failed to fetch matches"
         const val FetchMatchError = "Failed to fetch match"
         const val FetchItemsError = "Failed to fetch items"
-        const val FetchItemError = "Failed to fetch item"
-        const val FetchHeroesError = "Failed to fetch heroes"
-        const val FetchHeroError = "Failed to fetch hero"
-        const val FetchHeroStatsError = "Failed to fetch hero statistics"
     }
 
     override suspend fun fetchPlayersByName(playerName: String): Result<List<PlayerDetails>?> {
@@ -129,32 +116,6 @@ class FakeOmedaCityRepository(
         } else when (matchId) {
             "No Match" -> Result.success(null)
             else -> Result.success(fakeMatchDto.create())
-        }
-    }
-
-    override suspend fun fetchAllItems(): Result<List<ItemDetails>?> {
-        return if (hasItemDetailsErrors) {
-            Result.failure(Exception(FetchItemsError))
-        } else when (itemDetailsResponse) {
-            ResponseType.Empty -> Result.success(emptyList())
-            ResponseType.SuccessNull -> Result.success(null)
-            else -> Result.success(
-                listOf(
-                    fakeItemDto.create(),
-                    fakeItemDto2.create(),
-                    fakeItemDto3.create(),
-                    fakeItemDto4.create()
-                )
-            )
-        }
-    }
-
-    override suspend fun fetchItemByName(itemName: String): Result<ItemDetails?> {
-        return if (hasItemDetailsErrors) {
-            Result.failure(Exception(FetchItemError))
-        } else when (itemName) {
-            "Empty" -> Result.success(null)
-            else -> Result.success(fakeItemDto.create())
         }
     }
 

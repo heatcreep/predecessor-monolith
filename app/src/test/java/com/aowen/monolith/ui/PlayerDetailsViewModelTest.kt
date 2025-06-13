@@ -20,7 +20,6 @@ import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
-import com.aowen.monolith.fakes.repo.ResponseType
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsUiState
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsViewModel
 import com.aowen.monolith.feature.home.playerdetails.PlayerErrors
@@ -222,9 +221,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(
-                hasHeroDetailsErrors = true
-            ),
+            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = heroRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
@@ -253,10 +250,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(
-                itemDetailsResponse = ResponseType.Empty,
-                heroDetailsResponse = ResponseType.Empty
-            ),
+            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = heroRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),

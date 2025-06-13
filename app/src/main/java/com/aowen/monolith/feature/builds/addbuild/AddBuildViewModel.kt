@@ -10,6 +10,7 @@ import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.SlotType
 import com.aowen.monolith.data.repository.heroes.HeroRepository
+import com.aowen.monolith.data.repository.items.ItemRepository
 import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.Resource
 import com.aowen.monolith.network.UserPreferencesManager
@@ -87,6 +88,7 @@ data class CrestGroupDetails(
 class AddBuildViewModel @Inject constructor(
     val repository: OmedaCityRepository,
     val omedaCityHeroRepository: HeroRepository,
+    val omedaCityItemRepository: ItemRepository,
     val userPreferencesDataStore: UserPreferencesManager
 ) : ViewModel() {
 
@@ -104,15 +106,15 @@ class AddBuildViewModel @Inject constructor(
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
             val heroesResultDeferred = async { omedaCityHeroRepository.fetchAllHeroes() }
-            val itemsResultDeferred = async { repository.fetchAllItems() }
+            val itemsResultDeferred = async { omedaCityItemRepository.fetchAllItems() }
             val heroesResult = heroesResultDeferred.await()
             val itemsResult = itemsResultDeferred.await()
-            if (heroesResult is Resource.Success && itemsResult.isSuccess) {
+            if (heroesResult is Resource.Success && itemsResult is Resource.Success) {
                 _uiState.value = _uiState.value.copy(
                     isLoadingHeroes = false,
-                    heroes = heroesResult.data ?: emptyList(),
-                    items = itemsResult.getOrNull() ?: emptyList(),
-                    crestsList = groupCrests(itemsResult.getOrNull() ?: emptyList())
+                    heroes = heroesResult.data,
+                    items = itemsResult.data,
+                    crestsList = groupCrests(itemsResult.data)
                 )
             } else {
                 _uiState.value = _uiState.value.copy(

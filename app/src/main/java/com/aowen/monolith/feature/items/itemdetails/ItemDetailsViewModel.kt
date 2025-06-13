@@ -4,58 +4,49 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.repository.items.ItemRepository
 import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class ItemDetailsUiState(
-    val isLoading: Boolean = true,
-    val item: ItemDetails = ItemDetails(),
-    val error: String? = null
-)
+sealed interface ItemDetailsUiState {
+    data object Loading : ItemDetailsUiState
+    data class Loaded(val item: ItemDetails) : ItemDetailsUiState
+    data class Error(val message: String?) : ItemDetailsUiState
+}
 
 @HiltViewModel
 class ItemDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    val repository: OmedaCityRepository
+    val repository: OmedaCityRepository,
+    val itemRepository: ItemRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ItemDetailsUiState())
+    private val _uiState = MutableStateFlow<ItemDetailsUiState>(ItemDetailsUiState.Loading)
     val uiState: StateFlow<ItemDetailsUiState> = _uiState
 
     private val itemName: String = checkNotNull(savedStateHandle["itemName"])
 
     init {
-        viewModelScope.launch {
-            initViewModel()
-        }
+        initViewModel()
     }
 
-    suspend fun initViewModel() {
-        _uiState.value = ItemDetailsUiState(isLoading = true)
-        val itemResponse = repository.fetchItemByName(itemName)
-        if (itemResponse.isSuccess) {
-            val item = itemResponse.getOrNull()
-            if (item == null) {
-                _uiState.value = ItemDetailsUiState(
-                    isLoading = false,
-                    error = "Item was null"
+    fun initViewModel() {
+        viewModelScope.launch {
+            val itemResponse = itemRepository.fetchItemByName(itemName)
+            try {
+                _uiState.value = ItemDetailsUiState.Loaded(
+                    item = itemResponse.getOrThrow()
                 )
-            } else {
-                _uiState.value = ItemDetailsUiState(
-                    isLoading = false,
-                    item = item
+            } catch (e: Exception) {
+                _uiState.value = ItemDetailsUiState.Error(
+                    message = e.message
                 )
             }
-        } else {
-            _uiState.value = ItemDetailsUiState(
-                isLoading = false,
-                error = itemResponse.exceptionOrNull()?.message
-            )
         }
-
     }
 }

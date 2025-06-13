@@ -4,7 +4,6 @@ import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
 import com.aowen.monolith.fakes.FakeOmedaCityService
 import com.aowen.monolith.fakes.data.fakeBuildDto
-import com.aowen.monolith.fakes.data.fakeItemDto
 import com.aowen.monolith.fakes.data.fakeMatchDto
 import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
@@ -191,69 +190,6 @@ class OmedaCityRepositoryTest {
         assertEquals(expected, actual?.message)
     }
 
-    // fetchAllItems
-
-    @Test
-    fun `fetchAllItems - successful response returns a list of ItemDetails`() = runTest {
-        val actual = omedaCityRepository.fetchAllItems().getOrNull()
-        val expected = listOf(
-            fakeItemDto.create()
-        )
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `fetchAllItems - non-successful response returns exception with message`() = runTest {
-        omedaCityRepository = OmedaCityRepositoryImpl(
-            playerApiService = FakeOmedaCityService(404)
-        )
-        val actual = omedaCityRepository.fetchAllItems().exceptionOrNull()
-        val expected = "Failed to fetch items"
-        assertTrue(actual is Exception)
-        assertEquals(expected, actual?.message)
-    }
-
-    @Test
-    fun `fetchAllItems - thrown exception returns failure with message`() = runTest {
-        omedaCityRepository = OmedaCityRepositoryImpl(
-            playerApiService = FakeOmedaCityService()
-        )
-        val actual = omedaCityRepository.fetchAllItems().exceptionOrNull()
-        val expected = "Something went wrong"
-        assertTrue(actual is Exception)
-        assertEquals(expected, actual?.message)
-    }
-
-    // fetchItemByName
-
-    @Test
-    fun `fetchItemByName - successful response returns an ItemDetails`() = runTest {
-        val actual = omedaCityRepository.fetchItemByName("test").getOrNull()
-        val expected = fakeItemDto.create()
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `fetchItemByName - non-successful response returns exception with message`() = runTest {
-        omedaCityRepository = OmedaCityRepositoryImpl(
-            playerApiService = FakeOmedaCityService(404)
-        )
-        val actual = omedaCityRepository.fetchItemByName("test").exceptionOrNull()
-        val expected = "Failed to fetch item"
-        assertTrue(actual is Exception)
-        assertEquals(expected, actual?.message)
-    }
-
-    @Test
-    fun `fetchItemByName - thrown exception returns failure with message`() = runTest {
-        omedaCityRepository = OmedaCityRepositoryImpl(
-            playerApiService = FakeOmedaCityService()
-        )
-        val actual = omedaCityRepository.fetchItemByName("test").exceptionOrNull()
-        val expected = "Something went wrong"
-        assertTrue(actual is Exception)
-        assertEquals(expected, actual?.message)
-    }
 
 
     // fetchAllBuilds
