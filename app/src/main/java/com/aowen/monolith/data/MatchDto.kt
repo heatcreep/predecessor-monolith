@@ -16,12 +16,12 @@ data class MatchPlayerDto(
     val rank: Int?,
     val team: String,
     @SerialName("hero_id")
-    val heroId: Int,
+    val heroId: Long,
     val role: String?,
     @SerialName("performance_score")
-    val performanceScore: Double,
+    val performanceScore: Double?,
     @SerialName("performance_title")
-    val performanceTitle: String,
+    val performanceTitle: String?,
     @SerialName("minions_killed")
     val minionsKilled: Int,
     @SerialName("lane_minions_killed")

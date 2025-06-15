@@ -56,7 +56,7 @@ fun HeroDto.asHeroDetails(): HeroDetails {
         }
     } else abilities
     return HeroDetails(
-        id = id,
+        id = id.toInt(),
         name = name,
         displayName = displayName,
         stats = stats,
@@ -72,7 +72,7 @@ fun HeroDto.asHeroDetails(): HeroDetails {
 
 fun FavoriteHeroDto.create(): FavoriteHero =
     FavoriteHero(
-        id = id,
+        id = id.toInt(),
         gameId = gameId ?: 0,
         name = name,
         displayName = displayName,

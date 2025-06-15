@@ -3,11 +3,11 @@
 package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
-import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.asHeroDetails
+import com.aowen.monolith.data.asMatchDetails
 import com.aowen.monolith.data.create
 import com.aowen.monolith.data.repository.heroes.HeroRepository
+import com.aowen.monolith.data.repository.matches.MatchRepository
 import com.aowen.monolith.fakes.AuthScenario
 import com.aowen.monolith.fakes.FakeAuthRepository
 import com.aowen.monolith.fakes.FakeUserClaimedPlayerRepository
@@ -19,10 +19,10 @@ import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
+import com.aowen.monolith.fakes.repo.FakeOmedaCityMatchRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsUiState
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsViewModel
-import com.aowen.monolith.feature.home.playerdetails.PlayerErrors
 import com.aowen.monolith.network.Resource
 import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 import com.aowen.monolith.utils.MainDispatcherRule
@@ -51,6 +51,8 @@ class PlayerDetailsViewModelTest {
 
     private var heroRepository: HeroRepository = FakeOmedaCityHeroRepository()
 
+    private var matchRepository: MatchRepository = FakeOmedaCityMatchRepository()
+
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         .withZone(ZoneId.of("UTC"))
 
@@ -65,6 +67,7 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = heroRepository,
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
@@ -80,7 +83,7 @@ class PlayerDetailsViewModelTest {
             claimedPlayerName = "heatcreep.tv",
             heroStats = listOf(fakePlayerHeroStatsDto.create()),
             stats = fakePlayerStatsDto.create(),
-            matches = listOf(fakeMatchDto.create()),
+            matches = listOf(fakeMatchDto.asMatchDetails()),
             heroes = listOf(
                 fakeHeroDto.asHeroDetails(),
                 fakeHeroDto2.asHeroDetails()
@@ -102,6 +105,7 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(errorScenario = AuthScenario.NoPlayerFound),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
@@ -110,9 +114,7 @@ class PlayerDetailsViewModelTest {
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
-            playerErrors = PlayerErrors(
-                playerIdError = FakeAuthRepository.GetPlayerError
-            ),
+            errorMessage = FakeAuthRepository.GetPlayerError,
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -131,6 +133,7 @@ class PlayerDetailsViewModelTest {
                 hasPlayerInfoError = true
             ),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
@@ -139,10 +142,7 @@ class PlayerDetailsViewModelTest {
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
-            playerErrors = PlayerErrors(
-                playerInfoError = FakeOmedaCityRepository.FetchPlayerInfoError,
-                statsError = FakeOmedaCityRepository.FetchPlayerInfoError,
-            ),
+            errorMessage = FakeOmedaCityRepository.FetchPlayerInfoError,
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -161,6 +161,7 @@ class PlayerDetailsViewModelTest {
                 hasPlayerHeroStatsError = true
             ),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
@@ -169,9 +170,7 @@ class PlayerDetailsViewModelTest {
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
-            playerErrors = PlayerErrors(
-                heroStatsError = FakeOmedaCityRepository.FetchPlayerHeroStatsError
-            ),
+            errorMessage = FakeOmedaCityRepository.FetchPlayerHeroStatsError,
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -179,6 +178,8 @@ class PlayerDetailsViewModelTest {
 
     @Test
     fun `initViewModel() should set UiState to error if matches fails`() = runTest {
+        matchRepository = mockk()
+        coEvery { matchRepository.fetchMatchesById(any()) } returns Resource.NetworkError(404, "Failed to fetch matches")
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -186,10 +187,9 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(
-                hasMatchDetailsError = true
-            ),
+            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
@@ -198,9 +198,7 @@ class PlayerDetailsViewModelTest {
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
-            playerErrors = PlayerErrors(
-                matchesError = FakeOmedaCityRepository.FetchMatchesError
-            ),
+            errorMessage = "Network error: Failed to fetch matches (Code: 404)",
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -223,6 +221,7 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = heroRepository,
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
@@ -231,44 +230,7 @@ class PlayerDetailsViewModelTest {
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
-            playerErrors = PlayerErrors(
-                heroesError = "Network error: $networkErrorMessage (Code: 404)"
-            ),
-        )
-        val actual = viewModel.uiState.value
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `initViewModel() sets proper values if all repo calls return null`() = runTest {
-        heroRepository = mockk<HeroRepository>()
-        coEvery { heroRepository.fetchAllHeroes() } returns Resource.Success(emptyList())
-        viewModel = PlayerDetailsViewModel(
-            savedStateHandle = SavedStateHandle(
-                mapOf(
-                    "playerId" to "Empty"
-                )
-
-            ),
-            repository = FakeOmedaCityRepository(),
-            omedaCityHeroRepository = heroRepository,
-            authRepository = FakeAuthRepository(),
-            userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
-            userPreferencesManager = FakeUserPreferencesManager()
-        )
-        advanceUntilIdle()
-
-        val expected = PlayerDetailsUiState(
-            isLoading = false,
-            playerId = "Empty",
-            claimedPlayerName = "heatcreep.tv",
-            isClaimed = false,
-            player = PlayerDetails(),
-            heroStats = emptyList(),
-            stats = PlayerStats(),
-            matches = emptyList(),
-            heroes = emptyList()
-
+            errorMessage = "Network error: $networkErrorMessage (Code: 404)",
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -286,6 +248,7 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = fakeUserClaimedPlayerRepository,
             userPreferencesManager = FakeUserPreferencesManager()
@@ -308,6 +271,7 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
@@ -328,6 +292,7 @@ class PlayerDetailsViewModelTest {
             ),
             repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
+            omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(
                 errorScenario = AuthScenario.SavePlayerError
             ),

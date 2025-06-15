@@ -17,6 +17,7 @@ import com.aowen.monolith.fakes.data.fakePlayerDetails
 import com.aowen.monolith.fakes.data.fakePlayerDetails2
 import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
+import com.aowen.monolith.fakes.repo.FakeOmedaCityMatchRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.search.AllHeroesState
 import com.aowen.monolith.feature.search.AllItemsState
@@ -44,6 +45,8 @@ class SearchScreenViewModelTest {
 
     private var itemRepository = FakeOmedaCityItemRepository()
 
+    private var matchRepository = FakeOmedaCityMatchRepository()
+
     @Test
     fun `calling initViewModel() should update uiState with recent searches and all items and heroes`() =
         runTest {
@@ -51,6 +54,7 @@ class SearchScreenViewModelTest {
                 omedaCityRepository = FakeOmedaCityRepository(),
                 omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
                 omedaCityItemRepository = itemRepository,
+                omedaCityMatchRepository = matchRepository,
                 userRecentSearchesRepository = FakeUserRecentSearchesRepository()
             )
             viewModel.initViewModel()
@@ -89,9 +93,10 @@ class SearchScreenViewModelTest {
             itemRepository = mockk()
             coEvery { itemRepository.fetchAllItems() } returns Resource.NetworkError(404, "Failed to fetch items")
             viewModel = SearchScreenViewModel(
-                omedaCityRepository = FakeOmedaCityRepository(hasItemDetailsErrors = true),
+                omedaCityRepository = FakeOmedaCityRepository(),
                 omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
                 omedaCityItemRepository = itemRepository,
+                omedaCityMatchRepository = matchRepository,
                 userRecentSearchesRepository = FakeUserRecentSearchesRepository()
             )
             viewModel.initViewModel()
@@ -127,6 +132,7 @@ class SearchScreenViewModelTest {
                 omedaCityRepository = FakeOmedaCityRepository(),
                 omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
                 omedaCityItemRepository = itemRepository,
+                omedaCityMatchRepository = matchRepository,
                 userRecentSearchesRepository = FakeUserRecentSearchesRepository()
             )
             viewModel.initViewModel()
@@ -164,6 +170,7 @@ class SearchScreenViewModelTest {
                 omedaCityRepository = FakeOmedaCityRepository(),
                 omedaCityHeroRepository = heroRepository,
                 omedaCityItemRepository = itemRepository,
+                omedaCityMatchRepository = matchRepository,
                 userRecentSearchesRepository = FakeUserRecentSearchesRepository()
             )
             advanceUntilIdle()
@@ -197,6 +204,7 @@ class SearchScreenViewModelTest {
             omedaCityRepository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityItemRepository = itemRepository,
+            omedaCityMatchRepository = matchRepository,
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.setSearchValue("test")
@@ -211,6 +219,7 @@ class SearchScreenViewModelTest {
             omedaCityRepository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityItemRepository = itemRepository,
+            omedaCityMatchRepository = matchRepository,
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.setSearchValue("test")
@@ -226,6 +235,7 @@ class SearchScreenViewModelTest {
             omedaCityRepository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityItemRepository = itemRepository,
+            omedaCityMatchRepository = matchRepository,
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         advanceUntilIdle()
@@ -242,6 +252,7 @@ class SearchScreenViewModelTest {
             omedaCityRepository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityItemRepository = itemRepository,
+            omedaCityMatchRepository = matchRepository,
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.handleClearAllRecentSearches()
@@ -256,6 +267,7 @@ class SearchScreenViewModelTest {
             omedaCityRepository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityItemRepository = itemRepository,
+            omedaCityMatchRepository = matchRepository,
             userRecentSearchesRepository = FakeUserRecentSearchesRepository()
         )
         viewModel.handleAddToRecentSearch(fakePlayerDetails)

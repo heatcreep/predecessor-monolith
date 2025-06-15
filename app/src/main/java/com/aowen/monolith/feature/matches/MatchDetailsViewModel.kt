@@ -8,8 +8,8 @@ import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.Team
 import com.aowen.monolith.data.getDetailsWithItems
 import com.aowen.monolith.data.repository.items.ItemRepository
+import com.aowen.monolith.data.repository.matches.MatchRepository
 import com.aowen.monolith.data.toDecimal
-import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -35,14 +35,13 @@ data class MatchDetailsUiState(
 @HiltViewModel
 class MatchDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: OmedaCityRepository,
-    private val itemRepository: ItemRepository
+    private val omedaCityItemRepository: ItemRepository,
+    private val omedaCityMatchRepository: MatchRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MatchDetailsUiState())
     val uiState: StateFlow<MatchDetailsUiState> = _uiState
 
-    private val playerId: String = checkNotNull(savedStateHandle["playerId"])
     private val matchId: String = checkNotNull(savedStateHandle["matchId"])
 
     init {
@@ -53,33 +52,21 @@ class MatchDetailsViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.value = MatchDetailsUiState(isLoading = true)
         viewModelScope.launch {
-            val matchDeferred = async { repository.fetchMatchById(matchId) }
-            val itemsDeferred = async { itemRepository.fetchAllItems() }
-            val matchResult = matchDeferred.await()
-            if (matchResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        matchDetailsErrors = MatchDetailsErrors(
-                            errorMessage = matchResult.exceptionOrNull()?.message,
-                        )
-                    )
-                }
-            }
+            val matchDeferred = async { omedaCityMatchRepository.fetchMatchById(matchId) }
+            val itemsDeferred = async { omedaCityItemRepository.fetchAllItems() }
 
             try {
-                val itemsResult = itemsDeferred.await().getOrThrow()
-                val match = matchResult.getOrNull()
-                val allItems = itemsResult
+                val allItems = itemsDeferred.await().getOrThrow()
+                val match = matchDeferred.await().getOrThrow()
                 val newMatch = match?.copy(
                     dusk = Team.Dusk(
-                        players = match.dusk.players.map {
-                                player -> player.getDetailsWithItems(allItems)
+                        players = match.dusk.players.map { player ->
+                            player.getDetailsWithItems(allItems)
                         }
                     ),
                     dawn = Team.Dawn(
-                        players = match.dawn.players.map {
-                                player -> player.getDetailsWithItems(allItems)
+                        players = match.dawn.players.map { player ->
+                            player.getDetailsWithItems(allItems)
                         }
                     )
                 )
@@ -116,6 +103,7 @@ class MatchDetailsViewModel @Inject constructor(
             )
         }
     }
+
     fun getCreepScorePerMinute(minionsKilled: Int): String {
         return ((60f / uiState.value.match.gameDuration.toFloat()) * minionsKilled.toFloat()).toDecimal()
     }

@@ -7,7 +7,8 @@ import androidx.paging.PagingConfig
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.MatchDetails
-import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.data.repository.matches.MatchRepository
+import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -36,12 +37,12 @@ data class MoreMatchesUiState(
 @HiltViewModel
 class MoreMatchesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: OmedaCityRepository
+    private val omedaCityMatchRepository: MatchRepository
 ) : ViewModel() {
 
     val playerId: String = checkNotNull(savedStateHandle["playerId"])
 
-    val _uiState = MutableStateFlow(MoreMatchesUiState())
+    private val _uiState = MutableStateFlow(MoreMatchesUiState())
     val uiState = _uiState
 
     lateinit var matchesPagingSource: MatchesPagingSource
@@ -50,12 +51,17 @@ class MoreMatchesViewModel @Inject constructor(
         config = PagingConfig(pageSize = PAGE_SIZE)
     ) {
         MatchesPagingSource(
-            playerId = playerId,
-            timeFrame = uiState.value.timeFrame.code,
-            heroId = uiState.value.hero?.heroId,
-            role = uiState.value.role?.roleName,
-            playerName = uiState.value.searchFieldValue,
-            repository = repository
+            getMatchesById = { page, perPage ->
+                omedaCityMatchRepository.fetchMatchesById(
+                    playerId = playerId,
+                    heroId = uiState.value.hero?.heroId,
+                    role = uiState.value.role?.roleName,
+                    timeFrame = uiState.value.timeFrame.code,
+                    playerName = uiState.value.searchFieldValue,
+                    page = page,
+                    perPage = perPage
+                ).getOrThrow()
+            }
         ).also {
             matchesPagingSource = it
         }

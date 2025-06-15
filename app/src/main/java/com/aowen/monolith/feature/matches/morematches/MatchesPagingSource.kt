@@ -3,37 +3,24 @@ package com.aowen.monolith.feature.matches.morematches
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.aowen.monolith.data.MatchDetails
-import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.data.MatchesDetails
 
 const val PAGE_SIZE = 30
 
 class MatchesPagingSource(
-    private val playerId: String,
-    private val timeFrame: String? = null,
-    private val heroId: Int? = null,
-    private val role: String? = null,
-    private val playerName: String? = null,
-    private val repository: OmedaCityRepository
+    private val getMatchesById: suspend (Int, Int) -> MatchesDetails
 ) : PagingSource<Int, MatchDetails>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MatchDetails> {
         return try {
             val page = params.key ?: 1
-            val response = repository.fetchMatchesById(
-                playerId = playerId,
-                heroId = heroId,
-                role = role,
-                timeFrame = timeFrame,
-                playerName = playerName,
-                page = page,
-                perPage = PAGE_SIZE
-            ).getOrThrow()
-            val nextKey = if (response?.matches.isNullOrEmpty()) null else {
+            val response = getMatchesById(page, PAGE_SIZE)
+            val nextKey = if (response.matches.isEmpty()) null else {
                 page + 1
             }
 
             LoadResult.Page(
-                data = response?.matches ?: emptyList(),
+                data = response.matches,
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = nextKey
             )

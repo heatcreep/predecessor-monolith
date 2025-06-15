@@ -62,10 +62,10 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
         vpTotal = this.vpTotal ?: 0,
         vpChange = if(this.vpChange != null) "${this.vpChange.toString()} VP" else "Unranked",
         rankDetails = this.rank.toRankedDetailsOrNull(),
-        heroId = this.heroId,
+        heroId = this.heroId.toInt(),
         role = this.role ?: "role unknown",
-        performanceScore = this.performanceScore.toFloat().toDecimal(),
-        performanceTitle = this.performanceTitle,
+        performanceScore = this.performanceScore?.toFloat().toDecimal(),
+        performanceTitle = this.performanceTitle ?: "None",
         kills = this.kills.toInt(),
         deaths = this.deaths.toInt(),
         assists = this.assists.toInt(),
@@ -156,16 +156,16 @@ data class MatchDetails(
     val dusk: Team = Team.Dusk(emptyList())
 )
 
-fun MatchesDto.create(): MatchesDetails {
+fun MatchesDto.asMatchesDetails(): MatchesDetails {
     return MatchesDetails(
         matches = this.matches.map { match ->
-            match.create()
+            match.asMatchDetails()
         },
         cursor = this.cursor
     )
 }
 
-fun MatchDto.create(): MatchDetails {
+fun MatchDto.asMatchDetails(): MatchDetails {
     return MatchDetails(
         matchId = this.id,
         startTime = this.startTime,

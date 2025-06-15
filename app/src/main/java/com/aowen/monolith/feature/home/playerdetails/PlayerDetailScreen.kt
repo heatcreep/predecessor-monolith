@@ -64,7 +64,6 @@ import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.feature.matches.MatchesList
 import com.aowen.monolith.feature.matches.morematches.navigation.navigateToMoreMatches
 import com.aowen.monolith.feature.matches.navigation.navigateToMatchDetails
-import com.aowen.monolith.logDebug
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.HeroSelectDropdown
 import com.aowen.monolith.ui.components.PlayerCard
@@ -134,20 +133,8 @@ fun PlayerDetailScreen(
             color = MaterialTheme.colorScheme.background
         ) {
 
-            if (uiState.playerErrors != null) {
-                val errorMessage = uiState.playerErrors.playerInfoErrorMessage
-                    ?: uiState.playerErrors.matchesErrorMessage
-                    ?: uiState.playerErrors.statsErrorMessage
-                    ?: uiState.playerErrors.heroesErrorMessage
-
-                    ?: "Something went wrong."
-                val errorLog = uiState.playerErrors.playerInfoError
-                    ?: uiState.playerErrors.matchesError
-                    ?: uiState.playerErrors.statsError
-                    ?: uiState.playerErrors.heroesError
-                    ?: uiState.playerErrors.heroStatsError
-                    ?: "No error log available."
-                logDebug(errorLog)
+            if (uiState.errorMessage != null) {
+                val errorMessage = uiState.errorMessage
                 FullScreenErrorWithRetry(
                     errorMessage = errorMessage
                 ) {
@@ -265,13 +252,15 @@ fun PlayerHeroStatsTab(
 ) {
     var selectedHero by remember {
         mutableStateOf(
-            uiState.heroes.find { it.displayName == uiState.stats.favoriteHero }
-                ?: uiState.heroes[0]
+            uiState.heroes.find { it.displayName == uiState.stats?.favoriteHero }
+                ?: uiState.heroes.getOrNull(0)
         )
     }
 
     LaunchedEffect(selectedHero) {
-        handlePlayerHeroStatsSelect(selectedHero.id)
+       selectedHero?.id?.let { id ->
+           handlePlayerHeroStatsSelect(id)
+       }
     }
 
     Column(

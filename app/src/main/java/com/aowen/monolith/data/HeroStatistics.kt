@@ -10,7 +10,7 @@ data class HeroStatistics(
 
 fun HeroStatisticsDto.create(): HeroStatistics {
     return HeroStatistics(
-        heroId = this.heroId,
+        heroId = this.heroId.toInt(),
         heroName = this.displayName,
         name = Hero.entries.find { it.heroName == this.displayName }?.pathName ?: "",
         winRate = this.winRate,

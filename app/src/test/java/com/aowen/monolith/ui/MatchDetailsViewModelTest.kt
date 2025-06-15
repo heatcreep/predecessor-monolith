@@ -9,7 +9,7 @@ import com.aowen.monolith.fakes.data.fakeDawnTeam
 import com.aowen.monolith.fakes.data.fakeDuskTeam
 import com.aowen.monolith.fakes.data.fakeMatchDetailsWithItems
 import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
+import com.aowen.monolith.fakes.repo.FakeOmedaCityMatchRepository
 import com.aowen.monolith.feature.matches.MatchDetailsErrors
 import com.aowen.monolith.feature.matches.MatchDetailsUiState
 import com.aowen.monolith.feature.matches.MatchDetailsViewModel
@@ -32,6 +32,8 @@ class MatchDetailsViewModelTest {
 
     private var itemRepository = FakeOmedaCityItemRepository()
 
+    private var matchRepository = FakeOmedaCityMatchRepository()
+
     private lateinit var viewModel: MatchDetailsViewModel
 
     @Before
@@ -44,16 +46,14 @@ class MatchDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
-            itemRepository = itemRepository
+            omedaCityItemRepository = itemRepository,
+            omedaCityMatchRepository = matchRepository,
         )
         advanceUntilIdle()
     }
 
     @Test
     fun `initViewModel() should set uiState to correct state`() = runTest {
-        viewModel.initViewModel()
-        advanceUntilIdle()
 
         val expected = MatchDetailsUiState(
             isLoading = false,
@@ -67,6 +67,8 @@ class MatchDetailsViewModelTest {
 
     @Test
     fun `initViewModel() should set uiState to correct state when matchDetails has errors`() = runTest {
+        matchRepository = mockk()
+        coEvery { matchRepository.fetchMatchById(any()) } returns Resource.NetworkError(404, "Failed to fetch match")
         viewModel = MatchDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -75,17 +77,16 @@ class MatchDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(hasMatchDetailsError = true),
-            itemRepository = itemRepository
+            omedaCityMatchRepository = matchRepository,
+            omedaCityItemRepository = itemRepository,
+
         )
-        viewModel.initViewModel()
         advanceUntilIdle()
         val expected = MatchDetailsUiState(
             isLoading = false,
             matchDetailsErrors = MatchDetailsErrors(
-                errorMessage = "Failed to fetch match"
+                errorMessage = "Network error: Failed to fetch match (Code: 404)"
             ),
-            items = FakeOmedaCityItemRepository.FAKE_ITEM_LIST
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -102,10 +103,8 @@ class MatchDetailsViewModelTest {
                     "matchId" to "validMatchId"
                 )
             ),
-            repository = FakeOmedaCityRepository(
-                hasItemDetailsErrors = true
-            ),
-            itemRepository = itemRepository
+            omedaCityMatchRepository = FakeOmedaCityMatchRepository(),
+            omedaCityItemRepository = itemRepository
         )
         advanceUntilIdle()
         val expected = MatchDetailsUiState(

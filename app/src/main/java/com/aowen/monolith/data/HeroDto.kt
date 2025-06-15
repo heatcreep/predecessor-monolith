@@ -43,7 +43,7 @@ data class AbilityDto(
 
 @Serializable
 data class HeroDto(
-    val id: Int,
+    val id: Long,
     val name: String,
     @SerialName("display_name")
     val displayName: String,
@@ -57,7 +57,7 @@ data class HeroDto(
 
 @Serializable
 data class FavoriteHeroDto(
-    val id: Int,
+    val id: Long,
     @SerialName("game_id")
     val gameId: Int? = 0,
     val name: String,

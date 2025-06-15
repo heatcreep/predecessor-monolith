@@ -2,12 +2,14 @@ package com.aowen.monolith.network
 
 import com.aowen.monolith.data.PlayerInfo
 import com.aowen.monolith.data.create
+import com.aowen.monolith.data.asMatchDetails
 import com.aowen.monolith.fakes.FakeOmedaCityService
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.data.fakeMatchDto
 import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
+import com.aowen.monolith.fakes.repo.FakeOmedaCityMatchRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -17,6 +19,8 @@ import org.junit.Test
 class OmedaCityRepositoryTest {
 
     private lateinit var omedaCityRepository: OmedaCityRepository
+
+    private var omedaCityMatchRepository = FakeOmedaCityMatchRepository()
 
     @Before
     fun setUp() {
@@ -95,67 +99,7 @@ class OmedaCityRepositoryTest {
 
     // fetchMatchesById
 
-    @Test
-    fun `fetchMatchesById - successful response returns a list of MatchDetails`() = runTest {
-        val actual = omedaCityRepository.fetchMatchesById("123").getOrNull()?.matches
-        val expected = listOf(
-            fakeMatchDto.create()
-        )
-        assertEquals(expected, actual)
-    }
 
-    @Test
-    fun `fetchMatchesById - non-successful response returns exception with message`() = runTest {
-        omedaCityRepository = OmedaCityRepositoryImpl(
-            playerApiService = FakeOmedaCityService(404)
-        )
-        val actual = omedaCityRepository.fetchMatchesById("123").exceptionOrNull()
-        val expected = "Failed to fetch matches: Code 404"
-        assertTrue(actual is Exception)
-        assertEquals(expected, actual?.message)
-    }
-
-    @Test
-    fun `fetchMatchesById - thrown exception returns failure with message`() = runTest {
-        omedaCityRepository = OmedaCityRepositoryImpl(
-            playerApiService = FakeOmedaCityService()
-        )
-        val actual = omedaCityRepository.fetchMatchesById("123").exceptionOrNull()
-        val expected = "Something went wrong"
-        assertTrue(actual is Exception)
-        assertEquals(expected, actual?.message)
-    }
-
-    // fetchMatchById
-
-    @Test
-    fun `fetchMatchById - successful response returns a MatchDetails`() = runTest {
-        val actual = omedaCityRepository.fetchMatchById("123").getOrNull()
-        val expected = fakeMatchDto.create()
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `fetchMatchById - non-successful response returns exception with message`() = runTest {
-        omedaCityRepository = OmedaCityRepositoryImpl(
-            playerApiService = FakeOmedaCityService(404)
-        )
-        val actual = omedaCityRepository.fetchMatchById("Error").exceptionOrNull()
-        val expected = "Failed to fetch match"
-        assertTrue(actual is Exception)
-        assertEquals(expected, actual?.message)
-    }
-
-    @Test
-    fun `fetchMatchById - thrown exception returns failure with message`() = runTest {
-        omedaCityRepository = OmedaCityRepositoryImpl(
-            playerApiService = FakeOmedaCityService()
-        )
-        val actual = omedaCityRepository.fetchMatchById("123").exceptionOrNull()
-        val expected = "Something went wrong"
-        assertTrue(actual is Exception)
-        assertEquals(expected, actual?.message)
-    }
 
     // fetchPlayersByName
 

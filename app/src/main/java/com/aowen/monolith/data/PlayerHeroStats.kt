@@ -67,7 +67,7 @@ fun PlayerHeroStatsDto.create(): PlayerHeroStats {
 
 
     return PlayerHeroStats(
-        heroId,
+        heroId.toInt(),
         displayName,
         matchCount,
         winRate = df.format(winRate?.let { it * 100 } ?: 0).toDouble(),

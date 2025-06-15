@@ -1,10 +1,10 @@
 package com.aowen.monolith.fakes.data
 
 import com.aowen.monolith.data.Team
-import com.aowen.monolith.data.create
+import com.aowen.monolith.data.asMatchDetails
 import com.aowen.monolith.data.getDetailsWithItems
 
-val fakeMatchDetails = fakeMatchDto.create()
+val fakeMatchDetails = fakeMatchDto.asMatchDetails()
 
 val fakeDuskTeam = Team.Dusk(fakeMatchDetails.dusk.players.map {
     it.getDetailsWithItems(fakeAllItems)

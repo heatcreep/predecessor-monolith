@@ -128,7 +128,7 @@ class BuildDetailsScreenViewModelTest {
                 )
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
-            repository = FakeOmedaCityRepository(hasItemDetailsErrors = true),
+            repository = FakeOmedaCityRepository(),
             omedaCityItemRepository = itemRepository,
             userFavoriteBuildsRepository = FakeUserFavoriteBuildsRepository()
         )

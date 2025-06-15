@@ -11,7 +11,7 @@ data class HeroStatisticsResponseDto(
 @Serializable
 data class HeroStatisticsDto(
     @SerialName("hero_id")
-    val heroId: Int,
+    val heroId: Long,
     @SerialName("display_name")
     val displayName: String,
     @SerialName("match_count")

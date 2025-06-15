@@ -33,14 +33,14 @@ import com.aowen.monolith.ui.theme.inputFieldDefaults
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HeroSelectDropdown(
-    selectedHero: HeroDetails,
+    selectedHero: HeroDetails?,
     onSelect: (HeroDetails) -> Unit,
     heroes: List<HeroDetails>,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    val heroImage = selectedHero.imageId ?: Hero.UNKNOWN.drawableId
+    val heroImage = selectedHero?.imageId ?: Hero.UNKNOWN.drawableId
 
     Box(
         modifier = modifier
@@ -52,32 +52,35 @@ internal fun HeroSelectDropdown(
                 expanded = !expanded
             }
         ) {
-            TextField(
-                value = selectedHero.displayName,
-                onValueChange = {},
-                readOnly = true,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                colors = inputFieldDefaults(),
-                leadingIcon = if (selectedHero.imageId != null) {
-                    {
-                        Image(
-                            painter = painterResource(id = heroImage),
-                            modifier = Modifier
-                                .clip(CircleShape)
-                                .size(36.dp),
-                            contentDescription = selectedHero.displayName
-                        )
-                    }
-                } else null,
-                trailingIcon = {
-                    AnimatedContent(targetState = expanded, label = "") {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = it)
-                    }
-                },
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
-            )
+            selectedHero?.let { hero ->
+                TextField(
+                    value = hero.displayName,
+                    onValueChange = {},
+                    readOnly = true,
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    colors = inputFieldDefaults(),
+                    leadingIcon = if (hero.imageId != null) {
+                        {
+                            Image(
+                                painter = painterResource(id = heroImage),
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .size(36.dp),
+                                contentDescription = selectedHero.displayName
+                            )
+                        }
+                    } else null,
+                    trailingIcon = {
+                        AnimatedContent(targetState = expanded, label = "") {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = it)
+                        }
+                    },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                )
+            }
+
 
             ExposedDropdownMenu(
                 modifier = Modifier.fillMaxWidth(),

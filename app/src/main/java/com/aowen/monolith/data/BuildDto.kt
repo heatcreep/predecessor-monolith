@@ -8,7 +8,7 @@ data class BuildDto(
     val id: Int,
     val title: String,
     val description: String?,
-    @SerialName("hero_id") val heroId: Int,
+    @SerialName("hero_id") val heroId: Long,
     val role: String,
     @SerialName("crest_id")
     val crestId: Int,

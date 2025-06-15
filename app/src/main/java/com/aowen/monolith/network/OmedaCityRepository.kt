@@ -2,8 +2,6 @@ package com.aowen.monolith.network
 
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.ItemModule
-import com.aowen.monolith.data.MatchDetails
-import com.aowen.monolith.data.MatchesDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerInfo
@@ -16,20 +14,7 @@ interface OmedaCityRepository {
 
     suspend fun fetchPlayerInfo(playerId: String): Result<PlayerInfo>
 
-    suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>?>
-
-    // Matches
-    suspend fun fetchMatchesById(
-        playerId: String,
-        perPage: Int? = null,
-        timeFrame: String? = null,
-        heroId: Int? = null,
-        role: String? = null,
-        playerName: String? = null,
-        page: Int? = 1
-    ): Result<MatchesDetails?>
-
-    suspend fun fetchMatchById(matchId: String): Result<MatchDetails?>
+    suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>>
 
     suspend fun fetchAllBuilds(
         name: String? = null,
@@ -82,56 +67,14 @@ class OmedaCityRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>?> {
+    override suspend fun fetchAllPlayerHeroStats(playerId: String): Result<List<PlayerHeroStats>> {
         return try {
             val playerHeroStatsResponse = playerApiService.getPlayerHeroStatsById(playerId)
             if (playerHeroStatsResponse.isSuccessful) {
-                Result.success(playerHeroStatsResponse.body()?.heroStatistics?.map { it.create() })
+                val playerHeroStats = playerHeroStatsResponse.body()?.heroStatistics?.map { it.create() } ?: emptyList()
+                Result.success(playerHeroStats)
             } else {
                 Result.failure(Exception("Failed to fetch player hero stats"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-
-    override suspend fun fetchMatchesById(
-        playerId: String,
-        perPage: Int?,
-        timeFrame: String?,
-        heroId: Int?,
-        role: String?,
-        playerName: String?,
-        page: Int?
-    ): Result<MatchesDetails?> {
-        return try {
-            val matchesResponse = playerApiService.getPlayerMatchesById(
-                playerId = playerId,
-                perPage = perPage,
-                timeFrame = timeFrame,
-                heroId = heroId,
-                role = role,
-                playerName = playerName,
-                page = page
-            )
-            if (matchesResponse.isSuccessful) {
-                Result.success(matchesResponse.body()?.create())
-            } else {
-                Result.failure(Exception("Failed to fetch matches: Code ${matchesResponse.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun fetchMatchById(matchId: String): Result<MatchDetails?> {
-        return try {
-            val matchResponse = playerApiService.getMatchById(matchId)
-            if (matchResponse.isSuccessful) {
-                Result.success(matchResponse.body()?.create())
-            } else {
-                Result.failure(Exception("Failed to fetch match"))
             }
         } catch (e: Exception) {
             Result.failure(e)
