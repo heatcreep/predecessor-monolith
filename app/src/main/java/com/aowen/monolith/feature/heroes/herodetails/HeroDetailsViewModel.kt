@@ -7,8 +7,8 @@ import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
+import com.aowen.monolith.data.repository.builds.BuildRepository
 import com.aowen.monolith.data.repository.heroes.HeroRepository
-import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserPreferencesManager
 import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,8 +39,8 @@ data class HeroDetailsUiState(
 class HeroDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userPreferencesDataStore: UserPreferencesManager,
-    private val omedaCityRepository: OmedaCityRepository,
     private val omedaCityHeroRepository: HeroRepository,
+    private val omedaCityBuildRepository: BuildRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HeroDetailsUiState())
@@ -63,44 +63,27 @@ class HeroDetailsViewModel @Inject constructor(
             val hero = async { omedaCityHeroRepository.fetchHeroByName(heroName) }
             val statistics =
                 async { omedaCityHeroRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
+            val heroBuildsDeferred = async {
+                omedaCityBuildRepository.fetchAllBuilds(
+                    heroId = heroId.toInt(),
+                    order = "popular",
+                    currentVersion = 1
+                )
+            }
             try {
                 val heroResult = hero.await().getOrThrow()
                 val statisticsResult = statistics.await().getOrThrow()
+                val heroBuilds = heroBuildsDeferred.await().getOrThrow()
                 _uiState.update {
                     it.copy(
                         hero = heroResult ?: HeroDetails(),
                         statistics = statisticsResult ?: HeroStatistics(),
+                        heroBuilds = heroBuilds.take(5),
                         isLoading = false,
+                        isLoadingBuilds = false,
                         heroDetailsErrors = null
                     )
                 }
-                val heroBuildsDeferred = async {
-                    omedaCityRepository.fetchAllBuilds(
-                        heroId = heroId.toInt(),
-                        order = "popular",
-                        currentVersion = 1
-                    )
-                }
-                val heroBuildsResult = heroBuildsDeferred.await()
-                if (heroBuildsResult.isSuccess) {
-                    _uiState.update {
-                        it.copy(
-                            heroBuilds = heroBuildsResult.getOrNull()?.take(5) ?: emptyList(),
-                            isLoadingBuilds = false
-                        )
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            heroDetailsErrors = HeroDetailsError(
-                                errorMessage = "Failed to fetch hero builds.",
-                                error = heroBuildsResult.exceptionOrNull()?.message
-                            ),
-                            isLoadingBuilds = false
-                        )
-                    }
-                }
-
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
@@ -108,6 +91,7 @@ class HeroDetailsViewModel @Inject constructor(
                             errorMessage = "Failed to fetch hero details.",
                             error = e.message,
                         ),
+                        heroBuilds = emptyList(),
                         isLoading = false,
                         isLoadingBuilds = false
                     )

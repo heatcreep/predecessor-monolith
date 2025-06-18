@@ -7,6 +7,7 @@ import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.data.repository.builds.BuildRepository
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.data.repository.items.ItemRepository
 import com.aowen.monolith.data.repository.matches.MatchRepository
@@ -66,6 +67,7 @@ class SearchScreenViewModel @Inject constructor(
     private val omedaCityHeroRepository: HeroRepository,
     private val omedaCityItemRepository: ItemRepository,
     private val omedaCityMatchRepository: MatchRepository,
+    private val omedaCityBuildRepository: BuildRepository,
     private val userRecentSearchesRepository: UserRecentSearchRepository
 ) : ViewModel() {
 
@@ -233,7 +235,7 @@ class SearchScreenViewModel @Inject constructor(
             val playersListDeferredResult =
                 async { omedaCityRepository.fetchPlayersByName(fieldValue) }
             val buildsListDeferredResult = async {
-                omedaCityRepository.fetchAllBuilds(
+                omedaCityBuildRepository.fetchAllBuilds(
                     name = fieldValue
                 )
             }
@@ -241,7 +243,7 @@ class SearchScreenViewModel @Inject constructor(
                 async { omedaCityMatchRepository.fetchMatchById(fieldValue) }
 
             val playersListResult = playersListDeferredResult.await()
-            val buildsListResult = buildsListDeferredResult.await()
+
             if (playersListResult.isFailure) {
                 _uiState.update {
                     it.copy(
@@ -249,17 +251,11 @@ class SearchScreenViewModel @Inject constructor(
                     )
                 }
             }
-            if (buildsListResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        buildsError = buildsListResult.exceptionOrNull()?.message
-                    )
-                }
-            }
             val filteredPlayersList = playersListResult.getOrNull()?.filter {
                 !it.isCheater && !it.isMmrDisabled
             }
             try {
+                val buildsList = buildsListDeferredResult.await().getOrThrow()
                 val matchesList = matchesListDeferredResult.await().getOrThrow()
                 _uiState.update {
                     it.copy(
@@ -268,7 +264,7 @@ class SearchScreenViewModel @Inject constructor(
                         matchesError = null,
                         playersList = filteredPlayersList ?: emptyList(),
                         foundMatch = matchesList,
-                        filteredBuilds = buildsListResult.getOrNull() ?: emptyList()
+                        filteredBuilds = buildsList
                     )
                 }
             } catch (e: Exception) {
@@ -278,7 +274,6 @@ class SearchScreenViewModel @Inject constructor(
                         isLoadingMatchSearch = false,
                         matchesError = e.message,
                         playersList = filteredPlayersList ?: emptyList(),
-                        filteredBuilds = buildsListResult.getOrNull() ?: emptyList()
                     )
                 }
             }

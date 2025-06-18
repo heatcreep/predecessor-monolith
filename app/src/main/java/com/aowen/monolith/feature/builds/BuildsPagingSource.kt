@@ -3,7 +3,8 @@ package com.aowen.monolith.feature.builds
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.data.repository.builds.BuildRepository
+import com.aowen.monolith.network.getOrThrow
 
 const val PAGE_SIZE = 10
 
@@ -15,13 +16,13 @@ class BuildsPagingSource(
     private val skillOrder: Int? = null,
     private val currentVersion: Int? = null,
     private val modules: Int? = null,
-    private val repository: OmedaCityRepository
+    private val omedaCityBuildRepository: BuildRepository
 ) : PagingSource<Int, BuildListItem>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BuildListItem> {
         return try {
             val page = params.key ?: 1
-            val response = repository.fetchAllBuilds(
+            val response = omedaCityBuildRepository.fetchAllBuilds(
                 name = name,
                 role = role,
                 order = order,
@@ -31,10 +32,10 @@ class BuildsPagingSource(
                 modules = modules,
                 page = page
             ).getOrThrow()
-            val nextKey = if(response.isNullOrEmpty()) null else page + 1
+            val nextKey = if(response.isEmpty()) null else page + 1
 
             LoadResult.Page(
-                data = response ?: emptyList(),
+                data = response,
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = nextKey
             )

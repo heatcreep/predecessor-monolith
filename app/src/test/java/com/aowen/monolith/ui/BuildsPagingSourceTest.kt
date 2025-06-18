@@ -4,11 +4,14 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource.LoadResult
 import androidx.paging.testing.TestPager
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.create
+import com.aowen.monolith.data.asBuildListItem
 import com.aowen.monolith.fakes.data.fakeBuildDto
-import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
+import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
 import com.aowen.monolith.fakes.repo.resetPageCount
 import com.aowen.monolith.feature.builds.BuildsPagingSource
+import com.aowen.monolith.network.Resource
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -16,6 +19,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BuildsPagingSourceTest {
+
+    private var buildRepository = FakeOmedaCityBuildRepository()
 
     @After
     fun cleanup() {
@@ -26,10 +31,10 @@ class BuildsPagingSourceTest {
     @Test
     fun `pager refresh should contain the list of builds`() = runTest {
 
-        val mockBuilds = List(10) { fakeBuildDto.create() }
+        val mockBuilds = List(10) { fakeBuildDto.asBuildListItem() }
 
         val pagingSource = BuildsPagingSource(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         val pager = TestPager(PagingConfig(pageSize = 10), pagingSource)
@@ -45,7 +50,7 @@ class BuildsPagingSourceTest {
     fun `pager append should return empty list when there are no more builds`() = runTest {
 
         val pagingSource = BuildsPagingSource(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         val pager = TestPager(PagingConfig(pageSize = 10), pagingSource)
@@ -53,7 +58,6 @@ class BuildsPagingSourceTest {
         //  fake repo returns empty list on fourth page
         val result = with(pager) {
             refresh()
-            append()
             append()
             append()
         } as LoadResult.Page
@@ -64,8 +68,21 @@ class BuildsPagingSourceTest {
     @Test
     fun `pager returns error when repo returns error`() = runTest {
 
+        buildRepository = mockk()
+
+        coEvery { buildRepository.fetchAllBuilds(
+            name = any(),
+            role = any(),
+            order = any(),
+            heroId = any(),
+            skillOrder = any(),
+            currentVersion = any(),
+            modules = any(),
+            page = any()
+        ) } returns Resource.NetworkError(404, "Not Found")
+
         val pagingSource = BuildsPagingSource(
-            repository = FakeOmedaCityRepository(hasBuildsError = true)
+            omedaCityBuildRepository = buildRepository
         )
 
         val pager = TestPager(PagingConfig(pageSize = 10), pagingSource)

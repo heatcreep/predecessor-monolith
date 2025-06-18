@@ -5,7 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.data.repository.builds.BuildRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -24,7 +24,7 @@ data class BuildsUiState(
 
 @HiltViewModel
 class BuildsScreenViewModel @Inject constructor(
-    private val repository: OmedaCityRepository
+    private val omedaCityBuildRepository: BuildRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<BuildsUiState> = MutableStateFlow(BuildsUiState())
@@ -45,7 +45,7 @@ class BuildsScreenViewModel @Inject constructor(
             skillOrder = if (uiState.value.hasSkillOrderSelected) 1 else null,
             modules = if (uiState.value.hasModulesSelected) 1 else null,
             currentVersion = if (uiState.value.hasCurrentVersionSelected) 1 else null,
-            repository = repository
+            omedaCityBuildRepository = omedaCityBuildRepository
         ).also {
             buildsPagingSource = it
         }

@@ -4,15 +4,19 @@ package com.aowen.monolith.ui
 
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.Console
+import com.aowen.monolith.data.HeroDetails
+import com.aowen.monolith.data.HeroStatistics
+import com.aowen.monolith.data.asBuildListItem
 import com.aowen.monolith.data.asHeroDetails
 import com.aowen.monolith.data.create
+import com.aowen.monolith.data.repository.builds.BuildRepository
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
+import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.fakes.repo.resetPageCount
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsError
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsUiState
@@ -42,6 +46,8 @@ class HeroDetailsViewModelTest {
 
     private var heroRepository: HeroRepository = FakeOmedaCityHeroRepository()
 
+    private var buildRepository: BuildRepository = FakeOmedaCityBuildRepository()
+
     @Before
     fun setup() {
         viewModel = HeroDetailsViewModel(
@@ -54,7 +60,7 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = heroRepository,
-            omedaCityRepository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
     }
 
@@ -65,22 +71,23 @@ class HeroDetailsViewModelTest {
     }
 
     @Test
-    fun `calling initViewModel() should update uiState with hero statistics and first five builds`() = runTest {
-        viewModel.initViewModel()
-        advanceUntilIdle()
-        val actual = viewModel.uiState.value
-        val actualConsole = viewModel.console.value
-        val expected = HeroDetailsUiState(
-            isLoading = false,
-            isLoadingBuilds = false,
-            heroBuilds = List(5) { fakeBuildDto.create() },
-            heroDetailsErrors = null,
-            hero = fakeHeroDto.asHeroDetails(),
-            statistics = fakeHeroStatisticsDto.create()
-        )
-        assertEquals(expected, actual)
-        assertEquals(Console.PC, actualConsole)
-    }
+    fun `calling initViewModel() should update uiState with hero statistics and first five builds`() =
+        runTest {
+            viewModel.initViewModel()
+            advanceUntilIdle()
+            val actual = viewModel.uiState.value
+            val actualConsole = viewModel.console.value
+            val expected = HeroDetailsUiState(
+                isLoading = false,
+                isLoadingBuilds = false,
+                heroBuilds = List(5) { fakeBuildDto.asBuildListItem() },
+                heroDetailsErrors = null,
+                hero = fakeHeroDto.asHeroDetails(),
+                statistics = fakeHeroStatisticsDto.create()
+            )
+            assertEquals(expected, actual)
+            assertEquals(Console.PC, actualConsole)
+        }
 
     @Test
     fun `initViewModel should show error if hero details fails`() = runTest {
@@ -103,7 +110,7 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = heroRepository,
-            omedaCityRepository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         advanceUntilIdle()
@@ -138,7 +145,7 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = heroRepository,
-            omedaCityRepository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
         advanceUntilIdle()
         val actual = viewModel.uiState.value
@@ -155,6 +162,15 @@ class HeroDetailsViewModelTest {
 
     @Test
     fun `initViewModel should show error if hero builds fails`() = runTest {
+        val networkErrorMessage = "Failed to fetch hero builds"
+        buildRepository = mockk()
+        coEvery {
+            buildRepository.fetchAllBuilds(
+                heroId = any(),
+                order = any(),
+                currentVersion = any()
+            )
+        } returns Resource.NetworkError(404, networkErrorMessage)
         viewModel = HeroDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -165,23 +181,20 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
-            omedaCityRepository = FakeOmedaCityRepository(
-                hasBuildsError = true
-            )
+            omedaCityBuildRepository = buildRepository
         )
 
-        viewModel.initViewModel()
         advanceUntilIdle()
         val actual = viewModel.uiState.value
         val expected = HeroDetailsUiState(
             isLoading = false,
             isLoadingBuilds = false,
             heroDetailsErrors = HeroDetailsError(
-                errorMessage = "Failed to fetch hero builds.",
-                error = "Failed to fetch builds"
+                errorMessage = "Failed to fetch hero details.",
+                error = "Network error: $networkErrorMessage (Code: 404)"
             ),
-            hero = fakeHeroDto.asHeroDetails(),
-            statistics = fakeHeroStatisticsDto.create()
+            hero = HeroDetails(),
+            statistics = HeroStatistics()
         )
         assertEquals(expected, actual)
     }

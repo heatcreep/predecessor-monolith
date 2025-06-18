@@ -30,7 +30,7 @@ data class ItemModule(
     val items: List<Int> = emptyList(),
 )
 
-fun BuildDto.create(): BuildListItem {
+fun BuildDto.asBuildListItem(): BuildListItem {
     return BuildListItem(
         id = id,
         title = title,

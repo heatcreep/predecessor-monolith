@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.ItemDetails
+import com.aowen.monolith.data.repository.builds.BuildRepository
 import com.aowen.monolith.data.repository.items.ItemRepository
-import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
 import com.aowen.monolith.network.UserPreferencesManager
 import com.aowen.monolith.network.getOrThrow
@@ -37,8 +37,8 @@ class BuildDetailsScreenViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userPreferencesDataStore: UserPreferencesManager,
     private val userFavoriteBuildsRepository: UserFavoriteBuildsRepository,
-    private val repository: OmedaCityRepository,
-    private val omedaCityItemRepository: ItemRepository
+    private val omedaCityItemRepository: ItemRepository,
+    private val omedaCityBuildRepository: BuildRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BuildDetailsUiState())
@@ -53,7 +53,7 @@ class BuildDetailsScreenViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
-            val buildsDeferred = async { repository.fetchBuildById(buildId) }
+            val buildsDeferred = async { omedaCityBuildRepository.fetchBuildById(buildId) }
             val itemsDeferred = async { omedaCityItemRepository.fetchAllItems() }
 
             val favoritedBuilds = userFavoriteBuildsRepository.fetchFavoriteBuilds()
@@ -66,22 +66,8 @@ class BuildDetailsScreenViewModel @Inject constructor(
                 }
             }
 
-            val buildsResult = buildsDeferred.await()
-
-            if (buildsResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = BuildDetailsErrors(
-                            errorMessage = buildsResult.exceptionOrNull()?.message
-                        )
-                    )
-                }
-                return@launch
-            }
-
             try {
-                val buildDetails = buildsResult.getOrNull()
+                val buildDetails = buildsDeferred.await().getOrThrow()
                 val allItems = itemsDeferred.await().getOrThrow()
 
                 _uiState.update {

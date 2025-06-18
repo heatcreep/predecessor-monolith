@@ -312,21 +312,6 @@ class AddBuildViewModel @Inject constructor(
                 modulesMap.map { "${it.key}=${it.value}" }.joinToString("&")
     }
 
-    private fun submitToOmedaCity() {
-        viewModelScope.launch {
-            repository.deeplinkToNewBuild(
-                title = uiState.value.buildTitle,
-                description = uiState.value.buildDescription,
-                role = uiState.value.selectedRole.roleName,
-                heroId = uiState.value.selectedHero?.id ?: -1,
-                crestId = uiState.value.selectedCrest?.id ?: -1,
-                itemIds = uiState.value.selectedItems.map { it.id },
-                skillOrder = uiState.value.skillOrder,
-                modules = uiState.value.modules
-            )
-        }
-    }
-
     private fun groupCrests(items: List<ItemDetails>): List<CrestGroupDetails> {
         val crestDetailsList = mutableListOf<CrestGroupDetails>()
 

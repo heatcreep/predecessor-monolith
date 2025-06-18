@@ -3,8 +3,9 @@ package com.aowen.monolith.ui
 import androidx.paging.testing.asSnapshot
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.data.create
+import com.aowen.monolith.data.asBuildListItem
 import com.aowen.monolith.fakes.data.fakeBuildDto
+import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.builds.BuildsPagingSource
 import com.aowen.monolith.feature.builds.BuildsScreenViewModel
@@ -25,23 +26,25 @@ class BuildsScreenViewModelTest {
 
     private val fakeRepository = FakeOmedaCityRepository()
 
+    private var buildRepository = FakeOmedaCityBuildRepository()
+
     @Test
     fun `creating a new BuildsScreenViewModel should initialize with first page`() = runTest {
-        viewModel = BuildsScreenViewModel(repository = FakeOmedaCityRepository())
+        viewModel = BuildsScreenViewModel(omedaCityBuildRepository = buildRepository)
         val builds = viewModel.buildsPager
         val snapshot = builds.asSnapshot()
-        assertEquals(snapshot, List(20) { fakeBuildDto.create() })
+        assertEquals(snapshot, List(20) { fakeBuildDto.asBuildListItem() })
     }
 
     @Test
     fun `updateSearchField should update uiState with searchFieldValue`() = runTest {
 
         viewModel = BuildsScreenViewModel(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
         viewModel.updateSearchField("test")
         val actual = viewModel.uiState.value
@@ -55,11 +58,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `updateSelectedRoleFilter should update uiState with selectedRoleFilter and invalidate the paging source`() {
         viewModel = BuildsScreenViewModel(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
         viewModel.updateSelectedRole("Support")
         val actual = viewModel.uiState.value
@@ -73,11 +76,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `clearSelectedRoleFilter should update uiState with selectedRoleFilter`() {
         viewModel = BuildsScreenViewModel(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.updateSelectedRole("Support")
@@ -96,11 +99,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `updateSelectedHeroFilter should update uiState with selectedHeroFilter`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.updateSelectedHero("Narbash")
@@ -114,11 +117,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `clearSelectedHeroFilter should update uiState with selectedHeroFilter`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.updateSelectedHero("Narbash")
@@ -136,11 +139,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `updateSelectedSortOrder should update uiState with selectedSortOrder`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.updateSelectedSortOrder("Trending")
@@ -154,11 +157,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `clearSelectedSortOrder should update uiState with default Popular`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.updateSelectedSortOrder("Trending")
@@ -176,11 +179,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `updateHasSkillOrder should update uiState with hasSkillOrderSelected`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.updateHasSkillOrder(true)
@@ -194,11 +197,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `updateHasModules should update uiState with hasModulesSelected`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.updateHasModules(true)
@@ -212,11 +215,11 @@ class BuildsScreenViewModelTest {
     @Test
     fun `updateHasCurrentVersion should update uiState with hasCurrentVersionSelected`() {
         viewModel = BuildsScreenViewModel(
-            repository = FakeOmedaCityRepository()
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.buildsPagingSource = BuildsPagingSource(
-            repository = fakeRepository
+            omedaCityBuildRepository = buildRepository
         )
 
         viewModel.updateHasCurrentVersion(true)
