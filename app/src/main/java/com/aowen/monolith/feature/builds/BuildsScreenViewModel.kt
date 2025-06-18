@@ -41,7 +41,7 @@ class BuildsScreenViewModel @Inject constructor(
                 .trim(),
             role = uiState.value.selectedRoleFilter?.name?.lowercase(),
             order = uiState.value.selectedSortOrder.lowercase(),
-            heroId = uiState.value.selectedHeroFilter?.heroId,
+            heroId = uiState.value.selectedHeroFilter?.heroId?.toInt(),
             skillOrder = if (uiState.value.hasSkillOrderSelected) 1 else null,
             modules = if (uiState.value.hasModulesSelected) 1 else null,
             currentVersion = if (uiState.value.hasCurrentVersionSelected) 1 else null,

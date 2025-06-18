@@ -54,7 +54,7 @@ class MoreMatchesViewModel @Inject constructor(
             getMatchesById = { page, perPage ->
                 omedaCityMatchRepository.fetchMatchesById(
                     playerId = playerId,
-                    heroId = uiState.value.hero?.heroId,
+                    heroId = uiState.value.hero?.heroId?.toInt(),
                     role = uiState.value.role?.roleName,
                     timeFrame = uiState.value.timeFrame.code,
                     playerName = uiState.value.searchFieldValue,

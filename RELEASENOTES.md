@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.8.7 - Latest
+
+#### Improvements & Bug Fixes
+
+- fixed broken endpoints related to new hero id for Yurei
+- add photo and enum for Yurei
+
 ## 1.8.6 - Latest
 
 #### Improvements & Bug Fixes

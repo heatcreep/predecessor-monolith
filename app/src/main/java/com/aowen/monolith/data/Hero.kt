@@ -12,7 +12,7 @@ enum class HeroRole(val roleName: String, val drawableId: Int) {
 }
 
 fun getHeroName(heroId: Int) = Hero.entries.firstOrNull {
-    it.heroId == heroId
+    it.heroId.toInt() == heroId
 }?.heroName ?: "Hero"
 
 fun getHeroRole(roleName: String? = "") : HeroRole? = HeroRole.entries.firstOrNull {
@@ -20,13 +20,13 @@ fun getHeroRole(roleName: String? = "") : HeroRole? = HeroRole.entries.firstOrNu
 }
 
 fun getHeroImage(heroId: Int) = Hero.entries.firstOrNull {
-    it.heroId == heroId
+    it.heroId.toInt() == heroId
 }?.drawableId ?: R.drawable.unknown
 
 enum class Hero(
     val heroName: String,
     val pathName: String,
-    val heroId: Int,
+    val heroId: Long,
     val drawableId: Int
 ) {
     ARGUS("Argus", "Emerald", 49, R.drawable.argus),
@@ -72,5 +72,6 @@ enum class Hero(
     YIN("Yin", "Yin", 58, R.drawable.yin),
     ZARUS("Zarus", "Lizard", 31, R.drawable.zarus),
     ZINX("Zinx", "Zinx", 55, R.drawable.zinx),
+    YUREI("Yurei", "Tidebinder", 10000000001, R.drawable.yurei),
     UNKNOWN("Unknown", "Unknown", 999, R.drawable.unknown),
 }
