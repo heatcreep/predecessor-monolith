@@ -11,16 +11,16 @@ enum class HeroRole(val roleName: String, val drawableId: Int) {
     Unknown("unknown", R.drawable.unknown),
 }
 
-fun getHeroName(heroId: Int) = Hero.entries.firstOrNull {
-    it.heroId.toInt() == heroId
+fun getHeroName(heroId: Long) = Hero.entries.firstOrNull {
+    it.heroId == heroId
 }?.heroName ?: "Hero"
 
 fun getHeroRole(roleName: String? = "") : HeroRole? = HeroRole.entries.firstOrNull {
     it.roleName.lowercase() == roleName?.lowercase()
 }
 
-fun getHeroImage(heroId: Int) = Hero.entries.firstOrNull {
-    it.heroId.toInt() == heroId
+fun getHeroImage(heroId: Long) = Hero.entries.firstOrNull {
+    it.heroId == heroId
 }?.drawableId ?: R.drawable.unknown
 
 enum class Hero(

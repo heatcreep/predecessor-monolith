@@ -14,7 +14,7 @@ class OmedaCityBuildRepository @Inject constructor(
         name: String?,
         role: String?,
         order: String?,
-        heroId: Int?,
+        heroId: Long?,
         skillOrder: Int?,
         currentVersion: Int?,
         modules: Int?,

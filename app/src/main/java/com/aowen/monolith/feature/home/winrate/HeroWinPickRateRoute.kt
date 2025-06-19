@@ -77,7 +77,7 @@ fun HeroWinPickRateRoute(
 fun HeroWinPickRateScreen(
     uiState: HomeScreenUiState,
     selectedStatFromNav: String,
-    navigateToHeroDetails: (heroId: Int, heroName: String) -> Unit,
+    navigateToHeroDetails: (heroId: Long, heroName: String) -> Unit,
     updateHeroStatsByTime: (TimeFrame) -> Unit,
     navigateBack: () -> Unit
 ) {

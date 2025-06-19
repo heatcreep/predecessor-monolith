@@ -36,7 +36,7 @@ fun HeroPickRateSection(
     isLoading: Boolean,
     modifier: Modifier = Modifier,
     heroStatsList: List<HeroStatistics>,
-    navigateToHeroDetails: (heroId: Int, heroName: String) -> Unit = { _, _ -> },
+    navigateToHeroDetails: (heroId: Long, heroName: String) -> Unit = { _, _ -> },
     navigateToHeroPickRate: (String) -> Unit = { }
 ) {
     Column(

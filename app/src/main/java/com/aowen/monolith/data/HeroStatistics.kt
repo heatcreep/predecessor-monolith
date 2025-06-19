@@ -1,7 +1,7 @@
 package com.aowen.monolith.data
 
 data class HeroStatistics(
-    val heroId: Int = 0,
+    val heroId: Long = 0,
     val name: String = "",
     val heroName: String = "",
     val winRate: Float = 0f,
@@ -10,7 +10,7 @@ data class HeroStatistics(
 
 fun HeroStatisticsDto.create(): HeroStatistics {
     return HeroStatistics(
-        heroId = this.heroId.toInt(),
+        heroId = this.heroId,
         heroName = this.displayName,
         name = Hero.entries.find { it.heroName == this.displayName }?.pathName ?: "",
         winRate = this.winRate,

@@ -12,7 +12,7 @@ class BuildsPagingSource(
     private val name: String? = null,
     private val role: String? = null,
     private val order: String? = null,
-    private val heroId: Int? = null,
+    private val heroId: Long? = null,
     private val skillOrder: Int? = null,
     private val currentVersion: Int? = null,
     private val modules: Int? = null,

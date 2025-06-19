@@ -87,7 +87,7 @@ internal fun SearchScreen(
     handlePullRefresh: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
     navigateToItemDetails: (String) -> Unit,
-    navigateToHeroDetails: (Int, String) -> Unit,
+    navigateToHeroDetails: (Long, String) -> Unit,
     navigateToMatchDetails: (String, String) -> Unit,
     navigateToBuildDetails: (Int) -> Unit,
     navigateBack: () -> Unit

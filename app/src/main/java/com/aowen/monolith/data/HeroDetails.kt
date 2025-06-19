@@ -23,7 +23,7 @@ fun AbilityDto.create(): AbilityDetails =
     )
 
 data class HeroDetails(
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String = "",
     val displayName: String = "",
     val imageId: Int? = null,
@@ -56,7 +56,7 @@ fun HeroDto.asHeroDetails(): HeroDetails {
         }
     } else abilities
     return HeroDetails(
-        id = id.toInt(),
+        id = id,
         name = name,
         displayName = displayName,
         stats = stats,

@@ -60,7 +60,7 @@ data class ModuleDto(
 
 @Serializable
 data class GameVersionDto(
-    val id: Int?,
+    val id: Long?,
     val name: String?,
     val release: String?,
     @SerialName("display_badge")

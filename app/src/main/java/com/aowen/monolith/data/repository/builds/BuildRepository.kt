@@ -9,7 +9,7 @@ interface BuildRepository {
         name: String? = null,
         role: String? = null,
         order: String? = null,
-        heroId: Int? = null,
+        heroId: Long? = null,
         skillOrder: Int? = null,
         currentVersion: Int? = null,
         modules: Int? = null,

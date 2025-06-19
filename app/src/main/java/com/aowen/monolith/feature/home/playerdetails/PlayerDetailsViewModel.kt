@@ -87,7 +87,7 @@ class PlayerDetailsViewModel @Inject constructor(
         }
     }
 
-    fun handlePlayerHeroStatsSelect(heroId: Int) {
+    fun handlePlayerHeroStatsSelect(heroId: Long) {
         _uiState.update {
             it.copy(
                 selectedHeroStats = uiState.value.heroStats.find { stat ->

@@ -4,7 +4,7 @@ import com.aowen.monolith.data.database.model.FavoriteBuildListEntity
 
 data class FavoriteBuildListItem(
     val buildId: Int,
-    val heroId: Int,
+    val heroId: Long,
     val role: String,
     val title: String,
     val description: String?,

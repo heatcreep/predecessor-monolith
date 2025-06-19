@@ -123,7 +123,7 @@ fun HomeScreen(
     claimedPlayerName: String?,
     navigateToSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
-    navigateToHeroDetails: (Int, String) -> Unit,
+    navigateToHeroDetails: (Long, String) -> Unit,
     navigateToHeroWinPickRate: (String) -> Unit,
     navigateToBuildDetails: (Int) -> Unit,
     handlePullRefresh: () -> Unit,

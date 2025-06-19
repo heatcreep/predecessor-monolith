@@ -44,7 +44,7 @@ fun HeroWinRateSection(
     isLoading: Boolean,
     modifier: Modifier = Modifier,
     heroStatsList: List<HeroStatistics>,
-    navigateToHeroDetails: (heroId: Int, heroName: String) -> Unit = { _, _ -> },
+    navigateToHeroDetails: (heroId: Long, heroName: String) -> Unit = { _, _ -> },
     navigateToHeroWinRate: (String) -> Unit = { }
 ) {
     Column(

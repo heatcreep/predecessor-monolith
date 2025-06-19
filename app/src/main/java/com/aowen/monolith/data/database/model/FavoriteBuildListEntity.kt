@@ -12,7 +12,7 @@ import com.aowen.monolith.data.FavoriteBuildListItem
 data class FavoriteBuildListEntity(
     @PrimaryKey
     val buildId: Int,
-    val heroId: Int,
+    val heroId: Long,
     val role: String,
     val title: String,
     @ColumnInfo(defaultValue = "")

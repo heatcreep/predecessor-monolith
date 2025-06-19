@@ -5,7 +5,7 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 
 data class PlayerHeroStats(
-    val heroId: Int = 0,
+    val heroId: Long = 0,
     val displayName: String = "",
     val matchCount: Int = 0,
     val winRate: Double? = 0.0,
@@ -67,7 +67,7 @@ fun PlayerHeroStatsDto.create(): PlayerHeroStats {
 
 
     return PlayerHeroStats(
-        heroId.toInt(),
+        heroId,
         displayName,
         matchCount,
         winRate = df.format(winRate?.let { it * 100 } ?: 0).toDouble(),

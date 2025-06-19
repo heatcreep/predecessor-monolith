@@ -158,7 +158,7 @@ class FakeOmedaCityService(private val resCode: Int? = null) : OmedaCityService 
         name: String?,
         role: String?,
         order: String?,
-        heroId: Int?,
+        heroId: Long?,
         skillOrder: Int?,
         modules: Int?,
         currentVersion: Int?,

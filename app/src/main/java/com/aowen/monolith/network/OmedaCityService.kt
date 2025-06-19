@@ -74,7 +74,7 @@ interface OmedaCityService {
         @Query("filter[name]") name: String? = null,
         @Query("filter[role]") role: String? = null,
         @Query("filter[order]") order: String? = "popular",
-        @Query("filter[hero_id]") heroId: Int? = null,
+        @Query("filter[hero_id]") heroId: Long? = null,
         @Query("filter[skill_order]") skillOrder: Int? = null,
         @Query("filter[modules]") modules: Int? = null,
         @Query("filter[current_version]") currentVersion: Int? = null,

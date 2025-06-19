@@ -105,7 +105,7 @@ fun PlayerDetailScreen(
     handleSavePlayer: suspend (Boolean) -> Unit = {},
     handleSavePlayerName: () -> Unit = {},
     handlePlayerNameChange: (String) -> Unit = {},
-    handlePlayerHeroStatsSelect: (Int) -> Unit = { },
+    handlePlayerHeroStatsSelect: (Long) -> Unit = { },
     navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
     navigateToMoreMatches: (String) -> Unit = { },
     onEditPlayerName: () -> Unit = { }
@@ -248,7 +248,7 @@ fun PlayerStatsTab(
 fun PlayerHeroStatsTab(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
-    handlePlayerHeroStatsSelect: (Int) -> Unit = { }
+    handlePlayerHeroStatsSelect: (Long) -> Unit = { }
 ) {
     var selectedHero by remember {
         mutableStateOf(

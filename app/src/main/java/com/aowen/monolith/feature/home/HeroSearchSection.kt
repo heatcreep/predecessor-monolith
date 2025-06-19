@@ -35,7 +35,7 @@ import com.aowen.monolith.ui.theme.NeroBlack
 fun HeroSearchSection(
     isLoading: Boolean,
     filteredHeroes: List<HeroDetails>,
-    navigateToHeroDetails: (Int, String) -> Unit = { _, _ -> }
+    navigateToHeroDetails: (Long, String) -> Unit = { _, _ -> }
 ) {
     Column {
         Row(
@@ -90,7 +90,7 @@ fun HeroSearchSection(
 fun HeroResultCard(
     modifier: Modifier = Modifier,
     heroDetails: HeroDetails,
-    navigateToHeroDetails: (Int, String) -> Unit = { _, _ -> }
+    navigateToHeroDetails: (Long, String) -> Unit = { _, _ -> }
 ) {
 
 

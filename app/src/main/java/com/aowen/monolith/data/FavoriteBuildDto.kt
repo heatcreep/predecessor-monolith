@@ -18,7 +18,7 @@ data class FavoriteBuildDto(
     val userId: UUID,
     @SerialName("build_id")
     val buildId: Int,
-    @SerialName("hero_id") val heroId: Int,
+    @SerialName("hero_id") val heroId: Long,
     val role: String,
     val title: String,
     val description: String?,
