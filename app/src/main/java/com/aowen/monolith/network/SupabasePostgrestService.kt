@@ -4,6 +4,7 @@ import com.aowen.monolith.data.FavoriteBuildDto
 import com.aowen.monolith.data.PlayerSearchDto
 import com.aowen.monolith.data.UserInfo
 import com.aowen.monolith.logDebug
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
@@ -142,7 +143,15 @@ class SupabasePostgrestServiceImpl @Inject constructor(
     }
 
     override suspend fun insertRecentSearch(playerSearchDto: PlayerSearchDto) {
-        postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
+        try {
+            postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
+        } catch (e: RestException) {
+            logDebug("Error inserting recent search: ${e.localizedMessage ?: "Unknown error"}")
+        } catch (e: HttpRequestTimeoutException) {
+            logDebug("Request timed out while inserting recent search: ${e.localizedMessage ?: "Unknown error"}")
+        } catch (e: HttpRequestException) {
+            logDebug("HTTP request error while inserting recent search: ${e.localizedMessage ?: "Unknown error"}")
+        }
     }
 
     override suspend fun updateRecentSearch(

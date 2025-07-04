@@ -10,9 +10,9 @@ import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.data.repository.matches.MatchRepository
+import com.aowen.monolith.data.repository.players.di.PlayerRepository
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
-import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserClaimedPlayerRepository
 import com.aowen.monolith.network.UserPreferencesManager
 import com.aowen.monolith.network.getOrThrow
@@ -44,9 +44,9 @@ data class PlayerDetailsUiState(
 @HiltViewModel
 class PlayerDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repository: OmedaCityRepository,
     private val omedaCityHeroRepository: HeroRepository,
     private val omedaCityMatchRepository: MatchRepository,
+    private val omedaCityPlayerRepository: PlayerRepository,
     private val userPreferencesManager: UserPreferencesManager,
     private val authRepository: AuthRepository,
     private val userClaimedPlayerRepository: UserClaimedPlayerRepository,
@@ -127,8 +127,10 @@ class PlayerDetailsViewModel @Inject constructor(
             try {
                 val claimedPlayerName = userPreferencesManager.claimedPlayerName.firstOrNull()
                 val userProfileDeferred = async { authRepository.getPlayer() }
-                val playerInfoDeferred = async { repository.fetchPlayerInfo(playerId) }
-                val playerHeroStatsDeferred = async { repository.fetchAllPlayerHeroStats(playerId) }
+                val playerInfoDeferred =
+                    async { omedaCityPlayerRepository.fetchPlayerInfo(playerId) }
+                val playerHeroStatsDeferred =
+                    async { omedaCityPlayerRepository.fetchAllPlayerHeroStats(playerId) }
                 val matchesDeferred = async { omedaCityMatchRepository.fetchMatchesById(playerId) }
                 val heroesDeferred = async { omedaCityHeroRepository.fetchAllHeroes() }
 

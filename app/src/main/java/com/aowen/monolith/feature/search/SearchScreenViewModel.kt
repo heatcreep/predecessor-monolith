@@ -11,11 +11,10 @@ import com.aowen.monolith.data.repository.builds.BuildRepository
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.data.repository.items.ItemRepository
 import com.aowen.monolith.data.repository.matches.MatchRepository
+import com.aowen.monolith.data.repository.players.di.PlayerRepository
 import com.aowen.monolith.logDebug
-import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.Resource
 import com.aowen.monolith.network.UserRecentSearchRepository
-import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +36,27 @@ sealed interface AllHeroesState {
     data object Loading : AllHeroesState
 }
 
+sealed interface PlayersListState {
+    data class Success(val players: List<PlayerDetails>) : PlayersListState
+    data class Error(val errorMessage: String?) : PlayersListState
+    data object Empty : PlayersListState
+    data object Loading : PlayersListState
+}
+
+sealed interface BuildsListState {
+    data class Success(val builds: List<BuildListItem>) : BuildsListState
+    data class Error(val errorMessage: String?) : BuildsListState
+    data object Empty : BuildsListState
+    data object Loading : BuildsListState
+}
+
+sealed interface MatchSearchState {
+    data class Success(val match: MatchDetails) : MatchSearchState
+    data class Error(val errorMessage: String?) : MatchSearchState
+    data object None : MatchSearchState
+    data object Loading : MatchSearchState
+}
+
 data class SearchScreenUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
@@ -52,22 +72,22 @@ data class SearchScreenUiState(
     val allHeroes: AllHeroesState = AllHeroesState.Loading,
     val filteredHeroes: List<HeroDetails> = emptyList(),
     val heroesError: String? = null,
-    val filteredBuilds: List<BuildListItem> = emptyList(),
+    val filteredBuilds: BuildsListState = BuildsListState.Empty,
     val buildsError: String? = null,
     val isLoadingMatchSearch: Boolean = true,
-    val foundMatch: MatchDetails? = null,
+    val foundMatch: MatchSearchState = MatchSearchState.None,
     val matchesError: String? = null,
-    val playersList: List<PlayerDetails?> = emptyList(),
+    val playersList: PlayersListState = PlayersListState.Empty,
     val recentSearchesList: List<PlayerDetails?> = emptyList(),
 )
 
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
-    private val omedaCityRepository: OmedaCityRepository,
+    private val omedaCityBuildRepository: BuildRepository,
     private val omedaCityHeroRepository: HeroRepository,
     private val omedaCityItemRepository: ItemRepository,
     private val omedaCityMatchRepository: MatchRepository,
-    private val omedaCityBuildRepository: BuildRepository,
+    private val omedaCityPlayerRepository: PlayerRepository,
     private val userRecentSearchesRepository: UserRecentSearchRepository
 ) : ViewModel() {
 
@@ -154,7 +174,7 @@ class SearchScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 searchFieldValue = "",
-                playersList = emptyList(),
+                playersList = PlayersListState.Empty,
                 searchError = null
             )
         }
@@ -202,11 +222,14 @@ class SearchScreenViewModel @Inject constructor(
                 val addRecentSearchDeferred =
                     async { userRecentSearchesRepository.addRecentSearch(playerDetails) }
                 addRecentSearchDeferred.await()
-                _uiState.update {
-                    it.copy(
-                        recentSearchesList = it.recentSearchesList + playerDetails
-                    )
+                if (!uiState.value.recentSearchesList.any { it?.playerId == playerDetails.playerId }) {
+                    _uiState.update {
+                        it.copy(
+                            recentSearchesList = it.recentSearchesList.plus(playerDetails)
+                        )
+                    }
                 }
+
             } catch (e: Exception) {
                 logDebug(e.toString())
             }
@@ -232,8 +255,15 @@ class SearchScreenViewModel @Inject constructor(
             )
         }
         viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    playersList = PlayersListState.Loading,
+                    filteredBuilds = BuildsListState.Loading,
+                    foundMatch = MatchSearchState.Loading
+                )
+            }
             val playersListDeferredResult =
-                async { omedaCityRepository.fetchPlayersByName(fieldValue) }
+                async { omedaCityPlayerRepository.fetchPlayersByName(fieldValue) }
             val buildsListDeferredResult = async {
                 omedaCityBuildRepository.fetchAllBuilds(
                     name = fieldValue
@@ -242,40 +272,79 @@ class SearchScreenViewModel @Inject constructor(
             val matchesListDeferredResult =
                 async { omedaCityMatchRepository.fetchMatchById(fieldValue) }
 
-            val playersListResult = playersListDeferredResult.await()
+            val playersResource = playersListDeferredResult.await()
+            val buildsResource = buildsListDeferredResult.await()
+            val matchesResource = matchesListDeferredResult.await()
 
-            if (playersListResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        searchError = playersListResult.exceptionOrNull()?.message
-                    )
+
+            // Handle Players State
+            val playersState = when (playersResource) {
+                is Resource.Success -> {
+                    if (playersResource.data.isEmpty()) {
+                        PlayersListState.Empty
+                    } else {
+                        val filteredPlayersList = playersResource.data.filter {
+                            !it.isCheater && !it.isMmrDisabled
+                        }
+                        PlayersListState.Success(filteredPlayersList)
+                    }
+                }
+
+                is Resource.NetworkError -> {
+                    PlayersListState.Error(playersResource.errorMessage)
+                }
+
+                is Resource.GenericError -> {
+                    PlayersListState.Error(playersResource.errorMessage)
                 }
             }
-            val filteredPlayersList = playersListResult.getOrNull()?.filter {
-                !it.isCheater && !it.isMmrDisabled
+
+            // Handle Builds State
+            val buildsListState = when (buildsResource) {
+                is Resource.Success -> {
+                    if (buildsResource.data.isEmpty()) {
+                        BuildsListState.Empty
+                    } else {
+                        BuildsListState.Success(buildsResource.data)
+                    }
+                }
+
+                is Resource.NetworkError -> {
+                    BuildsListState.Error(buildsResource.errorMessage)
+                }
+
+                is Resource.GenericError -> {
+                    BuildsListState.Error(buildsResource.errorMessage)
+                }
             }
-            try {
-                val buildsList = buildsListDeferredResult.await().getOrThrow()
-                val matchesList = matchesListDeferredResult.await().getOrThrow()
-                _uiState.update {
-                    it.copy(
-                        isLoadingSearch = false,
-                        isLoadingMatchSearch = false,
-                        matchesError = null,
-                        playersList = filteredPlayersList ?: emptyList(),
-                        foundMatch = matchesList,
-                        filteredBuilds = buildsList
-                    )
+
+            // Handle Matches State
+            val foundMatchState = when (matchesResource) {
+                is Resource.Success -> {
+                    if (matchesResource.data == null) {
+                        MatchSearchState.None
+                    } else {
+                        MatchSearchState.Success(matchesResource.data)
+                    }
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoadingSearch = false,
-                        isLoadingMatchSearch = false,
-                        matchesError = e.message,
-                        playersList = filteredPlayersList ?: emptyList(),
-                    )
+
+                is Resource.NetworkError -> {
+                    MatchSearchState.Error(matchesResource.errorMessage)
                 }
+
+                is Resource.GenericError -> {
+                    MatchSearchState.Error(matchesResource.errorMessage)
+                }
+            }
+            _uiState.update {
+                it.copy(
+                    isLoadingSearch = false,
+                    isLoadingMatchSearch = false,
+                    matchesError = null,
+                    playersList = playersState,
+                    foundMatch = foundMatchState,
+                    filteredBuilds = buildsListState
+                )
             }
         }
     }

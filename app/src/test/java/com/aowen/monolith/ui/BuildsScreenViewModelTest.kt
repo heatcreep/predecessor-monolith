@@ -6,7 +6,6 @@ import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.asBuildListItem
 import com.aowen.monolith.fakes.data.fakeBuildDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.builds.BuildsPagingSource
 import com.aowen.monolith.feature.builds.BuildsScreenViewModel
 import com.aowen.monolith.feature.builds.BuildsUiState
@@ -23,8 +22,6 @@ class BuildsScreenViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: BuildsScreenViewModel
-
-    private val fakeRepository = FakeOmedaCityRepository()
 
     private var buildRepository = FakeOmedaCityBuildRepository()
 

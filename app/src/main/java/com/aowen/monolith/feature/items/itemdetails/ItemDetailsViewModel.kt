@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.repository.items.ItemRepository
-import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +21,6 @@ sealed interface ItemDetailsUiState {
 @HiltViewModel
 class ItemDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    val repository: OmedaCityRepository,
     val itemRepository: ItemRepository
 ) : ViewModel() {
 

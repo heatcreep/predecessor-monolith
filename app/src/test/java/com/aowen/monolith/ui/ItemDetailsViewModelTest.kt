@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.asItemDetails
 import com.aowen.monolith.fakes.data.fakeItemDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.items.itemdetails.ItemDetailsUiState
 import com.aowen.monolith.feature.items.itemdetails.ItemDetailsViewModel
 import com.aowen.monolith.network.Resource
@@ -39,7 +38,6 @@ class ItemDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
             itemRepository = itemRepository
         )
 
@@ -62,7 +60,6 @@ class ItemDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
             itemRepository = itemRepository
         )
 

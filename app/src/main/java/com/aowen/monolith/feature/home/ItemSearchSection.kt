@@ -36,32 +36,33 @@ fun ItemSearchSection(
     filteredItems: List<ItemDetails>,
     navigateToItemDetails: (String) -> Unit = {}
 ) {
-    Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Items",
-                color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-        Spacer(modifier = Modifier.size(16.dp))
-        AnimatedContent(targetState = isLoading, label = "loadingItems") { loading ->
-            if (loading) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    PlayerLoadingCard(
-                        titleWidth = 100.dp,
-                        subtitleWidth = 75.dp
-                    )
-                }
-            } else {
-                if (filteredItems.isNotEmpty()) {
+    if (filteredItems.isNotEmpty()) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Items",
+                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Spacer(modifier = Modifier.size(16.dp))
+            AnimatedContent(targetState = isLoading, label = "loadingItems") { loading ->
+                if (loading) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        PlayerLoadingCard(
+                            titleWidth = 100.dp,
+                            subtitleWidth = 75.dp
+                        )
+                    }
+                } else {
+
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -74,17 +75,14 @@ fun ItemSearchSection(
                             )
                         }
                     }
-                } else {
-                    Text(
-                        text = "No items match your search.",
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+
                 }
             }
+
+
         }
-
-
     }
+
 }
 
 @Composable

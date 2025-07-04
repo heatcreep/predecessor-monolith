@@ -5,9 +5,12 @@ package com.aowen.monolith.ui
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.asHeroDetails
 import com.aowen.monolith.data.asMatchDetails
+import com.aowen.monolith.data.asPlayerDetails
+import com.aowen.monolith.data.asPlayerHeroStats
 import com.aowen.monolith.data.create
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.data.repository.matches.MatchRepository
+import com.aowen.monolith.data.repository.players.di.PlayerRepository
 import com.aowen.monolith.fakes.AuthScenario
 import com.aowen.monolith.fakes.FakeAuthRepository
 import com.aowen.monolith.fakes.FakeUserClaimedPlayerRepository
@@ -17,10 +20,11 @@ import com.aowen.monolith.fakes.data.fakeHeroDto2
 import com.aowen.monolith.fakes.data.fakeMatchDto
 import com.aowen.monolith.fakes.data.fakePlayerDto
 import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
+import com.aowen.monolith.fakes.data.fakePlayerInfo
 import com.aowen.monolith.fakes.data.fakePlayerStatsDto
 import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityMatchRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
+import com.aowen.monolith.fakes.repo.FakeOmedaCityPlayerRepository
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsUiState
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsViewModel
 import com.aowen.monolith.network.Resource
@@ -53,6 +57,8 @@ class PlayerDetailsViewModelTest {
 
     private var matchRepository: MatchRepository = FakeOmedaCityMatchRepository()
 
+    private var playerRepository: PlayerRepository = FakeOmedaCityPlayerRepository()
+
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         .withZone(ZoneId.of("UTC"))
 
@@ -65,7 +71,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = heroRepository,
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
@@ -79,9 +85,9 @@ class PlayerDetailsViewModelTest {
         advanceUntilIdle()
         val expected = PlayerDetailsUiState(
             isLoading = false,
-            player = fakePlayerDto.create(),
+            player = fakePlayerDto.asPlayerDetails(),
             claimedPlayerName = "heatcreep.tv",
-            heroStats = listOf(fakePlayerHeroStatsDto.create()),
+            heroStats = listOf(fakePlayerHeroStatsDto.asPlayerHeroStats()),
             stats = fakePlayerStatsDto.create(),
             matches = listOf(fakeMatchDto.asMatchDetails()),
             heroes = listOf(
@@ -103,7 +109,7 @@ class PlayerDetailsViewModelTest {
                     "playerId" to "validPlayerId"
                 )
             ),
-            repository = FakeOmedaCityRepository(),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(errorScenario = AuthScenario.NoPlayerFound),
@@ -122,6 +128,13 @@ class PlayerDetailsViewModelTest {
 
     @Test
     fun `initViewModel() should set UiState to error if player info fails`() = runTest {
+        playerRepository = mockk()
+        coEvery { playerRepository.fetchPlayerInfo(any()) } returns Resource.NetworkError(404)
+        coEvery { playerRepository.fetchAllPlayerHeroStats(any()) } returns Resource.Success(
+            listOf(
+                fakePlayerHeroStatsDto.asPlayerHeroStats()
+            )
+        )
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -129,9 +142,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(
-                hasPlayerInfoError = true
-            ),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
@@ -142,7 +153,7 @@ class PlayerDetailsViewModelTest {
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
-            errorMessage = FakeOmedaCityRepository.FetchPlayerInfoError,
+            errorMessage = "Network error: Unknown error (Code: 404)",
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -150,6 +161,9 @@ class PlayerDetailsViewModelTest {
 
     @Test
     fun `initViewModel() should set UiState to error if player hero stats fails`() = runTest {
+        playerRepository = mockk()
+        coEvery { playerRepository.fetchPlayerInfo(any()) } returns Resource.Success(fakePlayerInfo)
+        coEvery { playerRepository.fetchAllPlayerHeroStats(any()) } returns Resource.NetworkError(404)
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -157,9 +171,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(
-                hasPlayerHeroStatsError = true
-            ),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
@@ -170,7 +182,7 @@ class PlayerDetailsViewModelTest {
 
         val expected = PlayerDetailsUiState(
             isLoading = false,
-            errorMessage = FakeOmedaCityRepository.FetchPlayerHeroStatsError,
+            errorMessage = "Network error: Unknown error (Code: 404)",
         )
         val actual = viewModel.uiState.value
         assertEquals(expected, actual)
@@ -179,7 +191,10 @@ class PlayerDetailsViewModelTest {
     @Test
     fun `initViewModel() should set UiState to error if matches fails`() = runTest {
         matchRepository = mockk()
-        coEvery { matchRepository.fetchMatchesById(any()) } returns Resource.NetworkError(404, "Failed to fetch matches")
+        coEvery { matchRepository.fetchMatchesById(any()) } returns Resource.NetworkError(
+            404,
+            "Failed to fetch matches"
+        )
         viewModel = PlayerDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(
@@ -187,7 +202,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
@@ -219,7 +234,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = heroRepository,
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
@@ -246,7 +261,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
@@ -269,7 +284,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(),
@@ -290,7 +305,7 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
-            repository = FakeOmedaCityRepository(),
+            omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
             authRepository = FakeAuthRepository(
@@ -375,7 +390,7 @@ class PlayerDetailsViewModelTest {
             advanceUntilIdle()
             viewModel.handlePlayerHeroStatsSelect(1)
 
-            val expected = fakePlayerHeroStatsDto.create()
+            val expected = fakePlayerHeroStatsDto.asPlayerHeroStats()
             val actual = viewModel.uiState.value.selectedHeroStats
             assertEquals(expected, actual)
         }

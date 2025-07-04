@@ -11,7 +11,6 @@ import com.aowen.monolith.data.ItemModule
 import com.aowen.monolith.data.SlotType
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.data.repository.items.ItemRepository
-import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.Resource
 import com.aowen.monolith.network.UserPreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,11 +22,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed interface ModuleState {
-    data object Create : ModuleState
-    data object Edit : ModuleState
-}
 
 data class AddBuildState(
     val isLoadingHeroes: Boolean = true,
@@ -86,7 +80,6 @@ data class CrestGroupDetails(
 
 @HiltViewModel
 class AddBuildViewModel @Inject constructor(
-    val repository: OmedaCityRepository,
     val omedaCityHeroRepository: HeroRepository,
     val omedaCityItemRepository: ItemRepository,
     val userPreferencesDataStore: UserPreferencesManager

@@ -10,7 +10,10 @@ val fakeExistingPlayerSearchDto = PlayerSearchDto(
     displayName = "displayName",
     rank = 123,
     mmr = 123.45f,
-    region = "naeast"
+    region = "naeast",
+    rankTitle = "Gold I",
+    rankImage = "Gold I",
+    isRanked = true
 )
 
 val fakeNewPlayerSearchDto = PlayerSearchDto(
@@ -20,5 +23,8 @@ val fakeNewPlayerSearchDto = PlayerSearchDto(
     displayName = "displayName",
     rank = 123,
     mmr = 123.45f,
-    region = "naeast"
+    region = "naeast",
+    rankTitle = "Gold I",
+    rankImage = "Gold I",
+    isRanked = true
 )

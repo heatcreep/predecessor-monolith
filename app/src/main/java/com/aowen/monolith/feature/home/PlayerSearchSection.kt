@@ -1,6 +1,5 @@
 package com.aowen.monolith.feature.home
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.PlayerDetails
+import com.aowen.monolith.feature.search.PlayersListState
 import com.aowen.monolith.feature.search.SearchScreenUiState
 import com.aowen.monolith.feature.search.components.PlayerResultCard
 import com.aowen.monolith.ui.components.PlayerLoadingCard
@@ -39,86 +39,86 @@ fun PlayerSearchSection(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val tooltipState = remember { TooltipState() }
-    Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Players",
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleMedium
+    val playersListState = uiState.playersList
+    when (playersListState) {
+        is PlayersListState.Loading -> {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                PlayerLoadingCard(
+                    titleWidth = 100.dp,
+                    subtitleWidth = 75.dp
                 )
+            }
+        }
 
-                TooltipBox(
-                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                    tooltip = {
-                        PlainTooltip {
-                            Text(text = "We hide cheaters and players with MMR disabled from the search results.")
-                        }
-                    },
-                    state = tooltipState,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+        is PlayersListState.Error -> {
+            Text(
+                text = "There was an error loading players",
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+
+        is PlayersListState.Success -> {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                tooltipState.show()
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Players",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                            tooltip = {
+                                PlainTooltip {
+                                    Text(text = "We hide cheaters and players with MMR disabled from the search results.")
+                                }
+                            },
+                            state = tooltipState,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    coroutineScope.launch {
+                                        tooltipState.show()
+                                    }
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary
+                                )
                             }
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    playersListState.players.forEach { player ->
+                        PlayerResultCard(
+                            playerDetails = player,
+                            navigateToPlayerDetails = {
+                                handleAddToRecentSearch(player)
+                                navigateToPlayerDetails(player.playerId)
+                            }
                         )
                     }
                 }
             }
         }
-        Spacer(modifier = Modifier.size(16.dp))
-        AnimatedContent(
-            targetState = uiState.isLoadingSearch,
-            label = ""
-        ) { isLoadingSearch ->
-            if (isLoadingSearch) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    PlayerLoadingCard(
-                        titleWidth = 100.dp,
-                        subtitleWidth = 75.dp
-                    )
-                }
-            } else {
-                if (uiState.playersList.isNotEmpty()) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        uiState.playersList.forEach { player ->
-                            player?.let {
-                                PlayerResultCard(
-                                    playerDetails = player,
-                                    navigateToPlayerDetails = {
-                                        handleAddToRecentSearch(player)
-                                        navigateToPlayerDetails(player.playerId)
-                                    }
-                                )
 
-                            }
-                        }
-                    }
-                } else {
-                    Text(
-                        text = "No recent searches",
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-        }
+        else -> {}
     }
+
 }

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.repository.heroes.HeroRepository
-import com.aowen.monolith.network.OmedaCityRepository
 import com.aowen.monolith.network.UserClaimedPlayerRepository
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
 import com.aowen.monolith.network.getOrThrow
@@ -55,7 +54,6 @@ data class HomeScreenUiState(
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val repository: OmedaCityRepository,
     private val omedaCityHeroRepository: HeroRepository,
     private val favoriteBuildsRepository: UserFavoriteBuildsRepository,
     private val claimedPlayerRepository: UserClaimedPlayerRepository

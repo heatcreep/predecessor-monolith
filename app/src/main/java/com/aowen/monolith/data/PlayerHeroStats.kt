@@ -60,7 +60,7 @@ data class PlayerHeroStats(
     val maxWardsDestroyed: Int? = 0
 )
 
-fun PlayerHeroStatsDto.create(): PlayerHeroStats {
+fun PlayerHeroStatsDto.asPlayerHeroStats(): PlayerHeroStats {
 
     val symbols = DecimalFormatSymbols(Locale.US)
     val df = DecimalFormat("#.##", symbols)

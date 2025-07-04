@@ -1,6 +1,5 @@
 package com.aowen.monolith.feature.search
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,24 +23,42 @@ fun BuildsSearchSection(
     navigateToBuildDetails: (Int) -> Unit = {}
 ) {
     Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Builds",
-                color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.titleMedium
-            )
+        val buildsState = uiState.filteredBuilds
+        when (buildsState) {
+            is BuildsListState.Success -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Builds",
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
-        }
-        Spacer(modifier = Modifier.size(16.dp))
-        AnimatedContent(
-            targetState = uiState.isLoadingSearch,
-            label = ""
-        ) { isLoadingSearch ->
-            if (isLoadingSearch) {
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    buildsState.builds.forEach { build ->
+                        BuildListItem(
+                            build = build,
+                            navigateToBuildDetails = navigateToBuildDetails
+                        )
+                    }
+                }
+            }
+
+            is BuildsListState.Error -> {
+                Text(
+                    text = "An error occurred while fetching builds.",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            is BuildsListState.Loading -> {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -52,25 +69,11 @@ fun BuildsSearchSection(
                         subtitleWidth = 75.dp
                     )
                 }
-            } else {
-                if (uiState.filteredBuilds.isNotEmpty()) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        uiState.filteredBuilds.forEach { build ->
-                            BuildListItem(
-                                build = build,
-                                navigateToBuildDetails = navigateToBuildDetails
-                            )
-                        }
-                    }
-                } else {
-                    Text(
-                        text = "No builds match your search.",
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                }
             }
+
+            else -> {}
         }
+
+
     }
 }

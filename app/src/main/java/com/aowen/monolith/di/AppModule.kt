@@ -6,12 +6,11 @@ import com.aowen.monolith.data.database.dao.ClaimedPlayerDao
 import com.aowen.monolith.data.database.dao.FavoriteBuildDao
 import com.aowen.monolith.data.datastore.ThemePreferences
 import com.aowen.monolith.data.datastore.ThemePreferencesImpl
+import com.aowen.monolith.data.repository.players.di.PlayerRepository
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.AuthRepositoryImpl
 import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
 import com.aowen.monolith.network.ClaimedPlayerPreferencesManagerImpl
-import com.aowen.monolith.network.OmedaCityRepository
-import com.aowen.monolith.network.OmedaCityRepositoryImpl
 import com.aowen.monolith.network.OmedaCityService
 import com.aowen.monolith.network.RetrofitHelper
 import com.aowen.monolith.network.SupabaseAuthService
@@ -154,11 +153,6 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideOmedaCityRepository(api: OmedaCityService): OmedaCityRepository =
-        OmedaCityRepositoryImpl(api)
-
-    @Provides
-    @Singleton
     fun provideAuthRepository(
         authService: SupabaseAuthService,
         claimedPlayerDao: ClaimedPlayerDao,
@@ -185,10 +179,10 @@ object AppModule {
     fun providesUserClaimedPlayerRepository(
         authRepository: AuthRepository,
         userRepository: UserRepository,
+        playerRepository: PlayerRepository,
         userPreferencesManager: UserPreferencesManager,
         postgrestService: SupabasePostgrestService,
         claimedPlayerDao: ClaimedPlayerDao,
-        omedaCityRepository: OmedaCityRepository
     ): UserClaimedPlayerRepository =
         UserClaimedPlayerRepositoryImpl(
             authRepository = authRepository,
@@ -196,20 +190,20 @@ object AppModule {
             userRepository = userRepository,
             postgrestService = postgrestService,
             claimedPlayerDao = claimedPlayerDao,
-            omedaCityRepository = omedaCityRepository
+            omedaCityPlayerRepository = playerRepository
         )
 
     @Provides
     @Singleton
     fun provideUserRecentSearchRepository(
         postgrestService: SupabasePostgrestService,
-        omedaCityRepository: OmedaCityRepository,
+        playerRepository: PlayerRepository,
         repository: UserRepository
     ): UserRecentSearchRepository =
         UserRecentSearchRepositoryImpl(
             postgrestService = postgrestService,
-            omedaCityRepository = omedaCityRepository,
-            userRepository = repository
+            omedaCityPlayerRepository = playerRepository,
+            userRepository = repository,
         )
 
     @Provides

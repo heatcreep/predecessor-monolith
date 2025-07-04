@@ -60,7 +60,7 @@ data class PlayerDetails(
     val isConsolePlayer = playerName.contains("\uD83C\uDFAE user-")
 }
 
-fun PlayerDto.create(): PlayerDetails {
+fun PlayerDto.asPlayerDetails(): PlayerDetails {
     return PlayerDetails(
         playerId = this.id,
         playerName = this.displayName,

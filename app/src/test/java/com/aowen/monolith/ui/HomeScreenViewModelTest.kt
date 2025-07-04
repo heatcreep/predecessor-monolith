@@ -8,7 +8,6 @@ import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository
 import com.aowen.monolith.fakes.data.fakeClaimedPlayer
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
 import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityRepository
 import com.aowen.monolith.feature.home.HomeScreenError.ClaimedPlayerErrorMessage
 import com.aowen.monolith.feature.home.HomeScreenUiState
 import com.aowen.monolith.feature.home.HomeScreenViewModel
@@ -32,7 +31,6 @@ class HomeScreenViewModelTest {
     @Before
     fun setup() {
         viewModel = HomeScreenViewModel(
-            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository()
@@ -43,7 +41,6 @@ class HomeScreenViewModelTest {
     fun `initViewModel() should update state with recent searches`() = runTest {
 
         viewModel = HomeScreenViewModel(
-            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository()
@@ -66,7 +63,6 @@ class HomeScreenViewModelTest {
     fun `initViewModel() should update state successfully with ClaimedPlayer if playerId is valid`() =
         runTest {
             viewModel = HomeScreenViewModel(
-                repository = FakeOmedaCityRepository(),
                 omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
                 favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
                 claimedPlayerRepository = FakeUserClaimedPlayerRepository()
@@ -80,7 +76,6 @@ class HomeScreenViewModelTest {
     fun `initViewModel() should update state successfully if playerId is null`() = runTest {
 
         viewModel = HomeScreenViewModel(
-            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
@@ -97,7 +92,6 @@ class HomeScreenViewModelTest {
     fun `initViewModel() should update state with error when getClaimedUser() fails`() = runTest {
 
         viewModel = HomeScreenViewModel(
-            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
@@ -126,7 +120,6 @@ class HomeScreenViewModelTest {
     fun `initViewModel() should update state with error when getClaimedUser() errors`() = runTest {
 
         viewModel = HomeScreenViewModel(
-            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
@@ -155,7 +148,6 @@ class HomeScreenViewModelTest {
     fun `initViewModel() should set top five heroes by win rate`() = runTest {
 
         viewModel = HomeScreenViewModel(
-            repository = FakeOmedaCityRepository(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository()

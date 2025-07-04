@@ -2,7 +2,9 @@ package com.aowen.monolith.network
 
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerSearchDto
+import com.aowen.monolith.data.RankDetails
 import com.aowen.monolith.data.create
+import com.aowen.monolith.data.repository.players.di.PlayerRepository
 import com.aowen.monolith.logDebug
 import java.sql.Timestamp
 import java.util.UUID
@@ -15,7 +17,6 @@ const val TABLE_BUILD_ID = "build_id"
 const val TABLE_CREATED_AT = "created_at"
 const val TABLE_RECENT_PROFILES = "recent_profiles"
 const val TABLE_FAVORITE_BUILDS = "favorite_builds"
-const val TABLE_BUILDS = "builds"
 const val TABLE_MAX_ROWS = 10
 
 interface UserRecentSearchRepository {
@@ -29,7 +30,7 @@ interface UserRecentSearchRepository {
 
 class UserRecentSearchRepositoryImpl @Inject constructor(
     private val postgrestService: SupabasePostgrestService,
-    private val omedaCityRepository: OmedaCityRepository,
+    private val omedaCityPlayerRepository: PlayerRepository,
     private val userRepository: UserRepository
 ) : UserRecentSearchRepository {
 
@@ -42,7 +43,7 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                 postgrestService.fetchRecentSearches(user.id)
                     .map { it.create() }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -60,6 +61,9 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                     displayName = playerDetails.playerName,
                     region = playerDetails.region,
                     rank = playerDetails.rank,
+                    rankTitle = playerDetails.rankDetails.rankText,
+                    rankImage = playerDetails.rankDetails.rankText,
+                    isRanked = playerDetails.rankDetails != RankDetails.UNRANKED,
                     mmr = playerDetails.mmr?.toFloat(),
                 )
                 val recentSearches = postgrestService.fetchRecentSearches(user.id)
@@ -77,12 +81,14 @@ class UserRecentSearchRepositoryImpl @Inject constructor(
                     postgrestService.insertRecentSearch(playerSearchDto)
 
                 } else {
-                    val updatedPlayerDetailsResult = omedaCityRepository.fetchPlayerInfo(playerDetails.playerId)
-                    val updatedPlayerDetails = updatedPlayerDetailsResult.getOrNull()
-                    val updatedPlayerId = updatedPlayerDetails?.playerDetails?.playerId
+                    val updatedPlayerDetailsResult =
+                        omedaCityPlayerRepository.fetchPlayerInfo(playerDetails.playerId)
+                    val updatedPlayerDetails = updatedPlayerDetailsResult.getOrThrow()
+                    val updatedPlayerId = updatedPlayerDetails.playerDetails?.playerId
                     postgrestService.updateRecentSearch(
                         userId = user.id,
-                        recentPlayerId = UUID.fromString(updatedPlayerId) ?: playerSearchDto.playerId,
+                        recentPlayerId = UUID.fromString(updatedPlayerId)
+                            ?: playerSearchDto.playerId,
                         playerSearchDto
                     )
                 }

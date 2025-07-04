@@ -4,6 +4,7 @@ import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.data.database.dao.ClaimedPlayerDao
 import com.aowen.monolith.data.database.model.ClaimedPlayerEntity
+import com.aowen.monolith.data.repository.players.di.PlayerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
@@ -37,7 +38,7 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
     private val userPreferencesManager: UserPreferencesManager,
     private val postgrestService: SupabasePostgrestService,
     private val claimedPlayerDao: ClaimedPlayerDao,
-    private val omedaCityRepository: OmedaCityRepository,
+    private val omedaCityPlayerRepository: PlayerRepository
 ) : UserClaimedPlayerRepository {
     private val _claimedPlayerState: MutableStateFlow<ClaimedPlayerState> =
         MutableStateFlow(ClaimedPlayerState.NoClaimedPlayer)
@@ -68,29 +69,28 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
                 Result.success(null)
             } else {
                 val playerInfoResponse =
-                    omedaCityRepository.fetchPlayerInfo(playerId)
-                if (playerInfoResponse.isSuccess) {
-                    _claimedPlayerState.update {
-                        ClaimedPlayerState.Claimed(
-                            ClaimedPlayer(
-                                playerStats = playerInfoResponse.getOrNull()?.playerStats,
-                                playerDetails = playerInfoResponse.getOrNull()?.playerDetails
-                            )
-                        )
-                    }
-                    Result.success(
+                    omedaCityPlayerRepository.fetchPlayerInfo(playerId).getOrThrow()
+                _claimedPlayerState.update {
+                    ClaimedPlayerState.Claimed(
                         ClaimedPlayer(
-                            playerStats = playerInfoResponse.getOrNull()?.playerStats,
-                            playerDetails = playerInfoResponse.getOrNull()?.playerDetails
-
-                        ),
+                            playerStats = playerInfoResponse.playerStats,
+                            playerDetails = playerInfoResponse.playerDetails
+                        )
                     )
-                } else {
-                    Result.failure(Exception("Player not found"))
                 }
+                Result.success(
+                    ClaimedPlayer(
+                        playerStats = playerInfoResponse.playerStats,
+                        playerDetails = playerInfoResponse.playerDetails
+
+                    ),
+                )
 
             }
         } catch (e: Exception) {
+            _claimedPlayerState.update {
+                ClaimedPlayerState.Error(e.message ?: "Error")
+            }
             Result.failure(e)
         }
 

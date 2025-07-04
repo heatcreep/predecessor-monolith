@@ -4,14 +4,9 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
-import android.content.Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.content.FileProvider.getUriForFile
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.updateAppWidgetState
@@ -27,16 +22,12 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import coil.annotation.ExperimentalCoilApi
-import coil.imageLoader
-import coil.memory.MemoryCache
-import coil.request.ErrorResult
-import coil.request.ImageRequest
+import com.aowen.monolith.data.repository.players.di.PlayerRepository
 import com.aowen.monolith.glance.PlayerStatsAppWidget
 import com.aowen.monolith.glance.state.PlayerStatsState
 import com.aowen.monolith.glance.state.PlayerStatsStateDefinition
 import com.aowen.monolith.network.ClaimedPlayerPreferencesManagerImpl
-import com.aowen.monolith.network.OmedaCityRepository
+import com.aowen.monolith.network.getOrThrow
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.firstOrNull
@@ -47,7 +38,7 @@ import java.util.concurrent.TimeUnit
 class UpdatePlayerStatsWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
-    private val omedaCityRepository: OmedaCityRepository
+    private val omedaCityPlayerRepository: PlayerRepository
 ) : CoroutineWorker(context, params) {
 
     companion object {
@@ -123,7 +114,6 @@ class UpdatePlayerStatsWorker @AssistedInject constructor(
 
         setWidgetState(PlayerStatsState.Loading)
         return try {
-            val force = inputData.getBoolean(FORCE_KEY, false)
 
             // Get the claimed player id from the preferences data store
             val claimedPlayerPreferencesManager =
@@ -132,10 +122,9 @@ class UpdatePlayerStatsWorker @AssistedInject constructor(
 
             // if the player id is not null, fetch the player info and update the widget state
             if (playerId != null) {
-                val playerInfo = omedaCityRepository
-                    .fetchPlayerInfo(playerId)
-                    .getOrNull()
-                if (playerInfo?.playerDetails != null) {
+                val playerInfo = omedaCityPlayerRepository
+                    .fetchPlayerInfo(playerId).getOrThrow()
+                if (playerInfo.playerDetails != null) {
                     setWidgetState(
                         PlayerStatsState.Success(
                             playerInfo = playerInfo,
@@ -202,52 +191,5 @@ class UpdatePlayerStatsWorker @AssistedInject constructor(
             )
         }
         PlayerStatsAppWidget().updateAll(context)
-    }
-
-    @OptIn(ExperimentalCoilApi::class)
-    private suspend fun getRankImage(url: String, force: Boolean): String {
-        val request = ImageRequest.Builder(context)
-            .data(url)
-            .build()
-
-        with(context.imageLoader) {
-            if (force) {
-                diskCache?.remove(url)
-                memoryCache?.remove(MemoryCache.Key(url))
-            }
-            val result = execute(request)
-            if (result is ErrorResult) {
-                throw result.throwable
-            }
-        }
-
-        val path = context.imageLoader.diskCache?.openSnapshot(url)?.use { snapshot ->
-            val imageFile = snapshot.data.toFile()
-
-            val contentUri = getUriForFile(
-                context,
-                "${context.packageName}.provider",
-                imageFile
-            )
-
-            // Find the current launcher everytime to ensure it has read permissions
-            val resolveInfo = context.packageManager.resolveActivity(
-                Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_HOME) },
-                PackageManager.MATCH_DEFAULT_ONLY
-            )
-            val launcherName = resolveInfo?.activityInfo?.packageName
-            if (launcherName != null) {
-                context.grantUriPermission(
-                    launcherName,
-                    contentUri,
-                    FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-                )
-            }
-
-            contentUri.toString()
-        }
-        return requireNotNull(path) {
-            "Failed to get rank image path"
-        }
     }
 }

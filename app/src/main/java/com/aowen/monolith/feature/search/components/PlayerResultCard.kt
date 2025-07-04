@@ -1,5 +1,6 @@
 package com.aowen.monolith.feature.search.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.PlayerDetails
 
@@ -58,6 +60,12 @@ fun PlayerResultCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Row {
+                    Image(
+                        painter = painterResource(id = playerDetails.rankDetails.rankImageAssetId),
+                        contentDescription = playerDetails.rankDetails.rankText
+                    )
+                }
                 Column {
                     Text(
                         text = playerDetails.playerName,
