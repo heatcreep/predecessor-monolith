@@ -70,7 +70,7 @@ class ItemsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        allItems = sortedItems,
+                        allItems = allItems,
                         filteredItems = sortedItems,
                     )
                 }
