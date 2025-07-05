@@ -38,7 +38,7 @@ val defaultStats = listOf(
 data class ItemsUiState(
     val isLoading: Boolean = true,
     val searchFieldValue: String = "",
-    val selectedTierFilter: String? = null,
+    val selectedTierFilter: String? = "Tier III",
     val allItems: List<ItemDetails> = emptyList(),
     val filteredItems: List<ItemDetails> = emptyList(),
     val allStats: List<String> = defaultStats,
@@ -64,6 +64,8 @@ class ItemsViewModel @Inject constructor(
                 val allItems = itemRepository.fetchAllItems().getOrThrow()
                 val sortedItems = allItems.sortedBy {
                     it.displayName
+                }.filterOrOriginal {
+                    it.rarity.value == uiState.value.selectedTierFilter
                 }
                 _uiState.update {
                     it.copy(
