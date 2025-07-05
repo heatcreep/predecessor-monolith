@@ -61,10 +61,8 @@ class ItemsViewModel @Inject constructor(
     private fun initViewModel() {
         viewModelScope.launch {
             try {
-                val allItems = itemRepository.fetchAllItems().getOrThrow()
-                val sortedItems = allItems.sortedBy {
-                    it.displayName
-                }.filterOrOriginal {
+                val allItems = itemRepository.fetchAllItems().getOrThrow().sortedBy { it.displayName }
+                val sortedItems = allItems.filterOrOriginal {
                     it.rarity.value == uiState.value.selectedTierFilter
                 }
                 _uiState.update {

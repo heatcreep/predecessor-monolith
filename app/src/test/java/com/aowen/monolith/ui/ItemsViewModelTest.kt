@@ -55,9 +55,8 @@ class ItemsViewModelTest {
             ),
             filteredItems = listOf(
                 fakeItemDto2.asItemDetails(),
-                fakeItemDto.asItemDetails(),
                 fakeItemDto3.asItemDetails(),
-                fakeItemDto4.asItemDetails()
+                fakeItemDto4.asItemDetails(),
             ),
         )
         val actual = viewModel.uiState.value
@@ -186,9 +185,8 @@ class ItemsViewModelTest {
         assertEquals(
             listOf(
                 fakeItemDto2.asItemDetails(),
-                fakeItemDto.asItemDetails(),
                 fakeItemDto3.asItemDetails(),
-                fakeItemDto4.asItemDetails()
+                fakeItemDto4.asItemDetails(),
             ),
             viewModel.uiState.value.filteredItems
         )
