@@ -1,13 +1,20 @@
 # Release Notes
 
-## 1.8.7 - Latest
+## 1.9.0 - Latest
+
+#### Improvements & Bug Fixes
+
+- Fixes issues with Search functionality enabling users to be found even if marked as inactive by the API
+- Also fixes recent searches list to update properly and return more than one person
+
+## 1.8.7
 
 #### Improvements & Bug Fixes
 
 - fixed broken endpoints related to new hero id for Yurei
 - add photo and enum for Yurei
 
-## 1.8.6 - Latest
+## 1.8.6
 
 #### Improvements & Bug Fixes
 
@@ -15,7 +22,7 @@
 - Add photo for Wukong
 - Add photo for Aegis of Agawar
 
-## 1.8.5 - Latest
+## 1.8.5
 
 #### Improvements & Bug Fixes
 
