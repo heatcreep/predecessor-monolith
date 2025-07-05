@@ -1,10 +1,10 @@
 [versions]
 accompanist = "0.34.0"
-androidGradlePlugin = "8.5.1"
+androidGradlePlugin = "8.9.0"
 androidXActivityCompose = "1.9.1"
 androidXCoreKtx = "1.13.1"
 androidXEspresso = "3.6.1"
-androidXGlance = "1.1.0"
+androidXGlance = "1.1.1"
 androidXHilt = "1.2.0"
 androidXLifecycleRuntimeKtx = "2.8.4"
 androidXComposeMaterial3 = "1.2.1"

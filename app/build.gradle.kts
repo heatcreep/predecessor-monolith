@@ -13,12 +13,12 @@ plugins {
 
 android {
     namespace = "com.aowen.monolith"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.aowen.monolith"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = (System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1) + 1
         versionName = System.getenv("VERSION_NAME") ?: "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
