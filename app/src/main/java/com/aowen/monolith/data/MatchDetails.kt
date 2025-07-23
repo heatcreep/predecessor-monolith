@@ -4,7 +4,7 @@ data class MatchPlayerDetails(
     val playerId: String = "",
     val playerName: String = "",
     val vpTotal: Int = 0,
-    val vpChange: String = "",
+    val vpChange: String = "0",
     val rankDetails: RankDetails = RankDetails.UNRANKED,
     val heroId: Long = 0,
     val role: String = "",
@@ -60,7 +60,7 @@ fun MatchPlayerDto.create(): MatchPlayerDetails {
         playerId = this.id,
         playerName = this.displayName,
         vpTotal = this.vpTotal ?: 0,
-        vpChange = if(this.vpChange != null) "${this.vpChange.toString()} VP" else "Unranked",
+        vpChange = this.vpChange?.let { "$it VP"} ?: "0 VP",
         rankDetails = this.rank.toRankedDetailsOrNull(),
         heroId = this.heroId,
         role = this.role ?: "role unknown",
@@ -143,9 +143,29 @@ data class MatchesDetails(
     val cursor: String? = ""
 )
 
+enum class MatchType(val text: String) {
+    RANKED("Ranked"),
+    UNRANKED("Unranked"),
+    LEGACY("Legacy"),
+    NITRO("Nitro"),
+    BRAWL("Brawl"),
+}
+
+fun String.toMatchType(): MatchType? {
+    return when (this) {
+        "ranked" -> MatchType.RANKED
+        "pvp" -> MatchType.UNRANKED
+        "TEAM_VS_TEAM_RUSH" -> MatchType.NITRO
+        "TEAM_VS_TEAM_LEGACY" -> MatchType.LEGACY
+        "brawl" -> MatchType.BRAWL
+        else -> null
+    }
+}
+
 
 data class MatchDetails(
     val matchId: String = "",
+    val matchType: MatchType? = null,
     val startTime: String = "",
     val endTime: String = "",
     val gameDuration: Int = 0,
@@ -168,6 +188,7 @@ fun MatchesDto.asMatchesDetails(): MatchesDetails {
 fun MatchDto.asMatchDetails(): MatchDetails {
     return MatchDetails(
         matchId = this.id,
+        matchType = this.gameMode.toMatchType(),
         startTime = this.startTime,
         endTime = this.endTime,
         gameDuration = this.gameDuration,

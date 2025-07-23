@@ -103,12 +103,14 @@ fun PlayerRow(
                     fontWeight = FontWeight.ExtraBold
                 )
                 // VP Change
-                Text(
-                    text = player.vpChange,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = player.vpChange.handleVpChangeColor(),
-                    fontWeight = FontWeight.ExtraBold
-                )
+                player.vpChange?.let { vpChange ->
+                    Text(
+                        text = vpChange,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = player.vpChange.handleVpChangeColor(),
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                }
             }
             Spacer(modifier = Modifier.size(28.dp))
             Row(

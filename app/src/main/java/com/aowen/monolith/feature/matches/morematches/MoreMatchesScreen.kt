@@ -46,12 +46,12 @@ import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.MatchDetails
-import com.aowen.monolith.feature.matches.navigation.navigateToMatchDetails
-import com.aowen.monolith.ui.common.MonolithCollapsableListColumn
-import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.feature.builds.FilterDropdown
 import com.aowen.monolith.feature.matches.MatchPlayerCard
+import com.aowen.monolith.feature.matches.navigation.navigateToMatchDetails
 import com.aowen.monolith.feature.search.SearchBar
+import com.aowen.monolith.ui.common.MonolithCollapsableListColumn
+import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 import kotlinx.coroutines.launch
 
@@ -254,6 +254,7 @@ fun MoreMatchesScreen(
                                 },
                                 isWinner = isWinner,
                                 timeSinceMatch = handleTimeSinceMatch(match.endTime),
+                                matchType = match.matchType,
                                 playerHero = playerHero
                             )
                         }

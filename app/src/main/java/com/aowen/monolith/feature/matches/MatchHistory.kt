@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
+import com.aowen.monolith.data.MatchType
 import com.aowen.monolith.data.Team
 import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getHeroName
@@ -94,6 +95,7 @@ fun MatchesList(
                             navigateToMatchDetails(playerHero?.playerId!!, match.matchId)
                         },
                         isWinner = isWinner,
+                        matchType = match.matchType,
                         timeSinceMatch = handleTimeSinceMatch(match.endTime),
                         playerHero = playerHero
                     )
@@ -107,6 +109,7 @@ fun MatchesList(
 fun MatchPlayerCard(
     modifier: Modifier = Modifier,
     isWinner: Boolean,
+    matchType: MatchType?,
     timeSinceMatch: String,
     playerHero: MatchPlayerDetails?,
 ) {
@@ -147,7 +150,7 @@ fun MatchPlayerCard(
                 // Win/Loss + MMR Change
                 Column(
                     modifier = Modifier
-                        .width(72.dp),
+                        .width(80.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Box(
@@ -166,14 +169,26 @@ fun MatchPlayerCard(
                         )
                     }
                     Spacer(modifier = Modifier.size(4.dp))
+                    matchType?.let { type ->
+                        Text(
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            text = type.text
+                        )
+                        if( type == MatchType.RANKED) {
+                            Text(
+                                textAlign = TextAlign.Start,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.tertiary,
+                                text = "${playerHero?.vpChange}"
+                            )
+                        }
+                    }
+                    playerHero?.vpChange?.let {vpChange ->
+
+                    }
                     Text(
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        text = "${playerHero?.vpChange}"
-                    )
-                    Text(
-                        textAlign = TextAlign.Start,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.tertiary,
                         text = timeSinceMatch
@@ -264,6 +279,8 @@ fun MatchesListPreview() {
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dusk",
+                        matchType = MatchType.RANKED,
+                        endTime = "2023-10-01T12:00:00Z",
                         dawn = Team.Dawn(
                             players = listOf(
                                 MatchPlayerDetails(
@@ -295,6 +312,7 @@ fun MatchesListPreview() {
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dusk",
+                        endTime = "2023-10-01T12:00:00Z",
                         dawn = Team.Dawn(
                             players = listOf(
                                 MatchPlayerDetails(
@@ -324,6 +342,7 @@ fun MatchesListPreview() {
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dawn",
+                        endTime = "2023-10-01T12:00:00Z",
                         dawn = Team.Dawn(
                             players = listOf(
                                 MatchPlayerDetails(
@@ -371,6 +390,7 @@ fun MatchesListPreviewLightMode() {
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dusk",
+                        endTime = "2023-10-01T12:00:00Z",
                         dawn = Team.Dawn(
                             listOf(
                                 MatchPlayerDetails(
@@ -399,6 +419,7 @@ fun MatchesListPreviewLightMode() {
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dusk",
+                        endTime = "2023-10-01T12:00:00Z",
                         dawn = Team.Dawn(
                             players = listOf(
                                 MatchPlayerDetails(
@@ -427,6 +448,7 @@ fun MatchesListPreviewLightMode() {
                     MatchDetails(
                         matchId = "1",
                         winningTeam = "Dawn",
+                        endTime = "2023-10-01T12:00:00Z",
                         dawn = Team.Dawn(
                             listOf(
                                 MatchPlayerDetails(
