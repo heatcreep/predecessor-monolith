@@ -73,7 +73,18 @@ class HeroDetailsViewModelTest {
     @Test
     fun `calling initViewModel() should update uiState with hero statistics and first five builds`() =
         runTest {
-            viewModel.initViewModel()
+            viewModel = HeroDetailsViewModel(
+                savedStateHandle = SavedStateHandle(
+                    mapOf(
+                        "heroName" to "her",
+                        "heroId" to "123"
+                    )
+
+                ),
+                userPreferencesDataStore = FakeUserPreferencesManager(),
+                omedaCityHeroRepository = heroRepository,
+                omedaCityBuildRepository = buildRepository
+            )
             advanceUntilIdle()
             val actual = viewModel.uiState.value
             val actualConsole = viewModel.console.value
@@ -93,7 +104,7 @@ class HeroDetailsViewModelTest {
     fun `initViewModel should show error if hero details fails`() = runTest {
         val networkErrorMessage = "Failed to fetch hero details"
         heroRepository = mockk<HeroRepository>()
-        coEvery { heroRepository.fetchHeroByName(any()) } returns Resource.NetworkError(
+        coEvery { heroRepository.fetchAllHeroes() } returns Resource.NetworkError(
             404,
             networkErrorMessage
         )
@@ -134,7 +145,7 @@ class HeroDetailsViewModelTest {
             404,
             networkErrorMessage
         )
-        coEvery { heroRepository.fetchHeroByName(any()) } returns Resource.Success(fakeHeroDto.asHeroDetails())
+        coEvery { heroRepository.fetchAllHeroes() } returns Resource.Success(listOf(fakeHeroDto.asHeroDetails()))
         viewModel = HeroDetailsViewModel(
             savedStateHandle = SavedStateHandle(
                 mapOf(

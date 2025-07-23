@@ -1,6 +1,21 @@
 # Release Notes
 
-## 1.9.0 - Latest
+## 1.9.2 - Latest
+
+#### Improvements & Bug Fixes
+
+#### New Features
+
+- Users can now delete single or all favorite builds from the Home Screen
+- Adds photo data for Renna
+
+#### Improvements & Bug Fixes
+
+- Fixes match history to better communicate game type and if the user gained or lost VP, not showing 0 for unranked matches
+- Favorited builds that have been deleted will now be pruned from the favorites list
+- Fixes issue with getting new heroes from Top/Most Played Heroes section
+
+## 1.9.0 
 
 #### Improvements & Bug Fixes
 

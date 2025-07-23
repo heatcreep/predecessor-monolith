@@ -15,7 +15,7 @@ fun getHeroName(heroId: Long) = Hero.entries.firstOrNull {
     it.heroId == heroId
 }?.heroName ?: "Hero"
 
-fun getHeroRole(roleName: String? = "") : HeroRole? = HeroRole.entries.firstOrNull {
+fun getHeroRole(roleName: String? = ""): HeroRole? = HeroRole.entries.firstOrNull {
     it.roleName.lowercase() == roleName?.lowercase()
 }
 
@@ -57,6 +57,7 @@ enum class Hero(
     NARBASH("Narbash", "Narbash", 16, R.drawable.narbash),
     PHASE("Phase", "Phase", 25, R.drawable.phase),
     RAMPAGE("Rampage", "Rampage", 17, R.drawable.rampage),
+    RENNA("Renna", "Bright", 67, R.drawable.renna),
     REVENANT("Revenant", "Revenant", 22, R.drawable.revenant),
     RIKTOR("Riktor", "Riktor", 18, R.drawable.riktor),
     SERATH("Serath", "Serath", 39, R.drawable.serath),

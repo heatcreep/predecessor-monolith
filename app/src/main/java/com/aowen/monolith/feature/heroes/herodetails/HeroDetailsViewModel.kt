@@ -49,7 +49,6 @@ class HeroDetailsViewModel @Inject constructor(
     private val _console = MutableStateFlow(Console.PC)
     val console: StateFlow<Console> = _console
 
-    private val heroName: String = checkNotNull(savedStateHandle["heroName"])
     private val heroId: String = checkNotNull(savedStateHandle["heroId"])
 
     init {
@@ -60,7 +59,7 @@ class HeroDetailsViewModel @Inject constructor(
         _uiState.value = HeroDetailsUiState(isLoading = true, heroDetailsErrors = null)
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
-            val hero = async { omedaCityHeroRepository.fetchHeroByName(heroName) }
+            val heroes = async { omedaCityHeroRepository.fetchAllHeroes() }
             val statistics =
                 async { omedaCityHeroRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
             val heroBuildsDeferred = async {
@@ -71,7 +70,7 @@ class HeroDetailsViewModel @Inject constructor(
                 )
             }
             try {
-                val heroResult = hero.await().getOrThrow()
+                val heroResult = heroes.await().getOrThrow().firstOrNull { it.id == heroId.toLong() }
                 val statisticsResult = statistics.await().getOrThrow()
                 val heroBuilds = heroBuildsDeferred.await().getOrThrow()
                 _uiState.update {
