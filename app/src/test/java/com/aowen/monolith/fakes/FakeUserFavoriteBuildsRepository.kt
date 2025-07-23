@@ -1,37 +1,19 @@
 package com.aowen.monolith.fakes
 
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.network.FavoriteBuildsState
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeUserFavoriteBuildsRepository() : UserFavoriteBuildsRepository {
 
-    companion object {
-        val buildListItem1 = FavoriteBuildListItem(
-            buildId = 1,
-            heroId = 24,
-            author = "Author 1",
-            title = "Title 1",
-            description = "Description 1",
-            role = "Role 1",
-            crestId = 1,
-            gameVersion = "1.0.0",
-            upvotesCount = 10,
-            downvotesCount = 5,
-            itemIds = listOf(1, 2, 3),
-            createdAt = "2021-01-01"
-        )
-    }
-
     override val favoriteBuildsState: MutableStateFlow<FavoriteBuildsState>
         get() {
             return MutableStateFlow(FavoriteBuildsState.Empty)
         }
 
-    override suspend fun fetchFavoriteBuilds(): Result<List<FavoriteBuildListItem>> {
-        return Result.success(listOf(buildListItem1))
+    override suspend fun fetchFavoriteBuildIds(): Result<List<Int>> {
+        return Result.success(listOf(1))
     }
 
     override suspend fun addFavoriteBuild(buildDetails: BuildListItem) {
@@ -39,6 +21,10 @@ class FakeUserFavoriteBuildsRepository() : UserFavoriteBuildsRepository {
     }
 
     override suspend fun removeFavoriteBuild(buildId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun removeAllFavoriteBuilds() {
         TODO("Not yet implemented")
     }
 }

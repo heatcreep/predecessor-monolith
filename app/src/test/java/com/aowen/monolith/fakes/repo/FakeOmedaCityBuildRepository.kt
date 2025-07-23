@@ -14,6 +14,23 @@ fun resetPageCount() {
 
 class FakeOmedaCityBuildRepository : BuildRepository {
 
+    companion object {
+        val buildListItem1 = BuildListItem(
+            id = 1,
+            heroId = 24,
+            author = "Author 1",
+            title = "Title 1",
+            description = "Description 1",
+            role = "Role 1",
+            crest = 1,
+            version = "1.0.0",
+            upvotes = 10,
+            downvotes = 5,
+            buildItems = listOf(1, 2, 3),
+            createdAt = "2021-01-01"
+        )
+    }
+
     override suspend fun fetchAllBuilds(
         name: String?,
         role: String?,

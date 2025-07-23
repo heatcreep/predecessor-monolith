@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.data.repository.heroes.HeroRepository
+import com.aowen.monolith.feature.home.usecase.VerifyFavoriteBuildsUseCase
 import com.aowen.monolith.network.UserClaimedPlayerRepository
 import com.aowen.monolith.network.UserFavoriteBuildsRepository
 import com.aowen.monolith.network.getOrThrow
@@ -55,8 +56,9 @@ data class HomeScreenUiState(
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val omedaCityHeroRepository: HeroRepository,
-    private val favoriteBuildsRepository: UserFavoriteBuildsRepository,
-    private val claimedPlayerRepository: UserClaimedPlayerRepository
+    private val claimedPlayerRepository: UserClaimedPlayerRepository,
+    private val verifyFavoriteBuildsUseCase: VerifyFavoriteBuildsUseCase,
+    private val favoriteBuildsRepository: UserFavoriteBuildsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeScreenUiState())
@@ -77,7 +79,7 @@ class HomeScreenViewModel @Inject constructor(
 
             claimedPlayerRepository.getClaimedPlayerName()
             val favoriteBuildsDeferredResult =
-                async { favoriteBuildsRepository.fetchFavoriteBuilds() }
+                async { verifyFavoriteBuildsUseCase() }
 
             val claimedUserDeferredResult =
                 async { claimedPlayerRepository.getClaimedPlayer() }
@@ -138,6 +140,49 @@ class HomeScreenViewModel @Inject constructor(
                 }
             }
 
+        }
+    }
+
+    fun handleRemoveFavoriteBuild(buildId: Int) {
+        viewModelScope.launch {
+            try {
+                favoriteBuildsRepository.removeFavoriteBuild(buildId)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        homeScreenError = _uiState.value.homeScreenError.plus(
+                            HomeScreenError.FavoriteBuildsErrorMessage(
+                                errorMessage = "Failed to remove favorite build",
+                                error = e.message
+                            )
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun handleRemoveAllFavoriteBuilds() {
+        viewModelScope.launch {
+            try {
+                favoriteBuildsRepository.removeAllFavoriteBuilds()
+                _uiState.update {
+                    it.copy(
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        homeScreenError = _uiState.value.homeScreenError.plus(
+                            HomeScreenError.FavoriteBuildsErrorMessage(
+                                errorMessage = "Failed to remove all favorite builds",
+                                error = e.message
+                            )
+                        )
+                    )
+                }
+            }
         }
     }
 

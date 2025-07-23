@@ -56,11 +56,11 @@ class BuildDetailsScreenViewModel @Inject constructor(
             val buildsDeferred = async { omedaCityBuildRepository.fetchBuildById(buildId) }
             val itemsDeferred = async { omedaCityItemRepository.fetchAllItems() }
 
-            val favoritedBuilds = userFavoriteBuildsRepository.fetchFavoriteBuilds()
+            val favoritedBuilds = userFavoriteBuildsRepository.fetchFavoriteBuildIds()
 
             if (favoritedBuilds.isSuccess) {
                 val isFavorited =
-                    favoritedBuilds.getOrNull()?.any { it.buildId == buildId.toInt() } == true
+                    favoritedBuilds.getOrNull()?.any { it == buildId.toInt() } == true
                 _uiState.update {
                     it.copy(isFavorited = isFavorited)
                 }

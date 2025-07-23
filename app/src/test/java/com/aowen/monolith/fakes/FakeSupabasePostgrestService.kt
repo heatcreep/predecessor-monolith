@@ -72,6 +72,10 @@ class FakeSupabasePostgrestService(private val recentSearchStatus: RecentSearchS
     override suspend fun deleteFavoriteBuild(userId: UUID, buildId: Int) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun deleteAllFavoriteBuilds(userId: UUID) {
+        TODO("Not yet implemented")
+    }
 }
 
 enum class RecentSearchStatus {

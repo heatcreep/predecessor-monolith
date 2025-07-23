@@ -17,7 +17,7 @@ data class FavoriteBuildListItem(
     val gameVersion: String
 )
 
-fun FavoriteBuildDto.create(): FavoriteBuildListItem {
+fun FavoriteBuildDto.asFavoriteBuildListItem(): FavoriteBuildListItem {
     return FavoriteBuildListItem(
         buildId = this.buildId,
         heroId = this.heroId,

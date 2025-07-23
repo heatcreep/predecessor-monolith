@@ -2,17 +2,22 @@
 
 package com.aowen.monolith.ui
 
+import com.aowen.monolith.data.asFavoriteBuildListItem
 import com.aowen.monolith.fakes.ClaimedPlayerScenario
 import com.aowen.monolith.fakes.FakeUserClaimedPlayerRepository
 import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository
 import com.aowen.monolith.fakes.data.fakeClaimedPlayer
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
+import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
 import com.aowen.monolith.feature.home.HomeScreenError.ClaimedPlayerErrorMessage
 import com.aowen.monolith.feature.home.HomeScreenUiState
 import com.aowen.monolith.feature.home.HomeScreenViewModel
+import com.aowen.monolith.feature.home.usecase.VerifyFavoriteBuildsUseCase
 import com.aowen.monolith.network.ClaimedPlayerState
 import com.aowen.monolith.utils.MainDispatcherRule
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -28,12 +33,18 @@ class HomeScreenViewModelTest {
 
     private lateinit var viewModel: HomeScreenViewModel
 
+    val verifyFavoriteBuildsUseCase: VerifyFavoriteBuildsUseCase = mockk()
+
     @Before
     fun setup() {
+        coEvery { verifyFavoriteBuildsUseCase() } returns Result.success(
+            listOf(FakeOmedaCityBuildRepository.buildListItem1.asFavoriteBuildListItem())
+        )
         viewModel = HomeScreenViewModel(
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
-            claimedPlayerRepository = FakeUserClaimedPlayerRepository()
+            claimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
         )
     }
 
@@ -43,7 +54,8 @@ class HomeScreenViewModelTest {
         viewModel = HomeScreenViewModel(
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
-            claimedPlayerRepository = FakeUserClaimedPlayerRepository()
+            claimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
 
         )
         viewModel.initViewModel()
@@ -65,7 +77,8 @@ class HomeScreenViewModelTest {
             viewModel = HomeScreenViewModel(
                 omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
                 favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
-                claimedPlayerRepository = FakeUserClaimedPlayerRepository()
+                claimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+                verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
             )
             advanceUntilIdle()
             val actual = viewModel.claimedPlayerState.value
@@ -80,7 +93,8 @@ class HomeScreenViewModelTest {
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
                 claimedPlayerScenario = ClaimedPlayerScenario.PlayerNullOrEmpty
-            )
+            ),
+            verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
 
         )
         advanceUntilIdle()
@@ -96,7 +110,8 @@ class HomeScreenViewModelTest {
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
                 claimedPlayerScenario = ClaimedPlayerScenario.PlayerInfoResponseFailure
-            )
+            ),
+            verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
 
         )
         advanceUntilIdle()
@@ -124,7 +139,8 @@ class HomeScreenViewModelTest {
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
             claimedPlayerRepository = FakeUserClaimedPlayerRepository(
                 claimedPlayerScenario = ClaimedPlayerScenario.PlayerInfoError
-            )
+            ),
+            verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
 
         )
         advanceUntilIdle()
@@ -150,7 +166,8 @@ class HomeScreenViewModelTest {
         viewModel = HomeScreenViewModel(
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
-            claimedPlayerRepository = FakeUserClaimedPlayerRepository()
+            claimedPlayerRepository = FakeUserClaimedPlayerRepository(),
+            verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
 
         )
         viewModel.initViewModel()

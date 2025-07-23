@@ -4,7 +4,7 @@ import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.asFavoriteBuildDto
 import com.aowen.monolith.data.asFavoriteBuildListEntity
-import com.aowen.monolith.data.create
+import com.aowen.monolith.data.asFavoriteBuildListItem
 import com.aowen.monolith.data.database.dao.FavoriteBuildDao
 import com.aowen.monolith.data.database.model.asFavoriteBuildListItem
 import com.aowen.monolith.logDebug
@@ -23,9 +23,10 @@ interface UserFavoriteBuildsRepository {
 
     val favoriteBuildsState: MutableStateFlow<FavoriteBuildsState>
 
-    suspend fun fetchFavoriteBuilds(): Result<List<FavoriteBuildListItem>>
+    suspend fun fetchFavoriteBuildIds(): Result<List<Int>>
     suspend fun addFavoriteBuild(buildDetails: BuildListItem)
     suspend fun removeFavoriteBuild(buildId: Int)
+    suspend fun removeAllFavoriteBuilds()
 }
 
 class UserFavoriteBuildsRepositoryImpl @Inject constructor(
@@ -39,7 +40,7 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
         MutableStateFlow(FavoriteBuildsState.Empty)
     override val favoriteBuildsState = _favoriteBuildsState
 
-    override suspend fun fetchFavoriteBuilds(): Result<List<FavoriteBuildListItem>> {
+    override suspend fun fetchFavoriteBuildIds(): Result<List<Int>> {
         when (authRepository.userState.value) {
 
             // Local User
@@ -53,7 +54,7 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                 } else {
                     _favoriteBuildsState.update { FavoriteBuildsState.Success(favoriteBuilds) }
                 }
-                return Result.success(favoriteBuilds)
+                return Result.success(favoriteBuilds.map { it.buildId })
             }
             // Supabase User
             is UserState.Authenticated -> {
@@ -62,11 +63,18 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                     if (user?.id == null) {
                         Result.failure(Exception("User not found"))
                     } else {
-                        val favoriteBuilds = postgrestService.fetchFavoriteBuilds(user.id).map {
-                            it.create()
+                        val favoriteBuilds = postgrestService.fetchFavoriteBuilds(user.id)
+                            .map { networkFavoriteBuild ->
+                                networkFavoriteBuild.asFavoriteBuildListItem()
+                            }
+                        if (favoriteBuilds.isEmpty()) {
+                            _favoriteBuildsState.update {
+                                FavoriteBuildsState.Empty
+                            }
+                        } else {
+                            _favoriteBuildsState.update { FavoriteBuildsState.Success(favoriteBuilds) }
                         }
-                        _favoriteBuildsState.update { FavoriteBuildsState.Success(favoriteBuilds) }
-                        Result.success(favoriteBuilds)
+                        Result.success(favoriteBuilds.map { it.buildId })
                     }
                 } catch (e: Exception) {
                     Result.failure(e)
@@ -116,7 +124,7 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                             (state as FavoriteBuildsState.Success).copy(
                                 favoriteBuilds = state.favoriteBuilds.plus(
                                     state.favoriteBuilds.plus(
-                                        favoriteBuildDto.create()
+                                        favoriteBuildDto.asFavoriteBuildListItem()
                                     )
                                 )
                             )
@@ -165,23 +173,58 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                     if (user?.id == null) {
                         return
                     } else {
-                        val buildFromState =
-                            (_favoriteBuildsState.value as FavoriteBuildsState.Success).favoriteBuilds.find {
-                                it.buildId == buildId
-                            }
-                        buildFromState?.let { build ->
-                            _favoriteBuildsState.update { state ->
-                                (state as FavoriteBuildsState.Success).copy(
-                                    favoriteBuilds = state.favoriteBuilds.plus(
-                                        state.favoriteBuilds.minus(
-                                            build
-                                        )
-
-                                    )
-                                )
+                        postgrestService.deleteFavoriteBuild(user.id, buildId)
+                        _favoriteBuildsState.update { state ->
+                            when(state) {
+                                is FavoriteBuildsState.Success -> {
+                                    if(state.favoriteBuilds.size == 1) {
+                                        FavoriteBuildsState.Empty
+                                    } else {
+                                        val buildFromState = state.favoriteBuilds.find {
+                                            it.buildId == buildId
+                                        }
+                                        buildFromState?.let { build ->
+                                            state.copy(
+                                                favoriteBuilds = state.favoriteBuilds.minus(
+                                                    build
+                                                )
+                                            )
+                                        } ?: state
+                                    }
+                                }
+                                else -> state
                             }
                         }
-                        postgrestService.deleteFavoriteBuild(user.id, buildId)
+
+                    }
+                } catch (e: Exception) {
+                    logDebug(e.toString())
+                }
+            }
+        }
+    }
+
+    override suspend fun removeAllFavoriteBuilds() {
+        when (authRepository.userState.value) {
+            // Local User
+            is UserState.Unauthenticated -> {
+                favoriteBuildDao.deleteAllFavoriteBuildListItems()
+                _favoriteBuildsState.update {
+                    FavoriteBuildsState.Empty
+                }
+            }
+
+            // Supabase User
+            is UserState.Authenticated -> {
+                return try {
+                    val user = userRepository.getUser()
+                    if (user?.id == null) {
+                        return
+                    } else {
+                        _favoriteBuildsState.update {
+                            FavoriteBuildsState.Empty
+                        }
+                        postgrestService.deleteAllFavoriteBuilds(user.id)
                     }
                 } catch (e: Exception) {
                     logDebug(e.toString())

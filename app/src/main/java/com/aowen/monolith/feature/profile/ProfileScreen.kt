@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -139,7 +141,9 @@ fun ProfileScreenRoute(
     ) {
         ProfileScreen(
             uiState = uiState,
-            modifier = Modifier.padding(it).padding(horizontal = 16.dp),
+            modifier = Modifier
+                .padding(it)
+                .padding(horizontal = 16.dp),
             submitLogin = viewModel::submitLogin,
             handleSaveConsole = viewModel::saveConsole,
             handleSaveTheme = viewModel::saveTheme,
@@ -187,10 +191,11 @@ fun ProfileScreen(
         modifier = modifier,
         color = MaterialTheme.colorScheme.background
     ) {
-        when(uiState) {
+        when (uiState) {
             is ProfileScreenState.Loading -> {
                 FullScreenLoadingIndicator("Profile")
             }
+
             is ProfileScreenState.Error -> {
                 FullScreenErrorWithRetry(
                     errorMessage = uiState.message
@@ -198,10 +203,13 @@ fun ProfileScreen(
                     handleRetry()
                 }
             }
+
             is ProfileScreenState.UserInfoLoaded -> {
                 if (uiState.userInfo != null) {
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(state = rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {

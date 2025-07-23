@@ -52,6 +52,8 @@ interface SupabasePostgrestService {
 
     suspend fun deleteFavoriteBuild(userId: UUID, buildId: Int)
 
+    suspend fun deleteAllFavoriteBuilds(userId: UUID)
+
 //    suspend fun fetchAllUserBuilds(): Result<List<BuildListItem>?>
 }
 
@@ -190,6 +192,18 @@ class SupabasePostgrestServiceImpl @Inject constructor(
                 eq(TABLE_USER_ID, userId)
                 eq(TABLE_BUILD_ID, buildId)
             }
+        }
+    }
+
+    override suspend fun deleteAllFavoriteBuilds(userId: UUID) {
+        try {
+            postgrest[TABLE_FAVORITE_BUILDS].delete {
+                filter {
+                    eq(TABLE_USER_ID, userId)
+                }
+            }
+        } catch (e: Exception) {
+            logDebug(e.localizedMessage ?: "Error deleting all favorite builds")
         }
     }
 

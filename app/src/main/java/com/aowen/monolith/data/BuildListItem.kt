@@ -58,6 +58,23 @@ fun ModuleDto.create(): ItemModule {
     )
 }
 
+fun BuildListItem.asFavoriteBuildListItem(): FavoriteBuildListItem {
+    return FavoriteBuildListItem(
+        buildId = id,
+        heroId = heroId,
+        role = role,
+        title = title,
+        description = description,
+        author = author,
+        crestId = crest,
+        itemIds = buildItems,
+        upvotesCount = upvotes,
+        downvotesCount = downvotes,
+        createdAt = createdAt,
+        gameVersion = version ?: ""
+    )
+}
+
 fun BuildListItem.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
     return FavoriteBuildListEntity(
         buildId = id,

@@ -27,4 +27,11 @@ interface FavoriteBuildDao {
         """
     )
     suspend fun deleteFavoriteBuildListItems(buildIds: List<Int>)
+
+    @Query(
+        value = """
+            DELETE FROM favorite_builds
+        """
+    )
+    suspend fun deleteAllFavoriteBuildListItems()
 }

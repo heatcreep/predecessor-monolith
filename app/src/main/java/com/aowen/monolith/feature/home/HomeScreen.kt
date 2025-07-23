@@ -10,9 +10,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Badge
@@ -37,6 +40,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -79,6 +83,7 @@ import com.aowen.monolith.network.ClaimedPlayerState
 import com.aowen.monolith.network.FavoriteBuildsState
 import com.aowen.monolith.network.firebase.Feedback
 import com.aowen.monolith.ui.common.PlayerIcon
+import com.aowen.monolith.ui.components.MonolithAlertDialog
 import com.aowen.monolith.ui.components.PlayerLoadingCard
 import com.aowen.monolith.ui.components.RefreshableContainer
 import com.aowen.monolith.ui.theme.GreenHighlight
@@ -102,7 +107,7 @@ internal fun HomeScreenRoute(
     HomeScreen(
         uiState = homeUiState,
         favoriteBuildsSharedState = favoriteBuildsState,
-        claimedPlayerState  = claimedPlayerState,
+        claimedPlayerState = claimedPlayerState,
         claimedPlayerName = claimedPlayerName,
         navigateToSearch = navController::navigateToSearch,
         navigateToPlayerDetails = navController::navigateToPlayerDetails,
@@ -110,6 +115,8 @@ internal fun HomeScreenRoute(
         navigateToHeroWinPickRate = navController::navigateToHeroWinPickRate,
         navigateToBuildDetails = navController::navigateToBuildDetails,
         handlePullRefresh = homeScreenViewModel::initViewModel,
+        handleRemoveAllFavoriteBuilds = homeScreenViewModel::handleRemoveAllFavoriteBuilds,
+        handleRemoveFavoriteBuild = homeScreenViewModel::handleRemoveFavoriteBuild,
         modifier = modifier
     )
 }
@@ -117,6 +124,7 @@ internal fun HomeScreenRoute(
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
     uiState: HomeScreenUiState,
     favoriteBuildsSharedState: FavoriteBuildsState,
     claimedPlayerState: ClaimedPlayerState,
@@ -127,7 +135,8 @@ fun HomeScreen(
     navigateToHeroWinPickRate: (String) -> Unit,
     navigateToBuildDetails: (Int) -> Unit,
     handlePullRefresh: () -> Unit,
-    modifier: Modifier = Modifier
+    handleRemoveAllFavoriteBuilds: () -> Unit = {},
+    handleRemoveFavoriteBuild: (Int) -> Unit = {}
 ) {
 
     val isRefreshing by remember { mutableStateOf(false) }
@@ -141,6 +150,22 @@ fun HomeScreen(
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
+
+    var clearAllFavoriteBuildsDialogIsOpen by remember {
+        mutableStateOf(false)
+    }
+
+    // Dialog confirming user wants to clear all recent searches
+    if (clearAllFavoriteBuildsDialogIsOpen) {
+        MonolithAlertDialog(
+            bodyText = "Are you sure you want to clear all favorite builds? This action cannot be undone.",
+            onDismissRequest = { clearAllFavoriteBuildsDialogIsOpen = false },
+            onConfirm = {
+                handleRemoveAllFavoriteBuilds()
+                clearAllFavoriteBuildsDialogIsOpen = false
+            }
+        )
+    }
 
     RefreshableContainer(
         isRefreshing = isRefreshing,
@@ -174,7 +199,7 @@ fun HomeScreen(
                 )
             }
         ) {
-            if(openBottomSheet) {
+            if (openBottomSheet) {
                 ModalBottomSheet(
                     onDismissRequest = closeBottomSheet,
                     sheetState = bottomSheetState
@@ -227,7 +252,11 @@ fun HomeScreen(
                 FavoriteBuildsSection(
                     uiState = uiState,
                     favoriteBuildsSharedState = favoriteBuildsSharedState,
-                    navigateToBuildDetails = navigateToBuildDetails
+                    navigateToBuildDetails = navigateToBuildDetails,
+                    handleOpenDialog = {
+                        clearAllFavoriteBuildsDialogIsOpen = true
+                    },
+                    handleRemoveFavoriteBuild = handleRemoveFavoriteBuild
                 )
                 HeroWinRateSection(
                     isLoading = uiState.isLoading,
@@ -345,17 +374,36 @@ fun ClaimedPlayerCard(
 fun FavoriteBuildsSection(
     uiState: HomeScreenUiState,
     favoriteBuildsSharedState: FavoriteBuildsState,
+    handleOpenDialog: () -> Unit = {},
+    handleRemoveFavoriteBuild: (Int) -> Unit,
     navigateToBuildDetails: (Int) -> Unit
 ) {
+
+    var isReloadingSection by remember { mutableStateOf(false) }
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = "Favorite Builds",
-            color = MaterialTheme.colorScheme.secondary,
-            style = MaterialTheme.typography.titleMedium
-        )
-        AnimatedContent(targetState = uiState.isLoading, label = "") {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Favorite Builds",
+                color = MaterialTheme.colorScheme.secondary,
+                style = MaterialTheme.typography.titleMedium
+            )
+            if (favoriteBuildsSharedState is FavoriteBuildsState.Success) {
+                TextButton(onClick = handleOpenDialog) {
+                    Text(
+                        text = "Clear All",
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        AnimatedContent(targetState = uiState.isLoading || isReloadingSection, label = "") {
             if (it) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -380,7 +428,7 @@ fun FavoriteBuildsSection(
                         color = MaterialTheme.colorScheme.secondary
                     )
                 } else {
-                    when(favoriteBuildsSharedState) {
+                    when (favoriteBuildsSharedState) {
                         is FavoriteBuildsState.Error -> {
                             Text(
                                 text = "Error loading favorite builds",
@@ -388,6 +436,7 @@ fun FavoriteBuildsSection(
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
+
                         is FavoriteBuildsState.Empty -> {
                             Text(
                                 text = "No favorite builds found",
@@ -395,6 +444,7 @@ fun FavoriteBuildsSection(
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
+
                         is FavoriteBuildsState.Success -> {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -402,7 +452,8 @@ fun FavoriteBuildsSection(
                                 favoriteBuildsSharedState.favoriteBuilds.forEach { build ->
                                     FavoriteBuildListItem(
                                         build = build,
-                                        navigateToBuildDetails = navigateToBuildDetails
+                                        navigateToBuildDetails = navigateToBuildDetails,
+                                        onRemoveBuild = handleRemoveFavoriteBuild
                                     )
                                 }
                             }
@@ -418,7 +469,8 @@ fun FavoriteBuildsSection(
 fun FavoriteBuildListItem(
     modifier: Modifier = Modifier,
     build: FavoriteBuildListItem,
-    navigateToBuildDetails: (Int) -> Unit
+    navigateToBuildDetails: (Int) -> Unit,
+    onRemoveBuild: (Int) -> Unit = {},
 ) {
 
     val context = LocalContext.current
@@ -572,6 +624,15 @@ fun FavoriteBuildListItem(
                         )
                     }
                 }
+            }
+            IconButton(onClick = {
+                onRemoveBuild(build.buildId)
+            }) {
+                Icon(
+                    imageVector = Icons.Outlined.Clear,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    contentDescription = null
+                )
             }
         }
     }
