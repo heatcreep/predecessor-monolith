@@ -2,13 +2,14 @@ package com.aowen.monolith.data
 
 import com.aowen.monolith.R
 
-enum class HeroRole(val roleName: String, val drawableId: Int) {
-    Offlane("offlane", R.drawable.offlane),
-    Jungle("jungle", R.drawable.jungle),
-    Midlane("midlane", R.drawable.midlane),
-    Carry("carry", R.drawable.carry),
-    Support("support", R.drawable.support),
-    Unknown("unknown", R.drawable.unknown),
+
+enum class HeroRole(val roleName: String, val drawableId: Int, val simpleDrawableId: Int) {
+    Offlane("offlane", R.drawable.offlane, R.drawable.simple_offlane),
+    Jungle("jungle", R.drawable.jungle, R.drawable.simple_jungle),
+    Midlane("midlane", R.drawable.midlane, R.drawable.simple_mid),
+    Carry("carry", R.drawable.carry, R.drawable.simple_carry),
+    Support("support", R.drawable.support, R.drawable.simple_support),
+    Unknown("unknown", R.drawable.unknown, R.drawable.unknown),
 }
 
 fun getHeroName(heroId: Long) = Hero.entries.firstOrNull {

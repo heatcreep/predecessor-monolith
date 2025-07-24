@@ -34,6 +34,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.navOptions
 import com.aowen.monolith.R
 import com.aowen.monolith.feature.home.navigation.navigateToHome
 import com.aowen.monolith.logDebug
@@ -61,7 +63,12 @@ internal fun LoginRoute(
                 logDebug("Loading user state", "LoginScreen")
             }
             UserState.Authenticated -> {
-                navController.navigateToHome()
+                navController.navigateToHome(navOptions {
+                    launchSingleTop = true
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                })
             }
             is UserState.Unauthenticated -> {
                 if(userState.hasSkippedOnboarding) {

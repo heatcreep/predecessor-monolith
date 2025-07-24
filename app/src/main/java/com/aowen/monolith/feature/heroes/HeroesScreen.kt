@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -20,17 +19,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -60,6 +57,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
+import com.aowen.monolith.core.ui.filters.RoleFilter
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
@@ -110,7 +108,7 @@ fun HeroesScreen(
 
     val isTablet = screenWidthDp >= 600
 
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(true) }
     val rotationAngle = remember { Animatable(0f) }
 
     val listState = rememberLazyGridState()
@@ -153,18 +151,6 @@ fun HeroesScreen(
                     MonolithTopAppBar(
                         title = "Heroes",
                         actions = {
-                            IconButton(
-                                onClick = {
-                                    expanded = !expanded
-                                }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Settings,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .rotate(rotationAngle.value),
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
                             IconButton(onClick = navigateToSearch) {
                                 Icon(
                                     imageVector = Icons.Outlined.Search,
@@ -184,43 +170,24 @@ fun HeroesScreen(
                 ) {
                     MonolithCollapsableGridColumn(listState = listState) {
                         AnimatedVisibility(visible = expanded) {
-                            Column {
-                                Text(
-                                    text = "Roles",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                                Spacer(modifier = Modifier.size(4.dp))
-                                FlowRow(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    HeroRole.entries.forEach { role ->
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Checkbox(
-                                                checked = uiState.selectedRoleFilters.contains(
-                                                    role
-                                                ),
-                                                onCheckedChange = { isChecked ->
-                                                    onFilterRole(role, isChecked)
-                                                },
-                                                colors = CheckboxDefaults.colors(
-                                                    checkedColor = MaterialTheme.colorScheme.secondary,
-                                                )
-                                            )
-                                            Text(
-                                                text = role.name,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = MaterialTheme.colorScheme.secondary
-                                            )
+                            LazyRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                items(items = HeroRole.entries.dropLast(1)) { role ->
+                                    RoleFilter(
+                                        text = role.roleName,
+                                        selected = !uiState.selectedRoleFilters.contains(role),
+                                        iconRes = role.simpleDrawableId,
+                                        onClick = {
+                                            onFilterRole(role, !uiState.selectedRoleFilters.contains(role))
                                         }
-                                    }
+                                    )
                                 }
                             }
                         }
-
                     }
+
                     if (uiState.currentHeroes.isEmpty()) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
