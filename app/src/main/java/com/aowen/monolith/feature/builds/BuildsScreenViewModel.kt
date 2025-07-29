@@ -1,17 +1,23 @@
 package com.aowen.monolith.feature.builds
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.repository.builds.BuildRepository
+import com.aowen.monolith.data.repository.heroes.HeroRepository
+import com.aowen.monolith.feature.home.playerdetails.HeroUiModel
+import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class BuildsUiState(
+    val allHeroes: List<HeroUiModel> = emptyList(),
     val searchFieldValue: String = "",
     val selectedHeroFilter: Hero? = null,
     val selectedRoleFilter: HeroRole? = null,
@@ -24,13 +30,29 @@ data class BuildsUiState(
 
 @HiltViewModel
 class BuildsScreenViewModel @Inject constructor(
-    private val omedaCityBuildRepository: BuildRepository
+    private val omedaCityBuildRepository: BuildRepository,
+    private val omedaCityHeroRepository: HeroRepository
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<BuildsUiState> = MutableStateFlow(BuildsUiState())
     val uiState = _uiState
 
     lateinit var buildsPagingSource: BuildsPagingSource
+
+    init {
+        viewModelScope.launch {
+            val allHeroes = omedaCityHeroRepository.fetchAllHeroes().getOrThrow().map {
+                HeroUiModel(
+                    heroId = it.id,
+                    name = it.displayName,
+                    imageId = it.imageId
+                )
+            }
+            _uiState.update {
+                it.copy(allHeroes = allHeroes)
+            }
+        }
+    }
 
     val buildsPager = Pager(
         config = PagingConfig(pageSize = PAGE_SIZE)
@@ -58,12 +80,9 @@ class BuildsScreenViewModel @Inject constructor(
         buildsPagingSource.invalidate()
     }
 
-    fun updateSelectedRole(role: String) {
+    fun updateSelectedRole(role: HeroRole) {
         _uiState.update {
-            it.copy(selectedRoleFilter = HeroRole.entries.first { heroRole ->
-                heroRole.name == role
-
-            })
+            it.copy(selectedRoleFilter = role)
         }
         buildsPagingSource.invalidate()
     }

@@ -57,7 +57,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
-import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
@@ -65,7 +64,7 @@ import com.aowen.monolith.feature.matches.MatchesList
 import com.aowen.monolith.feature.matches.morematches.navigation.navigateToMoreMatches
 import com.aowen.monolith.feature.matches.navigation.navigateToMatchDetails
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
-import com.aowen.monolith.ui.components.HeroSelectDropdown
+import com.aowen.monolith.core.ui.dropdown.HeroSelectDropdown
 import com.aowen.monolith.ui.components.PlayerCard
 import com.aowen.monolith.ui.components.RefreshableContainer
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -236,7 +235,7 @@ fun PlayerStatsTab(
                 playerId = uiState.playerId,
                 matches = uiState.matches,
                 navigateToMatchDetails = navigateToMatchDetails,
-                navigateToMoreMatches= navigateToMoreMatches
+                navigateToMoreMatches = navigateToMoreMatches
             )
 
         }
@@ -252,15 +251,16 @@ fun PlayerHeroStatsTab(
 ) {
     var selectedHero by remember {
         mutableStateOf(
-            uiState.heroes.find { it.displayName == uiState.stats?.favoriteHero }
-                ?: uiState.heroes.getOrNull(0)
+            uiState.allHeroes.firstOrNull {
+                it.name == uiState.stats?.favoriteHero
+            }
         )
     }
 
     LaunchedEffect(selectedHero) {
-       selectedHero?.id?.let { id ->
-           handlePlayerHeroStatsSelect(id)
-       }
+        selectedHero?.let {
+            handlePlayerHeroStatsSelect(it.heroId)
+        }
     }
 
     Column(
@@ -271,9 +271,13 @@ fun PlayerHeroStatsTab(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HeroSelectDropdown(
-            selectedHero = selectedHero,
-            onSelect = { selectedHero = it },
-            heroes = uiState.heroes
+            heroName = selectedHero?.name ?: "Select Hero",
+            heroImageId = selectedHero?.imageId,
+            onSelect = {
+                selectedHero = uiState.allHeroes.firstOrNull { hero ->
+                    hero.name == it
+            }},
+            heroes = uiState.allHeroes
         )
         Spacer(modifier = Modifier.size(32.dp))
         FlowRow(
@@ -611,12 +615,12 @@ fun PlayerHeroStatsPreview() {
                     player = PlayerDetails(
                         playerName = "heatcreep.tv"
                     ),
-                    heroes = listOf(
-                        HeroDetails(
-                            id = 1,
-                            displayName = "Narbash",
+                    allHeroes = listOf(
+                        HeroUiModel(
+                            heroId = 1,
+                            name = "Narbash",
                             imageId = R.drawable.narbash
-                        ),
+                        )
                     ),
                     heroStats = listOf(
                         PlayerHeroStats(

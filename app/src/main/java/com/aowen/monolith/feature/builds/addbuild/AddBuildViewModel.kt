@@ -316,7 +316,7 @@ class AddBuildViewModel @Inject constructor(
             val finalCrests = allCrests.filter { it.requirements.contains(secondCrest.name) }
             crestDetailsList.add(
                 CrestGroupDetails(
-                    crestType = CrestType.valueOf(baseCrest.heroClass ?: "Unknown"),
+                    crestType = CrestType.valueOf(baseCrest.heroClass.label),
                     baseCrest = baseCrest,
                     secondCrest = secondCrest,
                     finalCrests = finalCrests,

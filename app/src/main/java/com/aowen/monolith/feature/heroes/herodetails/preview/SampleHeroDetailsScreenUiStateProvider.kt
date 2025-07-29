@@ -47,8 +47,8 @@ val heroBuildsLoadingState = HeroDetailsUiState(
             HeroRole.Support
         ),
         classes = listOf(
-            HeroClass.Fighter,
-            HeroClass.Tank
+            HeroClass.FIGHTER,
+            HeroClass.TANK
         ),
     ),
 )
@@ -105,8 +105,8 @@ val heroBuildsState = HeroDetailsUiState(
             HeroRole.Support
         ),
         classes = listOf(
-            HeroClass.Fighter,
-            HeroClass.Tank
+            HeroClass.FIGHTER,
+            HeroClass.TANK
         ),
     ),
 )

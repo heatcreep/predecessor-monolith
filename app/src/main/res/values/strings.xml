@@ -7,4 +7,7 @@
     <string name="additionalFormText">This feedback is only used to help fix bugs and make improvements to the app. We do not collect or store personal information with this tool.</string>
     <string name="feedback_deny_toast">No worries! Any feedback is appreciated</string>
     <string name="icon_builds">Builds</string>
+    <string name="top_heroes">Top Heroes</string>
+    <string name="most_played_heroes">Most Played Heroes</string>
+    <string name="claim_player_on_console">Claim Player on Console</string>
 </resources>

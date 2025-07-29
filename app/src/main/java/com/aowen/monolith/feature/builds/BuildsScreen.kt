@@ -22,12 +22,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Search
@@ -77,8 +80,11 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.FullScreenLoadingIndicator
+import com.aowen.monolith.R
+import com.aowen.monolith.core.ui.dropdown.HeroSelectDropdown
+import com.aowen.monolith.core.ui.dropdown.PredCompanionSortDropdown
+import com.aowen.monolith.core.ui.filters.PredCompanionChipFilter
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.getHeroImage
 import com.aowen.monolith.data.getHeroRole
@@ -132,7 +138,7 @@ fun BuildsScreen(
     uiState: BuildsUiState,
     builds: LazyPagingItems<BuildListItem>,
     onSearchFieldUpdate: (String) -> Unit,
-    onSelectRoleFilter: (String) -> Unit,
+    onSelectRoleFilter: (HeroRole) -> Unit,
     onClearRoleFilter: () -> Unit,
     onSelectHeroFilter: (String) -> Unit,
     onClearHeroFilter: () -> Unit,
@@ -167,6 +173,29 @@ fun BuildsScreen(
         topBar = {
             MonolithTopAppBar(
                 title = "Builds",
+                titleSuffix = {
+                    Row(
+                        modifier = Modifier
+                    ) {
+                        HeroSelectDropdown(
+                            modifier = Modifier.weight(1f),
+                            heroName = uiState.selectedHeroFilter?.heroName ?: "All Heroes",
+                            heroes = uiState.allHeroes,
+                            heroImageId = uiState.selectedHeroFilter?.drawableId,
+                            onSelect = onSelectHeroFilter
+                        )
+                        AnimatedVisibility(visible = uiState.selectedHeroFilter != null) {
+                            IconButton(onClick = onClearHeroFilter) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    contentDescription = "Clear Hero Filter",
+                                )
+                            }
+                        }
+                    }
+
+                },
                 actions = {
                     IconButton(
                         onClick = {
@@ -218,43 +247,6 @@ fun BuildsScreen(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "Filters:",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-
-                            FilterDropdown(
-                                dropdownTitle = "Role",
-                                filterOptions = HeroRole.entries.map { role -> role.name },
-                                selectedFilter = uiState.selectedRoleFilter?.name,
-                                onSelectOption = onSelectRoleFilter,
-                                onClearOption = onClearRoleFilter
-                            )
-                            FilterDropdown(
-                                dropdownTitle = "Hero",
-                                filterOptions = Hero.entries.filter { hero -> hero != Hero.UNKNOWN }
-                                    .map { hero -> hero.heroName },
-                                selectedFilter = uiState.selectedHeroFilter?.heroName,
-                                onSelectOption = onSelectHeroFilter,
-                                onClearOption = onClearHeroFilter
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            FilterDropdown(
-                                dropdownTitle = "Sort by ${uiState.selectedSortOrder}",
-                                filterOptions = listOf("Popular", "Trending", "Latest"),
-                                selectedFilter = uiState.selectedSortOrder,
-                                onSelectOption = onSelectSortFilter,
-                                onClearOption = onClearSortFilter
-                            )
-                        }
                         FilterSwitchWithLabel(
                             label = "Has skill order",
                             isChecked = uiState.hasSkillOrderSelected,
@@ -287,6 +279,36 @@ fun BuildsScreen(
 
                 }
             }
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                item {
+                    PredCompanionChipFilter(
+                        text = "All",
+                        iconRes = R.drawable.all_roles,
+                        selected = uiState.selectedRoleFilter == null,
+                        onClick = onClearRoleFilter
+                    )
+                }
+                items(HeroRole.entries.dropLast(1)) { role ->
+                    PredCompanionChipFilter(
+                        text = role.roleName,
+                        iconRes = role.simpleDrawableId,
+                        selected = uiState.selectedRoleFilter == role,
+                        onClick = { onSelectRoleFilter(role) }
+                    )
+                }
+            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                PredCompanionSortDropdown(
+                    selectedOption = uiState.selectedSortOrder,
+                    sortOptions = listOf("Popular", "Trending", "Latest"),
+                    onClickOption = onSelectSortFilter
+                )
+            }
+
+            Spacer(modifier = Modifier.size(8.dp))
             when (builds.loadState.refresh) {
                 is LoadState.Loading -> {
                     FullScreenLoadingIndicator()

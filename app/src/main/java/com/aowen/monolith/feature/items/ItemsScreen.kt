@@ -2,7 +2,6 @@ package com.aowen.monolith.feature.items
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -21,15 +20,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -56,7 +56,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -67,12 +66,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
+import com.aowen.monolith.core.ui.dropdown.PredCompanionFilterDropdown
+import com.aowen.monolith.core.ui.dropdown.PredCompanionSortDropdown
+import com.aowen.monolith.core.ui.filters.PredCompanionChipFilter
+import com.aowen.monolith.data.HeroClass
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.StatDetails
 import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.items.itemdetails.navigation.navigateToItemDetails
 import com.aowen.monolith.feature.search.navigation.navigateToSearch
-import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.theme.dropDownDefaults
@@ -91,12 +93,10 @@ fun ItemsScreenRoute(
         uiState = uiState,
         navigateToItemDetails = navController::navigateToItemDetails,
         navigateToSearch = navController::navigateToSearch,
-        onSetSearchValue = viewModel::onSetSearchValue,
-        onClearSearch = viewModel::onClearSearch,
         onSelectTier = viewModel::onSelectTier,
-        onClearTierFilter = viewModel::onClearTier,
         onSelectStat = viewModel::onSelectStat,
-        onClearStats = viewModel::onClearStats,
+        onSelectHeroClass = viewModel::onSelectHeroClass,
+        onClearSelectedHeroClass = viewModel::onClearHeroClass,
         onFilterItems = viewModel::getFilteredItems,
     )
 }
@@ -107,12 +107,10 @@ fun ItemsScreen(
     uiState: ItemsUiState,
     navigateToItemDetails: (String) -> Unit = {},
     navigateToSearch: () -> Unit = {},
-    onSetSearchValue: (String) -> Unit = {},
-    onClearSearch: () -> Unit = {},
     onSelectTier: (String) -> Unit = {},
-    onClearTierFilter: () -> Unit = {},
+    onSelectHeroClass: (HeroClass) -> Unit = {},
+    onClearSelectedHeroClass: () -> Unit = {},
     onSelectStat: (String) -> Unit = {},
-    onClearStats: () -> Unit = {},
     onFilterItems: () -> Unit = {}
 ) {
 
@@ -136,9 +134,10 @@ fun ItemsScreen(
     }
 
     LaunchedEffect(
-        key1 = uiState.selectedTierFilter,
-        key2 = uiState.selectedStatFilters,
-        key3 = uiState.searchFieldValue
+        uiState.selectedHeroClass,
+        uiState.selectedTierFilter,
+        uiState.selectedStatFilters,
+        uiState.searchFieldValue
     ) {
         onFilterItems()
     }
@@ -157,23 +156,11 @@ fun ItemsScreen(
             }
         } else {
             Scaffold(
-                contentWindowInsets = WindowInsets(0,0,0,0),
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 topBar = {
                     MonolithTopAppBar(
                         title = "Items",
                         actions = {
-                            IconButton(
-                                onClick = {
-                                    expanded = !expanded
-                                }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Settings,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .rotate(rotationAngle.value),
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
                             IconButton(onClick = navigateToSearch) {
                                 Icon(
                                     imageVector = Icons.Outlined.Search,
@@ -191,37 +178,45 @@ fun ItemsScreen(
                         .padding(paddingValues)
                         .padding(horizontal = 16.dp),
                 ) {
-                    MonolithCollapsableGridColumn(listState = listState) {
-                        AnimatedVisibility(visible = expanded) {
-                            Column {
-                                Spacer(modifier = Modifier.size(8.dp))
-                                Text(
-                                    text = "Filters:",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                                Spacer(modifier = Modifier.size(8.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    TierFilterDropdown(
-                                        selectedTierFilter = uiState.selectedTierFilter,
-                                        onSelectTier = onSelectTier,
-                                        onClearTierFilter = onClearTierFilter
-                                    )
-                                    StatFilterDropdown(
-                                        allStats = uiState.allStats,
-                                        selectedStatFilters = uiState.selectedStatFilters,
-                                        onSelectStat = onSelectStat,
-                                        onClearStatsFilters = onClearStats
-                                    )
-                                }
-                                Spacer(modifier = Modifier.size(16.dp))
-                            }
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        item {
+                            PredCompanionChipFilter(
+                                text = "All",
+                                iconRes = R.drawable.all_roles,
+                                selected = uiState.selectedHeroClass == null,
+                                onClick = onClearSelectedHeroClass
+                            )
                         }
-
+                        items(HeroClass.entries.dropLast(1)) {
+                            PredCompanionChipFilter(
+                                text = it.label,
+                                iconRes = it.iconRes,
+                                selected = uiState.selectedHeroClass == it,
+                                onClick = {
+                                    onSelectHeroClass(it)
+                                }
+                            )
+                        }
                     }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        PredCompanionFilterDropdown(
+                            selectedOptions = uiState.selectedStatFilters,
+                            filterOptions = uiState.allStats,
+                            onClickOption = onSelectStat
+                        )
+                        PredCompanionSortDropdown(
+                            selectedOption = uiState.selectedTierFilter ?: "Tier",
+                            sortOptions = listOf("Tier I", "Tier II", "Tier III"),
+                            onClickOption = onSelectTier
+                        )
+                    }
+                    Spacer(modifier = Modifier.size(8.dp))
                     if (uiState.filteredItems.isEmpty()) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
@@ -448,7 +443,7 @@ fun ItemsScreenLoadingPreview() {
                     ItemDetails(
                         id = 1,
                         displayName = "Ashbringer",
-
+                        heroClass = HeroClass.FIGHTER,
                         stats = listOf(
                             StatDetails(
                                 name = "Max Health",
@@ -482,7 +477,7 @@ fun ItemsScreenNoItemsPreview() {
                     ItemDetails(
                         id = 1,
                         displayName = "Ashbringer",
-
+                        heroClass = HeroClass.FIGHTER,
                         stats = listOf(
                             StatDetails(
                                 name = "Max Health",
@@ -513,6 +508,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 1,
                         displayName = "Ashbringer",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -525,6 +521,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 2,
                         displayName = "Witchstalker",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -537,6 +534,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 3,
                         displayName = "Item 3",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -549,6 +547,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 4,
                         displayName = "Item 4",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -561,6 +560,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 5,
                         displayName = "Item 5",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -573,6 +573,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 6,
                         displayName = "Item 6",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -587,6 +588,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 1,
                         displayName = "Ashbringer",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -599,6 +601,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 2,
                         displayName = "The Witchstalker",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -611,6 +614,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 3,
                         displayName = "Item 3",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -623,6 +627,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 4,
                         displayName = "Item 4",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -635,6 +640,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 5,
                         displayName = "Item 5",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -647,6 +653,7 @@ fun ItemsScreenScreenSizePreview() {
                     ItemDetails(
                         id = 6,
                         displayName = "Item 6",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -676,6 +683,7 @@ fun ItemsScreenPreview() {
                     ItemDetails(
                         id = 1,
                         displayName = "Ashbringer",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(
@@ -690,6 +698,7 @@ fun ItemsScreenPreview() {
                     ItemDetails(
                         id = 1,
                         displayName = "Ashbringer",
+                        heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
                             StatDetails(

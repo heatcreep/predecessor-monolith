@@ -2,6 +2,7 @@ package com.aowen.monolith.feature.items
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aowen.monolith.data.HeroClass
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.repository.items.ItemRepository
 import com.aowen.monolith.network.getOrThrow
@@ -39,6 +40,7 @@ data class ItemsUiState(
     val isLoading: Boolean = true,
     val searchFieldValue: String = "",
     val selectedTierFilter: String? = "Tier III",
+    val selectedHeroClass: HeroClass? = null,
     val allItems: List<ItemDetails> = emptyList(),
     val filteredItems: List<ItemDetails> = emptyList(),
     val allStats: List<String> = defaultStats,
@@ -95,6 +97,18 @@ class ItemsViewModel @Inject constructor(
         }
     }
 
+    fun onSelectHeroClass(heroClass: HeroClass) {
+        _uiState.update {
+            it.copy(selectedHeroClass = heroClass)
+        }
+    }
+
+    fun onClearHeroClass() {
+        _uiState.update {
+            it.copy(selectedHeroClass = null)
+        }
+    }
+
     fun onClearTier() {
         _uiState.update {
             it.copy(selectedTierFilter = null)
@@ -124,8 +138,12 @@ class ItemsViewModel @Inject constructor(
     }
 
     fun getFilteredItems() {
+
+        val itemsByHeroClass = uiState.value.allItems.filterOrOriginal {
+            it.heroClass == uiState.value.selectedHeroClass
+        }
         val itemsByTier =
-            uiState.value.allItems.filterOrOriginal {
+            itemsByHeroClass.filterOrOriginal {
                 it.rarity.value == uiState.value.selectedTierFilter
             }
 

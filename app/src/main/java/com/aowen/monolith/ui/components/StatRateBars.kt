@@ -40,9 +40,11 @@ fun HeroInlineStatsRateBar(
             modifier = Modifier
                 .height(16.dp),
             progress = { animatedProgress },
+            gapSize = (-15).dp,
             trackColor = MaterialTheme.colorScheme.tertiaryContainer,
             color = MaterialTheme.colorScheme.onTertiaryContainer,
-            strokeCap = StrokeCap.Butt,
+            strokeCap = StrokeCap.Round,
+            drawStopIndicator = {}
         )
         Text(
             text = "${rate.toInt()}%",

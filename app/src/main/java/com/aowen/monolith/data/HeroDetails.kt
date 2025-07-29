@@ -1,5 +1,6 @@
 package com.aowen.monolith.data
 
+import com.aowen.monolith.R
 import com.aowen.monolith.network.RetrofitHelper
 import com.aowen.monolith.network.utils.trimExtraNewLine
 
@@ -85,13 +86,14 @@ fun FavoriteHeroDto.create(): FavoriteHero =
         updatedAt = updatedAt,
     )
 
-enum class HeroClass {
-    Assassin,
-    Fighter,
-    Mage,
-    Sharpshooter,
-    Support,
-    Tank
+enum class HeroClass(val label: String, val iconRes: Int) {
+    MAGE(label = "Mage", iconRes = R.drawable.simple_mid),
+    SUPPORT(label = "Support", iconRes = R.drawable.simple_support),
+    SHARPSHOOTER(label = "Sharpshooter", iconRes = R.drawable.simple_carry),
+    TANK(label = "Tank", iconRes = R.drawable.simple_tank),
+    FIGHTER(label = "Fighter", iconRes = R.drawable.simple_fighter),
+    ASSASSIN(label = "Assassin", iconRes = R.drawable.simple_assassin),
+    UNKNOWN(label = "Unknown", iconRes = R.drawable.unknown)
 }
 
 fun List<String>.toHeroRole(): List<HeroRole?> =

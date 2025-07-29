@@ -57,7 +57,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
-import com.aowen.monolith.core.ui.filters.RoleFilter
+import com.aowen.monolith.core.ui.filters.PredCompanionChipFilter
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
@@ -175,9 +175,9 @@ fun HeroesScreen(
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
                                 items(items = HeroRole.entries.dropLast(1)) { role ->
-                                    RoleFilter(
+                                    PredCompanionChipFilter(
                                         text = role.roleName,
-                                        selected = !uiState.selectedRoleFilters.contains(role),
+                                        selected = uiState.selectedRoleFilters.contains(role),
                                         iconRes = role.simpleDrawableId,
                                         onClick = {
                                             onFilterRole(role, !uiState.selectedRoleFilters.contains(role))

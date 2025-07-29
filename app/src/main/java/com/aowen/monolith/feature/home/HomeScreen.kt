@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,10 +18,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -59,12 +59,16 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.aowen.monolith.R
+import com.aowen.monolith.core.ui.cards.HeroUiInfo
+import com.aowen.monolith.core.ui.cards.HomeScreenHeroesCard
 import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.PlayerDetails
@@ -76,6 +80,8 @@ import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
 import com.aowen.monolith.feature.heroes.herodetails.navigation.navigateToHeroDetails
 import com.aowen.monolith.feature.home.playerdetails.navigation.navigateToPlayerDetails
+import com.aowen.monolith.feature.home.winrate.PICK_RATE
+import com.aowen.monolith.feature.home.winrate.WIN_RATE
 import com.aowen.monolith.feature.home.winrate.navigation.navigateToHeroWinPickRate
 import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.network.ClaimedPlayer
@@ -209,7 +215,7 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Claim Player on Console",
+                            text = stringResource(R.string.claim_player_on_console),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.secondary
                         )
@@ -231,45 +237,71 @@ fun HomeScreen(
                     }
                 }
             }
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(it)
-                    .padding(horizontal = 16.dp)
-                    .pullRefresh(pullRefreshState)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                ClaimedPlayerSection(
-                    uiState = uiState,
-                    claimedPlayerState = claimedPlayerState,
-                    claimedPlayerName = claimedPlayerName,
-                    navigateToPlayerDetails = navigateToPlayerDetails,
-                    onOpenBottomSheet = {
-                        openBottomSheet = true
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(pullRefreshState)) {
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(it)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        ClaimedPlayerSection(
+                            uiState = uiState,
+                            claimedPlayerState = claimedPlayerState,
+                            claimedPlayerName = claimedPlayerName,
+                            navigateToPlayerDetails = navigateToPlayerDetails,
+                            onOpenBottomSheet = {
+                                openBottomSheet = true
+                            }
+                        )
                     }
-                )
-                FavoriteBuildsSection(
-                    uiState = uiState,
-                    favoriteBuildsSharedState = favoriteBuildsSharedState,
-                    navigateToBuildDetails = navigateToBuildDetails,
-                    handleOpenDialog = {
-                        clearAllFavoriteBuildsDialogIsOpen = true
-                    },
-                    handleRemoveFavoriteBuild = handleRemoveFavoriteBuild
-                )
-                HeroWinRateSection(
-                    isLoading = uiState.isLoading,
-                    heroStatsList = uiState.topFiveHeroesByWinRate,
-                    navigateToHeroDetails = navigateToHeroDetails,
-                    navigateToHeroWinRate = navigateToHeroWinPickRate
-                )
-                HeroPickRateSection(
-                    isLoading = uiState.isLoading,
-                    heroStatsList = uiState.topFiveHeroesByPickRate,
-                    navigateToHeroDetails = navigateToHeroDetails,
-                    navigateToHeroPickRate = navigateToHeroWinPickRate
-                )
+                    item {
+                        FavoriteBuildsSection(
+                            uiState = uiState,
+                            favoriteBuildsSharedState = favoriteBuildsSharedState,
+                            navigateToBuildDetails = navigateToBuildDetails,
+                            handleOpenDialog = {
+                                clearAllFavoriteBuildsDialogIsOpen = true
+                            },
+                            handleRemoveFavoriteBuild = handleRemoveFavoriteBuild
+                        )
+                    }
+                    item {
+                        HomeScreenHeroesCard(
+                            modifier = Modifier.animateItem(),
+                            cardTitle = stringResource(R.string.top_heroes),
+                            heroUiInfo = uiState.topFiveHeroesByWinRate.map {
+                                HeroUiInfo(
+                                    heroName = it.heroName,
+                                    heroPathName = it.name,
+                                    heroImageId = it.heroId.toInt(),
+                                    winRate = it.winRate
+                                )
+                            },
+                            onHeroClick = navigateToHeroDetails,
+                            onTitleActionClick = { navigateToHeroWinPickRate(WIN_RATE) }
+                        )
+                    }
+                    item {
+                        HomeScreenHeroesCard(
+                            modifier = Modifier.animateItem(),
+                            cardTitle = stringResource(R.string.most_played_heroes),
+                            heroUiInfo = uiState.topFiveHeroesByPickRate.map {
+                                HeroUiInfo(
+                                    heroName = it.heroName,
+                                    heroPathName = it.name,
+                                    heroImageId = it.heroId.toInt(),
+                                    winRate = it.winRate
+                                )
+                            },
+                            onHeroClick = navigateToHeroDetails,
+                            onTitleActionClick = { navigateToHeroWinPickRate(PICK_RATE) }
+                        )
+                    }
+                }
             }
         }
     }

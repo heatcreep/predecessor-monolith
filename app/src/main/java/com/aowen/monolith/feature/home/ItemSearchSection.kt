@@ -151,19 +151,19 @@ fun ItemResultCard(
                             color = WarmWhite
                         )
                         // Hero Class (e.g. Support, Mage, etc.)
-                        itemDetails.heroClass?.let { heroClass ->
-                            Text(
-                                text = heroClass,
-                                modifier = Modifier
-                                    .background(
-                                        BadgeBlueGreen,
-                                        RoundedCornerShape(4.dp)
-                                    )
-                                    .padding(4.dp),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = NeroBlack
-                            )
-                        }
+
+                        Text(
+                            text = itemDetails.heroClass.label,
+                            modifier = Modifier
+                                .background(
+                                    BadgeBlueGreen,
+                                    RoundedCornerShape(4.dp)
+                                )
+                                .padding(4.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = NeroBlack
+                        )
+
                         // Aggression Type (e.g. Scaling, Mobility, etc.)
                         itemDetails.aggressionType?.let { aggressionType ->
                             Text(

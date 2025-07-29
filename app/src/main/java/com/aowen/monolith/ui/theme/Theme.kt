@@ -14,6 +14,7 @@ import com.aowen.monolith.data.datastore.Theme
 
 val DarkColorScheme = darkColorScheme(
     surface = NeroBlack,
+    onSurface = LightKhaki,
     primary = NeroBlack,
     secondary = LightKhaki,
     tertiary = WarmWhite,
@@ -26,11 +27,13 @@ val DarkColorScheme = darkColorScheme(
     tertiaryContainer = LightKhaki,
     onTertiary = NeroBlack,
     onTertiaryContainer = DarkKhaki,
-    inversePrimary = Color.LightGray
+    outlineVariant = LightKhaki.copy(alpha = 0.2f),
+    inversePrimary = Color.LightGray,
 )
 
 val LightColorScheme = lightColorScheme(
     surface = WarmWhite200,
+    onSurface = NeroBlack,
     primary = WarmWhite,
     secondary = NeroBlack,
     tertiary = NeroGrey,
@@ -41,7 +44,8 @@ val LightColorScheme = lightColorScheme(
     onSecondaryContainer = WarmWhite,
     onTertiary = WarmWhite,
     tertiaryContainer = NeroLightGrey,
-    onTertiaryContainer = NeroGrey
+    outlineVariant = NeroBlack.copy(0.2f),
+    onTertiaryContainer = NeroGrey,
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -66,6 +70,7 @@ fun MonolithTheme(
         localTheme != Theme.SYSTEM -> {
             if (localTheme == Theme.DARK) DarkColorScheme else LightColorScheme
         }
+
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)

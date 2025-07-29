@@ -52,7 +52,7 @@ class HeroRepositoryTest {
                 name = "test",
                 displayName = "Test",
                 stats = listOf(3, 4, 5, 6),
-                classes = listOf(HeroClass.Assassin, HeroClass.Fighter),
+                classes = listOf(HeroClass.ASSASSIN, HeroClass.FIGHTER),
                 roles = listOf(HeroRole.Offlane, HeroRole.Jungle),
                 abilities = listOf(
                     AbilityDetails(

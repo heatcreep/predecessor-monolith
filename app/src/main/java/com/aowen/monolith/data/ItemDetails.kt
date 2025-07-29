@@ -187,7 +187,7 @@ data class ItemDetails(
     val slotType: SlotType = SlotType.PASSIVE,
     val rarity: Rarity = Rarity.COMMON,
     val aggressionType: String? = null,
-    val heroClass: String? = null,
+    val heroClass: HeroClass = HeroClass.UNKNOWN,
     val requiredLevel: Int? = null,
     val stats: List<StatDetails> = emptyList(),
     val effects: List<EffectDetails?> = emptyList(),
@@ -204,6 +204,16 @@ fun ItemDto.asItemDetails(): ItemDetails {
         "Epic" -> Rarity.EPIC
         "Legendary" -> Rarity.LEGENDARY
         else -> Rarity.COMMON
+    }
+
+    val heroClass = when (this.heroClass) {
+        "Fighter" -> HeroClass.FIGHTER
+        "Tank" -> HeroClass.TANK
+        "Assassin" -> HeroClass.ASSASSIN
+        "Mage" -> HeroClass.MAGE
+        "Support" -> HeroClass.SUPPORT
+        "Sharpshooter" -> HeroClass.SHARPSHOOTER
+        else -> HeroClass.UNKNOWN
     }
 
     val slotType = when (this.slotType) {
@@ -223,7 +233,7 @@ fun ItemDto.asItemDetails(): ItemDetails {
         slotType = slotType,
         rarity = rarity,
         aggressionType = this.aggressionType,
-        heroClass = this.heroClass,
+        heroClass = heroClass,
         requiredLevel = this.requiredLevel,
         stats = this.stats.createStatDetails(),
         effects = this.effects.map { it?.create() },

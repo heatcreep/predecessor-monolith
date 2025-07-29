@@ -3,7 +3,6 @@ package com.aowen.monolith.feature.home.playerdetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
@@ -36,9 +35,16 @@ data class PlayerDetailsUiState(
     val selectedHeroStats: PlayerHeroStats? = null,
     val stats: PlayerStats? = null,
     val matches: List<MatchDetails> = emptyList(),
-    val heroes: List<HeroDetails> = emptyList(),
+    val allHeroes: List<HeroUiModel> = emptyList(),
+    val allHeroIds: List<Long> = emptyList(),
     val playerId: String = "",
     val isClaimed: Boolean = false
+)
+
+data class HeroUiModel(
+    val heroId: Long = 0L,
+    val name: String,
+    val imageId: Int? = null,
 )
 
 @HiltViewModel
@@ -155,7 +161,13 @@ class PlayerDetailsViewModel @Inject constructor(
                         heroStats = playerHeroStats,
                         stats = playerInfo.playerStats,
                         matches = matchesDetails.matches,
-                        heroes = heroes
+                        allHeroes = heroes.map {
+                            HeroUiModel(
+                                heroId = it.id,
+                                name = it.displayName,
+                                imageId = it.imageId
+                            )
+                        }
                     )
                 }
 
