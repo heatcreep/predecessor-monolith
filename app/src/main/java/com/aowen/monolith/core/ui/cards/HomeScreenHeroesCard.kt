@@ -1,10 +1,8 @@
 package com.aowen.monolith.core.ui.cards
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,10 +19,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.core.ui.content.HeroPercentageTile
 import com.aowen.monolith.ui.theme.MonolithTheme
+import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
 
 data class HeroUiInfo(
     val heroName: String,
@@ -104,9 +102,7 @@ fun HomeScreenHeroesCard(
     }
 }
 
-@Preview(
-    showBackground = true
-)
+@LightDarkPreview
 @Composable
 fun HomeScreenHeroesCardPreview() {
     MonolithTheme {
@@ -116,55 +112,6 @@ fun HomeScreenHeroesCardPreview() {
             ) {
                 HomeScreenHeroesCard(
                     cardTitle = "Top Heroes by Win Rate",
-                    heroUiInfo = listOf(
-                        HeroUiInfo(
-                            heroName = "Countess",
-                            heroPathName = "countess",
-                            heroImageId = 1,
-                            winRate = 55.0f
-                        ),
-                        HeroUiInfo(
-                            heroName = "Crunch",
-                            heroPathName = "crunch",
-                            heroImageId = 2,
-                            winRate = 50.0f
-                        ),
-                        HeroUiInfo(
-                            heroName = "Dekker",
-                            heroPathName = "dekker",
-                            heroImageId = 3,
-                            winRate = 55.0f
-                        ),
-                        HeroUiInfo(
-                            heroName = "Drongo",
-                            heroPathName = "drongo",
-                            heroImageId = 4,
-                            winRate = 50.0f
-                        ),
-                    )
-                )
-            }
-        }
-    }
-}
-
-@Preview(
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun HomeScreenHeroesCardPreviewDark() {
-    MonolithTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                HomeScreenHeroesCard(
-                    cardTitle = "Most Played Heroes",
                     heroUiInfo = listOf(
                         HeroUiInfo(
                             heroName = "Countess",

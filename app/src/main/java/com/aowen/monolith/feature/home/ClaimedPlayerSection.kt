@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.aowen.monolith.core.ui.cards.claimedplayer.ClaimedPlayerCard
 import com.aowen.monolith.network.ClaimedPlayerState
 import com.aowen.monolith.ui.components.PlayerLoadingCard
 import com.aowen.monolith.ui.theme.MonolithTheme
@@ -115,13 +116,20 @@ fun ClaimedPlayerSection(
                             val claimedPlayer = claimedPlayerState.claimedPlayer
                             if (claimedPlayer.playerStats != null && claimedPlayer.playerDetails != null) {
                                 ClaimedPlayerCard(
-                                    claimedPlayerName = claimedPlayerName,
                                     playerDetails = claimedPlayer.playerDetails,
                                     playerStats = claimedPlayer.playerStats,
-                                    navigateToPlayerDetails = {
-                                        navigateToPlayerDetails(claimedPlayer.playerDetails.playerId)
-                                    }
+                                    navigateToPlayerDetails = navigateToPlayerDetails,
+                                    playerName = claimedPlayerName
+                                        ?: claimedPlayer.playerDetails.playerName
                                 )
+//                                ClaimedPlayerCard(
+//                                    claimedPlayerName = claimedPlayerName,
+//                                    playerDetails = claimedPlayer.playerDetails,
+//                                    playerStats = claimedPlayer.playerStats,
+//                                    navigateToPlayerDetails = {
+//                                        navigateToPlayerDetails(claimedPlayer.playerDetails.playerId)
+//                                    }
+//                                )
                             }
                         }
                     }

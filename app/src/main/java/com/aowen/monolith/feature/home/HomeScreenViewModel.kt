@@ -102,14 +102,16 @@ class HomeScreenViewModel @Inject constructor(
                     )
                 }
             }
-            if(favoriteBuildsResult.isFailure) {
+            if (favoriteBuildsResult.isFailure) {
                 _uiState.update {
-                    it.copy(homeScreenError = _uiState.value.homeScreenError.plus(
-                        HomeScreenError.FavoriteBuildsErrorMessage(
-                            errorMessage = "Failed to fetch favorite builds",
-                            error = favoriteBuildsResult.exceptionOrNull()?.message
+                    it.copy(
+                        homeScreenError = _uiState.value.homeScreenError.plus(
+                            HomeScreenError.FavoriteBuildsErrorMessage(
+                                errorMessage = "Failed to fetch favorite builds",
+                                error = favoriteBuildsResult.exceptionOrNull()?.message
+                            )
                         )
-                    ))
+                    )
                 }
             }
             try {
@@ -143,25 +145,6 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    fun handleRemoveFavoriteBuild(buildId: Int) {
-        viewModelScope.launch {
-            try {
-                favoriteBuildsRepository.removeFavoriteBuild(buildId)
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        homeScreenError = _uiState.value.homeScreenError.plus(
-                            HomeScreenError.FavoriteBuildsErrorMessage(
-                                errorMessage = "Failed to remove favorite build",
-                                error = e.message
-                            )
-                        )
-                    )
-                }
-            }
-        }
-    }
-
     fun handleRemoveAllFavoriteBuilds() {
         viewModelScope.launch {
             try {
@@ -189,16 +172,18 @@ class HomeScreenViewModel @Inject constructor(
     fun updateHeroStatsByTime(timeFrame: TimeFrame) {
         viewModelScope.launch {
             try {
-                val heroStatsResult = omedaCityHeroRepository.fetchAllHeroStatistics(timeFrame = timeFrame.value).getOrThrow()
+                val heroStatsResult =
+                    omedaCityHeroRepository.fetchAllHeroStatistics(timeFrame = timeFrame.value)
+                        .getOrThrow()
                 _uiState.update {
                     it.copy(
                         heroStats = heroStatsResult
                     )
                 }
-            } catch ( _: Exception) {
+            } catch (_: Exception) {
                 _uiState.update {
                     it.copy(
-                       heroStats = emptyList()
+                        heroStats = emptyList()
                     )
                 }
             }

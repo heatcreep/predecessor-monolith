@@ -1,20 +1,23 @@
 package com.aowen.monolith.network
 
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.FavoriteBuildListItem
 import com.aowen.monolith.data.asFavoriteBuildDto
 import com.aowen.monolith.data.asFavoriteBuildListEntity
 import com.aowen.monolith.data.asFavoriteBuildListItem
 import com.aowen.monolith.data.database.dao.FavoriteBuildDao
 import com.aowen.monolith.data.database.model.asFavoriteBuildListItem
 import com.aowen.monolith.logDebug
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
+import com.aowen.monolith.ui.model.BuildUiListItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 abstract class FavoriteBuildsState {
-    data class Success(val favoriteBuilds: List<FavoriteBuildListItem>) : FavoriteBuildsState()
+    data class Success(val favoriteBuilds: List<BuildUiListItem.FavoriteBuildUiListItem>) :
+        FavoriteBuildsState()
+
     data object Empty : FavoriteBuildsState()
     data class Error(val message: String) : FavoriteBuildsState()
 }
@@ -33,7 +36,8 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
     private val postgrestService: SupabasePostgrestService,
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val favoriteBuildDao: FavoriteBuildDao
+    private val favoriteBuildDao: FavoriteBuildDao,
+    private val buildListItemUiMapper: BuildListItemUiMapper
 ) : UserFavoriteBuildsRepository {
 
     private val _favoriteBuildsState: MutableStateFlow<FavoriteBuildsState> =
@@ -52,7 +56,13 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                 if (favoriteBuilds.isEmpty()) {
                     _favoriteBuildsState.update { FavoriteBuildsState.Empty }
                 } else {
-                    _favoriteBuildsState.update { FavoriteBuildsState.Success(favoriteBuilds) }
+                    _favoriteBuildsState.update {
+                        FavoriteBuildsState.Success(favoriteBuilds.map {
+                            buildListItemUiMapper.buildFrom(
+                                it
+                            )
+                        })
+                    }
                 }
                 return Result.success(favoriteBuilds.map { it.buildId })
             }
@@ -72,7 +82,13 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                                 FavoriteBuildsState.Empty
                             }
                         } else {
-                            _favoriteBuildsState.update { FavoriteBuildsState.Success(favoriteBuilds) }
+                            _favoriteBuildsState.update {
+                                FavoriteBuildsState.Success(favoriteBuilds.map {
+                                    buildListItemUiMapper.buildFrom(
+                                        it
+                                    )
+                                })
+                            }
                         }
                         Result.success(favoriteBuilds.map { it.buildId })
                     }
@@ -93,16 +109,18 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
             is UserState.Unauthenticated -> {
                 val favoriteBuildEntity = buildDetails.asFavoriteBuildListEntity()
                 favoriteBuildDao.insertFavoriteBuildListItem(favoriteBuildEntity)
+                val favoriteBuildUiListItem =
+                    buildListItemUiMapper.buildFrom(favoriteBuildEntity.asFavoriteBuildListItem())
                 _favoriteBuildsState.update { state ->
                     when (state) {
                         is FavoriteBuildsState.Empty -> {
-                            FavoriteBuildsState.Success(listOf(favoriteBuildEntity.asFavoriteBuildListItem()))
+                            FavoriteBuildsState.Success(listOf(favoriteBuildUiListItem))
                         }
 
                         is FavoriteBuildsState.Success -> {
                             state.copy(
                                 favoriteBuilds = state.favoriteBuilds.plus(
-                                    favoriteBuildEntity.asFavoriteBuildListItem()
+                                    favoriteBuildUiListItem
                                 )
                             )
                         }
@@ -119,12 +137,14 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                         return
                     } else {
                         val favoriteBuildDto = buildDetails.asFavoriteBuildDto(user.id)
+                        val favoriteBuildUiListItem =
+                            buildListItemUiMapper.buildFrom(favoriteBuildDto.asFavoriteBuildListItem())
                         postgrestService.insertFavoriteBuild(favoriteBuildDto)
                         _favoriteBuildsState.update { state ->
                             (state as FavoriteBuildsState.Success).copy(
                                 favoriteBuilds = state.favoriteBuilds.plus(
                                     state.favoriteBuilds.plus(
-                                        favoriteBuildDto.asFavoriteBuildListItem()
+                                        favoriteBuildUiListItem
                                     )
                                 )
                             )
@@ -175,9 +195,9 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                     } else {
                         postgrestService.deleteFavoriteBuild(user.id, buildId)
                         _favoriteBuildsState.update { state ->
-                            when(state) {
+                            when (state) {
                                 is FavoriteBuildsState.Success -> {
-                                    if(state.favoriteBuilds.size == 1) {
+                                    if (state.favoriteBuilds.size == 1) {
                                         FavoriteBuildsState.Empty
                                     } else {
                                         val buildFromState = state.favoriteBuilds.find {
@@ -192,6 +212,7 @@ class UserFavoriteBuildsRepositoryImpl @Inject constructor(
                                         } ?: state
                                     }
                                 }
+
                                 else -> state
                             }
                         }

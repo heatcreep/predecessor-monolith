@@ -37,6 +37,7 @@ import com.aowen.monolith.ui.theme.MonolithTheme
 fun PlayerIcon(
     modifier: Modifier = Modifier,
     heroImageId: Int? = null,
+    bordered: Boolean = true,
     fallbackIcon: ImageVector = Icons.Default.QuestionMark,
     heroIconSize: Dp = 52.dp,
     onClick: (() -> Unit)? = null,
@@ -46,11 +47,12 @@ fun PlayerIcon(
         modifier = modifier
             .width(IntrinsicSize.Min)
             .height(IntrinsicSize.Min)
-            .then(if (onClick != null) {
-                Modifier.clickable { onClick() }
-            } else {
-                Modifier
-            }),
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable { onClick() }
+                } else {
+                    Modifier
+                }),
     ) {
         heroImageId?.let { image ->
             Image(
@@ -58,10 +60,16 @@ fun PlayerIcon(
                     .padding(bottom = if (roleIcon != null) 8.dp else 0.dp)
                     .size(heroIconSize)
                     .clip(CircleShape)
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.secondary,
-                        shape = CircleShape
+                    .then(
+                        if (bordered) {
+                            Modifier.border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                shape = CircleShape
+                            )
+                        } else {
+                            Modifier
+                        }
                     ),
                 contentScale = ContentScale.Crop,
                 painter = painterResource(id = heroImageId),

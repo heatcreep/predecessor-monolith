@@ -28,6 +28,7 @@ import com.aowen.monolith.network.UserRecentSearchRepositoryImpl
 import com.aowen.monolith.network.UserRepository
 import com.aowen.monolith.network.UserRepositoryImpl
 import com.aowen.monolith.network.utils.NetworkUtil.getOkHttpClientWithCache
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -212,12 +213,14 @@ object AppModule {
         postgrestService: SupabasePostgrestService,
         userRepository: UserRepository,
         authRepository: AuthRepository,
-        favoriteBuildDao: FavoriteBuildDao
+        favoriteBuildDao: FavoriteBuildDao,
+        buildListItemUiMapper: BuildListItemUiMapper
     ): UserFavoriteBuildsRepository =
         UserFavoriteBuildsRepositoryImpl(
             postgrestService = postgrestService,
             userRepository = userRepository,
             authRepository = authRepository,
-            favoriteBuildDao = favoriteBuildDao
+            favoriteBuildDao = favoriteBuildDao,
+            buildListItemUiMapper = buildListItemUiMapper
         )
 }

@@ -4,7 +4,6 @@ import com.aowen.monolith.data.database.model.FavoriteBuildListEntity
 import java.sql.Timestamp
 import java.util.UUID
 
-
 data class BuildListItem(
     val id: Int = 0,
     val userId: String? = null,
@@ -16,6 +15,7 @@ data class BuildListItem(
     val crest: Int = 0,
     val buildItems: List<Int> = emptyList(),
     val skillOrder: List<Int>? = null,
+    val netVotes: Int = 0,
     val upvotes: Int = 0,
     val downvotes: Int = 0,
     val modules: List<ItemModule> = emptyList(),
@@ -41,6 +41,7 @@ fun BuildDto.asBuildListItem(): BuildListItem {
         crest = crestId,
         buildItems = listOfNotNull(item1Id, item2Id, item3Id, item4Id, item5Id, item6Id),
         skillOrder = skillOrder,
+        netVotes = upvotesCount - downvotesCount,
         upvotes = upvotesCount,
         downvotes = downvotesCount,
         createdAt = createdAt,
