@@ -150,6 +150,7 @@ fun BuildListCard(
                     }
                 }
             }
+            Spacer(modifier = Modifier.size(8.dp))
             Column(
                 modifier = Modifier.fillMaxHeight(),
                 horizontalAlignment = Alignment.End,

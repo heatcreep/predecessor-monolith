@@ -2,7 +2,6 @@ package com.aowen.monolith.feature.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.ItemDetails
 import com.aowen.monolith.data.MatchDetails
@@ -15,6 +14,8 @@ import com.aowen.monolith.data.repository.players.di.PlayerRepository
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.Resource
 import com.aowen.monolith.network.UserRecentSearchRepository
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
+import com.aowen.monolith.ui.model.BuildUiListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +45,7 @@ sealed interface PlayersListState {
 }
 
 sealed interface BuildsListState {
-    data class Success(val builds: List<BuildListItem>) : BuildsListState
+    data class Success(val builds: List<BuildUiListItem>) : BuildsListState
     data class Error(val errorMessage: String?) : BuildsListState
     data object Empty : BuildsListState
     data object Loading : BuildsListState
@@ -88,7 +89,8 @@ class SearchScreenViewModel @Inject constructor(
     private val omedaCityItemRepository: ItemRepository,
     private val omedaCityMatchRepository: MatchRepository,
     private val omedaCityPlayerRepository: PlayerRepository,
-    private val userRecentSearchesRepository: UserRecentSearchRepository
+    private val userRecentSearchesRepository: UserRecentSearchRepository,
+    private val buildListItemUiMapper: BuildListItemUiMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchScreenUiState())
@@ -305,7 +307,11 @@ class SearchScreenViewModel @Inject constructor(
                     if (buildsResource.data.isEmpty()) {
                         BuildsListState.Empty
                     } else {
-                        BuildsListState.Success(buildsResource.data)
+                        BuildsListState.Success(buildsResource.data.map {
+                            buildListItemUiMapper.buildFrom(
+                                it
+                            )
+                        })
                     }
                 }
 

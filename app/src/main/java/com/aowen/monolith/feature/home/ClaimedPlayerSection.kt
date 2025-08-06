@@ -122,14 +122,6 @@ fun ClaimedPlayerSection(
                                     playerName = claimedPlayerName
                                         ?: claimedPlayer.playerDetails.playerName
                                 )
-//                                ClaimedPlayerCard(
-//                                    claimedPlayerName = claimedPlayerName,
-//                                    playerDetails = claimedPlayer.playerDetails,
-//                                    playerStats = claimedPlayer.playerStats,
-//                                    navigateToPlayerDetails = {
-//                                        navigateToPlayerDetails(claimedPlayer.playerDetails.playerId)
-//                                    }
-//                                )
                             }
                         }
                     }

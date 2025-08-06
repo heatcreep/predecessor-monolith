@@ -22,6 +22,7 @@ import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsError
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsUiState
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsViewModel
 import com.aowen.monolith.network.Resource
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
 import com.aowen.monolith.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -48,6 +49,8 @@ class HeroDetailsViewModelTest {
 
     private var buildRepository: BuildRepository = FakeOmedaCityBuildRepository()
 
+    private val buildListItemUiMapper = BuildListItemUiMapper()
+
     @Before
     fun setup() {
         viewModel = HeroDetailsViewModel(
@@ -60,7 +63,8 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = heroRepository,
-            omedaCityBuildRepository = buildRepository
+            omedaCityBuildRepository = buildRepository,
+            buildListItemUiMapper = buildListItemUiMapper
         )
     }
 
@@ -83,7 +87,8 @@ class HeroDetailsViewModelTest {
                 ),
                 userPreferencesDataStore = FakeUserPreferencesManager(),
                 omedaCityHeroRepository = heroRepository,
-                omedaCityBuildRepository = buildRepository
+                omedaCityBuildRepository = buildRepository,
+                buildListItemUiMapper = buildListItemUiMapper
             )
             advanceUntilIdle()
             val actual = viewModel.uiState.value
@@ -91,7 +96,7 @@ class HeroDetailsViewModelTest {
             val expected = HeroDetailsUiState(
                 isLoading = false,
                 isLoadingBuilds = false,
-                heroBuilds = List(5) { fakeBuildDto.asBuildListItem() },
+                heroBuilds = List(5) { buildListItemUiMapper.buildFrom(fakeBuildDto.asBuildListItem()) },
                 heroDetailsErrors = null,
                 hero = fakeHeroDto.asHeroDetails(),
                 statistics = fakeHeroStatisticsDto.create()
@@ -121,7 +126,8 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = heroRepository,
-            omedaCityBuildRepository = buildRepository
+            omedaCityBuildRepository = buildRepository,
+            buildListItemUiMapper = buildListItemUiMapper
         )
 
         advanceUntilIdle()
@@ -156,7 +162,8 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = heroRepository,
-            omedaCityBuildRepository = buildRepository
+            omedaCityBuildRepository = buildRepository,
+            buildListItemUiMapper = buildListItemUiMapper
         )
         advanceUntilIdle()
         val actual = viewModel.uiState.value
@@ -192,7 +199,8 @@ class HeroDetailsViewModelTest {
             ),
             userPreferencesDataStore = FakeUserPreferencesManager(),
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
-            omedaCityBuildRepository = buildRepository
+            omedaCityBuildRepository = buildRepository,
+            buildListItemUiMapper = buildListItemUiMapper
         )
 
         advanceUntilIdle()

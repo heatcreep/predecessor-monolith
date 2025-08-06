@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.aowen.monolith.feature.builds.BuildListItem
+import com.aowen.monolith.core.ui.cards.builds.BuildListCard
 import com.aowen.monolith.ui.components.PlayerLoadingCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +43,7 @@ fun BuildsSearchSection(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     buildsState.builds.forEach { build ->
-                        BuildListItem(
+                        BuildListCard(
                             build = build,
                             navigateToBuildDetails = navigateToBuildDetails
                         )

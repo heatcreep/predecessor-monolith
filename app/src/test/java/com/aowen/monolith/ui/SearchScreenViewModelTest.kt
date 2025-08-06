@@ -25,6 +25,7 @@ import com.aowen.monolith.feature.search.AllItemsState
 import com.aowen.monolith.feature.search.SearchScreenUiState
 import com.aowen.monolith.feature.search.SearchScreenViewModel
 import com.aowen.monolith.network.Resource
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
 import com.aowen.monolith.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -50,6 +51,8 @@ class SearchScreenViewModelTest {
 
     private var buildRepository = FakeOmedaCityBuildRepository()
 
+    private val buildListItemUiMapper = BuildListItemUiMapper()
+
     @Test
     fun `calling initViewModel() should update uiState with recent searches and all items and heroes`() =
         runTest {
@@ -59,7 +62,8 @@ class SearchScreenViewModelTest {
                 omedaCityItemRepository = itemRepository,
                 omedaCityMatchRepository = matchRepository,
                 omedaCityBuildRepository = buildRepository,
-                userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+                userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+                buildListItemUiMapper = buildListItemUiMapper
             )
             viewModel.initViewModel()
             advanceUntilIdle()
@@ -105,7 +109,8 @@ class SearchScreenViewModelTest {
                 omedaCityItemRepository = itemRepository,
                 omedaCityMatchRepository = matchRepository,
                 omedaCityBuildRepository = buildRepository,
-                userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+                userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+                buildListItemUiMapper = buildListItemUiMapper
             )
             viewModel.initViewModel()
             advanceUntilIdle()
@@ -142,7 +147,8 @@ class SearchScreenViewModelTest {
                 omedaCityItemRepository = itemRepository,
                 omedaCityMatchRepository = matchRepository,
                 omedaCityBuildRepository = buildRepository,
-                userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+                userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+                buildListItemUiMapper = buildListItemUiMapper
             )
             viewModel.initViewModel()
             advanceUntilIdle()
@@ -181,7 +187,8 @@ class SearchScreenViewModelTest {
                 omedaCityItemRepository = itemRepository,
                 omedaCityMatchRepository = matchRepository,
                 omedaCityBuildRepository = buildRepository,
-                userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+                userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+                buildListItemUiMapper = buildListItemUiMapper
             )
             advanceUntilIdle()
             val actual = viewModel.uiState.value
@@ -216,7 +223,8 @@ class SearchScreenViewModelTest {
             omedaCityItemRepository = itemRepository,
             omedaCityMatchRepository = matchRepository,
             omedaCityBuildRepository = buildRepository,
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+            userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+            buildListItemUiMapper = buildListItemUiMapper
         )
         viewModel.setSearchValue("test")
         val actual = viewModel.uiState.value.searchFieldValue
@@ -232,7 +240,8 @@ class SearchScreenViewModelTest {
             omedaCityItemRepository = itemRepository,
             omedaCityMatchRepository = matchRepository,
             omedaCityBuildRepository = buildRepository,
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+            userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+            buildListItemUiMapper = buildListItemUiMapper
         )
         viewModel.setSearchValue("test")
         viewModel.handleClearSearch()
@@ -249,7 +258,8 @@ class SearchScreenViewModelTest {
             omedaCityItemRepository = itemRepository,
             omedaCityMatchRepository = matchRepository,
             omedaCityBuildRepository = buildRepository,
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+            userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+            buildListItemUiMapper = buildListItemUiMapper
         )
         advanceUntilIdle()
         viewModel.handleClearSingleRecentSearch(fakePlayerDetails.playerId)
@@ -267,7 +277,8 @@ class SearchScreenViewModelTest {
             omedaCityItemRepository = itemRepository,
             omedaCityMatchRepository = matchRepository,
             omedaCityBuildRepository = buildRepository,
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+            userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+            buildListItemUiMapper = buildListItemUiMapper
         )
         viewModel.handleClearAllRecentSearches()
         val actual = viewModel.uiState.value.recentSearchesList
@@ -283,7 +294,8 @@ class SearchScreenViewModelTest {
             omedaCityItemRepository = itemRepository,
             omedaCityMatchRepository = matchRepository,
             omedaCityBuildRepository = buildRepository,
-            userRecentSearchesRepository = FakeUserRecentSearchesRepository()
+            userRecentSearchesRepository = FakeUserRecentSearchesRepository(),
+            buildListItemUiMapper = buildListItemUiMapper
         )
         viewModel.handleAddToRecentSearch(fakePlayerDetails)
         advanceUntilIdle()

@@ -10,6 +10,7 @@ import com.aowen.monolith.data.repository.builds.BuildRepository
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.feature.home.playerdetails.HeroUiModel
 import com.aowen.monolith.network.getOrThrow
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -31,7 +32,8 @@ data class BuildsUiState(
 @HiltViewModel
 class BuildsScreenViewModel @Inject constructor(
     private val omedaCityBuildRepository: BuildRepository,
-    private val omedaCityHeroRepository: HeroRepository
+    private val omedaCityHeroRepository: HeroRepository,
+    private val buildListItemUiMapper: BuildListItemUiMapper
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<BuildsUiState> = MutableStateFlow(BuildsUiState())
@@ -67,7 +69,9 @@ class BuildsScreenViewModel @Inject constructor(
             skillOrder = if (uiState.value.hasSkillOrderSelected) 1 else null,
             modules = if (uiState.value.hasModulesSelected) 1 else null,
             currentVersion = if (uiState.value.hasCurrentVersionSelected) 1 else null,
-            omedaCityBuildRepository = omedaCityBuildRepository
+            omedaCityBuildRepository = omedaCityBuildRepository,
+            buildListItemUiMapper = buildListItemUiMapper
+
         ).also {
             buildsPagingSource = it
         }

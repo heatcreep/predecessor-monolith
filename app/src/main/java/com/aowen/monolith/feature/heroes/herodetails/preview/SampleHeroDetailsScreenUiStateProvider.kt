@@ -1,13 +1,13 @@
 package com.aowen.monolith.feature.heroes.herodetails.preview
 
 import com.aowen.monolith.data.AbilityDetails
-import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroBaseStats
 import com.aowen.monolith.data.HeroClass
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.HeroStatistics
 import com.aowen.monolith.feature.heroes.herodetails.HeroDetailsUiState
+import com.aowen.monolith.ui.model.BuildUiListItem
 import java.math.BigDecimal
 
 val heroBuildsLoadingState = HeroDetailsUiState(
@@ -61,8 +61,8 @@ val heroBuildsState = HeroDetailsUiState(
         pickRate = 62.13f
     ),
     heroBuilds = listOf(
-        BuildListItem(
-            id = 1,
+        BuildUiListItem.NormalBuildUiListItem(
+            buildId = 1,
             title = "Muriel Support Build [0.13.1]",
             description = "Test Build Description",
             heroId = 15,

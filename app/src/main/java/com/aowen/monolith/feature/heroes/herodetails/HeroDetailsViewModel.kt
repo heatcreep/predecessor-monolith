@@ -3,7 +3,6 @@ package com.aowen.monolith.feature.heroes.herodetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroStatistics
@@ -11,6 +10,8 @@ import com.aowen.monolith.data.repository.builds.BuildRepository
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.network.UserPreferencesManager
 import com.aowen.monolith.network.getOrThrow
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
+import com.aowen.monolith.ui.model.BuildUiListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,7 +32,7 @@ data class HeroDetailsUiState(
     val console: Console = Console.PC,
     val heroDetailsErrors: HeroDetailsError? = null,
     val hero: HeroDetails = HeroDetails(),
-    val heroBuilds: List<BuildListItem> = emptyList(),
+    val heroBuilds: List<BuildUiListItem> = emptyList(),
     val statistics: HeroStatistics = HeroStatistics(),
 )
 
@@ -40,7 +41,8 @@ class HeroDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userPreferencesDataStore: UserPreferencesManager,
     private val omedaCityHeroRepository: HeroRepository,
-    private val omedaCityBuildRepository: BuildRepository
+    private val omedaCityBuildRepository: BuildRepository,
+    private val buildListItemUiMapper: BuildListItemUiMapper
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HeroDetailsUiState())
@@ -70,14 +72,15 @@ class HeroDetailsViewModel @Inject constructor(
                 )
             }
             try {
-                val heroResult = heroes.await().getOrThrow().firstOrNull { it.id == heroId.toLong() }
+                val heroResult =
+                    heroes.await().getOrThrow().firstOrNull { it.id == heroId.toLong() }
                 val statisticsResult = statistics.await().getOrThrow()
                 val heroBuilds = heroBuildsDeferred.await().getOrThrow()
                 _uiState.update {
                     it.copy(
                         hero = heroResult ?: HeroDetails(),
                         statistics = statisticsResult ?: HeroStatistics(),
-                        heroBuilds = heroBuilds.take(5),
+                        heroBuilds = heroBuilds.take(5).map { buildListItemUiMapper.buildFrom(it) },
                         isLoading = false,
                         isLoadingBuilds = false,
                         heroDetailsErrors = null

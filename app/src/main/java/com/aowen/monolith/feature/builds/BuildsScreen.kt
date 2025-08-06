@@ -1,16 +1,10 @@
 package com.aowen.monolith.feature.builds
 
-import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,19 +20,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Badge
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
@@ -48,6 +35,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -62,17 +50,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.LoadState
@@ -81,25 +60,19 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.monolith.BuildConfig
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
+import com.aowen.monolith.core.ui.cards.builds.BuildListCard
 import com.aowen.monolith.core.ui.dropdown.HeroSelectDropdown
 import com.aowen.monolith.core.ui.dropdown.PredCompanionSortDropdown
 import com.aowen.monolith.core.ui.filters.PredCompanionChipFilter
-import com.aowen.monolith.data.BuildListItem
 import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.data.getHeroImage
-import com.aowen.monolith.data.getHeroRole
-import com.aowen.monolith.data.getItemImage
 import com.aowen.monolith.feature.builds.addbuild.navigation.navigateToAddBuildFlow
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
 import com.aowen.monolith.feature.search.navigation.navigateToSearch
 import com.aowen.monolith.ui.common.MonolithCollapsableFabButton
 import com.aowen.monolith.ui.common.MonolithCollapsableListColumn
-import com.aowen.monolith.ui.common.PlayerIcon
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.MonolithTopAppBar
-import com.aowen.monolith.ui.theme.GreenHighlight
-import com.aowen.monolith.ui.theme.MonolithTheme
-import com.aowen.monolith.ui.theme.RedHighlight
+import com.aowen.monolith.ui.model.BuildUiListItem
 import com.aowen.monolith.ui.theme.dropDownDefaults
 import com.aowen.monolith.ui.theme.inputFieldDefaults
 import kotlinx.coroutines.launch
@@ -116,13 +89,11 @@ fun BuildsScreenRoute(
     BuildsScreen(
         uiState = uiState,
         builds = builds,
-        onSearchFieldUpdate = viewModel::updateSearchField,
         onSelectRoleFilter = viewModel::updateSelectedRole,
         onClearRoleFilter = viewModel::clearSelectedRole,
         onSelectHeroFilter = viewModel::updateSelectedHero,
         onClearHeroFilter = viewModel::clearSelectedHero,
         onSelectSortFilter = viewModel::updateSelectedSortOrder,
-        onClearSortFilter = viewModel::clearSelectedSortOrder,
         onCheckHasSkillOrder = viewModel::updateHasSkillOrder,
         onCheckHasModules = viewModel::updateHasModules,
         onCheckHasCurrentVersion = viewModel::updateHasCurrentVersion,
@@ -136,14 +107,12 @@ fun BuildsScreenRoute(
 @Composable
 fun BuildsScreen(
     uiState: BuildsUiState,
-    builds: LazyPagingItems<BuildListItem>,
-    onSearchFieldUpdate: (String) -> Unit,
+    builds: LazyPagingItems<BuildUiListItem>,
     onSelectRoleFilter: (HeroRole) -> Unit,
     onClearRoleFilter: () -> Unit,
     onSelectHeroFilter: (String) -> Unit,
     onClearHeroFilter: () -> Unit,
     onSelectSortFilter: (String) -> Unit,
-    onClearSortFilter: () -> Unit,
     onCheckHasSkillOrder: (Boolean) -> Unit,
     onCheckHasModules: (Boolean) -> Unit,
     onCheckHasCurrentVersion: (Boolean) -> Unit,
@@ -325,12 +294,12 @@ fun BuildsScreen(
                 else -> {
                     LazyColumn(
                         state = scrollState,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(builds.itemCount) { index ->
                             val buildListItem = builds[index]
                             buildListItem?.let { build ->
-                                BuildListItem(
+                                BuildListCard(
                                     build = build,
                                     navigateToBuildDetails = navigateToBuildDetails
                                 )
@@ -430,7 +399,7 @@ fun RowScope.FilterDropdown(
                     }
                 },
                 modifier = Modifier
-                    .menuAnchor()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
             )
 
             ExposedDropdownMenu(
@@ -453,193 +422,5 @@ fun RowScope.FilterDropdown(
 
             }
         }
-    }
-}
-
-@Composable
-fun BuildListItem(
-    modifier: Modifier = Modifier,
-    build: BuildListItem,
-    navigateToBuildDetails: (Int) -> Unit
-) {
-
-    val context = LocalContext.current
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .border(
-                1.dp,
-                MaterialTheme.colorScheme.secondary,
-                RoundedCornerShape(4.dp)
-            )
-            .clickable {
-                navigateToBuildDetails(build.id)
-
-            },
-        shape = RoundedCornerShape(4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-
-            )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                modifier = Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                getHeroRole(build.role)?.let { role ->
-                    PlayerIcon(
-                        heroImageId = getHeroImage(build.heroId),
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    shape = CircleShape
-                                )
-                                .align(Alignment.BottomEnd),
-                            contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                            painter = painterResource(
-                                id = role.drawableId
-                            ),
-                            contentDescription = null
-                        )
-                    }
-                }
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = build.title,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        ),
-                        color = MaterialTheme.colorScheme.secondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Text(
-                            text = "Author: ${build.author}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.secondary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        build.version?.let { version ->
-                            Badge(
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                contentColor = MaterialTheme.colorScheme.primary
-                            ) {
-                                Text(
-                                    text = version,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        }
-                    }
-                    Row {
-                        Image(
-                            modifier = Modifier.size(24.dp),
-                            painter = painterResource(id = getItemImage(build.crest)),
-                            contentDescription = null
-                        )
-                        build.buildItems.forEach {
-                            Image(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(id = getItemImage(it)),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
-            }
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "${build.upvotes}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    IconButton(onClick = {
-                        // TODO: Replace with actual upvote logic
-                        Toast.makeText(context, "Coming soon!", Toast.LENGTH_LONG).show()
-                    }
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(16.dp),
-                            imageVector = Icons.Filled.ThumbUp,
-                            contentDescription = "thumbs up",
-                            tint = GreenHighlight
-                        )
-                    }
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "${build.downvotes}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    IconButton(onClick = {
-                        // TODO: Replace with actual downvote logic
-                        Toast.makeText(context, "Coming soon!", Toast.LENGTH_LONG).show()
-                    }) {
-                        Icon(
-                            modifier = Modifier.size(16.dp),
-                            imageVector = Icons.Filled.ThumbDown,
-                            contentDescription = "thumbs down",
-                            tint = RedHighlight
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Preview(
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun BuildListItemPreview() {
-    MonolithTheme {
-        BuildListItem(
-            build = BuildListItem(
-                id = 1,
-                title = "Muriel Support Build [0.13.1]",
-                description = "Test Build Description",
-                heroId = 15,
-                buildItems = listOf(1, 1, 1, 1, 1),
-                createdAt = "2021-01-01",
-                updatedAt = "2021-01-01",
-                author = "heatcreep.tv",
-                crest = 1,
-                role = "Support"
-            ),
-            navigateToBuildDetails = {}
-        )
     }
 }

@@ -68,13 +68,13 @@ import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
+import com.aowen.monolith.core.ui.cards.builds.BuildListCard
 import com.aowen.monolith.data.Console
 import com.aowen.monolith.data.HeroClass
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.data.getAbilityKey
 import com.aowen.monolith.data.getAbilityName
 import com.aowen.monolith.data.getHeroImage
-import com.aowen.monolith.feature.builds.BuildListItem
 import com.aowen.monolith.feature.builds.builddetails.navigation.navigateToBuildDetails
 import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsLoadingState
 import com.aowen.monolith.feature.heroes.herodetails.preview.heroBuildsState
@@ -302,10 +302,10 @@ fun HeroOverviewScreen(
                     } else {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             uiState.heroBuilds.forEach { build ->
-                                BuildListItem(
+                                BuildListCard(
                                     build = build,
                                     navigateToBuildDetails = navigateToBuildDetails
                                 )
