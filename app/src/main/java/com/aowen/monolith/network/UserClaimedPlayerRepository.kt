@@ -10,20 +10,21 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-abstract class ClaimedPlayerState {
+sealed interface ClaimedPlayerState {
+    data object Loading : ClaimedPlayerState
     data class Claimed(
         val claimedPlayer: ClaimedPlayer,
-    ) : ClaimedPlayerState()
+    ) : ClaimedPlayerState
 
-    data object NoClaimedPlayer : ClaimedPlayerState()
-    data class Error(val message: String) : ClaimedPlayerState()
+    data object NoClaimedPlayer : ClaimedPlayerState
+    data class Error(val message: String) : ClaimedPlayerState
 }
 
 interface UserClaimedPlayerRepository {
     val claimedPlayerState: MutableStateFlow<ClaimedPlayerState>
     val claimedPlayerName: MutableStateFlow<String?>
     suspend fun getClaimedPlayerName()
-    suspend fun getClaimedPlayer(): Result<ClaimedPlayer?>
+    suspend fun getClaimedPlayer()
     suspend fun setClaimedPlayerName(playerName: String?)
     suspend fun setClaimedUser(
         isRemoving: Boolean,
@@ -41,7 +42,7 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
     private val omedaCityPlayerRepository: PlayerRepository
 ) : UserClaimedPlayerRepository {
     private val _claimedPlayerState: MutableStateFlow<ClaimedPlayerState> =
-        MutableStateFlow(ClaimedPlayerState.NoClaimedPlayer)
+        MutableStateFlow(ClaimedPlayerState.Loading)
     override val claimedPlayerState = _claimedPlayerState
 
     private val _claimedPlayerName: MutableStateFlow<String?> = MutableStateFlow(null)
@@ -51,7 +52,8 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
         _claimedPlayerName.update { userPreferencesManager.claimedPlayerName.firstOrNull() }
     }
 
-    override suspend fun getClaimedPlayer(): Result<ClaimedPlayer?> {
+    override suspend fun getClaimedPlayer() {
+        _claimedPlayerState.update { ClaimedPlayerState.Loading }
         val playerId = when (authRepository.userState.value) {
             is UserState.Authenticated -> {
                 userRepository.getUser()?.playerId
@@ -63,10 +65,9 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
 
             else -> null
         }
-        return try {
+        try {
             if (playerId.isNullOrEmpty()) {
                 _claimedPlayerState.update { ClaimedPlayerState.NoClaimedPlayer }
-                Result.success(null)
             } else {
                 val playerInfoResponse =
                     omedaCityPlayerRepository.fetchPlayerInfo(playerId).getOrThrow()
@@ -78,20 +79,11 @@ class UserClaimedPlayerRepositoryImpl @Inject constructor(
                         )
                     )
                 }
-                Result.success(
-                    ClaimedPlayer(
-                        playerStats = playerInfoResponse.playerStats,
-                        playerDetails = playerInfoResponse.playerDetails
-
-                    ),
-                )
-
             }
         } catch (e: Exception) {
             _claimedPlayerState.update {
                 ClaimedPlayerState.Error(e.message ?: "Error")
             }
-            Result.failure(e)
         }
 
 

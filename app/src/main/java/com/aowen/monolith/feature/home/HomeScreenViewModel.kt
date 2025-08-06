@@ -86,22 +86,9 @@ class HomeScreenViewModel @Inject constructor(
             val heroStatsDeferredResult =
                 async { omedaCityHeroRepository.fetchAllHeroStatistics() }
 
-            val claimedUserResult = claimedUserDeferredResult.await()
+            claimedUserDeferredResult.await()
             val favoriteBuildsResult = favoriteBuildsDeferredResult.await()
             val heroStatsResult = heroStatsDeferredResult.await().getOrThrow()
-            if (claimedUserResult.isFailure) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        homeScreenError = _uiState.value.homeScreenError.plus(
-                            HomeScreenError.ClaimedPlayerErrorMessage(
-                                errorMessage = "Failed to fetch claimed user",
-                                error = claimedUserResult.exceptionOrNull()?.message
-                            )
-                        )
-                    )
-                }
-            }
             if (favoriteBuildsResult.isFailure) {
                 _uiState.update {
                     it.copy(
@@ -143,6 +130,10 @@ class HomeScreenViewModel @Inject constructor(
             }
 
         }
+    }
+
+    fun handleRetryClaimedPlayer() {
+        viewModelScope.launch { claimedPlayerRepository.getClaimedPlayer() }
     }
 
     fun handleRemoveAllFavoriteBuilds() {

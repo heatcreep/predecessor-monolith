@@ -221,7 +221,6 @@ fun HomeScreen(
                 ) {
                     item {
                         ClaimedPlayerSection(
-                            uiState = uiState,
                             claimedPlayerState = claimedPlayerState,
                             claimedPlayerName = claimedPlayerName,
                             navigateToPlayerDetails = navigateToPlayerDetails,
@@ -291,7 +290,6 @@ fun FavoriteBuildsSection(
     var isReloadingSection by remember { mutableStateOf(false) }
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

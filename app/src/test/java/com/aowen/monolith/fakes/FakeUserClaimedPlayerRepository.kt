@@ -3,7 +3,6 @@ package com.aowen.monolith.fakes
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerStats
 import com.aowen.monolith.fakes.data.fakeClaimedPlayer
-import com.aowen.monolith.network.ClaimedPlayer
 import com.aowen.monolith.network.ClaimedPlayerState
 import com.aowen.monolith.network.UserClaimedPlayerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,21 +32,15 @@ class FakeUserClaimedPlayerRepository(
     private val _setClaimedPlayerNameCounter: MutableStateFlow<Int> = MutableStateFlow(0)
     val setClaimedPlayerNameCounter: MutableStateFlow<Int> = _setClaimedPlayerNameCounter
 
-    override suspend fun getClaimedPlayer(): Result<ClaimedPlayer?> {
-        return when (claimedPlayerScenario) {
+    override suspend fun getClaimedPlayer() {
+        when (claimedPlayerScenario) {
             ClaimedPlayerScenario.PlayerNullOrEmpty -> {
                 _claimedPlayerState.update { ClaimedPlayerState.NoClaimedPlayer }
-                Result.success(null)
             }
-            ClaimedPlayerScenario.PlayerInfoResponseFailure -> {
-                Result.failure(Exception("Player not found"))
-            }
-            ClaimedPlayerScenario.PlayerInfoError -> {
-                Result.failure(Exception("Failed to get player"))
-            }
+            ClaimedPlayerScenario.PlayerInfoResponseFailure -> {}
+            ClaimedPlayerScenario.PlayerInfoError -> {}
             else -> {
                 _claimedPlayerState.update { ClaimedPlayerState.Claimed(fakeClaimedPlayer) }
-                Result.success(fakeClaimedPlayer)
             }
         }
 
