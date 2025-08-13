@@ -13,7 +13,7 @@ enum class ItemImage(val itemId: Int, val drawableId: Int) {
     ASHBRINGER(105, R.drawable.ashbringer),
     ASSASSIN_CREST(6, R.drawable.assassincrest),
     ASTRAL_CATALYST(106, R.drawable.astralcatalyst),
-    AUGMENTATION(107, R.drawable.augmentation),
+    AUGMENTATION(107, R.drawable.absolution),
     AZURE_CORE(108, R.drawable.azurecore),
     BANDED_EMERALD(64, R.drawable.bandedemerald),
     BARBARIC_CLEAVER(65, R.drawable.barbariccleaver),

@@ -7,6 +7,7 @@ import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
+import com.aowen.monolith.data.database.dao.ClaimedPlayerDao
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.data.repository.matches.MatchRepository
 import com.aowen.monolith.data.repository.players.di.PlayerRepository
@@ -14,6 +15,8 @@ import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.UserClaimedPlayerRepository
 import com.aowen.monolith.network.UserPreferencesManager
+import com.aowen.monolith.network.UserRepository
+import com.aowen.monolith.network.UserState
 import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -55,13 +58,15 @@ class PlayerDetailsViewModel @Inject constructor(
     private val omedaCityPlayerRepository: PlayerRepository,
     private val userPreferencesManager: UserPreferencesManager,
     private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
+    private val claimedPlayerDao: ClaimedPlayerDao,
     private val userClaimedPlayerRepository: UserClaimedPlayerRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PlayerDetailsUiState())
     val uiState: StateFlow<PlayerDetailsUiState> = _uiState
 
-    private val playerId: String = checkNotNull(savedStateHandle["playerId"])
+    private val playerId: String? = savedStateHandle["playerId"]
 
     fun onEditPlayerName() {
         _uiState.update {
@@ -131,6 +136,16 @@ class PlayerDetailsViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
+                val playerId = playerId ?: getFreshPlayerId()
+                if(playerId == null) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "No player ID found. Please claim a player."
+                        )
+                    }
+                    return@launch
+                }
                 val claimedPlayerName = userPreferencesManager.claimedPlayerName.firstOrNull()
                 val userProfileDeferred = async { authRepository.getPlayer() }
                 val playerInfoDeferred =
@@ -180,6 +195,20 @@ class PlayerDetailsViewModel @Inject constructor(
                 }
             }
 
+        }
+    }
+
+    private suspend fun getFreshPlayerId(): String? {
+        return when (authRepository.userState.value) {
+            is UserState.Authenticated -> {
+                userRepository.getUser()?.playerId
+            }
+
+            is UserState.Unauthenticated -> {
+                claimedPlayerDao.getClaimedPlayerIds().firstOrNull()?.firstOrNull()
+            }
+
+            else -> null
         }
     }
 }

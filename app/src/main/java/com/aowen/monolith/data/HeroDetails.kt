@@ -28,6 +28,7 @@ data class HeroDetails(
     val name: String = "",
     val displayName: String = "",
     val imageId: Int? = null,
+    val posterImageId: Int? = null,
     val stats: List<Int> = emptyList(),
     val classes: List<HeroClass> = emptyList(),
     val roles: List<HeroRole> = emptyList(),
@@ -56,6 +57,8 @@ fun HeroDto.asHeroDetails(): HeroDetails {
             add(0, lastElement)
         }
     } else abilities
+
+    val hero = Hero.entries.firstOrNull() { it.heroName == displayName }
     return HeroDetails(
         id = id,
         name = name,
@@ -63,7 +66,8 @@ fun HeroDto.asHeroDetails(): HeroDetails {
         stats = stats,
         classes = classes.toHeroClass().filterNotNull(),
         roles = roles.toHeroRole().filterNotNull(),
-        imageId = Hero.entries.firstOrNull { it.heroName == displayName }?.drawableId,
+        imageId = hero?.drawableId,
+        posterImageId = hero?.posterDrawableId,
         abilities = reorderedAbilities.map {
             it.create()
         },

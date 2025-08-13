@@ -4,30 +4,20 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,19 +34,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
-import com.aowen.monolith.R
+import com.aowen.monolith.core.ui.cards.heroes.HeroTileCard
 import com.aowen.monolith.core.ui.filters.PredCompanionChipFilter
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroDetails
@@ -67,7 +51,6 @@ import com.aowen.monolith.ui.common.MonolithCollapsableGridColumn
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
 import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
-import com.aowen.monolith.ui.theme.WarmWhite
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -171,7 +154,7 @@ fun HeroesScreen(
                     MonolithCollapsableGridColumn(listState = listState) {
                         AnimatedVisibility(visible = expanded) {
                             LazyRow(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
                                 items(items = HeroRole.entries.dropLast(1)) { role ->
@@ -210,7 +193,7 @@ fun HeroesScreen(
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             items(uiState.currentHeroes) { hero ->
-                                HeroCard(
+                                HeroTileCard(
                                     hero = hero,
                                     onClick = {
                                         navigateToHeroDetails(hero.id, hero.name)
@@ -226,116 +209,6 @@ fun HeroesScreen(
 
     }
 
-}
-
-@Composable
-fun HeroCard(
-    hero: HeroDetails,
-    modifier: Modifier = Modifier,
-    labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
-    isSelected: Boolean = false,
-    onClick: () -> Unit = {}
-) {
-
-    val image = hero.imageId ?: R.drawable.unknown
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .clickable {
-                onClick()
-            },
-        contentAlignment = Alignment.BottomCenter,
-        propagateMinConstraints = true
-    ) {
-        Image(
-            painter = painterResource(id = image),
-            contentScale = ContentScale.FillWidth,
-            contentDescription = hero.displayName
-        )
-        if (isSelected) {
-            Box(
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .fillMaxSize()
-                    .background(
-                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-            )
-            Column(
-                modifier = modifier
-                    .aspectRatio(1f)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.CheckCircle,
-                    modifier = Modifier.size(36.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.size(12.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 4.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = hero.displayName,
-                        style = labelTextStyle,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-        } else {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            listOf(
-                                Color.Transparent,
-                                Color.Black
-                            ),
-                        ),
-                        shape = RoundedCornerShape(4.dp),
-                    )
-                    .padding(top = 20.dp, bottom = 4.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = hero.displayName,
-                    style = labelTextStyle,
-                    color = WarmWhite
-                )
-            }
-        }
-    }
-}
-
-
-@Preview(
-    group = "Hero Card"
-)
-@Composable
-fun HeroCardPreview() {
-    MonolithTheme {
-        LazyVerticalGrid(GridCells.Fixed(5)) {
-            items(5) {
-                HeroCard(
-                    hero = HeroDetails(
-                        imageId = Hero.NARBASH.drawableId,
-                        displayName = "Narbash"
-                    ),
-                    isSelected = true
-                )
-            }
-        }
-
-    }
 }
 
 @Preview(

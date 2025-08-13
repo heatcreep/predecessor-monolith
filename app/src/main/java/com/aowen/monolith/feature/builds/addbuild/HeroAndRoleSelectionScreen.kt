@@ -38,11 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
+import com.aowen.monolith.core.ui.cards.heroes.HeroTileCard
 import com.aowen.monolith.data.Hero
 import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.HeroRole
 import com.aowen.monolith.feature.builds.addbuild.navigation.navigateToAddBuildDetails
-import com.aowen.monolith.feature.heroes.HeroCard
 import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.tooling.previews.LightDarkPreview
@@ -186,7 +186,7 @@ fun HeroSelection(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(heroes) { hero ->
-            HeroCard(
+            HeroTileCard(
                 hero = hero,
                 isSelected = hero.id == selectedHero?.id,
                 labelTextStyle = MaterialTheme.typography.bodySmall,
