@@ -31,6 +31,7 @@ enum class Hero(
     val drawableId: Int,
     val posterDrawableId: Int
 ) {
+    AKERON("Akeron", "DemonKing", 69, R.drawable.akeron, R.drawable.akeron_v2),
     ARGUS("Argus", "Emerald", 49, R.drawable.argus, R.drawable.argus_v2),
     AURORA("Aurora", "Aurora", 53, R.drawable.aurora, R.drawable.aurora_v2),
     BELICA("Lt. Belica", "LtBelica", 13, R.drawable.belica, R.drawable.belica_v2),
