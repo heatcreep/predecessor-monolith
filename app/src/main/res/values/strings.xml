@@ -10,4 +10,12 @@
     <string name="top_heroes">Top Heroes</string>
     <string name="most_played_heroes">Most Played Heroes</string>
     <string name="claim_player_on_console">Claim Player on Console</string>
+    <!--region Player Profile Strings -->
+    <string name="player_profile_win_rate">Win rate:</string>
+    <string name="player_profile_matches_played">Matches played:</string>
+    <string name="player_profile_favorite_hero">Favorite hero:</string>
+    <string name="player_profile_favorite_role">Favorite role:</string>
+    <string name="player_profile_average_kda">Average KDA:</string>
+    <string name="player_profile_average_ps">Average PS:</string>
+    <!--endregion-->
 </resources>

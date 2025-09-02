@@ -107,5 +107,5 @@ fun List<String>.toHeroRole(): List<HeroRole?> =
 
 fun List<String>.toHeroClass(): List<HeroClass?> =
     map {
-        HeroClass.entries.firstOrNull { heroClass -> heroClass.name == it }
+        HeroClass.entries.firstOrNull { heroClass -> heroClass.label == it }
     }

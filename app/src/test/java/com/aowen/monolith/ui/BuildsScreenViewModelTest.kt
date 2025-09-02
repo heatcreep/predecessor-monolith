@@ -40,7 +40,7 @@ class BuildsScreenViewModelTest {
         )
         val builds = viewModel.buildsPager
         val snapshot = builds.asSnapshot()
-        assertEquals(snapshot, List(20) { fakeBuildDto.asBuildListItem() })
+        assertEquals(snapshot, List(20) { BuildListItemUiMapper().buildFrom(fakeBuildDto.asBuildListItem()) })
     }
 
     @Test

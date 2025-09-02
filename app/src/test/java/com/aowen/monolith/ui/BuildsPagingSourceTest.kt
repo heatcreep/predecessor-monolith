@@ -10,6 +10,7 @@ import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
 import com.aowen.monolith.fakes.repo.resetPageCount
 import com.aowen.monolith.feature.builds.BuildsPagingSource
 import com.aowen.monolith.network.Resource
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -22,6 +23,8 @@ class BuildsPagingSourceTest {
 
     private var buildRepository = FakeOmedaCityBuildRepository()
 
+    private val mockBuidListItemUiMapper = BuildListItemUiMapper()
+
     @After
     fun cleanup() {
         // Reset the page count after each test
@@ -31,26 +34,28 @@ class BuildsPagingSourceTest {
     @Test
     fun `pager refresh should contain the list of builds`() = runTest {
 
-        val mockBuilds = List(10) { fakeBuildDto.asBuildListItem() }
+        val mockBuilds = List(10) { mockBuidListItemUiMapper.buildFrom(fakeBuildDto.asBuildListItem()) }
 
         val pagingSource = BuildsPagingSource(
-            omedaCityBuildRepository = buildRepository
+            omedaCityBuildRepository = buildRepository,
+            buildListItemUiMapper = mockBuidListItemUiMapper
         )
 
         val pager = TestPager(PagingConfig(pageSize = 10), pagingSource)
 
         val result = with(pager) {
             refresh()
-        } as LoadResult.Page
+        } as? LoadResult.Page
 
-        assertEquals(result.data, mockBuilds)
+        assertEquals(mockBuilds, result?.data)
     }
 
     @Test
-    fun `pager append should return empty list when there are no more builds`() = runTest {
+    fun `pager append should return null when there are no more builds`() = runTest {
 
         val pagingSource = BuildsPagingSource(
-            omedaCityBuildRepository = buildRepository
+            omedaCityBuildRepository = buildRepository,
+            buildListItemUiMapper = mockBuidListItemUiMapper
         )
 
         val pager = TestPager(PagingConfig(pageSize = 10), pagingSource)
@@ -82,7 +87,8 @@ class BuildsPagingSourceTest {
         ) } returns Resource.NetworkError(404, "Not Found")
 
         val pagingSource = BuildsPagingSource(
-            omedaCityBuildRepository = buildRepository
+            omedaCityBuildRepository = buildRepository,
+            buildListItemUiMapper = mockBuidListItemUiMapper
         )
 
         val pager = TestPager(PagingConfig(pageSize = 10), pagingSource)

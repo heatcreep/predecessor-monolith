@@ -64,6 +64,7 @@ androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navig
 androidx-paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "androidXPaging" }
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "androidXPaging" }
 androidx-paging-testing = { group = "androidx.paging", name = "paging-testing", version.ref = "androidXPaging" }
+androidx-paging-testing-android = { group = "androidx.paging", name = "paging-testing-android", version.ref = "androidXPaging" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }

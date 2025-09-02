@@ -10,11 +10,11 @@ import com.aowen.monolith.fakes.data.fakeClaimedPlayer
 import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
 import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
-import com.aowen.monolith.feature.home.HomeScreenError.ClaimedPlayerErrorMessage
 import com.aowen.monolith.feature.home.HomeScreenUiState
 import com.aowen.monolith.feature.home.HomeScreenViewModel
 import com.aowen.monolith.feature.home.usecase.VerifyFavoriteBuildsUseCase
 import com.aowen.monolith.network.ClaimedPlayerState
+import com.aowen.monolith.ui.model.BuildListItemUiMapper
 import com.aowen.monolith.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -34,6 +34,8 @@ class HomeScreenViewModelTest {
     private lateinit var viewModel: HomeScreenViewModel
 
     val verifyFavoriteBuildsUseCase: VerifyFavoriteBuildsUseCase = mockk()
+
+    val buildListItemUiMapper = BuildListItemUiMapper()
 
     @Before
     fun setup() {
@@ -100,64 +102,6 @@ class HomeScreenViewModelTest {
         advanceUntilIdle()
         val actual = viewModel.claimedPlayerState.value
         assertEquals(ClaimedPlayerState.NoClaimedPlayer, actual)
-    }
-
-    @Test
-    fun `initViewModel() should update state with error when getClaimedUser() fails`() = runTest {
-
-        viewModel = HomeScreenViewModel(
-            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
-            favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
-            claimedPlayerRepository = FakeUserClaimedPlayerRepository(
-                claimedPlayerScenario = ClaimedPlayerScenario.PlayerInfoResponseFailure
-            ),
-            verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
-
-        )
-        advanceUntilIdle()
-        val expected = HomeScreenUiState(
-            isLoading = false,
-            homeScreenError = listOf(
-                ClaimedPlayerErrorMessage(
-                    errorMessage = "Failed to fetch claimed user",
-                    error = "Player not found"
-                )
-            ),
-            heroStats = fakeHeroStatisticsResult,
-            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
-            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed()
-        )
-        val actual = viewModel.uiState.value
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `initViewModel() should update state with error when getClaimedUser() errors`() = runTest {
-
-        viewModel = HomeScreenViewModel(
-            omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
-            favoriteBuildsRepository = FakeUserFavoriteBuildsRepository(),
-            claimedPlayerRepository = FakeUserClaimedPlayerRepository(
-                claimedPlayerScenario = ClaimedPlayerScenario.PlayerInfoError
-            ),
-            verifyFavoriteBuildsUseCase = verifyFavoriteBuildsUseCase
-
-        )
-        advanceUntilIdle()
-        val expected = HomeScreenUiState(
-            isLoading = false,
-            homeScreenError = listOf(
-                ClaimedPlayerErrorMessage(
-                    errorMessage = "Failed to fetch claimed user",
-                    error = "Failed to get player"
-                )
-            ),
-            heroStats = fakeHeroStatisticsResult,
-            topFiveHeroesByWinRate = fakeHeroStatisticsResult.dropLast(1),
-            topFiveHeroesByPickRate = fakeHeroStatisticsResult.drop(1).reversed()
-        )
-        val actual = viewModel.uiState.value
-        assertEquals(expected, actual)
     }
 
     @Test

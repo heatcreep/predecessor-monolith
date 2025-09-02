@@ -3,6 +3,7 @@ package com.aowen.monolith.feature.home.playerdetails
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aowen.monolith.data.HeroDetails
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
@@ -49,6 +50,14 @@ data class HeroUiModel(
     val name: String,
     val imageId: Int? = null,
 )
+
+fun HeroDetails.asHeroUiModel(): HeroUiModel {
+    return HeroUiModel(
+        heroId = id,
+        name = displayName,
+        imageId = imageId
+    )
+}
 
 @HiltViewModel
 class PlayerDetailsViewModel @Inject constructor(
@@ -98,6 +107,12 @@ class PlayerDetailsViewModel @Inject constructor(
         }
     }
 
+    fun handleClaimPlayerStatus(isRemoving: Boolean = false) {
+        viewModelScope.launch {
+            async { handleSavePlayer(isRemoving = isRemoving) }.await()
+        }
+    }
+
     fun handlePlayerHeroStatsSelect(heroId: Long) {
         _uiState.update {
             it.copy(
@@ -108,24 +123,24 @@ class PlayerDetailsViewModel @Inject constructor(
         }
     }
 
-    fun handleSavePlayer(isRemoving: Boolean = false) {
-        viewModelScope.launch {
-            try {
-                userClaimedPlayerRepository.setClaimedUser(
-                    isRemoving = isRemoving,
-                    uiState.value.stats,
-                    uiState.value.player
+    private suspend fun handleSavePlayer(isRemoving: Boolean = false) {
+
+        try {
+            userClaimedPlayerRepository.setClaimedUser(
+                isRemoving = isRemoving,
+                uiState.value.stats,
+                uiState.value.player
+            )
+            userClaimedPlayerRepository.setClaimedPlayerName(null)
+            _uiState.update {
+                it.copy(
+                    isClaimed = !isRemoving
                 )
-                userClaimedPlayerRepository.setClaimedPlayerName(null)
-                _uiState.update {
-                    it.copy(
-                        isClaimed = !uiState.value.isClaimed
-                    )
-                }
-            } catch (e: Exception) {
-                logDebug(e.toString())
             }
+        } catch (e: Exception) {
+            logDebug(e.toString())
         }
+
     }
 
     init {

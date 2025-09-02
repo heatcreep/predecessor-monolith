@@ -2,12 +2,14 @@
 
 package com.aowen.monolith.ui
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.asHeroDetails
 import com.aowen.monolith.data.asMatchDetails
 import com.aowen.monolith.data.asPlayerDetails
 import com.aowen.monolith.data.asPlayerHeroStats
 import com.aowen.monolith.data.create
+import com.aowen.monolith.data.database.dao.ClaimedPlayerDao
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.data.repository.matches.MatchRepository
 import com.aowen.monolith.data.repository.players.di.PlayerRepository
@@ -27,7 +29,9 @@ import com.aowen.monolith.fakes.repo.FakeOmedaCityMatchRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityPlayerRepository
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsUiState
 import com.aowen.monolith.feature.home.playerdetails.PlayerDetailsViewModel
+import com.aowen.monolith.feature.home.playerdetails.asHeroUiModel
 import com.aowen.monolith.network.Resource
+import com.aowen.monolith.network.UserRepository
 import com.aowen.monolith.ui.utils.handleTimeSinceMatch
 import com.aowen.monolith.utils.MainDispatcherRule
 import io.mockk.coEvery
@@ -51,6 +55,10 @@ class PlayerDetailsViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private val mockAppContext = mockk<Context>()
+    private val mockUserRepository = mockk<UserRepository>()
+    private val mockClaimedPlayerDao = mockk<ClaimedPlayerDao>()
+
     private lateinit var viewModel: PlayerDetailsViewModel
 
     private var heroRepository: HeroRepository = FakeOmedaCityHeroRepository()
@@ -71,6 +79,8 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = heroRepository,
             omedaCityMatchRepository = matchRepository,
@@ -78,6 +88,7 @@ class PlayerDetailsViewModelTest {
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
         )
+        coEvery { mockAppContext.applicationContext } returns mockAppContext
     }
 
     @Test
@@ -90,10 +101,10 @@ class PlayerDetailsViewModelTest {
             heroStats = listOf(fakePlayerHeroStatsDto.asPlayerHeroStats()),
             stats = fakePlayerStatsDto.create(),
             matches = listOf(fakeMatchDto.asMatchDetails()),
-            heroes = listOf(
+            allHeroes = listOf(
                 fakeHeroDto.asHeroDetails(),
                 fakeHeroDto2.asHeroDetails()
-            ),
+            ).map { it.asHeroUiModel() },
             playerId = "validPlayerId",
             isClaimed = true
         )
@@ -109,6 +120,8 @@ class PlayerDetailsViewModelTest {
                     "playerId" to "validPlayerId"
                 )
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
@@ -142,6 +155,8 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
@@ -171,6 +186,8 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
@@ -202,6 +219,8 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
@@ -234,6 +253,8 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = heroRepository,
             omedaCityMatchRepository = matchRepository,
@@ -261,6 +282,8 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
@@ -268,7 +291,7 @@ class PlayerDetailsViewModelTest {
             userClaimedPlayerRepository = fakeUserClaimedPlayerRepository,
             userPreferencesManager = FakeUserPreferencesManager()
         )
-        viewModel.handleSavePlayer()
+        viewModel.handleClaimPlayerStatus()
         advanceUntilIdle()
 
 
@@ -284,6 +307,8 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
@@ -291,7 +316,7 @@ class PlayerDetailsViewModelTest {
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
         )
-        viewModel.handleSavePlayer()
+        viewModel.handleClaimPlayerStatus()
 
         assertFalse(viewModel.uiState.value.isClaimed)
     }
@@ -305,6 +330,8 @@ class PlayerDetailsViewModelTest {
                 )
 
             ),
+            userRepository = mockUserRepository,
+            claimedPlayerDao = mockClaimedPlayerDao,
             omedaCityPlayerRepository = playerRepository,
             omedaCityHeroRepository = FakeOmedaCityHeroRepository(),
             omedaCityMatchRepository = matchRepository,
@@ -314,7 +341,7 @@ class PlayerDetailsViewModelTest {
             userClaimedPlayerRepository = FakeUserClaimedPlayerRepository(),
             userPreferencesManager = FakeUserPreferencesManager()
         )
-        viewModel.handleSavePlayer()
+        viewModel.handleClaimPlayerStatus()
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.isClaimed)

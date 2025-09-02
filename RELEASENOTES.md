@@ -1,8 +1,16 @@
 # Release Notes
 
-## 1.9.2 - Latest
+## 1.9.5 - Latest
+
+#### New Features
+
+- UI for Home Screen, Heroes, Items, and Builds have all been refreshed to be more modern and easier to use
 
 #### Improvements & Bug Fixes
+- Fixed a bug where going back from a top level destination (Heroes, Items, Builds, Profile) would take you into an infinite loading state requiring an app restart.
+
+
+## 1.9.2
 
 #### New Features
 

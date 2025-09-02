@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.FlowRowScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -26,13 +28,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -57,6 +64,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aowen.monolith.FullScreenLoadingIndicator
 import com.aowen.monolith.R
+import com.aowen.monolith.core.ui.cards.playerprofile.PlayerProfilePlayerStatsCard
+import com.aowen.monolith.core.ui.dropdown.HeroSelectDropdown
 import com.aowen.monolith.data.PlayerDetails
 import com.aowen.monolith.data.PlayerHeroStats
 import com.aowen.monolith.data.PlayerStats
@@ -64,9 +73,10 @@ import com.aowen.monolith.feature.matches.MatchesList
 import com.aowen.monolith.feature.matches.morematches.navigation.navigateToMoreMatches
 import com.aowen.monolith.feature.matches.navigation.navigateToMatchDetails
 import com.aowen.monolith.ui.components.FullScreenErrorWithRetry
-import com.aowen.monolith.core.ui.dropdown.HeroSelectDropdown
-import com.aowen.monolith.ui.components.PlayerCard
+import com.aowen.monolith.ui.components.MonolithTopAppBar
 import com.aowen.monolith.ui.components.RefreshableContainer
+import com.aowen.monolith.ui.components.UnclaimPlayerDialog
+import com.aowen.monolith.ui.model.StatLine
 import com.aowen.monolith.ui.theme.MonolithTheme
 import com.aowen.monolith.ui.utils.animateHorizontalAlignmentAsState
 import kotlinx.coroutines.launch
@@ -85,12 +95,13 @@ internal fun PlayerDetailsRoute(
         uiState = uiState,
         handleRetry = viewModel::initViewModel,
         modifier = modifier,
-        handleSavePlayer = viewModel::handleSavePlayer,
+        handleClaimPlayerStatus = viewModel::handleClaimPlayerStatus,
         handleSavePlayerName = viewModel::handleSaveClaimedPlayerName,
         handlePlayerNameChange = viewModel::handlePlayerNameFieldChange,
         handlePlayerHeroStatsSelect = viewModel::handlePlayerHeroStatsSelect,
         navigateToMatchDetails = navController::navigateToMatchDetails,
         navigateToMoreMatches = navController::navigateToMoreMatches,
+        navigateBack = navController::navigateUp,
         onEditPlayerName = viewModel::onEditPlayerName
     )
 }
@@ -101,12 +112,13 @@ fun PlayerDetailScreen(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
-    handleSavePlayer: suspend (Boolean) -> Unit = {},
+    handleClaimPlayerStatus: (Boolean) -> Unit = {},
     handleSavePlayerName: () -> Unit = {},
     handlePlayerNameChange: (String) -> Unit = {},
     handlePlayerHeroStatsSelect: (Long) -> Unit = { },
     navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
     navigateToMoreMatches: (String) -> Unit = { },
+    navigateBack: () -> Unit = {},
     onEditPlayerName: () -> Unit = { }
 ) {
 
@@ -126,76 +138,138 @@ fun PlayerDetailScreen(
         onRefresh = handleRetry
     )
 
-    RefreshableContainer(isRefreshing = isRefreshing, pullRefreshState = pullRefreshState) {
-        Surface(
-            modifier = modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.background
-        ) {
+    var isUnclaimPlayerDialogOpen by remember { mutableStateOf(false) }
 
-            if (uiState.errorMessage != null) {
-                val errorMessage = uiState.errorMessage
-                FullScreenErrorWithRetry(
-                    errorMessage = errorMessage
-                ) {
-                    handleRetry()
+
+    if (isUnclaimPlayerDialogOpen) {
+        UnclaimPlayerDialog(
+            onDismissRequest = { isUnclaimPlayerDialogOpen = false },
+            handleSavePlayer = {
+                coroutineScope.launch {
+                    handleClaimPlayerStatus(true)
                 }
-            } else {
-                Column(modifier = Modifier.fillMaxHeight()) {
-                    if (uiState.isLoading) {
-                        FullScreenLoadingIndicator("Player Details")
-                    } else {
-                        TabRow(
-                            selectedTabIndex = pagerState.currentPage,
-                            indicator = { tabPositions ->
-                                TabRowDefaults.SecondaryIndicator(
-                                    Modifier.tabIndicatorOffset(
-                                        tabPositions[pagerState.currentPage]
-                                    ),
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        ) {
-                            tabs.forEachIndexed { index, tab ->
-                                Tab(
-                                    text = { Text(text = tab) },
-                                    unselectedContentColor = MaterialTheme.colorScheme.tertiary,
-                                    selectedContentColor = MaterialTheme.colorScheme.secondary,
-                                    selected = pagerState.currentPage == index,
-                                    onClick = {
-                                        coroutineScope.launch {
-                                            pagerState.animateScrollToPage(index)
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                        HorizontalPager(
-                            modifier = Modifier.fillMaxWidth(),
-                            state = pagerState
-                        ) { page ->
-                            when (page) {
-                                0 -> PlayerStatsTab(
-                                    uiState = uiState,
-                                    handleSavePlayer = handleSavePlayer,
-                                    navigateToMatchDetails = navigateToMatchDetails,
-                                    handleSavePlayerName = handleSavePlayerName,
-                                    handlePlayerNameChange = handlePlayerNameChange,
-                                    navigateToMoreMatches = navigateToMoreMatches,
-                                    onEditPlayerName = onEditPlayerName
-                                )
+                isUnclaimPlayerDialogOpen = false
+            }
+        )
+    }
 
-                                1 -> PlayerHeroStatsTab(
-                                    uiState = uiState,
-                                    handlePlayerHeroStatsSelect = handlePlayerHeroStatsSelect
+    RefreshableContainer(isRefreshing = isRefreshing, pullRefreshState = pullRefreshState) {
+        Scaffold(
+            topBar = {
+                MonolithTopAppBar(
+                    title = "Player Details",
+                    titleStyle = MaterialTheme.typography.bodyLarge,
+                    backAction = {
+                        IconButton(onClick = navigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "navigate up"
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            if(uiState.isClaimed) {
+                                isUnclaimPlayerDialogOpen = true
+                            } else {
+                                handleClaimPlayerStatus(false)
+                            }
+                        }) {
+                            if(uiState.isClaimed) {
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = "unclaim player",
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Filled.FavoriteBorder,
+                                    contentDescription = "claim player",
                                 )
                             }
+
                         }
                     }
+                )
+            },
+        ) {
+            Surface(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(it),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                if (uiState.errorMessage != null) {
+                    val errorMessage = uiState.errorMessage
+                    FullScreenErrorWithRetry(
+                        errorMessage = errorMessage
+                    ) {
+                        handleRetry()
+                    }
+                } else {
+                    Column(modifier = Modifier.fillMaxHeight()) {
+                        if (uiState.isLoading) {
+                            FullScreenLoadingIndicator("Player Details")
+                        } else {
+                            uiState.player?.let {
+                                TabRow(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedTabIndex = pagerState.currentPage,
+                                    indicator = { tabPositions ->
+                                        TabRowDefaults.SecondaryIndicator(
+                                            Modifier.tabIndicatorOffset(
+                                                tabPositions[pagerState.currentPage]
+                                            ),
+                                            color = MaterialTheme.colorScheme.secondary
+                                        )
+                                    }
+                                ) {
+                                    tabs.forEachIndexed { index, tab ->
+                                        Tab(
+                                            text = {
+                                                Text(
+                                                    text = tab,
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                            },
+                                            unselectedContentColor = MaterialTheme.colorScheme.tertiary,
+                                            selectedContentColor = MaterialTheme.colorScheme.secondary,
+                                            selected = pagerState.currentPage == index,
+                                            onClick = {
+                                                coroutineScope.launch {
+                                                    pagerState.animateScrollToPage(index)
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                            HorizontalPager(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface),
+                                state = pagerState
+                            ) { page ->
+                                when (page) {
+                                    0 -> PlayerStatsTab(
+                                        uiState = uiState,
+                                        navigateToMatchDetails = navigateToMatchDetails,
+                                        handleSavePlayerName = handleSavePlayerName,
+                                        handlePlayerNameChange = handlePlayerNameChange,
+                                        navigateToMoreMatches = navigateToMoreMatches,
+                                        onEditPlayerName = onEditPlayerName
+                                    )
 
+                                    1 -> PlayerHeroStatsTab(
+                                        uiState = uiState,
+                                        handlePlayerHeroStatsSelect = handlePlayerHeroStatsSelect
+                                    )
+                                }
+                            }
+                        }
+
+                    }
                 }
             }
-
-
         }
     }
 }
@@ -204,7 +278,6 @@ fun PlayerDetailScreen(
 fun PlayerStatsTab(
     uiState: PlayerDetailsUiState,
     modifier: Modifier = Modifier,
-    handleSavePlayer: suspend (Boolean) -> Unit = {},
     handlePlayerNameChange: (String) -> Unit = {},
     handleSavePlayerName: () -> Unit = {},
     navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
@@ -212,32 +285,57 @@ fun PlayerStatsTab(
     onEditPlayerName: () -> Unit = { }
 ) {
 
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        uiState.player.let { playerDetails ->
-            PlayerCard(
-                player = playerDetails,
-                claimedPlayerName = uiState.claimedPlayerName,
-                playerNameField = uiState.playerNameField,
-                isEditingPlayerName = uiState.isEditingPlayerName,
-                isClaimed = uiState.isClaimed,
-                handleSavePlayer = handleSavePlayer,
-                stats = uiState.stats,
-                onPlayerNameChange = handlePlayerNameChange,
-                handleSavePlayerName = handleSavePlayerName,
-                onEditPlayerName = onEditPlayerName
-            )
-            Spacer(modifier = Modifier.size(32.dp))
+        item {
+            uiState.player?.let { playerDetails ->
+                PlayerProfilePlayerStatsCard(
+                    playerDetails = playerDetails,
+                    stats = listOf(
+                        StatLine.SingleStatLine("Win rate", uiState.stats?.winRate ?: "0%"),
+                        StatLine.SingleStatLine(
+                            "Matches played",
+                            uiState.stats?.matchesPlayed ?: "0"
+                        ),
+                        StatLine.SingleStatLine(
+                            "Favorite hero",
+                            uiState.stats?.favoriteHero ?: "N/A"
+                        ),
+                        StatLine.SingleStatLine(
+                            "Favorite role",
+                            uiState.stats?.favoriteRole ?: "N/A"
+                        ),
+                        StatLine.MultiStatLine(
+                            "Average KDA",
+                            uiState.stats?.averageKda ?: listOf("0", "0", "0")
+                        ),
+                        StatLine.SingleStatLine(
+                            "Average PS",
+                            uiState.stats?.averagePerformanceScore ?: "0 PS"
+                        )
+                    ),
+                    handleSavePlayerName = handleSavePlayerName,
+                    onPlayerNameChange = handlePlayerNameChange,
+                    onEditPlayerName = onEditPlayerName,
+                    isClaimed = uiState.isClaimed,
+                    playerNameField = uiState.playerNameField,
+                    claimedPlayerName = uiState.claimedPlayerName,
+                    isEditingPlayerName = uiState.isEditingPlayerName
+
+                )
+            }
+        }
+        item {
             MatchesList(
                 playerId = uiState.playerId,
                 matches = uiState.matches,
                 navigateToMatchDetails = navigateToMatchDetails,
                 navigateToMoreMatches = navigateToMoreMatches
             )
-
         }
     }
 }
@@ -276,7 +374,8 @@ fun PlayerHeroStatsTab(
             onSelect = {
                 selectedHero = uiState.allHeroes.firstOrNull { hero ->
                     hero.name == it
-            }},
+                }
+            },
             heroes = uiState.allHeroes
         )
         Spacer(modifier = Modifier.size(32.dp))
