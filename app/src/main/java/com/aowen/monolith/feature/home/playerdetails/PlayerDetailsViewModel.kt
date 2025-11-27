@@ -12,6 +12,7 @@ import com.aowen.monolith.data.database.dao.ClaimedPlayerDao
 import com.aowen.monolith.data.repository.heroes.HeroRepository
 import com.aowen.monolith.data.repository.matches.MatchRepository
 import com.aowen.monolith.data.repository.players.di.PlayerRepository
+import com.aowen.monolith.di.IoDispatcher
 import com.aowen.monolith.logDebug
 import com.aowen.monolith.network.AuthRepository
 import com.aowen.monolith.network.UserClaimedPlayerRepository
@@ -20,6 +21,8 @@ import com.aowen.monolith.network.UserRepository
 import com.aowen.monolith.network.UserState
 import com.aowen.monolith.network.getOrThrow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -62,6 +65,7 @@ fun HeroDetails.asHeroUiModel(): HeroUiModel {
 @HiltViewModel
 class PlayerDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    @IoDispatcher val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val omedaCityHeroRepository: HeroRepository,
     private val omedaCityMatchRepository: MatchRepository,
     private val omedaCityPlayerRepository: PlayerRepository,
@@ -149,7 +153,7 @@ class PlayerDetailsViewModel @Inject constructor(
 
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             try {
                 val playerId = playerId ?: getFreshPlayerId()
                 if(playerId == null) {

@@ -10,9 +10,9 @@ data class BaseStatsDto(
     @SerialName("base_health_regeneration")
     val healthRegen: List<Float>,
     @SerialName("max_mana")
-    val maxMana: List<Float>,
+    val maxMana: List<Float>?,
     @SerialName("base_mana_regeneration")
-    val manaRegen: List<Float>,
+    val manaRegen: List<Float>?,
     @SerialName("attack_speed")
     val attackSpeed: List<Float>,
     @SerialName("physical_armor")

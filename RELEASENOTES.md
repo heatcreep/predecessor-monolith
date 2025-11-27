@@ -1,5 +1,14 @@
 # Release Notes
 
+## 1.9.7 - Latest
+
+#### New Features
+
+- Added Images for Bayle and Eden
+
+#### Improvements & Bug Fixes
+- Fix Player Detail page error due to missing mana info for Eden since she has no mana.
+
 ## 1.9.5 - Latest
 
 #### New Features

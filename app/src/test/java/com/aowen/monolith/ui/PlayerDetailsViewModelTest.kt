@@ -73,6 +73,7 @@ class PlayerDetailsViewModelTest {
     @Before
     fun setup() {
         viewModel = PlayerDetailsViewModel(
+            dispatcher = mainDispatcherRule.testDispatcher,
             savedStateHandle = SavedStateHandle(
                 mapOf(
                     "playerId" to "validPlayerId"
@@ -115,6 +116,7 @@ class PlayerDetailsViewModelTest {
     @Test
     fun `initViewModel() should set UiState to error if playerId fails`() = runTest {
         viewModel = PlayerDetailsViewModel(
+            dispatcher = mainDispatcherRule.testDispatcher,
             savedStateHandle = SavedStateHandle(
                 mapOf(
                     "playerId" to "validPlayerId"
@@ -149,6 +151,7 @@ class PlayerDetailsViewModelTest {
             )
         )
         viewModel = PlayerDetailsViewModel(
+            dispatcher = mainDispatcherRule.testDispatcher,
             savedStateHandle = SavedStateHandle(
                 mapOf(
                     "playerId" to "Error"
@@ -180,6 +183,7 @@ class PlayerDetailsViewModelTest {
         coEvery { playerRepository.fetchPlayerInfo(any()) } returns Resource.Success(fakePlayerInfo)
         coEvery { playerRepository.fetchAllPlayerHeroStats(any()) } returns Resource.NetworkError(404)
         viewModel = PlayerDetailsViewModel(
+            dispatcher = mainDispatcherRule.testDispatcher,
             savedStateHandle = SavedStateHandle(
                 mapOf(
                     "playerId" to "Error"
@@ -213,6 +217,7 @@ class PlayerDetailsViewModelTest {
             "Failed to fetch matches"
         )
         viewModel = PlayerDetailsViewModel(
+            dispatcher = mainDispatcherRule.testDispatcher,
             savedStateHandle = SavedStateHandle(
                 mapOf(
                     "playerId" to "Error"
@@ -247,6 +252,7 @@ class PlayerDetailsViewModelTest {
             networkErrorMessage
         )
         viewModel = PlayerDetailsViewModel(
+            dispatcher = mainDispatcherRule.testDispatcher,
             savedStateHandle = SavedStateHandle(
                 mapOf(
                     "playerId" to "Error"

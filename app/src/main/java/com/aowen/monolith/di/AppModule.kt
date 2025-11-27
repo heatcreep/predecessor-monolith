@@ -45,16 +45,26 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class IoDispatcher
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
     @Provides
+    @IoDispatcher
+    fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
     @Singleton
     fun providesClaimedPlayerPreferencesManager(@ApplicationContext appContext: Context): ClaimedPlayerPreferencesManager {
         return ClaimedPlayerPreferencesManagerImpl(appContext)
