@@ -1,0 +1,23 @@
+plugins {
+    alias(libs.plugins.predcompanion.android.library)
+    alias(libs.plugins.predcompanion.android.library.compose)
+}
+
+android {
+    namespace = "com.aowen.monolith.core.designsystem"
+}
+
+dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:resources"))
+    implementation(project(":core:data"))
+    implementation(project(":core:datastore"))
+
+    api(libs.androidx.compose.material3)
+    api(libs.androidx.compose.material3.adaptive)
+    api(libs.androidx.compose.material3.navigationSuite)
+    api(libs.androidx.compose.material.icons.extended)
+    api(libs.androidx.compose.ui.tooling)
+    api(libs.androidx.compose.ui.tooling.preview)
+    api(libs.coil.compose)
+}

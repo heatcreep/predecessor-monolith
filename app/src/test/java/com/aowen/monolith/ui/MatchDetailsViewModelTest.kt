@@ -10,9 +10,9 @@ import com.aowen.monolith.fakes.data.fakeDuskTeam
 import com.aowen.monolith.fakes.data.fakeMatchDetailsWithItems
 import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
 import com.aowen.monolith.fakes.repo.FakeOmedaCityMatchRepository
-import com.aowen.monolith.feature.matches.MatchDetailsErrors
-import com.aowen.monolith.feature.matches.MatchDetailsUiState
-import com.aowen.monolith.feature.matches.MatchDetailsViewModel
+import com.aowen.monolith.feature.matches.matchdetails.MatchDetailsErrors
+import com.aowen.monolith.feature.matches.matchdetails.MatchDetailsUiState
+import com.aowen.monolith.feature.matches.matchdetails.MatchDetailsViewModel
 import com.aowen.monolith.network.Resource
 import com.aowen.monolith.utils.MainDispatcherRule
 import io.mockk.coEvery

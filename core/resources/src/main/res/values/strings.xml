@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Shared strings used by core modules -->
+    <string name="player_profile_average_kda">Average KDA:</string>
+</resources>

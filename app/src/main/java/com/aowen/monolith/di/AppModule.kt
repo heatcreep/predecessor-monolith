@@ -27,7 +27,6 @@ import com.aowen.monolith.network.UserRecentSearchRepository
 import com.aowen.monolith.network.UserRecentSearchRepositoryImpl
 import com.aowen.monolith.network.UserRepository
 import com.aowen.monolith.network.UserRepositoryImpl
-import com.aowen.monolith.network.utils.NetworkUtil.getOkHttpClientWithCache
 import com.aowen.monolith.ui.model.BuildListItemUiMapper
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -51,12 +50,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
-import javax.inject.Qualifier
 import javax.inject.Singleton
-
-@Retention(AnnotationRetention.BINARY)
-@Qualifier
-annotation class IoDispatcher
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -64,6 +58,10 @@ object AppModule {
     @Provides
     @IoDispatcher
     fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @Provides
+    @SupabaseApiKey
+    fun providesSupabaseApiKey(): String = BuildConfig.SUPABASE_API_KEY
 
     @Singleton
     fun providesClaimedPlayerPreferencesManager(@ApplicationContext appContext: Context): ClaimedPlayerPreferencesManager {
@@ -92,25 +90,20 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(@ApplicationContext appContext: Context, json: Json): Retrofit {
+    fun provideRetrofit(json: Json): Retrofit {
 
         return Retrofit.Builder()
             .baseUrl(RetrofitHelper.baseUrl)
             .addConverterFactory(
                 json.asConverterFactory("application/json".toMediaType())
             )
-            .client(getOkHttpClientWithCache(appContext))
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideSupabaseClient(@ApplicationContext appContext: Context): SupabaseClient {
-        val httpClient = HttpClient(OkHttp) {
-            engine {
-                preconfigured = getOkHttpClientWithCache(appContext)
-            }
-        }
+    fun provideSupabaseClient(): SupabaseClient {
+        val httpClient = HttpClient(OkHttp)
         val client = createSupabaseClient(
             supabaseUrl = BuildConfig.SUPABASE_URL,
             supabaseKey = BuildConfig.SUPABASE_API_KEY
@@ -146,8 +139,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideSupabaseAuthService(auth: Auth, functions: Functions): SupabaseAuthService {
-        return SupabaseAuthServiceImpl(auth, functions)
+    fun provideSupabaseAuthService(
+        auth: Auth,
+        functions: Functions,
+        @SupabaseApiKey supabaseApiKey: String
+    ): SupabaseAuthService {
+        return SupabaseAuthServiceImpl(auth, functions, supabaseApiKey)
     }
 
     @Provides

@@ -1,14 +1,13 @@
+
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.predcompanion.android.application)
+    alias(libs.plugins.predcompanion.android.application.compose)
+    alias(libs.plugins.predcompanion.hilt)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.google.services)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -63,9 +62,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
     buildFeatures {
         compose = true
         buildConfig = true
@@ -96,66 +92,82 @@ fun getEnvironmentVariable(key: String): String? {
 }
 
 dependencies {
-    coreLibraryDesugaring(libs.desugar.jdk.libs)
-    implementation(platform(libs.firebase.bom))
+
+    // Core modules
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
+    implementation(project(":core:database"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:network"))
+    implementation(project(":core:data"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:navigation"))
+
+    implementation(project(":feature:auth"))
+    implementation(project(":feature:builds"))
+    implementation(project(":feature:heroes"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:items"))
+    implementation(project(":feature:profile"))
+
+    // Android / Kotlin
+    coreLibraryDesugaring(libs.android.desugarJdkLibs)
     implementation(platform(libs.kotlin.bom))
-    compileOnly(libs.android.gradle.plugin)
-    compileOnly(libs.kotlin.gradle.plugin)
-    compileOnly(libs.ksp.gradle)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.firebase.crashlytics)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.compose.ui.tooling)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.kotlinx.immutable.collections)
 
+    // Navigation
+    implementation(libs.androidx.compose.navigation)
+    implementation(libs.androidx.navigation3.ui)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.app.distribution.api)
     "firebaseDistributionImplementation"(libs.firebase.app.distribution)
 
-    implementation(libs.androidx.compose.navigation)
-
+    // Glance (App Widget)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
 
+    // Accompanist (used by feature screens still in app)
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.page.indictators)
-
     "firebaseDistributionImplementation"(libs.accompanist.permissions)
 
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    ksp(libs.hilt.compiler)
+    // Hilt
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.work)
+    ksp(libs.hilt.compiler)
 
+    // Markdown (used by feature screens still in app)
     implementation(libs.meetup.markdown)
 
-    implementation(libs.kotlinx.serialization)
-    implementation(libs.retrofit.serialization.converter)
-
+    // Paging (used by feature screens still in app)
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 
+    // Image loading (used by feature screens still in app)
     implementation(libs.coil.compose)
 
-    implementation(libs.supabase.gotrue)
+    // Serialization + Retrofit (AppModule.kt creates Json & Retrofit instances)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.serialization.converter)
+
+    // Supabase (AppModule.kt creates SupabaseClient)
     implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.gotrue)
     implementation(libs.supabase.postgres)
     implementation(libs.supabase.functions)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.okhttp)
 
-    // Room DB
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
-
-    implementation(libs.androidx.room.ktx)
-
+    // WorkManager
     implementation(libs.androidx.work)
 
+    // Test
     testImplementation(libs.junit4)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.paging.testing)
