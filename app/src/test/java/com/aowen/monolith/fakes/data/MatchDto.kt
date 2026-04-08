@@ -1,8 +1,8 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.MatchDto
-import com.aowen.monolith.data.MatchPlayerDto
-import com.aowen.monolith.data.TeamDto
+import com.aowen.predcompanion.data.MatchDto
+import com.aowen.predcompanion.data.MatchPlayerDto
+import com.aowen.predcompanion.data.TeamDto
 
 val fakeMatchPlayerDto = MatchPlayerDto(
     id = "player1",

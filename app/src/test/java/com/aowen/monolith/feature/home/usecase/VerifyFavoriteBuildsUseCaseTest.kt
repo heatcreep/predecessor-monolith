@@ -1,8 +1,8 @@
-package com.aowen.monolith.feature.home.usecase
+package com.aowen.predcompanion.feature.home.usecase
 
-import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
-import com.aowen.monolith.network.Resource
-import com.aowen.monolith.network.UserFavoriteBuildsRepository
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityBuildRepository
+import com.aowen.predcompanion.core.network.Resource
+import com.aowen.predcompanion.network.UserFavoriteBuildsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just

@@ -1,21 +1,21 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package com.aowen.monolith.ui
+package com.aowen.predcompanion.ui
 
 import com.aowen.monolith.data.asFavoriteBuildListItem
-import com.aowen.monolith.fakes.ClaimedPlayerScenario
-import com.aowen.monolith.fakes.FakeUserClaimedPlayerRepository
-import com.aowen.monolith.fakes.FakeUserFavoriteBuildsRepository
-import com.aowen.monolith.fakes.data.fakeClaimedPlayer
-import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
-import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
-import com.aowen.monolith.feature.home.HomeScreenUiState
-import com.aowen.monolith.feature.home.HomeScreenViewModel
-import com.aowen.monolith.feature.home.usecase.VerifyFavoriteBuildsUseCase
-import com.aowen.monolith.network.ClaimedPlayerState
-import com.aowen.monolith.ui.model.BuildListItemUiMapper
-import com.aowen.monolith.utils.MainDispatcherRule
+import com.aowen.predcompanion.fakes.ClaimedPlayerScenario
+import com.aowen.predcompanion.fakes.FakeUserClaimedPlayerRepository
+import com.aowen.predcompanion.fakes.FakeUserFavoriteBuildsRepository
+import com.aowen.predcompanion.fakes.data.fakeClaimedPlayer
+import com.aowen.predcompanion.fakes.data.fakeHeroStatisticsResult
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityBuildRepository
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityHeroRepository
+import com.aowen.predcompanion.feature.home.HomeScreenUiState
+import com.aowen.predcompanion.feature.home.HomeScreenViewModel
+import com.aowen.predcompanion.feature.home.usecase.VerifyFavoriteBuildsUseCase
+import com.aowen.predcompanion.core.data.repository.user.ClaimedPlayerState
+import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
+import com.aowen.predcompanion.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi

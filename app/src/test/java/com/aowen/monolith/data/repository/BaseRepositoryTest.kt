@@ -1,4 +1,4 @@
-package com.aowen.monolith.data.repository
+package com.aowen.predcompanion.data.repository
 
 open class BaseRepositoryTest {
     companion object {

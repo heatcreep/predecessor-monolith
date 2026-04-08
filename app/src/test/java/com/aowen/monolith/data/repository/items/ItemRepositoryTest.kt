@@ -1,9 +1,9 @@
-package com.aowen.monolith.data.repository.items
+package com.aowen.predcompanion.data.repository.items
 
-import com.aowen.monolith.data.asItemDetails
-import com.aowen.monolith.fakes.FakeOmedaCityService
-import com.aowen.monolith.fakes.data.fakeItemDto
-import com.aowen.monolith.network.Resource
+import com.aowen.predcompanion.data.asItemDetails
+import com.aowen.predcompanion.fakes.FakeOmedaCityService
+import com.aowen.predcompanion.fakes.data.fakeItemDto
+import com.aowen.predcompanion.core.network.Resource
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

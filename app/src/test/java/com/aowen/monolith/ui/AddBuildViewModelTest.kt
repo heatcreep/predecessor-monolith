@@ -1,12 +1,12 @@
 package com.aowen.monolith.ui
 
-import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.data.getHeroRole
-import com.aowen.monolith.fakes.FakeUserPreferencesManager
-import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
-import com.aowen.monolith.feature.builds.addbuild.AddBuildViewModel
-import com.aowen.monolith.utils.MainDispatcherRule
+import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.core.model.data.getHeroRole
+import com.aowen.predcompanion.fakes.FakeUserPreferencesManager
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityHeroRepository
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityItemRepository
+import com.aowen.predcompanion.feature.builds.addbuild.AddBuildViewModel
+import com.aowen.predcompanion.utils.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test

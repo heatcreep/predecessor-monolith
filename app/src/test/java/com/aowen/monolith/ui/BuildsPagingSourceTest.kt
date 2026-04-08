@@ -1,16 +1,16 @@
-package com.aowen.monolith.ui
+package com.aowen.predcompanion.ui
 
 import androidx.paging.PagingConfig
 import androidx.paging.PagingSource.LoadResult
 import androidx.paging.testing.TestPager
-import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.asBuildListItem
-import com.aowen.monolith.fakes.data.fakeBuildDto
-import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
-import com.aowen.monolith.fakes.repo.resetPageCount
-import com.aowen.monolith.feature.builds.BuildsPagingSource
-import com.aowen.monolith.network.Resource
-import com.aowen.monolith.ui.model.BuildListItemUiMapper
+import com.aowen.predcompanion.data.BuildListItem
+import com.aowen.predcompanion.data.asBuildListItem
+import com.aowen.predcompanion.fakes.data.fakeBuildDto
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityBuildRepository
+import com.aowen.predcompanion.fakes.repo.resetPageCount
+import com.aowen.predcompanion.feature.builds.BuildsPagingSource
+import com.aowen.predcompanion.core.network.Resource
+import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest

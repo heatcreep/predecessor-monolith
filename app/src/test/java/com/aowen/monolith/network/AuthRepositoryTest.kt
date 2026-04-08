@@ -1,10 +1,12 @@
-package com.aowen.monolith.network
+package com.aowen.predcompanion.network
 
-import com.aowen.monolith.data.database.dao.FakeClaimedPlayerDao
-import com.aowen.monolith.fakes.FakeSupabaseAuthService
+import com.aowen.predcompanion.data.database.dao.FakeClaimedPlayerDao
+import com.aowen.predcompanion.fakes.FakeSupabaseAuthService
 import com.aowen.monolith.fakes.FakeSupabasePostgrestService
-import com.aowen.monolith.fakes.FakeUserPreferencesManager
+import com.aowen.predcompanion.fakes.FakeUserPreferencesManager
 import com.aowen.monolith.utils.MainDispatcherRule
+import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
+import com.aowen.predcompanion.core.data.repository.auth.SupabaseAuthRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -22,7 +24,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `signInWithDiscord calls authService loginWithDiscord()`() = runTest {
-        authRepository = AuthRepositoryImpl(
+        authRepository = SupabaseAuthRepository(
             authService = FakeSupabaseAuthService(),
             postgrestService = FakeSupabasePostgrestService(),
             userPreferencesManager = FakeUserPreferencesManager(),
@@ -35,7 +37,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `signInWithDiscord returns failure result on timeout`() = runTest {
-        authRepository = AuthRepositoryImpl(
+        authRepository = SupabaseAuthRepository(
             authService = FakeSupabaseAuthService(resCode = 408),
             postgrestService = FakeSupabasePostgrestService(),
             userPreferencesManager = FakeUserPreferencesManager(),
@@ -48,7 +50,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `signInWithDiscord returns failure result on rest exception`() = runTest {
-        authRepository = AuthRepositoryImpl(
+        authRepository = SupabaseAuthRepository(
             authService = FakeSupabaseAuthService(resCode = 400),
             postgrestService = FakeSupabasePostgrestService(),
             userPreferencesManager = FakeUserPreferencesManager(),
@@ -61,7 +63,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `signInWithDiscord returns failure result on http exception`() = runTest {
-        authRepository = AuthRepositoryImpl(
+        authRepository = SupabaseAuthRepository(
             authService = FakeSupabaseAuthService(resCode = 500),
             postgrestService = FakeSupabasePostgrestService(),
             userPreferencesManager = FakeUserPreferencesManager(),
@@ -74,7 +76,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `getPlayer returns user session on 200`() = runTest {
-        authRepository = AuthRepositoryImpl(
+        authRepository = SupabaseAuthRepository(
             authService = FakeSupabaseAuthService(
                 resCode = 200
             ),
@@ -90,7 +92,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `getPlayer returns null on not 200`() = runTest {
-        authRepository = AuthRepositoryImpl(
+        authRepository = SupabaseAuthRepository(
             authService = FakeSupabaseAuthService(),
             postgrestService = FakeSupabasePostgrestService(),
             userPreferencesManager = FakeUserPreferencesManager(),
@@ -103,7 +105,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `deleteUserAccount returns success on 200`() = runTest {
-        authRepository = AuthRepositoryImpl(
+        authRepository = SupabaseAuthRepository(
             authService = FakeSupabaseAuthService(resCode = 200),
             postgrestService = FakeSupabasePostgrestService(),
             userPreferencesManager = FakeUserPreferencesManager(),
@@ -116,7 +118,7 @@ class AuthRepositoryTest {
 
     @Test
     fun `deleteUserAccount returns failure on not 200`() = runTest {
-        authRepository = AuthRepositoryImpl(
+        authRepository = SupabaseAuthRepository(
             authService = FakeSupabaseAuthService(),
             postgrestService = FakeSupabasePostgrestService(),
             userPreferencesManager = FakeUserPreferencesManager(),

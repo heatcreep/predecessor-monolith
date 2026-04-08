@@ -1,11 +1,11 @@
-package com.aowen.monolith.fakes.repo
+package com.aowen.predcompanion.fakes.repo
 
-import com.aowen.monolith.data.MatchDetails
-import com.aowen.monolith.data.MatchesDetails
-import com.aowen.monolith.data.asMatchDetails
-import com.aowen.monolith.data.repository.matches.MatchRepository
-import com.aowen.monolith.fakes.data.fakeMatchDto
-import com.aowen.monolith.network.Resource
+import com.aowen.predcompanion.data.MatchDetails
+import com.aowen.predcompanion.data.MatchesDetails
+import com.aowen.predcompanion.data.asMatchDetails
+import com.aowen.predcompanion.data.repository.matches.MatchRepository
+import com.aowen.predcompanion.fakes.data.fakeMatchDto
+import com.aowen.predcompanion.core.network.Resource
 
 class FakeOmedaCityMatchRepository : MatchRepository {
     override suspend fun fetchMatchesById(

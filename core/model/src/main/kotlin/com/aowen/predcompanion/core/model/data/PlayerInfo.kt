@@ -1,0 +1,9 @@
+package com.aowen.predcompanion.core.model.data
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class PlayerInfo(
+    val playerDetails: PlayerDetails,
+    val playerStats: PlayerStats
+)

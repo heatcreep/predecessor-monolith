@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes
+package com.aowen.predcompanion.fakes
 
-import com.aowen.monolith.network.SupabaseAuthService
+import com.aowen.predcompanion.core.network.SupabaseAuthService
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession

@@ -1,15 +1,15 @@
 package com.aowen.monolith.fakes.repo
 
-import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerHeroStats
-import com.aowen.monolith.data.PlayerInfo
-import com.aowen.monolith.data.asPlayerDetails
-import com.aowen.monolith.data.asPlayerHeroStats
-import com.aowen.monolith.data.repository.players.di.PlayerRepository
-import com.aowen.monolith.fakes.data.fakePlayerDto
-import com.aowen.monolith.fakes.data.fakePlayerHeroStatsDto
-import com.aowen.monolith.fakes.data.fakePlayerInfo
-import com.aowen.monolith.network.Resource
+import com.aowen.predcompanion.core.model.data.PlayerDetails
+import com.aowen.predcompanion.data.PlayerHeroStats
+import com.aowen.predcompanion.data.PlayerInfo
+import com.aowen.predcompanion.data.asPlayerDetails
+import com.aowen.predcompanion.data.asPlayerHeroStats
+import com.aowen.predcompanion.data.repository.players.di.PlayerRepository
+import com.aowen.predcompanion.fakes.data.fakePlayerDto
+import com.aowen.predcompanion.fakes.data.fakePlayerHeroStatsDto
+import com.aowen.predcompanion.fakes.data.fakePlayerInfo
+import com.aowen.predcompanion.core.network.Resource
 
 class FakeOmedaCityPlayerRepository : PlayerRepository {
     override suspend fun fetchPlayersByName(playerName: String): Resource<List<PlayerDetails>> =

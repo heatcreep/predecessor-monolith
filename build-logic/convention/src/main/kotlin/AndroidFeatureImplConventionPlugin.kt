@@ -11,22 +11,22 @@ class AndroidFeatureImplConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "predcompanion.android.library")
+            apply(plugin = "predcompanion.android.library.compose")
             apply(plugin = "predcompanion.hilt")
-            apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
 
             extensions.configure<LibraryExtension> {
                 testOptions.animationsDisabled = true
             }
 
             dependencies {
+                "implementation"(project(":core:ui"))
+                "implementation"(project(":core:designsystem"))
 
-
-                "api"(project(":core:navigation"))
-                "implementation"(libs.findLibrary("androidx.navigation3.ui").get())
                 "implementation"(libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
                 "implementation"(libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
                 "implementation"(libs.findLibrary("androidx.hilt.lifecycle.viewModelCompose").get())
                 "implementation"(libs.findLibrary("androidx.navigation3.runtime").get())
+                "implementation"(libs.findLibrary("androidx.navigation3.ui").get())
             }
         }
     }

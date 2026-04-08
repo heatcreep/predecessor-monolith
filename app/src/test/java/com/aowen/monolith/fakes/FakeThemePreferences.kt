@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes
+package com.aowen.predcompanion.fakes
 
-import com.aowen.monolith.data.datastore.Theme
+import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.monolith.data.datastore.ThemePreferences
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

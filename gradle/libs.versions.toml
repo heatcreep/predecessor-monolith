@@ -1,6 +1,6 @@
 [versions]
 accompanist = "0.34.0"
-androidGradlePlugin = "8.9.0"
+androidGradlePlugin = "9.0.0"
 androidXActivityCompose = "1.9.1"
 androidXAnnotation = "1.5.1"
 androidXCoreKtx = "1.13.1"
@@ -22,7 +22,7 @@ androidXWork = "2.9.1"
 coilCompose = "2.6.0"
 androidXComposeBom = "2025.09.01"
 composeNavigation = "2.8.8"
-daggerHilt = "2.57.2"
+daggerHilt = "2.59"
 daggerHiltCompose = "1.2.0"
 desugar_jdk_libs = "2.1.0"
 firebaseBom = "33.2.0"
@@ -51,7 +51,7 @@ accompanist-page-indictators = { module = "com.google.accompanist:accompanist-pa
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidXActivityCompose" }
-androidx-annotation-experimental = { group = "androidx.annotation", name = "annotation-experimental", version.ref = "androidXAnnotation"}
+androidx-annotation-experimental = { group = "androidx.annotation", name = "annotation-experimental", version.ref = "androidXAnnotation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidXCoreKtx" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidXDatastore" }
 androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidXEspresso" }
@@ -106,7 +106,6 @@ ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktorClientAndroid" }
 meetup-markdown = { module = "com.meetup:twain", version.ref = "meetupMarkdown" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-kotlin-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerialization" }
 retrofit-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerialization" }
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
 supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
@@ -140,7 +139,9 @@ room = { id = "androidx.room", version.ref = "room" }
 # Project-defined plugins
 predcompanion-android-application = { id = "predcompanion.android.application" }
 predcompanion-android-application-compose = { id = "predcompanion.android.application.compose" }
-predcompanion-android-feature-impl = { id = "predcompanion.android.feature.impl"}
+predcompanion-android-application-firebase = { id = "predcompanion.android.application.firebase" }
+predcompanion-android-feature-api = { id = "predcompanion.android.feature.api" }
+predcompanion-android-feature-impl = { id = "predcompanion.android.feature.impl" }
 predcompanion-android-library = { id = "predcompanion.android.library" }
 predcompanion-android-library-compose = { id = "predcompanion.android.library.compose" }
 predcompanion-android-room = { id = "predcompanion.android.room" }

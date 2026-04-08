@@ -1,8 +1,8 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.Team
-import com.aowen.monolith.data.asMatchDetails
-import com.aowen.monolith.data.getDetailsWithItems
+import com.aowen.predcompanion.data.Team
+import com.aowen.predcompanion.data.asMatchDetails
+import com.aowen.predcompanion.data.getDetailsWithItems
 
 val fakeMatchDetails = fakeMatchDto.asMatchDetails()
 

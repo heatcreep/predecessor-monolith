@@ -1,7 +1,7 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.EffectDto
-import com.aowen.monolith.data.ItemDto
+import com.aowen.predcompanion.data.EffectDto
+import com.aowen.predcompanion.data.ItemDto
 
 val effectDto1 = EffectDto(
     name = "Effect1",

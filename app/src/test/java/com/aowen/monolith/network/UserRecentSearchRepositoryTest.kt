@@ -1,15 +1,17 @@
-package com.aowen.monolith.network
+package com.aowen.predcompanion.network
 
 import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.asPlayerDetails
-import com.aowen.monolith.data.create
-import com.aowen.monolith.fakes.FakeSupabasePostgrestService
-import com.aowen.monolith.fakes.FakeUserRepository
-import com.aowen.monolith.fakes.RecentSearchStatus
-import com.aowen.monolith.fakes.UserScenario
+import com.aowen.predcompanion.data.asPlayerDetails
+import com.aowen.predcompanion.core.model.data.create
+import com.aowen.predcompanion.fakes.FakeSupabasePostgrestService
+import com.aowen.predcompanion.fakes.FakeUserRepository
+import com.aowen.predcompanion.fakes.RecentSearchStatus
+import com.aowen.predcompanion.fakes.UserScenario
 import com.aowen.monolith.fakes.data.fakeExistingPlayerSearchDto
-import com.aowen.monolith.fakes.data.fakePlayerDto
-import com.aowen.monolith.fakes.repo.FakeOmedaCityPlayerRepository
+import com.aowen.predcompanion.core.data.repository.user.UserRecentSearchRepository
+import com.aowen.predcompanion.core.data.repository.user.NetworkUserRecentSearchRepository
+import com.aowen.predcompanion.fakes.data.fakePlayerDto
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityPlayerRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -22,7 +24,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `calling getRecentSearches() should return list of recent searches`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository()
@@ -35,7 +37,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `calling getRecentSearches() should return empty list of user id is null`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository(UserScenario.UserNotFound)
@@ -49,7 +51,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `calling removeAllRecentSearches() should call postgrestService deleteAllRecentSearches()`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository()
@@ -62,7 +64,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `calling removeRecentSearch calls postgrestService deleteRecentSearch`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository()
@@ -75,7 +77,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `failed call to removeRecentSearch does not call postgrestService deleteRecentSearch`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService()
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository(UserScenario.UserNotFound)
@@ -87,7 +89,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `calling addRecentSearch calls postgrestService updateRecentSearch when search exists`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService(RecentSearchStatus.UPDATE)
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository()
@@ -100,7 +102,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `calling addRecentSearch calls postgrestService updateRecentSearch when search list is full`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService(RecentSearchStatus.FULL)
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository()
@@ -113,7 +115,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `calling addRecentSearch calls postgrestService insertRecentSearch when search does not exist`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService(RecentSearchStatus.ADD)
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository()
@@ -126,7 +128,7 @@ class UserRecentSearchRepositoryTest {
     @Test
     fun `failed call to addRecentSearch does not call postgrestService insertRecentSearch`() = runTest {
         val fakeSupabasePostgrestService = FakeSupabasePostgrestService(RecentSearchStatus.ADD)
-        userRecentSearchRepository = UserRecentSearchRepositoryImpl(
+        userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
             userRepository = FakeUserRepository(UserScenario.UserNotFound)

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Shared strings used by core modules -->
-    <string name="player_profile_average_kda">Average KDA:</string>
+    <string name="core_resources_app_name">PredCompanion</string>
+    <string name="core_resources_icon_home">Home</string>
+    <string name="core_resources_icon_heroes">Heroes</string>
+    <string name="core_resources_icon_items">Items</string>
+    <string name="core_resources_icon_profile">Profile</string>
+    <string name="core_resources_icon_builds">Builds</string>
+    <string name="core_resources_player_profile_average_kda">Average KDA:</string>
 </resources>

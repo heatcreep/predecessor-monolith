@@ -4,6 +4,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.predcompanion.android.application)
     alias(libs.plugins.predcompanion.android.application.compose)
+    alias(libs.plugins.predcompanion.android.application.firebase)
     alias(libs.plugins.predcompanion.hilt)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.google.services)
@@ -11,13 +12,13 @@ plugins {
 }
 
 android {
-    namespace = "com.aowen.monolith"
-    compileSdk = 35
+    namespace = "com.aowen.predcompanion"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.aowen.monolith"
+        applicationId = "com.aowen.predcompanion"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = (System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1) + 1
         versionName = System.getenv("VERSION_NAME") ?: "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -41,11 +42,6 @@ android {
     buildTypes {
         debug {
             isDebuggable = true
-        }
-        register("firebaseDistribution") {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("debug")
         }
         release {
             isMinifyEnabled = true
@@ -93,61 +89,62 @@ fun getEnvironmentVariable(key: String): String? {
 
 dependencies {
 
-    // Core modules
-    implementation(project(":core:model"))
-    implementation(project(":core:common"))
-    implementation(project(":core:database"))
-    implementation(project(":core:datastore"))
-    implementation(project(":core:network"))
-    implementation(project(":core:data"))
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:navigation"))
+    // Feature modules
+    implementation(projects.feature.auth.api)
+    implementation(projects.feature.auth.impl)
+    implementation(projects.feature.builds.api)
+    implementation(projects.feature.builds.impl)
+    implementation(projects.feature.heroes.api)
+    implementation(projects.feature.heroes.impl)
+    implementation(projects.feature.home.api)
+    implementation(projects.feature.home.impl)
+    implementation(projects.feature.items.api)
+    implementation(projects.feature.items.impl)
+    implementation(projects.feature.matches.api)
+    implementation(projects.feature.matches.impl)
+    implementation(projects.feature.profile.api)
+    implementation(projects.feature.profile.impl)
+    implementation(projects.feature.search.api)
+    implementation(projects.feature.search.impl)
 
-    implementation(project(":feature:auth"))
-    implementation(project(":feature:builds"))
-    implementation(project(":feature:heroes"))
-    implementation(project(":feature:home"))
-    implementation(project(":feature:items"))
-    implementation(project(":feature:profile"))
+    // Core modules
+    implementation(projects.core.analytics)
+    implementation(projects.core.common)
+    implementation(projects.core.data)
+    implementation(projects.core.database)
+    implementation(projects.core.datastore)
+    implementation(projects.core.designsystem)
+    implementation(projects.core.model)
+    implementation(projects.core.navigation)
+    implementation(projects.core.network)
+    implementation(projects.core.resources)
+    implementation(projects.core.ui)
 
     // Android / Kotlin
-    coreLibraryDesugaring(libs.android.desugarJdkLibs)
-    implementation(platform(libs.kotlin.bom))
+
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
     implementation(libs.kotlinx.immutable.collections)
 
-    // Navigation
+    // Compose
+    implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.navigation)
-    implementation(libs.androidx.navigation3.ui)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.app.distribution.api)
-    "firebaseDistributionImplementation"(libs.firebase.app.distribution)
+    // Navigation
+    implementation(libs.androidx.navigation3.ui)
 
     // Glance (App Widget)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
 
-    // Accompanist (used by feature screens still in app)
-    implementation(libs.accompanist.pager)
-    implementation(libs.accompanist.page.indictators)
-    "firebaseDistributionImplementation"(libs.accompanist.permissions)
-
     // Hilt
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.hilt.work)
     ksp(libs.hilt.compiler)
+    implementation(libs.hilt.work)
 
     // Markdown (used by feature screens still in app)
     implementation(libs.meetup.markdown)
 
-    // Paging (used by feature screens still in app)
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.paging.compose)
 
     // Image loading (used by feature screens still in app)
     implementation(libs.coil.compose)

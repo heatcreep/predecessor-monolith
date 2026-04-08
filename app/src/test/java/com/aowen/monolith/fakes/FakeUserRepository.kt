@@ -1,8 +1,8 @@
-package com.aowen.monolith.fakes
+package com.aowen.predcompanion.fakes
 
-import com.aowen.monolith.data.UserInfo
-import com.aowen.monolith.fakes.data.fakeUserInfo
-import com.aowen.monolith.network.UserRepository
+import com.aowen.predcompanion.data.UserInfo
+import com.aowen.predcompanion.fakes.data.fakeUserInfo
+import com.aowen.predcompanion.network.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update

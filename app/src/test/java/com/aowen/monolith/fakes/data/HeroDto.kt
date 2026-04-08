@@ -1,7 +1,7 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.AbilityDto
-import com.aowen.monolith.data.HeroDto
+import com.aowen.predcompanion.data.AbilityDto
+import com.aowen.predcompanion.data.HeroDto
 
 val fakeHeroDto = HeroDto(
     id = 123,

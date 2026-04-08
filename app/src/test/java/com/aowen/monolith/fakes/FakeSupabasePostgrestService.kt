@@ -1,11 +1,11 @@
-package com.aowen.monolith.fakes
+package com.aowen.predcompanion.fakes
 
-import com.aowen.monolith.data.FavoriteBuildDto
+import com.aowen.predcompanion.data.FavoriteBuildDto
 import com.aowen.monolith.data.PlayerSearchDto
-import com.aowen.monolith.data.UserInfo
+import com.aowen.predcompanion.data.UserInfo
 import com.aowen.monolith.fakes.data.fakeExistingPlayerSearchDto
-import com.aowen.monolith.fakes.data.fakeNewPlayerSearchDto
-import com.aowen.monolith.network.SupabasePostgrestService
+import com.aowen.predcompanion.fakes.data.fakeNewPlayerSearchDto
+import com.aowen.predcompanion.core.network.SupabasePostgrestService
 import com.aowen.monolith.network.UserProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.UUID

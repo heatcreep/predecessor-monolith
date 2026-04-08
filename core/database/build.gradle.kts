@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.aowen.monolith.core.database"
+    namespace = "com.aowen.predcompanion.core.database"
 }
 
 dependencies {

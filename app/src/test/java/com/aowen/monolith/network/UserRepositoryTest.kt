@@ -1,8 +1,8 @@
-package com.aowen.monolith.network
+package com.aowen.predcompanion.network
 
 import com.aowen.monolith.data.UserInfo
-import com.aowen.monolith.fakes.FakeSupabaseAuthService
-import com.aowen.monolith.fakes.FakeSupabasePostgrestService
+import com.aowen.predcompanion.fakes.FakeSupabaseAuthService
+import com.aowen.predcompanion.fakes.FakeSupabasePostgrestService
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test

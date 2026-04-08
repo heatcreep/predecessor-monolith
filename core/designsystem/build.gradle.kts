@@ -4,14 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.aowen.monolith.core.designsystem"
+    namespace = "com.aowen.predcompanion.core.designsystem"
 }
 
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:resources"))
-    implementation(project(":core:data"))
-    implementation(project(":core:datastore"))
+    implementation(projects.core.datastore)
 
     api(libs.androidx.compose.material3)
     api(libs.androidx.compose.material3.adaptive)

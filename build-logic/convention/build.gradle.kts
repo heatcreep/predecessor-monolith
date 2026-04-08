@@ -34,13 +34,17 @@ tasks {
 
 gradlePlugin {
     plugins {
+        register("androidApplication") {
+            id = libs.plugins.predcompanion.android.application.asProvider().get().pluginId
+            implementationClass = "AndroidApplicationConventionPlugin"
+        }
         register("androidApplicationCompose") {
             id = libs.plugins.predcompanion.android.application.compose.get().pluginId
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
-        register("androidApplication") {
-            id = libs.plugins.predcompanion.android.application.asProvider().get().pluginId
-            implementationClass = "AndroidApplicationConventionPlugin"
+        register("androidApplicationFirebase") {
+            id = libs.plugins.predcompanion.android.application.firebase.get().pluginId
+            implementationClass = "AndroidApplicationFirebaseConventionPlugin"
         }
         register("androidLibraryCompose") {
             id = libs.plugins.predcompanion.android.library.compose.get().pluginId
@@ -49,6 +53,10 @@ gradlePlugin {
         register("androidLibrary") {
             id = libs.plugins.predcompanion.android.library.asProvider().get().pluginId
             implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidFeatureApi") {
+            id = libs.plugins.predcompanion.android.feature.api.get().pluginId
+            implementationClass = "AndroidFeatureApiConventionPlugin"
         }
         register("androidFeatureImpl") {
             id = libs.plugins.predcompanion.android.feature.impl.get().pluginId

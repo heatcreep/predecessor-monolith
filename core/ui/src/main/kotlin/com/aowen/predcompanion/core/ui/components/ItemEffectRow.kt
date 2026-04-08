@@ -1,0 +1,78 @@
+package com.aowen.predcompanion.ui.components
+
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.data.EffectDetails
+import com.aowen.predcompanion.ui.utils.StyledText
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ItemEffectRow(effect: EffectDetails) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+    ) {
+        FlowRow(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            StyledText(
+                content = if(effect.condition != null) {
+                    "${effect.name} - ${effect.condition}"
+                } else {
+                    effect.name
+                }
+            )
+        }
+        StyledText(content = effect.menuDescription ?: "")
+    }
+}
+
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ItemEffectRowPreview() {
+    MonolithTheme {
+        Surface {
+            ItemEffectRow(
+                effect = EffectDetails(
+                    name = "Elation",
+                    condition = "\u003CCondition\u003EAfter\u003C/Condition\u003E \u003CManaText\u003ELevel 6\u003C/ManaText\u003E\u003CCondition\u003E\u003C/Condition\u003E",
+                    menuDescription = "Healing or Shielding Allied Heroes grants you both 40 magical power and 20 ability haste for 5s."
+                )
+            )
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ItemEffectRowNoConditionPreview() {
+    MonolithTheme {
+        Surface {
+            ItemEffectRow(
+                effect = EffectDetails(
+                    name = "Elation",
+                    condition = null,
+                    menuDescription = "Healing or Shielding Allied Heroes grants you both 40 magical power and 20 ability haste for 5s."
+                )
+            )
+        }
+    }
+}

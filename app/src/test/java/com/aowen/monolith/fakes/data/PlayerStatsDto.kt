@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.PlayerStatsDto
+import com.aowen.predcompanion.data.PlayerStatsDto
 
 val fakePlayerStatsDto = PlayerStatsDto(
     matchesPlayed = 123,

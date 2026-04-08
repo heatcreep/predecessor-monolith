@@ -1,7 +1,7 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.BuildDto
-import com.aowen.monolith.data.GameVersionDto
+import com.aowen.predcompanion.data.BuildDto
+import com.aowen.predcompanion.data.GameVersionDto
 import com.aowen.monolith.data.ModuleDto
 
 val fakeModuleDto = ModuleDto(

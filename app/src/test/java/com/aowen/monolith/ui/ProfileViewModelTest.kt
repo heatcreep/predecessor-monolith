@@ -1,21 +1,21 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package com.aowen.monolith.ui
+package com.aowen.predcompanion.ui
 
-import com.aowen.monolith.data.Console
-import com.aowen.monolith.data.datastore.Theme
-import com.aowen.monolith.fakes.AuthScenario
-import com.aowen.monolith.fakes.FakeAuthRepository
-import com.aowen.monolith.fakes.FakeThemePreferences
+import com.aowen.predcompanion.data.Console
+import com.aowen.predcompanion.core.datastore.Theme
+import com.aowen.predcompanion.fakes.AuthScenario
+import com.aowen.predcompanion.fakes.FakeAuthRepository
+import com.aowen.predcompanion.fakes.FakeThemePreferences
 import com.aowen.monolith.fakes.FakeUserPreferencesManager
-import com.aowen.monolith.fakes.FakeUserRepository
-import com.aowen.monolith.fakes.UserScenario
+import com.aowen.predcompanion.fakes.FakeUserRepository
+import com.aowen.predcompanion.fakes.UserScenario
 import com.aowen.monolith.fakes.data.fakeUserInfo
 import com.aowen.monolith.feature.profile.ProfileScreenState
-import com.aowen.monolith.feature.profile.ProfileToastState
-import com.aowen.monolith.feature.profile.ProfileViewModel
-import com.aowen.monolith.network.UserState
-import com.aowen.monolith.utils.MainDispatcherRule
+import com.aowen.predcompanion.feature.profile.ProfileToastState
+import com.aowen.predcompanion.feature.profile.ProfileViewModel
+import com.aowen.predcompanion.network.UserState
+import com.aowen.predcompanion.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

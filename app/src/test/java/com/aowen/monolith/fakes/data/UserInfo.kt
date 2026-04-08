@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.UserInfo
+import com.aowen.predcompanion.data.UserInfo
 import java.util.UUID
 
 val fakeUserInfo = UserInfo(

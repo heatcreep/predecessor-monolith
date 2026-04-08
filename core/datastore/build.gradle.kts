@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    namespace = "com.aowen.monolith.core.datastore"
+    namespace = "com.aowen.predcompanion.core.datastore"
 }
 
 dependencies {
-    implementation(project(":core:model"))
-    implementation(project(":core:data"))
+    implementation(projects.core.common)
+    implementation(projects.core.model)
     api(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
 }

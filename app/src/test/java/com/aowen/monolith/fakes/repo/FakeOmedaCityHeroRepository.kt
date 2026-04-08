@@ -1,15 +1,15 @@
-package com.aowen.monolith.fakes.repo
+package com.aowen.predcompanion.fakes.repo
 
-import com.aowen.monolith.data.HeroDetails
-import com.aowen.monolith.data.HeroStatistics
+import com.aowen.predcompanion.core.model.data.HeroDetails
+import com.aowen.predcompanion.data.HeroStatistics
 import com.aowen.monolith.data.asHeroDetails
-import com.aowen.monolith.data.create
-import com.aowen.monolith.data.repository.heroes.HeroRepository
-import com.aowen.monolith.fakes.data.fakeHeroDto
-import com.aowen.monolith.fakes.data.fakeHeroDto2
-import com.aowen.monolith.fakes.data.fakeHeroStatisticsDto
-import com.aowen.monolith.fakes.data.fakeHeroStatisticsResult
-import com.aowen.monolith.network.Resource
+import com.aowen.predcompanion.core.model.data.create
+import com.aowen.predcompanion.data.repository.heroes.HeroRepository
+import com.aowen.predcompanion.fakes.data.fakeHeroDto
+import com.aowen.predcompanion.fakes.data.fakeHeroDto2
+import com.aowen.predcompanion.fakes.data.fakeHeroStatisticsDto
+import com.aowen.predcompanion.fakes.data.fakeHeroStatisticsResult
+import com.aowen.predcompanion.core.network.Resource
 
 class FakeOmedaCityHeroRepository : HeroRepository {
     override suspend fun fetchAllHeroes(): Resource<List<HeroDetails>> =

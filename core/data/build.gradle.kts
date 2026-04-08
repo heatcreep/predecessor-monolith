@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.predcompanion.android.library)
+    alias(libs.plugins.predcompanion.android.library.compose)
     alias(libs.plugins.predcompanion.hilt)
 }
 

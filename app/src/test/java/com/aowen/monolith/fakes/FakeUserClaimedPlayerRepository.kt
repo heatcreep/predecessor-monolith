@@ -1,10 +1,10 @@
-package com.aowen.monolith.fakes
+package com.aowen.predcompanion.fakes
 
-import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.data.PlayerStats
-import com.aowen.monolith.fakes.data.fakeClaimedPlayer
-import com.aowen.monolith.network.ClaimedPlayerState
-import com.aowen.monolith.network.UserClaimedPlayerRepository
+import com.aowen.predcompanion.core.model.data.PlayerDetails
+import com.aowen.predcompanion.data.PlayerStats
+import com.aowen.predcompanion.fakes.data.fakeClaimedPlayer
+import com.aowen.predcompanion.core.data.repository.user.ClaimedPlayerState
+import com.aowen.predcompanion.core.data.repository.user.UserClaimedPlayerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 

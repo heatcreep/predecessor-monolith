@@ -1,4 +1,4 @@
-package com.aowen.monolith
+package com.aowen.predcompanion
 
 import org.junit.Test
 

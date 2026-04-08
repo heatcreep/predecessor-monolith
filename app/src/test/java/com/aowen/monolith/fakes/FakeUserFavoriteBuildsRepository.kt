@@ -1,8 +1,8 @@
-package com.aowen.monolith.fakes
+package com.aowen.predcompanion.fakes
 
 import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.network.FavoriteBuildsState
-import com.aowen.monolith.network.UserFavoriteBuildsRepository
+import com.aowen.predcompanion.network.FavoriteBuildsState
+import com.aowen.predcompanion.network.UserFavoriteBuildsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeUserFavoriteBuildsRepository() : UserFavoriteBuildsRepository {

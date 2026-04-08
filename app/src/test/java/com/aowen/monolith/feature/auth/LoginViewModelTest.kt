@@ -1,10 +1,10 @@
-package com.aowen.monolith.feature.auth
+package com.aowen.predcompanion.feature.auth
 
-import com.aowen.monolith.fakes.AuthScenario
-import com.aowen.monolith.fakes.FakeAuthRepository
-import com.aowen.monolith.fakes.FakeUserPreferencesManager
-import com.aowen.monolith.network.UserState
-import com.aowen.monolith.utils.MainDispatcherRule
+import com.aowen.predcompanion.fakes.AuthScenario
+import com.aowen.predcompanion.fakes.FakeAuthRepository
+import com.aowen.predcompanion.fakes.FakeUserPreferencesManager
+import com.aowen.predcompanion.core.model.network.UserState
+import com.aowen.predcompanion.utils.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest

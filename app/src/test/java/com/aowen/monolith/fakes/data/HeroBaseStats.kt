@@ -1,6 +1,6 @@
 package com.aowen.monolith.fakes.data
 
-import com.aowen.monolith.data.HeroBaseStats
+import com.aowen.predcompanion.data.HeroBaseStats
 
 val defaultHeroBaseStats = HeroBaseStats(
     maxHealth = listOf(

@@ -1,14 +1,14 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
-package com.aowen.monolith.ui
+package com.aowen.predcompanion.ui
 
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.monolith.data.asItemDetails
-import com.aowen.monolith.fakes.data.fakeItemDto
-import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
-import com.aowen.monolith.feature.items.itemdetails.ItemDetailsUiState
-import com.aowen.monolith.feature.items.itemdetails.ItemDetailsViewModel
-import com.aowen.monolith.network.Resource
-import com.aowen.monolith.utils.MainDispatcherRule
+import com.aowen.predcompanion.fakes.data.fakeItemDto
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityItemRepository
+import com.aowen.predcompanion.feature.items.itemdetails.ItemDetailsUiState
+import com.aowen.predcompanion.feature.items.itemdetails.ItemDetailsViewModel
+import com.aowen.predcompanion.core.network.Resource
+import com.aowen.predcompanion.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi

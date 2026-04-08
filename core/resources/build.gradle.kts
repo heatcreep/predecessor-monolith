@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.aowen.monolith.core.resources"
+    namespace = "com.aowen.predcompanion.core.resources"
 }
 
 // No dependencies needed - this module only holds drawable resources

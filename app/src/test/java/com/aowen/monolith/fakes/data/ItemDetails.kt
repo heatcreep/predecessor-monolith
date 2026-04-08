@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.asItemDetails
+import com.aowen.predcompanion.data.asItemDetails
 
 
 val fakeAllItems = listOf(

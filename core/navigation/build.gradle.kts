@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.aowen.monolith.core.navigation"
+    namespace = "com.aowen.predcompanion.core.navigation"
 }
 
 dependencies {

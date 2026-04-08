@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.PlayerDto
+import com.aowen.predcompanion.data.PlayerDto
 
 val fakePlayerDto =  PlayerDto(
     id = "addc8bb3-20ad-462a-a9f8-8b32bbf57515",

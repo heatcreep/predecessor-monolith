@@ -1,9 +1,9 @@
-package com.aowen.monolith.fakes
+package com.aowen.predcompanion.fakes
 
 import com.aowen.monolith.data.PlayerDetails
-import com.aowen.monolith.fakes.data.fakePlayerDetails
-import com.aowen.monolith.fakes.data.fakePlayerDetails2
-import com.aowen.monolith.network.UserRecentSearchRepository
+import com.aowen.predcompanion.fakes.data.fakePlayerDetails
+import com.aowen.predcompanion.fakes.data.fakePlayerDetails2
+import com.aowen.predcompanion.core.data.repository.user.UserRecentSearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update

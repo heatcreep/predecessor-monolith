@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.PlayerDetails
+import com.aowen.predcompanion.core.model.data.PlayerDetails
 
 val fakePlayerDetails = PlayerDetails(
     playerId = "addc8bb3-20ad-462a-a9f8-8b32bbf57514",

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.aowen.monolith.core.model"
+    namespace = "com.aowen.predcompanion.core.model"
 }
 
 dependencies {

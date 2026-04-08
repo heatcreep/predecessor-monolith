@@ -1,4 +1,3 @@
-
 import com.android.build.api.dsl.LibraryExtension
 import com.aowen.predcompanion.configureKotlinAndroid
 import com.aowen.predcompanion.libs
@@ -12,17 +11,19 @@ class AndroidLibraryConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             apply(plugin = "com.android.library")
-            apply(plugin = "org.jetbrains.kotlin.android")
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
-                testOptions.targetSdk = 36
-                // The resource prefix is derived from the module name,
-                // so resources inside ":core:module1" must be prefixed with "core_module1_"
+                testOptions.apply {
+                    targetSdk = 36
+                    animationsDisabled = true
+                }
                 resourcePrefix =
                     path.split("""\W""".toRegex()).drop(1).distinct().joinToString(separator = "_")
                         .lowercase() + "_"
             }
+
+
             dependencies {
                 "androidTestImplementation"(libs.findLibrary("kotlin.test").get())
                 "testImplementation"(libs.findLibrary("kotlin.test").get())

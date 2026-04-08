@@ -1,10 +1,10 @@
-package com.aowen.monolith.fakes.repo
+package com.aowen.predcompanion.fakes.repo
 
-import com.aowen.monolith.data.BuildListItem
-import com.aowen.monolith.data.asBuildListItem
+import com.aowen.predcompanion.data.BuildListItem
+import com.aowen.predcompanion.data.asBuildListItem
 import com.aowen.monolith.data.repository.builds.BuildRepository
-import com.aowen.monolith.fakes.data.fakeBuildDto
-import com.aowen.monolith.network.Resource
+import com.aowen.predcompanion.fakes.data.fakeBuildDto
+import com.aowen.predcompanion.core.network.Resource
 
 private var pageCount = 1
 

@@ -1,16 +1,16 @@
-package com.aowen.monolith.ui
+package com.aowen.predcompanion.ui
 
 import androidx.paging.testing.asSnapshot
-import com.aowen.monolith.data.Hero
-import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.data.asBuildListItem
-import com.aowen.monolith.fakes.data.fakeBuildDto
-import com.aowen.monolith.fakes.repo.FakeOmedaCityBuildRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
+import com.aowen.predcompanion.core.model.data.Hero
+import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.data.asBuildListItem
+import com.aowen.predcompanion.fakes.data.fakeBuildDto
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityBuildRepository
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityHeroRepository
 import com.aowen.monolith.feature.builds.BuildsPagingSource
-import com.aowen.monolith.feature.builds.BuildsScreenViewModel
+import com.aowen.predcompanion.feature.builds.BuildsScreenViewModel
 import com.aowen.monolith.feature.builds.BuildsUiState
-import com.aowen.monolith.ui.model.BuildListItemUiMapper
+import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
 import com.aowen.monolith.utils.MainDispatcherRule
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest

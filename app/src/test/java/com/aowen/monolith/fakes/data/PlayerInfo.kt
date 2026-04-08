@@ -1,8 +1,8 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.PlayerInfo
-import com.aowen.monolith.data.create
-import com.aowen.monolith.data.asPlayerDetails
+import com.aowen.predcompanion.data.PlayerInfo
+import com.aowen.predcompanion.core.model.data.create
+import com.aowen.predcompanion.data.asPlayerDetails
 
 val fakePlayerInfo = PlayerInfo(
     playerDetails = fakePlayerDto.asPlayerDetails(),

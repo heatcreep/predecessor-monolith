@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.BaseStatsDto
+import com.aowen.predcompanion.data.BaseStatsDto
 
 val fakeBaseStatsDto = BaseStatsDto(
     maxHealth = listOf(100.0f, 200.0f, 300.0f),

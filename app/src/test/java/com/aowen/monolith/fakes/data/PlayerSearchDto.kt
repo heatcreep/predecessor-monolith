@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.PlayerSearchDto
+import com.aowen.predcompanion.data.PlayerSearchDto
 import java.util.UUID
 
 val fakeExistingPlayerSearchDto = PlayerSearchDto(

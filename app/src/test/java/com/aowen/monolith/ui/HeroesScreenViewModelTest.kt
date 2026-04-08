@@ -1,16 +1,16 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package com.aowen.monolith.ui
+package com.aowen.predcompanion.ui
 
-import com.aowen.monolith.data.HeroRole
-import com.aowen.monolith.data.asHeroDetails
-import com.aowen.monolith.fakes.data.fakeHeroDto
+import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.core.model.data.asHeroDetails
+import com.aowen.predcompanion.fakes.data.fakeHeroDto
 import com.aowen.monolith.fakes.data.fakeHeroDto2
-import com.aowen.monolith.fakes.repo.FakeOmedaCityHeroRepository
-import com.aowen.monolith.feature.heroes.HeroesScreenUiState
-import com.aowen.monolith.feature.heroes.HeroesScreenViewModel
-import com.aowen.monolith.network.Resource
-import com.aowen.monolith.utils.MainDispatcherRule
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityHeroRepository
+import com.aowen.predcompanion.feature.heroes.HeroesScreenUiState
+import com.aowen.predcompanion.feature.heroes.HeroesScreenViewModel
+import com.aowen.predcompanion.core.network.Resource
+import com.aowen.predcompanion.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi

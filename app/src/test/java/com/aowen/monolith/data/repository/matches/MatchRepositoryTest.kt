@@ -1,12 +1,12 @@
-package com.aowen.monolith.data.repository.matches
+package com.aowen.predcompanion.data.repository.matches
 
-import com.aowen.monolith.data.MatchesDetails
-import com.aowen.monolith.data.asMatchDetails
-import com.aowen.monolith.data.repository.BaseRepositoryTest
-import com.aowen.monolith.fakes.FakeOmedaCityService
-import com.aowen.monolith.fakes.data.fakeMatchDto
-import com.aowen.monolith.network.Resource
-import com.aowen.monolith.network.getOrThrow
+import com.aowen.predcompanion.data.MatchesDetails
+import com.aowen.predcompanion.data.asMatchDetails
+import com.aowen.predcompanion.data.repository.BaseRepositoryTest
+import com.aowen.predcompanion.fakes.FakeOmedaCityService
+import com.aowen.predcompanion.fakes.data.fakeMatchDto
+import com.aowen.predcompanion.core.network.Resource
+import com.aowen.predcompanion.core.network.getOrThrow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

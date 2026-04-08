@@ -1,7 +1,7 @@
 package com.aowen.monolith.fakes
 
-import com.aowen.monolith.data.Console
-import com.aowen.monolith.network.UserPreferencesManager
+import com.aowen.predcompanion.data.Console
+import com.aowen.predcompanion.core.datastore.UserPreferencesManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

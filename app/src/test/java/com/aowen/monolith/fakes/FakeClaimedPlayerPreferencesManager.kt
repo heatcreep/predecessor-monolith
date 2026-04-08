@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes
+package com.aowen.predcompanion.fakes
 
-import com.aowen.monolith.network.ClaimedPlayerPreferencesManager
+import com.aowen.predcompanion.core.datastore.ClaimedPlayerPreferencesManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 

@@ -1,20 +1,20 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package com.aowen.monolith.ui
+package com.aowen.predcompanion.ui
 
 import androidx.lifecycle.SavedStateHandle
-import com.aowen.monolith.data.MatchDetails
-import com.aowen.monolith.fakes.data.fakeAllItems
-import com.aowen.monolith.fakes.data.fakeDawnTeam
-import com.aowen.monolith.fakes.data.fakeDuskTeam
+import com.aowen.predcompanion.data.MatchDetails
+import com.aowen.predcompanion.fakes.data.fakeAllItems
+import com.aowen.predcompanion.fakes.data.fakeDawnTeam
+import com.aowen.predcompanion.fakes.data.fakeDuskTeam
 import com.aowen.monolith.fakes.data.fakeMatchDetailsWithItems
-import com.aowen.monolith.fakes.repo.FakeOmedaCityItemRepository
-import com.aowen.monolith.fakes.repo.FakeOmedaCityMatchRepository
-import com.aowen.monolith.feature.matches.matchdetails.MatchDetailsErrors
-import com.aowen.monolith.feature.matches.matchdetails.MatchDetailsUiState
-import com.aowen.monolith.feature.matches.matchdetails.MatchDetailsViewModel
-import com.aowen.monolith.network.Resource
-import com.aowen.monolith.utils.MainDispatcherRule
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityItemRepository
+import com.aowen.predcompanion.fakes.repo.FakeOmedaCityMatchRepository
+import com.aowen.predcompanion.feature.matches.matchdetails.MatchDetailsErrors
+import com.aowen.predcompanion.feature.matches.matchdetails.MatchDetailsUiState
+import com.aowen.predcompanion.feature.matches.matchdetails.MatchDetailsViewModel
+import com.aowen.predcompanion.core.network.Resource
+import com.aowen.predcompanion.utils.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi

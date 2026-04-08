@@ -1,6 +1,6 @@
-package com.aowen.monolith.fakes.data
+package com.aowen.predcompanion.fakes.data
 
-import com.aowen.monolith.data.FavoriteHeroDto
+import com.aowen.predcompanion.data.FavoriteHeroDto
 
 val fakeFavoriteHeroDto = FavoriteHeroDto(
     id = 123,

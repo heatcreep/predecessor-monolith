@@ -1,11 +1,18 @@
+import com.android.build.api.variant.BuildConfigField
+import java.io.StringReader
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.predcompanion.android.library)
     alias(libs.plugins.predcompanion.hilt)
-    alias(libs.plugins.kotlin.serialization)
+    id("kotlinx-serialization")
 }
 
 android {
-    namespace = "com.aowen.monolith.core.network"
+    buildFeatures {
+        buildConfig = true
+    }
+    namespace = "com.aowen.predcompanion.core.network"
 }
 
 dependencies {
@@ -22,4 +29,33 @@ dependencies {
     implementation(libs.supabase.functions)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.okhttp)
+    implementation(libs.retrofit.serialization.converter)
+}
+
+val supabaseApiKey = providers.fileContents(
+    isolated.rootProject.projectDirectory.file("local.properties")
+).asText.map { text ->
+    val properties = Properties()
+    properties.load(StringReader(text))
+    properties["SUPABASE_KEY"]
+}.orElse("supabaseKey")
+
+val supabaseUrl = providers.fileContents(
+    isolated.rootProject.projectDirectory.file("local.properties")
+).asText.map { text ->
+    val properties = Properties()
+    properties.load(StringReader(text))
+    properties["SUPABASE_URL"]
+}.orElse("http://example.com")
+
+androidComponents {
+    onVariants {
+        it.buildConfigFields!!.put("SUPABASE_API_KEY", supabaseApiKey.map { value ->
+            BuildConfigField(type = "String", value = "$value", comment = null)
+        })
+        it.buildConfigFields!!.put("SUPABASE_URL", supabaseUrl.map { value ->
+            BuildConfigField(type = "String", value = "$value", comment = null)
+        })
+
+    }
 }
