@@ -5,8 +5,8 @@ import com.aowen.predcompanion.navigation.Navigator
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PlayerDetailsNavKey(val userId: String) : NavKey
+data class PlayerDetailsNavKey(val playerId: String) : NavKey
 
-fun Navigator.navigateToPlayerDetails(userId: String) {
-    navigate(PlayerDetailsNavKey(userId))
+fun Navigator.navigateToPlayerDetails(playerId: String) {
+    navigate(PlayerDetailsNavKey(playerId))
 }

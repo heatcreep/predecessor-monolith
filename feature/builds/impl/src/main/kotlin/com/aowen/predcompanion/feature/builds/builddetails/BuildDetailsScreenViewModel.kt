@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
+import com.aowen.predcompanion.core.datastore.UserPreferencesManager
+import com.aowen.predcompanion.core.network.getOrThrow
 import com.aowen.predcompanion.data.BuildListItem
 import com.aowen.predcompanion.data.Console
 import com.aowen.predcompanion.data.ItemDetails
-import com.aowen.predcompanion.core.datastore.UserPreferencesManager
-import com.aowen.predcompanion.core.network.getOrThrow
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -47,11 +47,16 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
         fun create(buildId: String): BuildDetailsScreenViewModel
     }
 
+
     private val _uiState = MutableStateFlow(BuildDetailsUiState())
     val uiState = _uiState
 
     private val _console = MutableStateFlow(Console.PC)
     val console = _console
+
+    init {
+        initViewModel()
+    }
 
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true, error = null) }

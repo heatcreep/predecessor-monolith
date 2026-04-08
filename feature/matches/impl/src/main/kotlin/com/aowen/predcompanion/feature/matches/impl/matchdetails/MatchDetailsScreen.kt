@@ -53,7 +53,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.aowen.monolith.data.MatchDetails
 import com.aowen.monolith.data.MatchPlayerDetails
 import com.aowen.monolith.data.Team
@@ -76,7 +75,7 @@ import com.aowen.predcompanion.core.resources.R as coreResources
 fun MatchDetailsRoute(
     modifier: Modifier = Modifier,
     navigateToPlayerDetails: (String) -> Unit,
-    viewModel: MatchDetailsViewModel = hiltViewModel()
+    viewModel: MatchDetailsViewModel
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -92,7 +91,7 @@ fun MatchDetailsRoute(
     )
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         if (uiState.isLoading) {
@@ -139,7 +138,6 @@ fun MatchDetailsRoute(
                         when (page) {
                             0 -> MatchDetailsTab(
                                 uiState = uiState,
-                                modifier = modifier,
                                 getCreepScorePerMinute = viewModel::getCreepScorePerMinute,
                                 getGoldEarnedPerMinute = viewModel::getGoldEarnedPerMinute,
                                 onItemClicked = viewModel::onItemClicked,
@@ -149,7 +147,6 @@ fun MatchDetailsRoute(
                             1 -> MatchStatsTab(
                                 selectedTeam = uiState.selectedTeam,
                                 onSelectedTeamChanged = viewModel::onTeamSelected,
-                                modifier = modifier,
                                 getCreepScorePerMinute = viewModel::getCreepScorePerMinute,
                                 getGoldEarnedPerMinute = viewModel::getGoldEarnedPerMinute
                             )

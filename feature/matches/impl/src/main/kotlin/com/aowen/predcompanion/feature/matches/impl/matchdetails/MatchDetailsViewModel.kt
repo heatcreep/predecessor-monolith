@@ -1,6 +1,5 @@
 package com.aowen.predcompanion.feature.matches.impl.matchdetails
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.MatchDetails
@@ -9,15 +8,17 @@ import com.aowen.monolith.data.getDetailsWithItems
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
 import com.aowen.predcompanion.core.model.data.toDecimal
-import com.aowen.predcompanion.data.ItemDetails
 import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.data.ItemDetails
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class MatchDetailsErrors(
     val errorMessage: String? = "Failed to fetch match details.",
@@ -32,17 +33,21 @@ data class MatchDetailsUiState(
     val selectedItemDetails: ItemDetails? = null,
 )
 
-@HiltViewModel
-class MatchDetailsViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = MatchDetailsViewModel.Factory::class)
+class MatchDetailsViewModel @AssistedInject constructor(
+    @Assisted private val matchId: String,
     private val omedaCityItemRepository: ItemRepository,
     private val omedaCityMatchRepository: MatchRepository
 ) : ViewModel() {
 
+    @AssistedFactory
+    interface Factory {
+        fun create(@Assisted matchId: String): MatchDetailsViewModel
+    }
+
+
     private val _uiState = MutableStateFlow(MatchDetailsUiState())
     val uiState: StateFlow<MatchDetailsUiState> = _uiState
-
-    private val matchId: String = checkNotNull(savedStateHandle["matchId"])
 
     init {
         initViewModel()

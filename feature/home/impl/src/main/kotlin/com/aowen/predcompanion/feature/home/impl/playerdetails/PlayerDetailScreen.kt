@@ -59,7 +59,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.aowen.predcompanion.core.data.model.HeroUiModel
 import com.aowen.predcompanion.core.data.model.mapper.StatLine
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
@@ -81,7 +80,7 @@ import com.aowen.predcompanion.feature.heroes.api.R as heroResources
 @Composable
 internal fun PlayerDetailsRoute(
     modifier: Modifier = Modifier,
-    viewModel: PlayerDetailsViewModel = hiltViewModel(),
+    viewModel: PlayerDetailsViewModel,
     navigateBack: () -> Unit,
     navigateToMoreMatches: (String) -> Unit,
     navigateToMatchDetails: (String, String) -> Unit,

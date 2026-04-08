@@ -30,6 +30,7 @@ import com.aowen.predcompanion.feature.home.impl.navigation.homeEntry
 import com.aowen.predcompanion.feature.home.impl.playerdetails.navigation.playerDetailsEntry
 import com.aowen.predcompanion.feature.items.impl.itemdetails.navigation.itemDetailsEntry
 import com.aowen.predcompanion.feature.items.impl.navigation.itemsEntry
+import com.aowen.predcompanion.feature.matches.impl.navigation.matchesEntry
 import com.aowen.predcompanion.feature.profile.impl.navigation.profileEntry
 import com.aowen.predcompanion.feature.search.impl.navigation.searchEntry
 import com.aowen.predcompanion.navigation.Navigator
@@ -52,6 +53,7 @@ fun MonolithApp(
         ) { padding ->
             val entryProvider = entryProvider {
                 homeEntry(navigator)
+                matchesEntry(navigator)
                 heroesEntry(navigator)
                 itemsEntry(navigator)
                 buildsEntry(navigator)

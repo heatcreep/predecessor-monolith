@@ -1,6 +1,5 @@
 package com.aowen.predcompanion.feature.matches.impl.morematches
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -9,9 +8,11 @@ import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
 import com.aowen.predcompanion.core.model.data.Hero
 import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.network.getOrThrow
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import javax.inject.Inject
 
 enum class TimeFrame(val code: String, val description: String) {
     ALL("ALL", "All Time"),
@@ -34,13 +35,16 @@ data class MoreMatchesUiState(
     val error: String = "",
 )
 
-@HiltViewModel
-class MoreMatchesViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = MoreMatchesViewModel.Factory::class)
+class MoreMatchesViewModel @AssistedInject constructor(
+    @Assisted private val playerId: String,
     private val omedaCityMatchRepository: MatchRepository
 ) : ViewModel() {
 
-    val playerId: String = checkNotNull(savedStateHandle["playerId"])
+    @AssistedFactory
+    interface Factory {
+        fun create(@Assisted playerId: String): MoreMatchesViewModel
+    }
 
     private val _uiState = MutableStateFlow(MoreMatchesUiState())
     val uiState = _uiState

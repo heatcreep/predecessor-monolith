@@ -37,15 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.monolith.data.MatchDetails
-import com.aowen.predcompanion.core.ui.shared.FilterDropdown
-import com.aowen.predcompanion.core.ui.shared.SearchBar
 import com.aowen.predcompanion.core.model.data.Hero
 import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.core.ui.shared.FilterDropdown
+import com.aowen.predcompanion.core.ui.shared.SearchBar
 import com.aowen.predcompanion.feature.matches.api.ui.MatchPlayerCard
 import com.aowen.predcompanion.ui.common.MonolithCollapsableListColumn
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
@@ -55,8 +54,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MoreMatchesRoute(
+    playerId: String,
     navigateToMatchDetails: (String, String) -> Unit,
-    viewModel: MoreMatchesViewModel = hiltViewModel()
+    viewModel: MoreMatchesViewModel
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -65,7 +65,7 @@ fun MoreMatchesRoute(
     MoreMatchesScreen(
         uiState = uiState,
         matches = matches,
-        playerId = viewModel.playerId,
+        playerId = playerId,
         onSearchFieldUpdate = viewModel::onSearchFieldUpdated,
         onSelectRoleFilter = viewModel::onRoleFilterUpdated,
         onSelectHeroFilter = viewModel::onHeroFilterUpdated,

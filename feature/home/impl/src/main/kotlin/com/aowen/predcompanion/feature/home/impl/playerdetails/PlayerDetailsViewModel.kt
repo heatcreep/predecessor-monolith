@@ -1,25 +1,27 @@
 package com.aowen.predcompanion.feature.home.impl.playerdetails
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.monolith.data.MatchDetails
-import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
+import com.aowen.predcompanion.core.common.di.IoDispatcher
+import com.aowen.predcompanion.core.data.model.HeroUiModel
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
-import com.aowen.predcompanion.core.data.model.HeroUiModel
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.data.PlayerHeroStats
-import com.aowen.predcompanion.core.common.di.IoDispatcher
-import com.aowen.predcompanion.core.model.network.UserState
-import com.aowen.predcompanion.logDebug
-import com.aowen.predcompanion.core.data.repository.user.UserRepository
+import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
 import com.aowen.predcompanion.core.data.repository.user.UserClaimedPlayerRepository
+import com.aowen.predcompanion.core.data.repository.user.UserRepository
 import com.aowen.predcompanion.core.database.dao.ClaimedPlayerDao
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
+import com.aowen.predcompanion.core.model.data.PlayerDetails
 import com.aowen.predcompanion.core.model.data.PlayerStats
+import com.aowen.predcompanion.core.model.network.UserState
 import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.data.PlayerHeroStats
+import com.aowen.predcompanion.logDebug
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +31,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 data class PlayerDetailsUiState(
     val isLoading: Boolean = true,
@@ -48,10 +49,10 @@ data class PlayerDetailsUiState(
     val isClaimed: Boolean = false
 )
 
-@HiltViewModel
-class PlayerDetailsViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = PlayerDetailsViewModel.Factory::class)
+class PlayerDetailsViewModel @AssistedInject constructor(
     @param:IoDispatcher val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @Assisted private val playerId: String,
     private val omedaCityHeroRepository: HeroRepository,
     private val omedaCityMatchRepository: MatchRepository,
     private val omedaCityPlayerRepository: PlayerRepository,
@@ -62,10 +63,13 @@ class PlayerDetailsViewModel @Inject constructor(
     private val userClaimedPlayerRepository: UserClaimedPlayerRepository,
 ) : ViewModel() {
 
+    @AssistedFactory
+    interface Factory {
+        fun create(@Assisted playerId: String): PlayerDetailsViewModel
+    }
+
     private val _uiState = MutableStateFlow(PlayerDetailsUiState())
     val uiState: StateFlow<PlayerDetailsUiState> = _uiState
-
-    private val playerId: String? = savedStateHandle["playerId"]
 
     fun onEditPlayerName() {
         _uiState.update {
