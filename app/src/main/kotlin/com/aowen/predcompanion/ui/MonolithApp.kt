@@ -42,32 +42,7 @@ fun MonolithApp(
 
     val navigator = remember { Navigator(appState.navigationState) }
 
-    PCNavigationSuiteScaffold(
-        navigationSuiteItems = {
-            if (appState.shouldShowBottomBar) {
-                TOP_LEVEL_NAV_ITEMS.forEach { (key, item) ->
-                    val selected = key == appState.navigationState.currentTopLevelKey
-                    item(
-                        selected = selected,
-                        onClick = { navigator.navigate(key) },
-                        icon = {
-                            Icon(
-                                imageVector = item.unselectedIcon,
-                                contentDescription = null
-                            )
-                        },
-                        selectedIcon = {
-                            Icon(
-                                imageVector = item.selectedIcon,
-                                contentDescription = null
-                            )
-                        },
-                        label = { Text(stringResource(item.iconTextId)) }
-                    )
-                }
-            }
-        }
-    ) {
+    val content: @Composable () -> Unit = {
         Scaffold(
             snackbarHost = {
                 SnackbarHost(
@@ -91,6 +66,36 @@ fun MonolithApp(
                 onBack = { navigator.goBack() }
             )
         }
+    }
+
+    if (appState.shouldShowBottomBar) {
+        PCNavigationSuiteScaffold(
+            navigationSuiteItems = {
+                TOP_LEVEL_NAV_ITEMS.forEach { (key, item) ->
+                    val selected = key == appState.navigationState.currentTopLevelKey
+                    item(
+                        selected = selected,
+                        onClick = { navigator.navigate(key) },
+                        icon = {
+                            Icon(
+                                imageVector = item.unselectedIcon,
+                                contentDescription = null
+                            )
+                        },
+                        selectedIcon = {
+                            Icon(
+                                imageVector = item.selectedIcon,
+                                contentDescription = null
+                            )
+                        },
+                        label = { Text(stringResource(item.iconTextId)) }
+                    )
+                }
+            },
+            content = content
+        )
+    } else {
+        content()
     }
 }
 

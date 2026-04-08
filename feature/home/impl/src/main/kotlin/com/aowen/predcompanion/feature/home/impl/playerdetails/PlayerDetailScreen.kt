@@ -201,6 +201,7 @@ fun PlayerDetailScreen(
                 }
             } else {
                 PullToRefreshBox(
+                    modifier = Modifier.fillMaxSize(),
                     isRefreshing = isRefreshing,
                     onRefresh = handleRetry
                 ) {
@@ -243,7 +244,7 @@ fun PlayerDetailScreen(
                             }
                             HorizontalPager(
                                 modifier = Modifier
-                                    .fillMaxWidth()
+                                    .fillMaxSize()
                                     .background(MaterialTheme.colorScheme.surface),
                                 state = pagerState
                             ) { page ->
@@ -286,7 +287,7 @@ fun PlayerStatsTab(
 
 
     LazyColumn(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

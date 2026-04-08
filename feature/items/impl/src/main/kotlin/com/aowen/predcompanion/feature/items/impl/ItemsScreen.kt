@@ -43,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,16 +52,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.getItemImage
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionFilterDropdown
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionSortDropdown
 import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
-import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.data.ItemDetails
 import com.aowen.predcompanion.data.StatDetails
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
-import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import kotlinx.coroutines.launch
 import com.aowen.predcompanion.core.resources.R as coreResources
 
@@ -77,9 +78,11 @@ fun ItemsScreen(
     onFilterItems: () -> Unit = {}
 ) {
 
-    val screenWidth = LocalWindowInfo.current.containerSize.width
+    val density = LocalDensity.current
+    val screenWidthPx = LocalWindowInfo.current.containerSize.width
+    val screenWidthDp = with(density) { screenWidthPx.toDp() }
 
-    val isTablet = screenWidth >= 600
+    val isTablet = screenWidthDp >= 600.dp
 
     var expanded by rememberSaveable { mutableStateOf(false) }
     val rotationAngle = remember { Animatable(0f) }

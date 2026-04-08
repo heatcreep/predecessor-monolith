@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,10 +84,11 @@ fun HeroesScreen(
     navigateToHeroDetails: (heroId: Long, heroName: String) -> Unit = { _, _ -> },
     navigateToSearch: () -> Unit = { }
 ) {
-    val localWindowInfo = LocalWindowInfo.current
-    val screenWidthDp = localWindowInfo.containerSize.width
+    val density = LocalDensity.current
+    val screenWidthPx = LocalWindowInfo.current.containerSize.width
+    val screenWidthDp = with(density) { screenWidthPx.toDp() }
 
-    val isTablet = screenWidthDp >= 600
+    val isTablet = screenWidthDp >= 600.dp
 
     var expanded by remember { mutableStateOf(true) }
     val rotationAngle = remember { Animatable(0f) }

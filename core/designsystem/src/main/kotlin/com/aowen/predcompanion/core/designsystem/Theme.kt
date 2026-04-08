@@ -10,6 +10,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.aowen.monolith.ui.theme.Typography
 import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.predcompanion.ui.theme.DarkKhaki
 import com.aowen.predcompanion.ui.theme.DiscordBlurple
@@ -90,7 +91,7 @@ fun MonolithTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = MaterialTheme.typography,
+        typography = Typography,
         content = content
     )
 }
