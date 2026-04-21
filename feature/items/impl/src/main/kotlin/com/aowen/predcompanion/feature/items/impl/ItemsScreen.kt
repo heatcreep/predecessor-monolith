@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,21 +44,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.HeroClass
-import com.aowen.predcompanion.core.model.data.getItemImage
+import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.StatDetails
+import com.aowen.predcompanion.core.ui.components.ShimmerCard
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionFilterDropdown
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionSortDropdown
 import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
-import com.aowen.predcompanion.data.ItemDetails
-import com.aowen.predcompanion.data.StatDetails
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 import kotlinx.coroutines.launch
@@ -199,10 +200,27 @@ fun ItemsScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(uiState.filteredItems) { item ->
-                                ItemCard(
-                                    itemDetails = item,
-                                    onClick = { navigateToItemDetails(item.name) }
-                                )
+                                SubcomposeAsyncImage(
+                                    model = item.imageSrc,
+                                    contentDescription = "Item image",
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    val imageState = painter.state
+                                    if (imageState is AsyncImagePainter.State.Loading) {
+                                        ShimmerCard()
+                                    } else {
+                                        ItemCard(
+                                            itemDetails = item,
+                                            onClick = { navigateToItemDetails(item.name) }
+                                        ) {
+                                            SubcomposeAsyncImageContent(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.FillWidth
+                                            )
+                                        }
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -239,7 +257,8 @@ fun ItemsScreenRoute(
 fun ItemCard(
     itemDetails: ItemDetails,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    imageContent: @Composable () -> Unit,
 ) {
 
     Card(
@@ -248,7 +267,6 @@ fun ItemCard(
                 onClick()
             }
     ) {
-
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
@@ -256,13 +274,7 @@ fun ItemCard(
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(start = 4.dp, end = 4.dp, bottom = 8.dp),
         ) {
-            Image(
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.FillWidth,
-                painter = painterResource(id = getItemImage(itemDetails.id)),
-                contentDescription = "image for ${itemDetails.displayName}"
-            )
-
+            imageContent()
             Text(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 text = itemDetails.displayName,

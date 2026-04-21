@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +40,7 @@ fun ItemDetailsBottomSheetPreview() {
         Surface {
             ItemDetailsContent(
                 itemDetails = ItemDetails(
-                    image = "https://omeda.city/images/items/Refillable-Potion.webp",
+                    imageSrc = "https://omeda.city/images/items/Refillable-Potion.webp",
                     name = "Refillable Potion",
                     displayName = "Malady",
                 ),

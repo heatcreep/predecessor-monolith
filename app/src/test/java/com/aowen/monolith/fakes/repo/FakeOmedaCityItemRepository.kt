@@ -1,7 +1,7 @@
 package com.aowen.predcompanion.fakes.repo
 
-import com.aowen.predcompanion.data.ItemDetails
-import com.aowen.predcompanion.data.asItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.asItemDetails
 import com.aowen.predcompanion.data.repository.items.ItemRepository
 import com.aowen.monolith.fakes.data.fakeItemDto
 import com.aowen.predcompanion.fakes.data.fakeItemDto2

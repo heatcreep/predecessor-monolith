@@ -14,32 +14,38 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
 
     @Binds
+    @Singleton
     internal abstract fun bindsAuthRepository(
         authRepository: SupabaseAuthRepository
     ): AuthRepository
 
     @Binds
+    @Singleton
     internal abstract fun bindsUserRepository(
         userRepository: NetworkUserRepository
     ): UserRepository
 
     @Binds
+    @Singleton
     internal abstract fun bindsUserClaimedPlayerRepository(
         userClaimedPlayerRepository: OfflineFirstUserClaimedPlayerRepository
     ): UserClaimedPlayerRepository
 
     @Binds
+    @Singleton
     internal abstract fun bindsUserRecentSearchRepository(
         userRecentSearchRepository: NetworkUserRecentSearchRepository
     ): UserRecentSearchRepository
 
     @Binds
+    @Singleton
     internal abstract fun bindsUserFavoriteBuildsRepository(
         userFavoriteBuildsRepository: OfflineFirstUserFavoriteBuildsRepository
     ): UserFavoriteBuildsRepository

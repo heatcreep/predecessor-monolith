@@ -4,7 +4,7 @@ package com.aowen.predcompanion.ui
 
 import androidx.lifecycle.SavedStateHandle
 import com.aowen.predcompanion.data.asBuildListItem
-import com.aowen.predcompanion.data.asItemDetails
+import com.aowen.predcompanion.core.model.data.asItemDetails
 import com.aowen.predcompanion.fakes.FakeUserFavoriteBuildsRepository
 import com.aowen.predcompanion.fakes.FakeUserPreferencesManager
 import com.aowen.predcompanion.fakes.data.fakeBuildDto

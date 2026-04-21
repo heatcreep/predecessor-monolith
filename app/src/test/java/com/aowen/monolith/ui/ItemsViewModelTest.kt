@@ -2,7 +2,7 @@
 
 package com.aowen.predcompanion.ui
 
-import com.aowen.predcompanion.data.asItemDetails
+import com.aowen.predcompanion.core.model.data.asItemDetails
 import com.aowen.predcompanion.fakes.data.fakeItemDto
 import com.aowen.predcompanion.fakes.data.fakeItemDto2
 import com.aowen.predcompanion.fakes.data.fakeItemDto3

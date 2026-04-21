@@ -2,9 +2,9 @@ package com.aowen.predcompanion.feature.builds
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
 import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
+import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.network.getOrThrow
 
 const val PAGE_SIZE = 10
@@ -18,7 +18,7 @@ class BuildsPagingSource(
     private val currentVersion: Int? = null,
     private val modules: Int? = null,
     private val omedaCityBuildRepository: BuildRepository,
-    private val buildListItemUiMapper: BuildListItemUiMapper
+    private val buildListItemUiMapper: BuildListItemUiMapper,
 ) : PagingSource<Int, BuildUiListItem>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BuildUiListItem> {

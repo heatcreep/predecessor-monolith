@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.data.StatDetails
+import com.aowen.predcompanion.core.model.data.StatDetails
 import com.aowen.predcompanion.ui.theme.GreenHighlight
 import com.aowen.predcompanion.core.resources.R as coreResources
 

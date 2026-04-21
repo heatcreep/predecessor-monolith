@@ -73,8 +73,8 @@ import com.aowen.predcompanion.data.getAbilityKey
 import com.aowen.predcompanion.data.getAbilityName
 import com.aowen.predcompanion.core.model.data.getHeroImage
 import com.aowen.predcompanion.feature.heroes.api.R
-import com.aowen.predcompanion.feature.heroes.herodetails.preview.heroBuildsLoadingState
-import com.aowen.predcompanion.feature.heroes.herodetails.preview.heroBuildsState
+import com.aowen.predcompanion.feature.heroes.impl.herodetails.preview.heroBuildsLoadingState
+import com.aowen.predcompanion.feature.heroes.impl.herodetails.preview.heroBuildsState
 import com.aowen.predcompanion.ui.common.PlayerIcon
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator

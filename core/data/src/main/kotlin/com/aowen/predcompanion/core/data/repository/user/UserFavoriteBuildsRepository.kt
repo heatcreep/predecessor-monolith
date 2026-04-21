@@ -2,15 +2,13 @@ package com.aowen.predcompanion.core.data.repository.user
 
 import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
 import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
+import com.aowen.predcompanion.core.data.model.mapper.asFavoriteBuildDto
+import com.aowen.predcompanion.core.data.model.mapper.asFavoriteBuildListEntity
+import com.aowen.predcompanion.core.data.repository.BuildListItemDataMapper
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.database.dao.FavoriteBuildDao
-import com.aowen.predcompanion.core.database.model.asFavoriteBuildListEntity
-import com.aowen.predcompanion.core.database.model.asFavoriteBuildListItem
 import com.aowen.predcompanion.core.model.network.UserState
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
-import com.aowen.predcompanion.data.BuildListItem
-import com.aowen.predcompanion.data.asFavoriteBuildDto
-import com.aowen.predcompanion.data.asFavoriteBuildListItem
 import com.aowen.predcompanion.logDebug
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -18,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 abstract class FavoriteBuildsState {
-    data class Success(val favoriteBuilds: List<BuildUiListItem.FavoriteBuildUiListItem>) :
+    data class Success(val favoriteBuilds: List<BuildUiListItem>) :
         FavoriteBuildsState()
 
     data object Empty : FavoriteBuildsState()
@@ -30,7 +28,7 @@ interface UserFavoriteBuildsRepository {
     val favoriteBuildsState: MutableStateFlow<FavoriteBuildsState>
 
     suspend fun fetchFavoriteBuildIds(): Result<List<Int>>
-    suspend fun addFavoriteBuild(buildDetails: BuildListItem)
+    suspend fun addFavoriteBuild(buildDetails: BuildUiListItem)
     suspend fun removeFavoriteBuild(buildId: Int)
     suspend fun removeAllFavoriteBuilds()
 }
@@ -40,21 +38,24 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
     private val favoriteBuildDao: FavoriteBuildDao,
-    private val buildListItemUiMapper: BuildListItemUiMapper
+    private val buildListItemUiMapper: BuildListItemUiMapper,
+    private val buildListItemDataMapper: BuildListItemDataMapper
 ) : UserFavoriteBuildsRepository {
 
     private val _favoriteBuildsState: MutableStateFlow<FavoriteBuildsState> =
         MutableStateFlow(FavoriteBuildsState.Empty)
     override val favoriteBuildsState = _favoriteBuildsState
 
+
     override suspend fun fetchFavoriteBuildIds(): Result<List<Int>> {
+
         when (authRepository.userState.value) {
 
             // Local User
             is UserState.Unauthenticated -> {
                 val favoriteBuilds =
                     favoriteBuildDao.getFavoriteBuildListItems().firstOrNull()?.map { buildEntity ->
-                        buildEntity.asFavoriteBuildListItem()
+                        buildListItemDataMapper.createFavoriteBuildListItemFrom(buildEntity)
                     } ?: emptyList()
                 if (favoriteBuilds.isEmpty()) {
                     _favoriteBuildsState.update { FavoriteBuildsState.Empty }
@@ -73,28 +74,27 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             is UserState.Authenticated -> {
                 val user = userRepository.getUser()
                 return try {
-                    if (user?.id == null) {
-                        Result.failure(Exception("User not found"))
-                    } else {
-                        val favoriteBuilds = postgrestService.fetchFavoriteBuilds(user.id!!)
-                            .map { networkFavoriteBuild ->
-                                networkFavoriteBuild.asFavoriteBuildListItem()
-                            }
-                        if (favoriteBuilds.isEmpty()) {
-                            _favoriteBuildsState.update {
-                                FavoriteBuildsState.Empty
-                            }
-                        } else {
-                            _favoriteBuildsState.update {
-                                FavoriteBuildsState.Success(favoriteBuilds.map {
-                                    buildListItemUiMapper.buildFrom(
-                                        it
-                                    )
-                                })
-                            }
+                    val userId = user?.id ?: return Result.failure(Exception("User not found"))
+                    val favoriteBuilds = postgrestService.fetchFavoriteBuilds(userId)
+                        .map { networkFavoriteBuild ->
+                            buildListItemDataMapper.createFavoriteBuildListItemFrom(
+                                networkFavoriteBuild
+                            )
                         }
-                        Result.success(favoriteBuilds.map { it.buildId })
+                    if (favoriteBuilds.isEmpty()) {
+                        _favoriteBuildsState.update {
+                            FavoriteBuildsState.Empty
+                        }
+                    } else {
+                        val uiItems = favoriteBuilds.map { listItem ->
+                            buildListItemUiMapper.buildFrom(listItem)
+                        }
+                        _favoriteBuildsState.update {
+                            FavoriteBuildsState.Success(uiItems)
+                        }
                     }
+                    Result.success(favoriteBuilds.map { it.buildId })
+
                 } catch (e: Exception) {
                     Result.failure(e)
                 }
@@ -106,14 +106,18 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
         }
     }
 
-    override suspend fun addFavoriteBuild(buildDetails: BuildListItem) {
+    override suspend fun addFavoriteBuild(buildDetails: BuildUiListItem) {
         when (authRepository.userState.value) {
             // Local User
             is UserState.Unauthenticated -> {
                 val favoriteBuildEntity = buildDetails.asFavoriteBuildListEntity()
                 favoriteBuildDao.insertFavoriteBuildListItem(favoriteBuildEntity)
+                val favoriteBuildListItem =
+                    buildListItemDataMapper.createFavoriteBuildListItemFrom(favoriteBuildEntity)
                 val favoriteBuildUiListItem =
-                    buildListItemUiMapper.buildFrom(favoriteBuildEntity.asFavoriteBuildListItem())
+                    buildListItemUiMapper.buildFrom(
+                        favoriteBuildListItem,
+                    )
                 _favoriteBuildsState.update { state ->
                     when (state) {
                         is FavoriteBuildsState.Empty -> {
@@ -140,8 +144,14 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
                         return
                     } else {
                         val favoriteBuildDto = buildDetails.asFavoriteBuildDto(user.id!!)
+                        val favoriteBuildListItem =
+                            buildListItemDataMapper.createFavoriteBuildListItemFrom(
+                                favoriteBuildDto
+                            )
                         val favoriteBuildUiListItem =
-                            buildListItemUiMapper.buildFrom(favoriteBuildDto.asFavoriteBuildListItem())
+                            buildListItemUiMapper.buildFrom(
+                                favoriteBuildListItem,
+                            )
                         postgrestService.insertFavoriteBuild(favoriteBuildDto)
                         _favoriteBuildsState.update { state ->
                             (state as FavoriteBuildsState.Success).copy(
@@ -157,6 +167,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
                     logDebug(e.toString())
                 }
             }
+
             else -> {}
         }
     }
@@ -226,6 +237,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
                     logDebug(e.toString())
                 }
             }
+
             else -> {}
         }
     }

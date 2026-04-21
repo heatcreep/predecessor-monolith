@@ -11,7 +11,7 @@ import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
 import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
 import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.model.data.HeroDetails
-import com.aowen.predcompanion.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.model.data.PlayerDetails
 import com.aowen.predcompanion.logDebug
 import com.aowen.predcompanion.core.network.Resource
@@ -105,14 +105,15 @@ class SearchScreenViewModel @Inject constructor(
             val recentSearchesDeferredResult =
                 async { userRecentSearchesRepository.getRecentSearches() }
 
-            val itemsDeferredResult =
+            val itemsWarmupDeferred =
                 async { omedaCityItemRepository.fetchAllItems() }
 
             val heroesDeferredResult =
                 async { omedaCityHeroRepository.fetchAllHeroes() }
 
             val recentSearches = recentSearchesDeferredResult.await()
-            val itemsResult = itemsDeferredResult.await()
+            itemsWarmupDeferred.await()
+            val allItems = omedaCityItemRepository.getAllItems()
             val heroesState = when (val heroesResource = heroesDeferredResult.await()) {
                 is Resource.Success -> {
                     if (heroesResource.data.isEmpty()) {
@@ -131,22 +132,10 @@ class SearchScreenViewModel @Inject constructor(
                 }
             }
 
-            val itemsState = when (itemsResult) {
-                is Resource.Success -> {
-                    if (itemsResult.data.isEmpty()) {
-                        AllItemsState.Empty
-                    } else {
-                        AllItemsState.Success(itemsResult.data)
-                    }
-                }
-
-                is Resource.NetworkError -> {
-                    AllItemsState.Error(itemsResult.errorMessage)
-                }
-
-                is Resource.GenericError -> {
-                    AllItemsState.Error(itemsResult.errorMessage)
-                }
+            val itemsState = if (allItems.isEmpty()) {
+                AllItemsState.Empty
+            } else {
+                AllItemsState.Success(allItems)
             }
 
             _uiState.update {

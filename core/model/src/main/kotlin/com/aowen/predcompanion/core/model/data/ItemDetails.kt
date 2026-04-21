@@ -1,7 +1,8 @@
-package com.aowen.predcompanion.data
+package com.aowen.predcompanion.core.model.data
 
 import com.aowen.predcompanion.core.common.network.RetrofitHelper
-import com.aowen.predcompanion.core.model.data.HeroClass
+import com.aowen.predcompanion.data.EffectDto
+import com.aowen.predcompanion.data.ItemDto
 import com.aowen.predcompanion.core.resources.R as coreResources
 
 data class EffectDetails(
@@ -182,7 +183,7 @@ data class ItemDetails(
     val gameId: Int = 0,
     val name: String = "",
     val displayName: String = "",
-    val image: String = "",
+    val imageSrc: String = "",
     val price: Int? = 0,
     val totalPrice: Int = 0,
     val slotType: SlotType = SlotType.PASSIVE,
@@ -228,7 +229,7 @@ fun ItemDto.asItemDetails(): ItemDetails {
         gameId = this.gameId ?: 0,
         name = this.name,
         displayName = this.displayName,
-        image = RetrofitHelper.getRankImageUrl(this.image),
+        imageSrc = RetrofitHelper.getRankImageUrl(this.image),
         price = this.price ?: 0,
         totalPrice = this.totalPrice,
         slotType = slotType,

@@ -1,12 +1,13 @@
-package com.aowen.predcompanion.feature.heroes.herodetails.preview
+package com.aowen.predcompanion.feature.heroes.impl.herodetails.preview
 
+import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.model.data.AbilityDetails
-import com.aowen.predcompanion.data.HeroBaseStats
 import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.data.HeroBaseStats
 import com.aowen.predcompanion.data.HeroStatistics
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.feature.heroes.impl.herodetails.HeroDetailsUiState
 import java.math.BigDecimal
 
@@ -61,16 +62,16 @@ val heroBuildsState = HeroDetailsUiState(
         pickRate = 62.13f
     ),
     heroBuilds = listOf(
-        BuildUiListItem.NormalBuildUiListItem(
+        BuildUiListItem(
             buildId = 1,
             title = "Muriel Support Build [0.13.1]",
             description = "Test Build Description",
             heroId = 15,
-            buildItems = listOf(1, 1, 1, 1, 1),
+            buildItems = listOf(ItemDetails()),
             createdAt = "2021-01-01",
             updatedAt = "2021-01-01",
             author = "heatcreep.tv",
-            crest = 1,
+            crest = ItemDetails(),
             role = "Support"
         )
     ),

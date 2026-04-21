@@ -38,15 +38,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.aowen.monolith.data.MatchPlayerDetails
-import com.aowen.predcompanion.core.model.data.getItemImage
 import com.aowen.monolith.data.getKda
 import com.aowen.predcompanion.core.model.data.HeroRole
-import com.aowen.predcompanion.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.model.data.getHeroImage
 import com.aowen.predcompanion.ui.common.PlayerIcon
 import com.aowen.predcompanion.ui.components.KDAText
@@ -70,8 +69,6 @@ fun PlayerRow(
     val roleImage = HeroRole.entries.firstOrNull {
         it.roleName == player.role
     }
-
-    val context = LocalContext.current
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
         Row(
             modifier = Modifier
@@ -103,14 +100,12 @@ fun PlayerRow(
                     fontWeight = FontWeight.ExtraBold
                 )
                 // VP Change
-                player.vpChange?.let { vpChange ->
-                    Text(
-                        text = vpChange,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = player.vpChange.handleVpChangeColor(),
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                }
+                Text(
+                    text = player.vpChange,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = player.vpChange.handleVpChangeColor(),
+                    fontWeight = FontWeight.ExtraBold
+                )
             }
             Spacer(modifier = Modifier.size(28.dp))
             Row(
@@ -121,31 +116,31 @@ fun PlayerRow(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                        PlayerIcon(
-                            modifier = Modifier.clickable {
-                                navigateToPlayerDetails(player.playerId)
-                            },
-                            heroImageId = getHeroImage(player.heroId),
-                        ) {
-                            roleImage?.let {
-                                Image(
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.primaryContainer)
-                                        .border(
-                                            width = 1.dp,
-                                            color = MaterialTheme.colorScheme.secondary,
-                                            shape = CircleShape
-                                        )
-                                        .align(Alignment.BottomEnd),
-                                    contentScale = ContentScale.Crop,
-                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                                    painter = painterResource(id = it.drawableId),
-                                    contentDescription = null
-                                )
-                            }
+                    PlayerIcon(
+                        modifier = Modifier.clickable {
+                            navigateToPlayerDetails(player.playerId)
+                        },
+                        heroImageId = getHeroImage(player.heroId),
+                    ) {
+                        roleImage?.let {
+                            Image(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        shape = CircleShape
+                                    )
+                                    .align(Alignment.BottomEnd),
+                                contentScale = ContentScale.Crop,
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                                painter = painterResource(id = it.drawableId),
+                                contentDescription = null
+                            )
                         }
+                    }
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
                         text = player.playerName,
@@ -204,11 +199,11 @@ fun PlayerRow(
                     maxItemsInEachRow = 4
                 ) {
                     playerItems.forEach { item ->
-                        Image(
+                        AsyncImage(
                             modifier = Modifier
                                 .size(56.dp)
                                 .clickable { openItemDetails(item) },
-                            painter = painterResource(id = getItemImage(item.id)),
+                            model = item.imageSrc,
                             contentDescription = null
                         )
                     }

@@ -3,8 +3,6 @@ package com.aowen.predcompanion.core.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.aowen.predcompanion.data.BuildListItem
-import com.aowen.predcompanion.data.FavoriteBuildListItem
 
 @Entity(
     tableName = "favorite_builds"
@@ -26,37 +24,3 @@ data class FavoriteBuildListEntity(
     val createdAt: String?,
     val gameVersion: String
 )
-
-fun FavoriteBuildListEntity.asBuildListItem(): BuildListItem {
-    return BuildListItem(
-        id = this.buildId,
-        title = this.title,
-        author = this.author,
-        role = this.role,
-        description = this.description,
-        heroId = this.heroId,
-        crest = this.crestId,
-        buildItems = this.itemIds,
-        upvotes = this.upvotesCount,
-        downvotes = this.downvotesCount,
-        createdAt = this.createdAt,
-        version = this.gameVersion
-    )
-}
-
-fun FavoriteBuildListEntity.asFavoriteBuildListItem(): FavoriteBuildListItem {
-    return FavoriteBuildListItem(
-        buildId = this.buildId,
-        heroId = this.heroId,
-        role = this.role,
-        title = this.title,
-        description = this.description,
-        author = this.author,
-        crestId = this.crestId,
-        itemIds = this.itemIds,
-        upvotesCount = this.upvotesCount,
-        downvotesCount = this.downvotesCount,
-        createdAt = this.createdAt,
-        gameVersion = this.gameVersion
-    )
-}

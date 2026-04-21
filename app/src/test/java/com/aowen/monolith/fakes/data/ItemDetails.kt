@@ -1,6 +1,6 @@
 package com.aowen.predcompanion.fakes.data
 
-import com.aowen.predcompanion.data.asItemDetails
+import com.aowen.predcompanion.core.model.data.asItemDetails
 
 
 val fakeAllItems = listOf(

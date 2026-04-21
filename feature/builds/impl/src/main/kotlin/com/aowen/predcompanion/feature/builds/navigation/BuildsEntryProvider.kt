@@ -16,7 +16,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.aowen.predcompanion.feature.builds.BuildsScreenRoute
-import com.aowen.predcompanion.feature.builds.addbuild.navigation.AddBuildNavigation
 import com.aowen.predcompanion.feature.builds.api.navigation.BuildsNavKey
 import com.aowen.predcompanion.feature.builds.api.navigation.navigateToBuildDetails
 import com.aowen.predcompanion.feature.builds.builddetails.BuildDetailsScreen
@@ -83,8 +82,5 @@ fun EntryProviderScope<NavKey>.buildsEntry(navigator: Navigator) {
                 onItemClicked = viewModel::onItemClicked
             )
         }
-    }
-    entry<BuildsNavKey.AddBuild> {
-        AddBuildNavigation(navigator)
     }
 }

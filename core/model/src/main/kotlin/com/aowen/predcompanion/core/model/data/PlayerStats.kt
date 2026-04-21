@@ -1,7 +1,6 @@
 package com.aowen.predcompanion.core.model.data
 
 import com.aowen.predcompanion.data.PlayerStatsDto
-import com.aowen.predcompanion.data.toPercentageString
 import kotlinx.serialization.Serializable
 
 @Serializable

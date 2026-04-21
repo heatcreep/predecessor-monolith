@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.data.EffectDetails
+import com.aowen.predcompanion.core.model.data.EffectDetails
 import com.aowen.predcompanion.ui.utils.StyledText
 
 @OptIn(ExperimentalLayoutApi::class)

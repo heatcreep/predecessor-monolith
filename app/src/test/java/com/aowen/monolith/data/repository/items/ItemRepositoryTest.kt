@@ -1,6 +1,6 @@
 package com.aowen.predcompanion.data.repository.items
 
-import com.aowen.predcompanion.data.asItemDetails
+import com.aowen.predcompanion.core.model.data.asItemDetails
 import com.aowen.predcompanion.fakes.FakeOmedaCityService
 import com.aowen.predcompanion.fakes.data.fakeItemDto
 import com.aowen.predcompanion.core.network.Resource

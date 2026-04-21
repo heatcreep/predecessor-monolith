@@ -36,12 +36,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.aowen.predcompanion.core.model.data.getHeroRole
-import com.aowen.predcompanion.ui.common.PlayerIcon
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.model.data.getHeroImage
-import com.aowen.predcompanion.core.model.data.getItemImage
+import com.aowen.predcompanion.core.model.data.getHeroRole
+import com.aowen.predcompanion.ui.common.PlayerIcon
 import com.aowen.predcompanion.ui.theme.GreenHighlight
 import com.aowen.predcompanion.ui.theme.RedHighlight
 
@@ -98,7 +99,10 @@ fun BuildListCard(
                         )
                     }
                 }
-                Column {
+                Column(
+                    modifier = Modifier.fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center
+                ) {
                     Text(
                         text = build.title,
                         style = MaterialTheme.typography.bodyMedium.copy(
@@ -134,18 +138,20 @@ fun BuildListCard(
                         }
                     }
                     val itemIconHeight = 28.dp
-                    Row {
-                        Image(
-                            modifier = Modifier.height(itemIconHeight),
-                            painter = painterResource(id = getItemImage(build.crest)),
-                            contentDescription = null
-                        )
-                        build.buildItems.forEach {
-                            Image(
+                    if (build.crest.imageSrc.isNotEmpty() && build.buildItems.isNotEmpty()) {
+                        Row {
+                            AsyncImage(
                                 modifier = Modifier.height(itemIconHeight),
-                                painter = painterResource(id = getItemImage(it)),
+                                model = build.crest.imageSrc,
                                 contentDescription = null
                             )
+                            build.buildItems.forEach {
+                                AsyncImage(
+                                    modifier = Modifier.height(itemIconHeight),
+                                    model = it.imageSrc,
+                                    contentDescription = null
+                                )
+                            }
                         }
                     }
                 }
@@ -205,16 +211,16 @@ fun BuildListItemPreview() {
                 modifier = Modifier.padding(16.dp)
             ) {
                 BuildListCard(
-                    build = BuildUiListItem.FavoriteBuildUiListItem(
+                    build = BuildUiListItem(
                         buildId = 1,
                         title = "Muriel Support Build",
                         description = "Test Build Description",
                         heroId = 15,
                         version = "v1.7",
-                        buildItems = listOf(207, 199, 171,117, 211, 214),
+                        buildItems = listOf(ItemDetails()),
                         updatedAt = "2021-01-01",
                         author = "heatcreep.tv",
-                        crest = 34,
+                        crest = ItemDetails(),
                         role = "Support"
                     ),
                     navigateToBuildDetails = {}

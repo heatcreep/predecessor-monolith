@@ -1,82 +1,53 @@
 package com.aowen.predcompanion.core.data.model.mapper
 
+import com.aowen.predcompanion.core.data.repository.items.ItemRepository
+import com.aowen.predcompanion.core.database.model.FavoriteBuildListEntity
+import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.data.BuildListItem
-import com.aowen.predcompanion.data.FavoriteBuildListItem
+import com.aowen.predcompanion.data.FavoriteBuildDto
 import com.aowen.predcompanion.data.ItemModule
+import java.sql.Timestamp
+import java.util.UUID
 import javax.inject.Inject
 
+data class ItemModuleUi(
+    val id: String? = null,
+    val title: String = "",
+    val items: List<ItemDetails> = emptyList(),
+)
 
-sealed class BuildUiListItem(
-    open val buildId: Int,
-    open val userId: String?,
-    open val title: String,
-    open val author: String,
-    open val role: String,
-    open val description: String?,
-    open val heroId: Long,
-    open val crest: Int,
-    open val buildItems: List<Int>,
-    open val skillOrder: List<Int>?,
-    open val netVotes: Int,
-    open val upvotes: Int,
-    open val downvotes: Int,
-    open val modules: List<ItemModule>,
-    open val createdAt: String?,
-    open val updatedAt: String?,
-    open val version: String?
+data class BuildUiListItem(
+    val buildId: Int,
+    val userId: String? = null,
+    val title: String,
+    val author: String,
+    val role: String,
+    val description: String? = null,
+    val heroId: Long,
+    val crest: ItemDetails = ItemDetails(),
+    val buildItems: List<ItemDetails> = emptyList(),
+    val skillOrder: List<Int>? = null,
+    val netVotes: Int = 0,
+    val upvotes: Int = 0,
+    val downvotes: Int = 0,
+    val modules: List<ItemModuleUi> = emptyList(),
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
+    val version: String? = null
+)
+
+
+class BuildListItemUiMapper @Inject constructor(
+    itemRepository: ItemRepository
 ) {
 
-    data class NormalBuildUiListItem(
-        override val buildId: Int,
-        override val userId: String? = null,
-        override val title: String,
-        override val author: String,
-        override val role: String,
-        override val description: String? = null,
-        override val heroId: Long,
-        override val crest: Int = 0,
-        override val buildItems: List<Int> = emptyList(),
-        override val skillOrder: List<Int>? = null,
-        override val netVotes: Int = 0,
-        override val upvotes: Int = 0,
-        override val downvotes: Int = 0,
-        override val modules: List<ItemModule> = emptyList(),
-        override val createdAt: String? = null,
-        override val updatedAt: String? = null,
-        override val version: String? = null
-    ) : BuildUiListItem(
-        buildId, userId, title, author, role, description, heroId, crest, buildItems, skillOrder,
-        netVotes, upvotes, downvotes, modules, createdAt, updatedAt, version
-    )
+    val items = itemRepository.allItems.value
 
-    data class FavoriteBuildUiListItem(
-        override val buildId: Int,
-        override val userId: String? = null,
-        override val title: String,
-        override val author: String,
-        override val role: String,
-        override val description: String? = null,
-        override val heroId: Long,
-        override val crest: Int = 0,
-        override val buildItems: List<Int> = emptyList(),
-        override val skillOrder: List<Int>? = null,
-        override val netVotes: Int = 0,
-        override val upvotes: Int = 0,
-        override val downvotes: Int = 0,
-        override val modules: List<ItemModule> = emptyList(),
-        override val createdAt: String? = null,
-        override val updatedAt: String? = null,
-        override val version: String? = null
-    ) : BuildUiListItem(
-        buildId, userId, title, author, role, description, heroId, crest, buildItems, skillOrder,
-        netVotes, upvotes, downvotes, modules, createdAt, updatedAt, version
-    )
-}
-
-class BuildListItemUiMapper @Inject constructor() {
-
-    fun buildFrom(buildListItem: BuildListItem): BuildUiListItem.NormalBuildUiListItem {
-        return BuildUiListItem.NormalBuildUiListItem(
+    fun buildFrom(
+        buildListItem: BuildListItem,
+    ): BuildUiListItem {
+        return BuildUiListItem(
             buildId = buildListItem.id,
             userId = buildListItem.userId,
             title = buildListItem.title,
@@ -84,29 +55,31 @@ class BuildListItemUiMapper @Inject constructor() {
             role = buildListItem.role,
             description = buildListItem.description,
             heroId = buildListItem.heroId,
-            crest = buildListItem.crest,
-            buildItems = buildListItem.buildItems,
+            crest = items[buildListItem.crestId] ?: ItemDetails(),
+            buildItems = buildListItem.buildItemIds.mapNotNull { items[it] },
             skillOrder = buildListItem.skillOrder,
             netVotes = buildListItem.netVotes,
             upvotes = buildListItem.upvotes,
             downvotes = buildListItem.downvotes,
-            modules = buildListItem.modules,
+            modules = buildListItem.modules.map { it.toUi(items) },
             createdAt = buildListItem.createdAt,
             updatedAt = buildListItem.updatedAt,
             version = buildListItem.version
         )
     }
 
-    fun buildFrom(favoriteBuildListItem: FavoriteBuildListItem): BuildUiListItem.FavoriteBuildUiListItem {
-        return BuildUiListItem.FavoriteBuildUiListItem(
+    fun buildFrom(
+        favoriteBuildListItem: FavoriteBuildListItem,
+    ): BuildUiListItem {
+        return BuildUiListItem(
             buildId = favoriteBuildListItem.buildId,
             title = favoriteBuildListItem.title,
             author = favoriteBuildListItem.author,
             role = favoriteBuildListItem.role,
             description = favoriteBuildListItem.description,
             heroId = favoriteBuildListItem.heroId,
-            crest = favoriteBuildListItem.crestId,
-            buildItems = favoriteBuildListItem.itemIds,
+            crest = items[favoriteBuildListItem.crestId] ?: ItemDetails(),
+            buildItems = favoriteBuildListItem.itemIds.mapNotNull { items[it] },
             upvotes = favoriteBuildListItem.upvotesCount,
             downvotes = favoriteBuildListItem.downvotesCount,
             createdAt = favoriteBuildListItem.createdAt,
@@ -114,3 +87,46 @@ class BuildListItemUiMapper @Inject constructor() {
         )
     }
 }
+
+fun BuildUiListItem.asFavoriteBuildDto(userId: UUID): FavoriteBuildDto {
+    return FavoriteBuildDto(
+        id = UUID.randomUUID(),
+        createdAt = Timestamp(System.currentTimeMillis()).toString(),
+        userId = userId,
+        buildId = buildId,
+        heroId = heroId,
+        role = role,
+        title = title,
+        description = description,
+        author = author,
+        crestId = crest.id,
+        itemIds = buildItems.map { it.id },
+        upvotesCount = upvotes,
+        downvotesCount = downvotes,
+        gameVersion = version ?: ""
+    )
+}
+
+fun BuildUiListItem.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
+    return FavoriteBuildListEntity(
+        buildId = buildId,
+        heroId = heroId,
+        role = role,
+        title = title,
+        description = description,
+        author = author,
+        crestId = crest.id,
+        itemIds = buildItems.map { it.id },
+        upvotesCount = upvotes,
+        downvotesCount = downvotes,
+        createdAt = createdAt,
+        gameVersion = version ?: ""
+    )
+}
+
+private fun ItemModule.toUi(items: Map<Int, ItemDetails>): ItemModuleUi =
+    ItemModuleUi(
+        id = id,
+        title = title,
+        items = itemIds.mapNotNull { items[it] },
+    )

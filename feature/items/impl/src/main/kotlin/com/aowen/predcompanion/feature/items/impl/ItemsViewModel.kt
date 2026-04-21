@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.model.data.HeroClass
-import com.aowen.predcompanion.data.ItemDetails
-import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.ui.utils.filterOrOriginal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,26 +61,23 @@ class ItemsViewModel @Inject constructor(
 
     private fun initViewModel() {
         viewModelScope.launch {
-            try {
-                val allItems =
-                    itemRepository.fetchAllItems().getOrThrow().sortedBy { it.displayName }
-                val sortedItems = allItems.filterOrOriginal {
-                    it.rarity.value == uiState.value.selectedTierFilter
-                }
+            itemRepository.fetchAllItems()
+            val allItems = itemRepository.getAllItems().sortedBy { it.displayName }
+            if (allItems.isEmpty()) {
                 _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        allItems = allItems,
-                        filteredItems = sortedItems,
-                    )
+                    it.copy(isLoading = false, itemsError = "Failed to fetch items")
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        itemsError = e.message
-                    )
-                }
+                return@launch
+            }
+            val sortedItems = allItems.filterOrOriginal {
+                it.rarity.value == uiState.value.selectedTierFilter
+            }
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    allItems = allItems,
+                    filteredItems = sortedItems,
+                )
             }
         }
     }

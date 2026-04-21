@@ -9,7 +9,7 @@ import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
 import com.aowen.predcompanion.core.model.data.toDecimal
 import com.aowen.predcompanion.core.network.getOrThrow
-import com.aowen.predcompanion.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -58,10 +58,11 @@ class MatchDetailsViewModel @AssistedInject constructor(
         _uiState.value = MatchDetailsUiState(isLoading = true)
         viewModelScope.launch {
             val matchDeferred = async { omedaCityMatchRepository.fetchMatchById(matchId) }
-            val itemsDeferred = async { omedaCityItemRepository.fetchAllItems() }
+            val warmupDeferred = async { omedaCityItemRepository.fetchAllItems() }
 
             try {
-                val allItems = itemsDeferred.await().getOrThrow()
+                warmupDeferred.await()
+                val allItems = omedaCityItemRepository.getAllItems()
                 val match = matchDeferred.await().getOrThrow()
                 val newMatch = match?.copy(
                     dusk = Team.Dusk(

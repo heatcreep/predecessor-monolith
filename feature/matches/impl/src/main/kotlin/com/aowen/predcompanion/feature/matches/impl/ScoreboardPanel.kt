@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.monolith.data.MatchPlayerDetails
-import com.aowen.predcompanion.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.ui.theme.DarkGreenHighlight35
 import com.aowen.predcompanion.ui.theme.DarkRedHighlight
 import com.aowen.predcompanion.ui.theme.GreenHighlight

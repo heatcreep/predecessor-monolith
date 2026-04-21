@@ -60,7 +60,7 @@ import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.RankDetails
 import com.aowen.predcompanion.core.model.data.getHeroImage
 import com.aowen.predcompanion.core.ui.shared.ItemDetailsBottomSheet
-import com.aowen.predcompanion.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.feature.matches.impl.ScoreboardPanel
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator

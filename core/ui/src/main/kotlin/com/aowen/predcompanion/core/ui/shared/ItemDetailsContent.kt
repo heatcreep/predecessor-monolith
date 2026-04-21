@@ -1,6 +1,5 @@
 package com.aowen.predcompanion.core.ui.shared
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,12 +23,12 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.core.resources.R as coreResources
-import com.aowen.predcompanion.core.model.data.getItemImage
-import com.aowen.predcompanion.data.ItemDetails
+import coil.compose.AsyncImage
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.ui.components.ItemEffectRow
 import com.aowen.predcompanion.ui.components.ItemStatRow
 import com.aowen.predcompanion.ui.components.TaperedItemTypeRow
+import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
 fun ItemDetailsContent(
@@ -46,12 +45,12 @@ fun ItemDetailsContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Image(
+        AsyncImage(
             modifier = Modifier
                 .size(160.dp)
                 .clip(CircleShape)
                 .border(2.dp, MaterialTheme.colorScheme.secondary, CircleShape),
-            painter = painterResource(id = getItemImage(itemDetails.id)),
+            model = itemDetails.imageSrc,
             contentDescription = null
         )
         Text(

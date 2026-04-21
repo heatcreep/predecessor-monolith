@@ -4,7 +4,7 @@ package com.aowen.predcompanion.ui
 
 import com.aowen.predcompanion.core.model.data.PlayerDetails
 import com.aowen.predcompanion.core.model.data.asHeroDetails
-import com.aowen.predcompanion.data.asItemDetails
+import com.aowen.predcompanion.core.model.data.asItemDetails
 import com.aowen.predcompanion.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.fakes.FakeUserRecentSearchesRepository
 import com.aowen.monolith.fakes.data.fakeHeroDto

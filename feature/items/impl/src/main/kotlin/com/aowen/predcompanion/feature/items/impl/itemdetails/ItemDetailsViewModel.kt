@@ -3,8 +3,7 @@ package com.aowen.predcompanion.feature.items.impl.itemdetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
-import com.aowen.predcompanion.core.network.getOrThrow
-import com.aowen.predcompanion.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -40,15 +39,13 @@ class ItemDetailsViewModel @AssistedInject constructor(
 
     fun initViewModel() {
         viewModelScope.launch {
-            val itemResponse = itemRepository.fetchItemByName(itemName)
-            try {
-                _uiState.value = ItemDetailsUiState.Loaded(
-                    item = itemResponse.getOrThrow()
-                )
-            } catch (e: Exception) {
-                _uiState.value = ItemDetailsUiState.Error(
-                    message = e.message
-                )
+            // Ensure the cache is warm (no-op if already populated from app startup).
+            itemRepository.fetchAllItems()
+            val item = itemRepository.getItemByName(itemName)
+            _uiState.value = if (item != null) {
+                ItemDetailsUiState.Loaded(item = item)
+            } else {
+                ItemDetailsUiState.Error(message = "Item '$itemName' not found")
             }
         }
     }

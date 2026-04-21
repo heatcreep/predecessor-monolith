@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.data
+package com.aowen.predcompanion.core.model.data
 
 data class FavoriteBuildListItem(
     val buildId: Int,
@@ -14,22 +14,3 @@ data class FavoriteBuildListItem(
     val createdAt: String?,
     val gameVersion: String
 )
-
-fun FavoriteBuildDto.asFavoriteBuildListItem(): FavoriteBuildListItem {
-    return FavoriteBuildListItem(
-        buildId = this.buildId,
-        heroId = this.heroId,
-        role = this.role,
-        title = this.title,
-        description = this.description,
-        author = this.author,
-        crestId = this.crestId,
-        itemIds = this.itemIds,
-        upvotesCount = this.upvotesCount,
-        downvotesCount = this.downvotesCount,
-        createdAt = this.createdAt,
-        gameVersion = this.gameVersion
-    )
-}
-
-

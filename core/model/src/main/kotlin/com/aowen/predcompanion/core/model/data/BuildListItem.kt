@@ -1,5 +1,6 @@
 package com.aowen.predcompanion.data
 
+import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
 import java.sql.Timestamp
 import java.util.UUID
 
@@ -11,8 +12,8 @@ data class BuildListItem(
     val role: String = "unknown",
     val description: String? = "",
     val heroId: Long = 999,
-    val crest: Int = 0,
-    val buildItems: List<Int> = emptyList(),
+    val crestId: Int = 0,
+    val buildItemIds: List<Int> = emptyList(),
     val skillOrder: List<Int>? = null,
     val netVotes: Int = 0,
     val upvotes: Int = 0,
@@ -26,35 +27,15 @@ data class BuildListItem(
 data class ItemModule(
     val id: String? = UUID.randomUUID().toString(),
     val title: String = "",
-    val items: List<Int> = emptyList(),
+    val itemIds: List<Int> = emptyList(),
 )
 
-fun BuildDto.asBuildListItem(): BuildListItem {
-    return BuildListItem(
-        id = id,
-        title = title,
-        author = author,
-        role = role,
-        description = description,
-        heroId = heroId,
-        crest = crestId,
-        buildItems = listOfNotNull(item1Id, item2Id, item3Id, item4Id, item5Id, item6Id),
-        skillOrder = skillOrder,
-        netVotes = upvotesCount - downvotesCount,
-        upvotes = upvotesCount,
-        downvotes = downvotesCount,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        modules = modules.map { it.create() },
-        version = gameVersion.name
-    )
-}
 
-fun ModuleDto.create(): ItemModule {
+fun ModuleDto.toItemModule(): ItemModule {
     return ItemModule(
         id = id,
         title = title,
-        items = listOfNotNull(item1Id, item2Id, item3Id, item4Id, item5Id, item6Id),
+        itemIds = listOfNotNull(item1Id, item2Id, item3Id, item4Id, item5Id, item6Id),
     )
 }
 
@@ -66,8 +47,8 @@ fun BuildListItem.asFavoriteBuildListItem(): FavoriteBuildListItem {
         title = title,
         description = description,
         author = author,
-        crestId = crest,
-        itemIds = buildItems,
+        crestId = crestId,
+        itemIds = buildItemIds,
         upvotesCount = upvotes,
         downvotesCount = downvotes,
         createdAt = createdAt,
@@ -75,21 +56,4 @@ fun BuildListItem.asFavoriteBuildListItem(): FavoriteBuildListItem {
     )
 }
 
-fun BuildListItem.asFavoriteBuildDto(userId: UUID): FavoriteBuildDto {
-    return FavoriteBuildDto(
-        id = UUID.randomUUID(),
-        createdAt = Timestamp(System.currentTimeMillis()).toString(),
-        userId = userId,
-        buildId = id,
-        heroId = heroId,
-        role = role,
-        title = title,
-        description = description,
-        author = author,
-        crestId = crest,
-        itemIds = buildItems,
-        upvotesCount = upvotes,
-        downvotesCount = downvotes,
-        gameVersion = version ?: ""
-    )
-}
+

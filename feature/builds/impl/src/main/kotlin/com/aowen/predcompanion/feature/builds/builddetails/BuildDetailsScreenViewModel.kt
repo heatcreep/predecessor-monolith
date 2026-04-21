@@ -2,14 +2,15 @@ package com.aowen.predcompanion.feature.builds.builddetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
+import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.network.getOrThrow
-import com.aowen.predcompanion.data.BuildListItem
 import com.aowen.predcompanion.data.Console
-import com.aowen.predcompanion.data.ItemDetails
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -26,7 +27,7 @@ data class BuildDetailsErrors(
 
 data class BuildDetailsUiState(
     val isLoading: Boolean = true,
-    val buildDetails: BuildListItem? = null,
+    val buildDetails: BuildUiListItem? = null,
     val isFavorited: Boolean = false,
     val items: List<ItemDetails> = emptyList(),
     val selectedItemDetails: ItemDetails? = null,
@@ -39,7 +40,8 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
     private val userPreferencesDataStore: UserPreferencesManager,
     private val userFavoriteBuildsRepository: UserFavoriteBuildsRepository,
     private val omedaCityItemRepository: ItemRepository,
-    private val omedaCityBuildRepository: BuildRepository
+    private val omedaCityBuildRepository: BuildRepository,
+    private val buildDetailsUiMapper: BuildListItemUiMapper
 ) : ViewModel() {
 
     @AssistedFactory
@@ -54,6 +56,8 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
     private val _console = MutableStateFlow(Console.PC)
     val console = _console
 
+    val allItems = omedaCityItemRepository.allItems.value
+
     init {
         initViewModel()
     }
@@ -63,7 +67,6 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
             val buildsDeferred = async { omedaCityBuildRepository.fetchBuildById(buildId) }
-            val itemsDeferred = async { omedaCityItemRepository.fetchAllItems() }
 
             val favoritedBuilds = userFavoriteBuildsRepository.fetchFavoriteBuildIds()
 
@@ -76,14 +79,12 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
             }
 
             try {
-                val buildDetails = buildsDeferred.await().getOrThrow()
-                val allItems = itemsDeferred.await().getOrThrow()
+                val buildDetails = buildDetailsUiMapper.buildFrom(buildsDeferred.await().getOrThrow())
 
                 _uiState.update {
                     it.copy(
                         isLoading = false,
                         buildDetails = buildDetails,
-                        items = allItems,
                     )
                 }
             } catch (e: Exception) {
@@ -99,7 +100,7 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
         }
     }
 
-    fun onAddBuildToFavorites(build: BuildListItem) {
+    fun onAddBuildToFavorites(build: BuildUiListItem) {
         viewModelScope.launch {
             userFavoriteBuildsRepository.addFavoriteBuild(build)
             _uiState.update {
@@ -108,9 +109,9 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
         }
     }
 
-    fun onRemoveBuildFromFavorites(build: BuildListItem) {
+    fun onRemoveBuildFromFavorites(build: BuildUiListItem) {
         viewModelScope.launch {
-            userFavoriteBuildsRepository.removeFavoriteBuild(build.id)
+            userFavoriteBuildsRepository.removeFavoriteBuild(build.buildId)
             _uiState.update {
                 it.copy(isFavorited = false)
             }
@@ -119,9 +120,7 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
 
     fun onItemClicked(itemId: Int) {
         _uiState.update {
-            it.copy(selectedItemDetails = uiState.value.items.firstOrNull { itemDetails ->
-                itemDetails.id == itemId
-            })
+            it.copy(selectedItemDetails = omedaCityItemRepository.getItemById(itemId))
         }
     }
 }

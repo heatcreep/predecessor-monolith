@@ -3,10 +3,11 @@ package com.aowen.predcompanion.feature.home.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
-import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
-import com.aowen.predcompanion.data.HeroStatistics
 import com.aowen.predcompanion.core.data.repository.user.UserClaimedPlayerRepository
+import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
 import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.data.HeroStatistics
+import com.aowen.predcompanion.feature.home.impl.usecase.VerifyFavoriteBuildsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +57,7 @@ data class HomeScreenUiState(
 class HomeScreenViewModel @Inject constructor(
     private val omedaCityHeroRepository: HeroRepository,
     private val claimedPlayerRepository: UserClaimedPlayerRepository,
-    private val verifyFavoriteBuildsUseCase: com.aowen.predcompanion.feature.home.impl.usecase.VerifyFavoriteBuildsUseCase,
+    private val verifyFavoriteBuildsUseCase: VerifyFavoriteBuildsUseCase,
     private val favoriteBuildsRepository: UserFavoriteBuildsRepository
 ) : ViewModel() {
 

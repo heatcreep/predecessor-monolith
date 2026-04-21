@@ -1,14 +1,15 @@
 package com.aowen.predcompanion.core.data.repository.builds
 
-import com.aowen.predcompanion.data.BuildListItem
-import com.aowen.predcompanion.data.asBuildListItem
+import com.aowen.predcompanion.core.data.repository.BuildListItemDataMapper
 import com.aowen.predcompanion.core.network.OmedaCityService
 import com.aowen.predcompanion.core.network.Resource
 import com.aowen.predcompanion.core.network.safeApiCall
+import com.aowen.predcompanion.data.BuildListItem
 import javax.inject.Inject
 
 class OmedaCityBuildRepository @Inject constructor(
-    private val omedaCityService: OmedaCityService
+    private val omedaCityService: OmedaCityService,
+    private val buildListItemDataMapper: BuildListItemDataMapper,
 ) : BuildRepository {
     override suspend fun fetchAllBuilds(
         name: String?,
@@ -33,12 +34,12 @@ class OmedaCityBuildRepository @Inject constructor(
                     page = page
                 )
             },
-            transform = { builds -> builds.map { it.asBuildListItem() } }
+            transform = { builds -> builds.map { buildListItemDataMapper.createBuildListItem(it) } }
         )
 
     override suspend fun fetchBuildById(buildId: String): Resource<BuildListItem> =
         safeApiCall(
             apiCall = { omedaCityService.getBuildById(buildId) },
-            transform = { build -> build.asBuildListItem() }
+            transform = { build -> buildListItemDataMapper.createBuildListItem(build) }
         )
 }

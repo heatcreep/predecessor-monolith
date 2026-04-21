@@ -1,7 +1,6 @@
 package com.aowen.predcompanion.core.ui.shared
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,10 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.core.model.data.getItemImage
-import com.aowen.predcompanion.data.ItemDetails
+import coil.compose.AsyncImage
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 import com.aowen.predcompanion.ui.theme.BadgeBlueGreen
 import com.aowen.predcompanion.ui.theme.BadgePurple
@@ -122,8 +120,8 @@ fun ItemResultCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Item Image
-                Image(
-                    painter = painterResource(id = getItemImage(itemDetails.id)),
+                AsyncImage(
+                    model = itemDetails.imageSrc,
                     contentDescription = null
                 )
                 Column {

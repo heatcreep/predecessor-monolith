@@ -3,7 +3,7 @@ package com.aowen.monolith.data
 import com.aowen.predcompanion.core.model.data.RankDetails
 import com.aowen.predcompanion.core.model.data.toDecimal
 import com.aowen.predcompanion.core.model.data.toRankedDetailsOrNull
-import com.aowen.predcompanion.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.data.MatchDto
 import com.aowen.predcompanion.data.MatchPlayerDto
 import com.aowen.predcompanion.data.MatchesDto
