@@ -1,45 +1,45 @@
 package com.aowen.predcompanion.core.data.repository
 
+import com.aowen.predcompanion.core.data.model.toItemModule
 import com.aowen.predcompanion.core.database.model.FavoriteBuildListEntity
 import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
-import com.aowen.predcompanion.data.BuildDto
-import com.aowen.predcompanion.data.BuildListItem
-import com.aowen.predcompanion.data.FavoriteBuildDto
-import com.aowen.predcompanion.data.toItemModule
+import com.aowen.predcompanion.core.model.data.HeroBuild
+import com.aowen.predcompanion.core.network.model.NetworkFavoriteHeroBuild
+import com.aowen.predcompanion.core.network.model.NetworkHeroBuild
 import javax.inject.Inject
 
 class BuildListItemDataMapper @Inject constructor() {
 
-    fun createBuildListItem(buildDto: BuildDto): BuildListItem {
+    fun createBuildListItem(networkHeroBuild: NetworkHeroBuild): HeroBuild {
         val allItemIds = listOfNotNull(
-            buildDto.item1Id,
-            buildDto.item2Id,
-            buildDto.item3Id,
-            buildDto.item4Id,
-            buildDto.item5Id,
-            buildDto.item6Id
+            networkHeroBuild.item1Id,
+            networkHeroBuild.item2Id,
+            networkHeroBuild.item3Id,
+            networkHeroBuild.item4Id,
+            networkHeroBuild.item5Id,
+            networkHeroBuild.item6Id
         )
-        return BuildListItem(
-            id = buildDto.id,
-            title = buildDto.title,
-            author = buildDto.author,
-            role = buildDto.role,
-            description = buildDto.description,
-            heroId = buildDto.heroId,
-            crestId = buildDto.crestId,
+        return HeroBuild(
+            id = networkHeroBuild.id,
+            title = networkHeroBuild.title,
+            author = networkHeroBuild.author,
+            role = networkHeroBuild.role,
+            description = networkHeroBuild.description,
+            heroId = networkHeroBuild.heroId,
+            crestId = networkHeroBuild.crestId,
             buildItemIds = allItemIds,
-            skillOrder = buildDto.skillOrder,
-            netVotes = buildDto.upvotesCount - buildDto.downvotesCount,
-            upvotes = buildDto.upvotesCount,
-            downvotes = buildDto.downvotesCount,
-            createdAt = buildDto.createdAt,
-            updatedAt = buildDto.updatedAt,
-            modules = buildDto.modules.map { it.toItemModule() },
-            version = buildDto.gameVersion.name
+            skillOrder = networkHeroBuild.skillOrder,
+            netVotes = networkHeroBuild.upvotesCount - networkHeroBuild.downvotesCount,
+            upvotes = networkHeroBuild.upvotesCount,
+            downvotes = networkHeroBuild.downvotesCount,
+            createdAt = networkHeroBuild.createdAt,
+            updatedAt = networkHeroBuild.updatedAt,
+            modules = networkHeroBuild.modules.map { it.toItemModule() },
+            version = networkHeroBuild.gameVersion.name
         )
     }
 
-    fun createFavoriteBuildListItemFrom(buildDto: FavoriteBuildDto): FavoriteBuildListItem {
+    fun createFavoriteBuildListItemFrom(buildDto: NetworkFavoriteHeroBuild): FavoriteBuildListItem {
         return FavoriteBuildListItem(
             buildId = buildDto.buildId,
             heroId = buildDto.heroId,

@@ -27,6 +27,7 @@ import com.aowen.predcompanion.core.ui.content.HeroPercentageTile
 data class HeroUiInfo(
     val heroName: String,
     val heroPathName: String,
+    val heroImageSrc: String,
     val heroImageId: Int,
     val winRate: Float
 )
@@ -83,7 +84,7 @@ fun HomeScreenHeroesCard(
                 heroUiInfo.forEach { hero ->
                     HeroPercentageTile(
                         heroName = hero.heroName,
-                        heroImageId = hero.heroImageId,
+                        heroImageSrc = hero.heroImageSrc,
                         winRate = hero.winRate,
                         onClick = { onHeroClick(hero.heroImageId.toLong(), hero.heroPathName ) }
                     )
@@ -116,24 +117,28 @@ fun HomeScreenHeroesCardPreview() {
                         HeroUiInfo(
                             heroName = "Countess",
                             heroPathName = "countess",
+                            heroImageSrc = "https://example.com/countess.jpg",
                             heroImageId = 1,
                             winRate = 55.0f
                         ),
                         HeroUiInfo(
                             heroName = "Crunch",
                             heroPathName = "crunch",
+                            heroImageSrc = "https://example.com/crunch.jpg",
                             heroImageId = 2,
                             winRate = 50.0f
                         ),
                         HeroUiInfo(
                             heroName = "Dekker",
                             heroPathName = "dekker",
+                            heroImageSrc = "https://example.com/dekker.jpg",
                             heroImageId = 3,
                             winRate = 55.0f
                         ),
                         HeroUiInfo(
                             heroName = "Drongo",
                             heroPathName = "drongo",
+                            heroImageSrc = "https://example.com/drongo.jpg",
                             heroImageId = 4,
                             winRate = 50.0f
                         ),

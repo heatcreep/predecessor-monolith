@@ -15,7 +15,10 @@ class AndroidFeatureImplConventionPlugin : Plugin<Project> {
             apply(plugin = "predcompanion.hilt")
 
             extensions.configure<LibraryExtension> {
-                testOptions.animationsDisabled = true
+                testOptions {
+                    animationsDisabled = true
+                    unitTests.isReturnDefaultValues = true
+                }
             }
 
             dependencies {

@@ -137,7 +137,7 @@ fun MediumPlayerStatsSuccess(
             Column(modifier = GlanceModifier.fillMaxWidth()) {
                 StatRow(
                     statLabel = "Favorite Hero",
-                    statValue = playerStats.favoriteHero
+                    statValue = playerStats.favoriteHero?.name ?: "N/A"
                 )
                 Divider()
             }

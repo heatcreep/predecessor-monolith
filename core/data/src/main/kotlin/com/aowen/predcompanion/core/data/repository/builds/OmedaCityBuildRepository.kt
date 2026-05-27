@@ -1,14 +1,14 @@
 package com.aowen.predcompanion.core.data.repository.builds
 
+import com.aowen.predcompanion.core.model.data.HeroBuild
 import com.aowen.predcompanion.core.data.repository.BuildListItemDataMapper
-import com.aowen.predcompanion.core.network.OmedaCityService
+import com.aowen.predcompanion.core.network.PredCompanionNetworkDataSource
 import com.aowen.predcompanion.core.network.Resource
 import com.aowen.predcompanion.core.network.safeApiCall
-import com.aowen.predcompanion.data.BuildListItem
 import javax.inject.Inject
 
 class OmedaCityBuildRepository @Inject constructor(
-    private val omedaCityService: OmedaCityService,
+    private val retrofitOmedaCityNetwork: PredCompanionNetworkDataSource,
     private val buildListItemDataMapper: BuildListItemDataMapper,
 ) : BuildRepository {
     override suspend fun fetchAllBuilds(
@@ -20,10 +20,10 @@ class OmedaCityBuildRepository @Inject constructor(
         currentVersion: Int?,
         modules: Int?,
         page: Int?
-    ): Resource<List<BuildListItem>> =
+    ): Resource<List<HeroBuild>> =
         safeApiCall(
             apiCall = {
-                omedaCityService.getBuilds(
+                retrofitOmedaCityNetwork.getBuilds(
                     name = name,
                     role = role,
                     order = order,
@@ -37,9 +37,9 @@ class OmedaCityBuildRepository @Inject constructor(
             transform = { builds -> builds.map { buildListItemDataMapper.createBuildListItem(it) } }
         )
 
-    override suspend fun fetchBuildById(buildId: String): Resource<BuildListItem> =
+    override suspend fun fetchBuildById(buildId: String): Resource<HeroBuild> =
         safeApiCall(
-            apiCall = { omedaCityService.getBuildById(buildId) },
+            apiCall = { retrofitOmedaCityNetwork.getBuildById(buildId) },
             transform = { build -> buildListItemDataMapper.createBuildListItem(build) }
         )
 }

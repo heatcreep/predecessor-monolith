@@ -2,11 +2,10 @@ package com.aowen.predcompanion.core.data.repository.auth
 
 import com.aowen.predcompanion.core.database.dao.ClaimedPlayerDao
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
-import com.aowen.predcompanion.core.model.network.UserState
 import com.aowen.predcompanion.core.network.SupabaseAuthService
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
-import com.aowen.predcompanion.logDebug
-import com.aowen.predcompanion.network.UserProfile
+import com.aowen.predcompanion.core.network.model.NetworkUserProfile
+import com.aowen.predcompanion.core.network.model.NetworkUserState
 import io.github.jan.supabase.gotrue.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,13 +18,13 @@ import javax.inject.Singleton
 
 interface AuthRepository {
 
-    val userState: StateFlow<UserState>
+    val networkUserState: StateFlow<NetworkUserState>
 
     suspend fun handleSuccessfulLoginFromDiscord()
 
     suspend fun signInWithDiscord(): Result<Unit?>
 
-    suspend fun getPlayer(): Result<UserProfile?>
+    suspend fun getPlayer(): Result<NetworkUserProfile?>
     suspend fun handleSavePlayer(playerId: String): Result<Unit>
 
     suspend fun deleteUserAccount(userId: String): Result<String>
@@ -41,24 +40,23 @@ class SupabaseAuthRepository @Inject constructor(
     private val userPreferencesManager: UserPreferencesManager
 ) : AuthRepository {
 
-    private val _userState = MutableStateFlow<UserState>(UserState.Loading)
-    override val userState: StateFlow<UserState> = _userState
+    private val _Network_userState = MutableStateFlow<NetworkUserState>(NetworkUserState.Loading)
+    override val networkUserState: StateFlow<NetworkUserState> = _Network_userState
 
     override suspend fun handleSuccessfulLoginFromDiscord() {
-        _userState.update { UserState.Authenticated }
+        _Network_userState.update { NetworkUserState.Authenticated }
     }
 
     override suspend fun getCurrentSessionStatus() {
         val hasSkippedOnboarding = userPreferencesManager.hasSkippedOnboarding.first()
         try {
             val sessionStatus = authService.awaitAuthService().first()
-            logDebug("Session status: $sessionStatus", "AuthViewModel")
             when (sessionStatus) {
-                is SessionStatus.LoadingFromStorage -> _userState.update { UserState.Loading }
-                is SessionStatus.Authenticated -> _userState.update { UserState.Authenticated }
+                is SessionStatus.LoadingFromStorage -> _Network_userState.update { NetworkUserState.Loading }
+                is SessionStatus.Authenticated -> _Network_userState.update { NetworkUserState.Authenticated }
                 is SessionStatus.NotAuthenticated -> {
-                    _userState.update {
-                        UserState.Unauthenticated(hasSkippedOnboarding = hasSkippedOnboarding)
+                    _Network_userState.update {
+                        NetworkUserState.Unauthenticated(hasSkippedOnboarding = hasSkippedOnboarding)
                     }
                 }
 
@@ -82,14 +80,14 @@ class SupabaseAuthRepository @Inject constructor(
         }
     }
 
-    override suspend fun getPlayer(): Result<UserProfile?> {
-        when (userState.value) {
-            is UserState.Unauthenticated -> {
+    override suspend fun getPlayer(): Result<NetworkUserProfile?> {
+        when (networkUserState.value) {
+            is NetworkUserState.Unauthenticated -> {
                 val playerId = claimedPlayerDao.getClaimedPlayerIds().firstOrNull()?.firstOrNull()
-                return Result.success(UserProfile(playerId))
+                return Result.success(NetworkUserProfile(playerId))
             }
 
-            is UserState.Authenticated -> {
+            is NetworkUserState.Authenticated -> {
                 return try {
                     val session = withTimeoutOrNull(1000) {
                         authService.currentSession()

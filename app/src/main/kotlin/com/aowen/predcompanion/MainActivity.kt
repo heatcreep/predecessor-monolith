@@ -19,7 +19,7 @@ import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.predcompanion.core.datastore.ThemePreferences
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.network.UserState
+import com.aowen.predcompanion.core.network.model.NetworkUserState
 import com.aowen.predcompanion.feature.auth.api.navigation.AuthNavKey
 import com.aowen.predcompanion.feature.auth.impl.navigation.loginEntry
 import com.aowen.predcompanion.ui.MonolithApp
@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val localTheme by themePreferences.theme.collectAsStateWithLifecycle(initialValue = Theme.SYSTEM)
-            val userState by authRepository.userState.collectAsStateWithLifecycle()
+            val userState by authRepository.networkUserState.collectAsStateWithLifecycle()
 
             MonolithTheme(localTheme = localTheme) {
                 Surface(
@@ -69,15 +69,15 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     when (val state = userState) {
-                        is UserState.Authenticated -> MonolithApp()
-                        is UserState.Unauthenticated -> {
+                        is NetworkUserState.Authenticated -> MonolithApp()
+                        is NetworkUserState.Unauthenticated -> {
                             if (state.hasSkippedOnboarding) {
                                 MonolithApp()
                             } else {
                                 UnauthenticatedRoot()
                             }
                         }
-                        is UserState.Loading -> Unit // splash
+                        is NetworkUserState.Loading -> Unit // splash
                     }
                 }
             }

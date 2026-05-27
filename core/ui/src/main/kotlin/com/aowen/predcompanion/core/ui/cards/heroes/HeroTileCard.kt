@@ -33,10 +33,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.resources.R as coreResources
-import com.aowen.predcompanion.core.model.data.Hero
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.ui.theme.WarmWhite
+import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
 fun HeroTileCard(
@@ -138,7 +137,7 @@ fun HeroCardPreview() {
             items(5) {
                 HeroTileCard(
                     hero = HeroDetails(
-                        imageId = Hero.NARBASH.drawableId,
+                        imageUrl = null,
                         displayName = "Narbash"
                     ),
                     isSelected = true

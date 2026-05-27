@@ -22,28 +22,39 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.core.ui.cards.claimedplayer.ClaimedPlayerCard
-import com.aowen.predcompanion.core.data.repository.user.ClaimedPlayerState
-import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.ui.cards.claimedplayer.ClaimedPlayerCard
+import com.aowen.predcompanion.core.ui.model.mapper.ClaimedPlayerCardUiModel
+import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 
-class SampleSearchScreenUiStateProvider : PreviewParameterProvider<ClaimedPlayerState> {
-    override val values: Sequence<ClaimedPlayerState> = sequenceOf(
-        ClaimedPlayerState.Loading,
-        ClaimedPlayerState.Error(message = "Something went wrong"),
-        ClaimedPlayerState.NoClaimedPlayer
+class SampleClaimedPlayerUiStateProvider : PreviewParameterProvider<ClaimedPlayerUiState> {
+    override val values: Sequence<ClaimedPlayerUiState> = sequenceOf(
+        ClaimedPlayerUiState.Loading,
+        ClaimedPlayerUiState.Error(message = "Something went wrong"),
+        ClaimedPlayerUiState.NoClaimed,
+        ClaimedPlayerUiState.Claimed(
+            playerName = "Player Name",
+            player = ClaimedPlayerCardUiModel(
+                playerId = "1",
+                heroImageUrl = null,
+                winRate = "55%",
+                rankText = "Gold (+100)",
+                rankColor = Color.Yellow,
+                rankImageModel = ""
+            )
+        )
     )
 }
 
 @Composable
 fun ClaimedPlayerSection(
-    claimedPlayerState: ClaimedPlayerState,
-    claimedPlayerName: String?,
+    claimedPlayerUiState: ClaimedPlayerUiState,
     modifier: Modifier = Modifier,
     onOpenBottomSheet: () -> Unit = {},
     navigateToPlayerDetails: (String) -> Unit = {}
@@ -57,9 +68,9 @@ fun ClaimedPlayerSection(
             style = MaterialTheme.typography.titleMedium
         )
         Spacer(modifier = Modifier.size(8.dp))
-        AnimatedContent(targetState = claimedPlayerState, label = "") { state ->
+        AnimatedContent(targetState = claimedPlayerUiState, label = "") { state ->
             when (state) {
-                is ClaimedPlayerState.Loading -> {
+                is ClaimedPlayerUiState.Loading -> {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -74,13 +85,12 @@ fun ClaimedPlayerSection(
                     }
                 }
 
-                is ClaimedPlayerState.Error -> {
+                is ClaimedPlayerUiState.Error -> {
                     Card(
                         modifier = modifier,
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
-
-                            )
+                        )
                     ) {
                         Row(
                             modifier = Modifier
@@ -109,13 +119,12 @@ fun ClaimedPlayerSection(
                     }
                 }
 
-                is ClaimedPlayerState.NoClaimedPlayer -> {
+                is ClaimedPlayerUiState.NoClaimed -> {
                     Card(
                         modifier = modifier,
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer,
-
-                            )
+                        )
                     ) {
                         Column(
                             modifier = Modifier
@@ -151,23 +160,14 @@ fun ClaimedPlayerSection(
                     }
                 }
 
-                is ClaimedPlayerState.Claimed -> {
-                    val claimedPlayer = state.claimedPlayer
-                    val playerDetails = claimedPlayer.playerDetails
-                    val playerStats = claimedPlayer.playerStats
-                    if (playerStats != null && playerDetails != null) {
-                        ClaimedPlayerCard(
-                            playerDetails = playerDetails,
-                            playerStats = playerStats,
-                            navigateToPlayerDetails = navigateToPlayerDetails,
-                            playerName = claimedPlayerName
-                                ?: playerDetails.playerName
-                        )
-                    }
+                is ClaimedPlayerUiState.Claimed -> {
+                    ClaimedPlayerCard(
+                        claimedPlayer = state.player,
+                        navigateToPlayerDetails = navigateToPlayerDetails,
+                        playerName = state.playerName
+                    )
                 }
             }
-
-
         }
     }
 }
@@ -175,13 +175,12 @@ fun ClaimedPlayerSection(
 @PreviewLightDark
 @Composable
 fun ClaimedPlayerSectionPreview(
-    @PreviewParameter(SampleSearchScreenUiStateProvider::class) claimedPlayerState: ClaimedPlayerState
+    @PreviewParameter(SampleClaimedPlayerUiStateProvider::class) claimedPlayerUiState: ClaimedPlayerUiState
 ) {
     MonolithTheme {
         Surface {
             ClaimedPlayerSection(
-                claimedPlayerName = "Player Name",
-                claimedPlayerState = claimedPlayerState
+                claimedPlayerUiState = claimedPlayerUiState
             )
         }
     }

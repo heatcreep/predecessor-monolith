@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.HeroRole
-import com.aowen.predcompanion.core.network.getOrThrow
 import com.aowen.predcompanion.ui.utils.filterOrOriginal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,7 +66,7 @@ class HeroesScreenViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                val heroesResource = omedaCityHeroRepository.fetchAllHeroes().getOrThrow()
+                val heroesResource = omedaCityHeroRepository.getAllHeroes()
                 val heroesSortedByName = heroesResource.sortedBy { it.displayName }
                 _uiState.update {
                     it.copy(

@@ -6,7 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.aowen.predcompanion.core.model.network.UserState
+import com.aowen.predcompanion.core.network.model.NetworkUserState
 import com.aowen.predcompanion.feature.auth.api.navigation.AuthNavKey
 import com.aowen.predcompanion.feature.auth.impl.LoginScreen
 import com.aowen.predcompanion.feature.auth.impl.LoginViewModel
@@ -20,13 +20,13 @@ fun EntryProviderScope<NavKey>.loginEntry() {
 
         LaunchedEffect(userState) {
             when (userState) {
-                is UserState.Loading -> {
+                is NetworkUserState.Loading -> {
                     logDebug("Loading user state", "LoginScreen")
                 }
-                is UserState.Authenticated -> {
+                is NetworkUserState.Authenticated -> {
                     // Session transition is handled at the Activity level; nothing to do here.
                 }
-                is UserState.Unauthenticated -> {
+                is NetworkUserState.Unauthenticated -> {
                     logDebug("User is not signed in", "LoginScreen")
                     viewModel.setLoading(false)
                 }

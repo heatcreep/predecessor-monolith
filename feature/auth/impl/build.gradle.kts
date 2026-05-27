@@ -11,4 +11,6 @@ dependencies {
     implementation(projects.core.resources)
     implementation(projects.feature.auth.api)
     implementation(projects.feature.home.api)
+
+    testImplementation(projects.core.testing)
 }

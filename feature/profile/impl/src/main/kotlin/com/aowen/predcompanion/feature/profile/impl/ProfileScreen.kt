@@ -59,9 +59,9 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.ui.theme.Console
+import com.aowen.predcompanion.core.network.model.NetworkUserInfo
 import com.aowen.predcompanion.core.ui.shared.SignInDiscordButton
-import com.aowen.predcompanion.data.Console
-import com.aowen.predcompanion.data.UserInfo
 import com.aowen.predcompanion.feature.profile.impl.ui.ConsoleDropdownMenu
 import com.aowen.predcompanion.feature.profile.impl.ui.ThemeDropdownMenu
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
@@ -329,7 +329,7 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileCard(
-    userInfo: UserInfo
+    userInfo: NetworkUserInfo
 ) {
 
     val context = LocalContext.current
@@ -469,7 +469,7 @@ fun ProfileCardPreview() {
             uiState = ProfileScreenState.UserInfoLoaded(
                 console = Console.PC,
                 theme = ThemeDataStore.SYSTEM,
-                userInfo = UserInfo(
+                userInfo = NetworkUserInfo(
                     email = "test@gmail.com",
                     avatarUrl = "https://cdn.discordapp.com/avatars/1234567890/abcdef1234567890.png",
                     fullName = "Test User"

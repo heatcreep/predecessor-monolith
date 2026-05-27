@@ -37,12 +37,11 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import com.aowen.predcompanion.core.model.data.getHeroImage
-import com.aowen.predcompanion.core.model.data.getHeroRole
-import com.aowen.predcompanion.ui.common.PlayerIcon
+import com.aowen.predcompanion.core.ui.common.PlayerIcon
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.ui.theme.GreenHighlight
 import com.aowen.predcompanion.ui.theme.RedHighlight
 
@@ -75,9 +74,9 @@ fun BuildListCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                getHeroRole(build.role)?.let { role ->
+                build.role?.let { role ->
                     PlayerIcon(
-                        heroImageId = getHeroImage(build.heroId),
+                        heroImageUrl = build.heroImageUrl
                     ) {
                         Image(
                             modifier = Modifier
@@ -221,7 +220,7 @@ fun BuildListItemPreview() {
                         updatedAt = "2021-01-01",
                         author = "heatcreep.tv",
                         crest = ItemDetails(),
-                        role = "Support"
+                        role = HeroRole.Support
                     ),
                     navigateToBuildDetails = {}
                 )

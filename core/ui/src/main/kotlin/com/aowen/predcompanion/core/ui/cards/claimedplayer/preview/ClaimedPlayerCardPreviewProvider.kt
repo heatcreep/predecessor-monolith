@@ -1,95 +1,54 @@
 package com.aowen.predcompanion.core.ui.cards.claimedplayer.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.model.data.PlayerStats
-import com.aowen.predcompanion.core.model.data.RankDetails
+import com.aowen.predcompanion.core.ui.model.mapper.ClaimedPlayerCardUiModel
+import com.aowen.predcompanion.core.ui.model.toRankColor
 
 data class ClaimedPlayerCardPreviewState(
-    val playerDetails: PlayerDetails,
-    val playerStats: PlayerStats
+    val claimedPlayer: ClaimedPlayerCardUiModel,
 )
 
 class ClaimedPlayerCardPreviewProvider : PreviewParameterProvider<ClaimedPlayerCardPreviewState> {
     override val values: Sequence<ClaimedPlayerCardPreviewState> = sequenceOf(
         ClaimedPlayerCardPreviewState(
-            playerDetails = PlayerDetails(
-                playerName = "heatcreep.tv",
-                region = "naeast",
-                rank = 31,
-                rankDetails = RankDetails.BRONZE_I,
-                vpTotal = 734,
-                vpCurrent = 53,
-            ),
-            playerStats = PlayerStats(
-                favoriteHero = "Narbash",
-                winRate = "50%",
+            claimedPlayer = ClaimedPlayerCardUiModel(
+                playerId = "heatcreep.tv",
+                rankText = "Bronze I (+53)",
+                rankColor = 32.toRankColor(),
+                winRate = "53%",
+                heroImageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
+                rankImageModel = "https://cdn.monolith.gg/assets/ranks/bronze_200.png",
             ),
         ),
         ClaimedPlayerCardPreviewState(
-            playerDetails = PlayerDetails(
-                playerName = "heatcreep.tv",
-                region = "naeast",
-                rank = 31,
-                rankDetails = RankDetails.SILVER_I,
-                vpTotal = 734,
-                vpCurrent = 53
-            ),
-            playerStats = PlayerStats(
-                favoriteHero = "Narbash",
+            claimedPlayer = ClaimedPlayerCardUiModel(
+                playerId = "heatcreep.tv",
+                rankText = "Bronze I (+53)",
+                rankColor = 32.toRankColor(),
+                winRate = "53%",
+                heroImageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
+                rankImageModel = "https://cdn.monolith.gg/assets/ranks/bronze_200.png",
             ),
         ),
         ClaimedPlayerCardPreviewState(
-            playerDetails = PlayerDetails(
-                playerName = "heatcreep.tv",
-                region = "naeast",
-                rank = 31,
-                rankDetails = RankDetails.GOLD_III,
-                vpTotal = 734,
-                vpCurrent = 53
-            ),
-            playerStats = PlayerStats(
-                favoriteHero = "Narbash",
+            claimedPlayer = ClaimedPlayerCardUiModel(
+                playerId = "heatcreep.tv",
+                rankText = "Bronze I (+53)",
+                rankColor = 32.toRankColor(),
+                winRate = "53%",
+                heroImageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
+                rankImageModel = "https://cdn.monolith.gg/assets/ranks/bronze_200.png",
             ),
         ),
         ClaimedPlayerCardPreviewState(
-            playerDetails = PlayerDetails(
-                playerName = "heatcreep.tv",
-                region = "naeast",
-                rank = 31,
-                rankDetails = RankDetails.PLATINUM_III,
-                vpTotal = 734,
-                vpCurrent = 53
-            ),
-            playerStats = PlayerStats(
-                favoriteHero = "Narbash",
+            claimedPlayer = ClaimedPlayerCardUiModel(
+                playerId = "heatcreep.tv",
+                rankText = "Bronze I (+53)",
+                rankColor = 32.toRankColor(),
+                winRate = "53%",
+                heroImageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
+                rankImageModel = "https://cdn.monolith.gg/assets/ranks/bronze_200.png",
             ),
         ),
-        ClaimedPlayerCardPreviewState(
-            playerDetails = PlayerDetails(
-                playerName = "heatcreep.tv",
-                region = "naeast",
-                rank = 31,
-                rankDetails = RankDetails.DIAMOND_III,
-                vpTotal = 734,
-                vpCurrent = 53
-            ),
-            playerStats = PlayerStats(
-                favoriteHero = "Narbash",
-            ),
-        ),
-        ClaimedPlayerCardPreviewState(
-            playerDetails = PlayerDetails(
-                playerName = "ReallyLongNameThatExceedsTheNormalLength",
-                region = "naeast",
-                rank = 31,
-                rankDetails = RankDetails.PARAGON,
-                vpTotal = 734,
-                vpCurrent = 53
-            ),
-            playerStats = PlayerStats(
-                favoriteHero = "Narbash",
-            ),
-        )
     )
 }

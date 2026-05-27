@@ -2,9 +2,9 @@ package com.aowen.predcompanion.feature.items.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.ui.utils.filterOrOriginal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +61,6 @@ class ItemsViewModel @Inject constructor(
 
     private fun initViewModel() {
         viewModelScope.launch {
-            itemRepository.fetchAllItems()
             val allItems = itemRepository.getAllItems().sortedBy { it.displayName }
             if (allItems.isEmpty()) {
                 _uiState.update {
@@ -85,6 +84,12 @@ class ItemsViewModel @Inject constructor(
     fun onSelectTier(tier: String) {
         _uiState.update {
             it.copy(selectedTierFilter = tier)
+        }
+    }
+
+    fun onClearTier() {
+        _uiState.update {
+            it.copy(selectedTierFilter = null)
         }
     }
 

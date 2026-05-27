@@ -2,15 +2,15 @@ package com.aowen.predcompanion.feature.heroes.impl.herodetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
-import com.aowen.predcompanion.data.Console
-import com.aowen.predcompanion.core.model.data.HeroDetails
-import com.aowen.predcompanion.data.HeroStatistics
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
+import com.aowen.predcompanion.core.model.data.HeroDetails
+import com.aowen.predcompanion.core.model.data.HeroStatistics
+import com.aowen.predcompanion.core.model.ui.theme.Console
 import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -65,7 +65,7 @@ class HeroDetailsViewModel @AssistedInject constructor(
         _uiState.value = HeroDetailsUiState(isLoading = true, heroDetailsErrors = null)
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
-            val heroes = async { omedaCityHeroRepository.fetchAllHeroes() }
+            val heroes = omedaCityHeroRepository.getAllHeroes()
             val statistics =
                 async { omedaCityHeroRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
             val heroBuildsDeferred = async {
@@ -77,14 +77,15 @@ class HeroDetailsViewModel @AssistedInject constructor(
             }
             try {
                 val heroResult =
-                    heroes.await().getOrThrow().firstOrNull { it.id == heroId.toLong() }
+                    heroes.firstOrNull { it.id == heroId.toLong() }
                 val statisticsResult = statistics.await().getOrThrow()
                 val heroBuilds = heroBuildsDeferred.await().getOrThrow()
                 _uiState.update {
                     it.copy(
                         hero = heroResult ?: HeroDetails(),
                         statistics = statisticsResult ?: HeroStatistics(),
-                        heroBuilds = heroBuilds.take(5).map { buildListItem -> buildListItemUiMapper.buildFrom(buildListItem) },
+                        heroBuilds = heroBuilds.take(5)
+                            .map { buildListItem -> buildListItemUiMapper.buildFrom(buildListItem) },
                         isLoading = false,
                         isLoadingBuilds = false,
                         heroDetailsErrors = null

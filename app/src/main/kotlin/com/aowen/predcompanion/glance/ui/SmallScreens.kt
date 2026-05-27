@@ -22,14 +22,14 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextDefaults
-import com.aowen.predcompanion.core.model.data.PlayerDetails
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.glance.RefreshAction
 import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
 fun SmallPlayerStatsSuccess(
     modifier: GlanceModifier = GlanceModifier,
-    playerDetails: PlayerDetails?,
+    playerDetails: PlayerInfo.PlayerDetails?,
     getRankImage: () -> ImageProvider
 ) {
 

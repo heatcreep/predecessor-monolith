@@ -21,12 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.StatDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.ui.theme.GreenHighlight
 import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
-fun ItemStatRow(stat: StatDetails) {
+fun ItemStatRow(stat: ItemDetails.StatDetails) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,7 +67,7 @@ fun ItemStatRowPreview() {
     MonolithTheme {
         Surface {
             ItemStatRow(
-                stat = StatDetails(
+                stat = ItemDetails.StatDetails(
                     name = "Attack Speed",
                     value = "25%",
                     iconId = coreResources.drawable.attack_speed

@@ -1,14 +1,11 @@
 package com.aowen.predcompanion.core.network.di
 
 import com.aowen.predcompanion.core.common.di.SupabaseApiKey
-import com.aowen.predcompanion.core.common.network.RetrofitHelper
 import com.aowen.predcompanion.core.network.BuildConfig
-import com.aowen.predcompanion.core.network.OmedaCityService
 import com.aowen.predcompanion.core.network.SupabaseAuthService
 import com.aowen.predcompanion.core.network.SupabaseAuthServiceImpl
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
 import com.aowen.predcompanion.core.network.SupabasePostgrestServiceImpl
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,8 +22,9 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.Retrofit
+import okhttp3.Call
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
 
 @Module
@@ -44,15 +42,6 @@ internal object NetworkModule {
     @Provides
     @SupabaseApiKey
     fun providesSupabaseApiKey(): String = BuildConfig.SUPABASE_API_KEY
-
-    @Provides
-    @Singleton
-    fun providesRetrofit(json: Json): Retrofit =
-        Retrofit.Builder()
-            .baseUrl(RetrofitHelper.baseUrl)
-            .addConverterFactory(
-                json.asConverterFactory("application/json".toMediaType())
-            ).build()
 
     @Provides
     @Singleton
@@ -96,12 +85,18 @@ internal object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideSupabasePostgrestService(postgrest: Postgrest): SupabasePostgrestService =
-        SupabasePostgrestServiceImpl(postgrest)
-
+    fun okHttpCallFactory(): Call.Factory = OkHttpClient.Builder()
+        .addInterceptor(
+            HttpLoggingInterceptor()
+                .apply {
+                    if (BuildConfig.DEBUG) {
+                        setLevel(HttpLoggingInterceptor.Level.BODY)
+                    }
+                }
+        ).build()
 
     @Provides
     @Singleton
-    fun provideOmedaCityApi(retrofit: Retrofit): OmedaCityService =
-        retrofit.create(OmedaCityService::class.java)
+    fun provideSupabasePostgrestService(postgrest: Postgrest): SupabasePostgrestService =
+        SupabasePostgrestServiceImpl(postgrest)
 }

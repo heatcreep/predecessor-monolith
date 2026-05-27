@@ -1,14 +1,14 @@
 package com.aowen.predcompanion.core.data.repository.user
 
-import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
-import com.aowen.predcompanion.core.data.model.mapper.asFavoriteBuildDto
-import com.aowen.predcompanion.core.data.model.mapper.asFavoriteBuildListEntity
+import com.aowen.predcompanion.core.data.model.asFavoriteBuildListEntity
+import com.aowen.predcompanion.core.data.model.asNetworkFavoriteBuild
 import com.aowen.predcompanion.core.data.repository.BuildListItemDataMapper
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.database.dao.FavoriteBuildDao
-import com.aowen.predcompanion.core.model.network.UserState
+import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
+import com.aowen.predcompanion.core.model.data.HeroBuild
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
+import com.aowen.predcompanion.core.network.model.NetworkUserState
 import com.aowen.predcompanion.logDebug
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 abstract class FavoriteBuildsState {
-    data class Success(val favoriteBuilds: List<BuildUiListItem>) :
+    data class Success(val favoriteBuilds: List<FavoriteBuildListItem>) :
         FavoriteBuildsState()
 
     data object Empty : FavoriteBuildsState()
@@ -28,7 +28,7 @@ interface UserFavoriteBuildsRepository {
     val favoriteBuildsState: MutableStateFlow<FavoriteBuildsState>
 
     suspend fun fetchFavoriteBuildIds(): Result<List<Int>>
-    suspend fun addFavoriteBuild(buildDetails: BuildUiListItem)
+    suspend fun addFavoriteBuild(heroBuild: HeroBuild)
     suspend fun removeFavoriteBuild(buildId: Int)
     suspend fun removeAllFavoriteBuilds()
 }
@@ -38,7 +38,6 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
     private val favoriteBuildDao: FavoriteBuildDao,
-    private val buildListItemUiMapper: BuildListItemUiMapper,
     private val buildListItemDataMapper: BuildListItemDataMapper
 ) : UserFavoriteBuildsRepository {
 
@@ -49,10 +48,10 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
 
     override suspend fun fetchFavoriteBuildIds(): Result<List<Int>> {
 
-        when (authRepository.userState.value) {
+        when (authRepository.networkUserState.value) {
 
             // Local User
-            is UserState.Unauthenticated -> {
+            is NetworkUserState.Unauthenticated -> {
                 val favoriteBuilds =
                     favoriteBuildDao.getFavoriteBuildListItems().firstOrNull()?.map { buildEntity ->
                         buildListItemDataMapper.createFavoriteBuildListItemFrom(buildEntity)
@@ -61,17 +60,13 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
                     _favoriteBuildsState.update { FavoriteBuildsState.Empty }
                 } else {
                     _favoriteBuildsState.update {
-                        FavoriteBuildsState.Success(favoriteBuilds.map {
-                            buildListItemUiMapper.buildFrom(
-                                it
-                            )
-                        })
+                        FavoriteBuildsState.Success(favoriteBuilds)
                     }
                 }
                 return Result.success(favoriteBuilds.map { it.buildId })
             }
             // Supabase User
-            is UserState.Authenticated -> {
+            is NetworkUserState.Authenticated -> {
                 val user = userRepository.getUser()
                 return try {
                     val userId = user?.id ?: return Result.failure(Exception("User not found"))
@@ -86,11 +81,8 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
                             FavoriteBuildsState.Empty
                         }
                     } else {
-                        val uiItems = favoriteBuilds.map { listItem ->
-                            buildListItemUiMapper.buildFrom(listItem)
-                        }
                         _favoriteBuildsState.update {
-                            FavoriteBuildsState.Success(uiItems)
+                            FavoriteBuildsState.Success(favoriteBuilds)
                         }
                     }
                     Result.success(favoriteBuilds.map { it.buildId })
@@ -106,28 +98,24 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
         }
     }
 
-    override suspend fun addFavoriteBuild(buildDetails: BuildUiListItem) {
-        when (authRepository.userState.value) {
+    override suspend fun addFavoriteBuild(heroBuild: HeroBuild) {
+        when (authRepository.networkUserState.value) {
             // Local User
-            is UserState.Unauthenticated -> {
-                val favoriteBuildEntity = buildDetails.asFavoriteBuildListEntity()
+            is NetworkUserState.Unauthenticated -> {
+                val favoriteBuildEntity = heroBuild.asFavoriteBuildListEntity()
                 favoriteBuildDao.insertFavoriteBuildListItem(favoriteBuildEntity)
                 val favoriteBuildListItem =
                     buildListItemDataMapper.createFavoriteBuildListItemFrom(favoriteBuildEntity)
-                val favoriteBuildUiListItem =
-                    buildListItemUiMapper.buildFrom(
-                        favoriteBuildListItem,
-                    )
                 _favoriteBuildsState.update { state ->
                     when (state) {
                         is FavoriteBuildsState.Empty -> {
-                            FavoriteBuildsState.Success(listOf(favoriteBuildUiListItem))
+                            FavoriteBuildsState.Success(listOf(favoriteBuildListItem))
                         }
 
                         is FavoriteBuildsState.Success -> {
                             state.copy(
                                 favoriteBuilds = state.favoriteBuilds.plus(
-                                    favoriteBuildUiListItem
+                                    favoriteBuildListItem
                                 )
                             )
                         }
@@ -137,27 +125,23 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
                 }
             }
             // Supabase User
-            is UserState.Authenticated -> {
+            is NetworkUserState.Authenticated -> {
                 return try {
                     val user = userRepository.getUser()
                     if (user?.id == null) {
                         return
                     } else {
-                        val favoriteBuildDto = buildDetails.asFavoriteBuildDto(user.id!!)
+                        val favoriteBuildDto = heroBuild.asNetworkFavoriteBuild(user.id!!)
                         val favoriteBuildListItem =
                             buildListItemDataMapper.createFavoriteBuildListItemFrom(
                                 favoriteBuildDto
-                            )
-                        val favoriteBuildUiListItem =
-                            buildListItemUiMapper.buildFrom(
-                                favoriteBuildListItem,
                             )
                         postgrestService.insertFavoriteBuild(favoriteBuildDto)
                         _favoriteBuildsState.update { state ->
                             (state as FavoriteBuildsState.Success).copy(
                                 favoriteBuilds = state.favoriteBuilds.plus(
                                     state.favoriteBuilds.plus(
-                                        favoriteBuildUiListItem
+                                        favoriteBuildListItem
                                     )
                                 )
                             )
@@ -173,9 +157,9 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
     }
 
     override suspend fun removeFavoriteBuild(buildId: Int) {
-        when (authRepository.userState.value) {
+        when (authRepository.networkUserState.value) {
             // Local User
-            is UserState.Unauthenticated -> {
+            is NetworkUserState.Unauthenticated -> {
                 favoriteBuildDao.deleteFavoriteBuildListItems(listOf(buildId))
                 _favoriteBuildsState.update { state ->
                     when (state) {
@@ -202,7 +186,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             }
 
             // Supabase User
-            is UserState.Authenticated -> {
+            is NetworkUserState.Authenticated -> {
                 return try {
                     val user = userRepository.getUser()
                     if (user?.id == null) {
@@ -243,9 +227,9 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
     }
 
     override suspend fun removeAllFavoriteBuilds() {
-        when (authRepository.userState.value) {
+        when (authRepository.networkUserState.value) {
             // Local User
-            is UserState.Unauthenticated -> {
+            is NetworkUserState.Unauthenticated -> {
                 favoriteBuildDao.deleteAllFavoriteBuildListItems()
                 _favoriteBuildsState.update {
                     FavoriteBuildsState.Empty
@@ -253,7 +237,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             }
 
             // Supabase User
-            is UserState.Authenticated -> {
+            is NetworkUserState.Authenticated -> {
                 return try {
                     val user = userRepository.getUser()
                     if (user?.id == null) {

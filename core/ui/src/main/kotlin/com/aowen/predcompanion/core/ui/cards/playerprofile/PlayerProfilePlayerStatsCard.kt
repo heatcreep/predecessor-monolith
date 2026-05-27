@@ -1,6 +1,5 @@
 package com.aowen.predcompanion.core.ui.cards.playerprofile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,25 +28,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.core.data.model.mapper.StatLine
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.model.data.RankDetails
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.ui.components.StatListItem
-import com.aowen.predcompanion.ui.components.KDAText
+import com.aowen.predcompanion.core.ui.model.mapper.StatLine
+import com.aowen.predcompanion.core.ui.components.KDAText
 import com.aowen.predcompanion.ui.theme.inputFieldDefaults
 import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
 fun PlayerProfilePlayerStatsCard(
     modifier: Modifier = Modifier,
-    playerDetails: PlayerDetails,
+    playerDetails: PlayerInfo.PlayerDetails,
     stats: List<StatLine>,
     claimedPlayerName: String? = null,
     playerNameField: String = "",
@@ -77,7 +75,7 @@ fun PlayerProfilePlayerStatsCard(
                     Text(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.secondary,
-                        text = playerDetails.rankDetails.rankText,
+                        text = playerDetails.rankTitle,
                     )
                     Text(
                         style = MaterialTheme.typography.bodyMedium,
@@ -86,10 +84,10 @@ fun PlayerProfilePlayerStatsCard(
                     )
 
                 }
-                Image(
+                AsyncImage(
                     modifier = Modifier
                         .size(200.dp),
-                    painter = painterResource(id = playerDetails.rankDetails.rankImageAssetId),
+                    model = playerDetails.rankImage,
                     contentDescription = null
                 )
             }
@@ -204,10 +202,11 @@ fun PlayerProfilePlayerStatsCardPreview() {
         Surface(modifier = Modifier.fillMaxWidth()) {
             PlayerProfilePlayerStatsCard(
                 modifier = Modifier.padding(16.dp),
-                playerDetails = PlayerDetails(
+                playerDetails = PlayerInfo.PlayerDetails(
                     playerName = "heatcreep.tv",
                     vpCurrent = 63,
-                    rankDetails = RankDetails.GOLD_III
+                    rankTitle = "Gold III",
+                    rankImage = "",
                 ),
                 stats = listOf(
                     StatLine.MultiStatLine(label = "KDA", values = listOf("3.5", "4.0", "2.8")),

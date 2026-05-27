@@ -1,11 +1,11 @@
 package com.aowen.predcompanion.core.ui.cards.claimedplayer
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,39 +19,31 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.ui.cards.claimedplayer.preview.ClaimedPlayerCardPreviewProvider
 import com.aowen.predcompanion.core.ui.cards.claimedplayer.preview.ClaimedPlayerCardPreviewState
-import com.aowen.predcompanion.core.model.data.Hero
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.model.data.PlayerStats
-import com.aowen.predcompanion.ui.common.PlayerIcon
+import com.aowen.predcompanion.core.ui.common.PlayerIcon
+import com.aowen.predcompanion.core.ui.model.mapper.ClaimedPlayerCardUiModel
 
 @Composable
 fun ClaimedPlayerCard(
     modifier: Modifier = Modifier,
     playerName: String,
-    playerDetails: PlayerDetails,
-    playerStats: PlayerStats,
+    claimedPlayer: ClaimedPlayerCardUiModel,
     navigateToPlayerDetails: (String) -> Unit,
 ) {
-
-    val heroImage = Hero.entries.firstOrNull {
-        it.heroName == playerStats.favoriteHero
-    } ?: Hero.UNKNOWN
-
     Card(
         modifier = modifier
             .fillMaxWidth()
             .height(84.dp)
             .clickable {
-                navigateToPlayerDetails(playerDetails.playerId)
+                navigateToPlayerDetails(claimedPlayer.playerId)
             },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -66,19 +58,20 @@ fun ClaimedPlayerCard(
         ) {
             // Player Favorite Hero
             Box(
+                modifier = Modifier.fillMaxHeight().aspectRatio(1f),
                 contentAlignment = Alignment.Center
             ) {
                 PlayerIcon(
-                    heroImageId = heroImage.drawableId,
+                    heroImageUrl = claimedPlayer.heroImageUrl,
                     bordered = false
                 )
-                Image(
-                    modifier = Modifier.fillMaxHeight(),
-                    painter = painterResource(id = playerDetails.rankDetails.rankImageAssetId),
-                    contentDescription = null
+                AsyncImage(
+                    model = claimedPlayer.rankImageModel,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxHeight()
                 )
             }
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = playerName,
                     style = MaterialTheme.typography.titleMedium,
@@ -89,12 +82,12 @@ fun ClaimedPlayerCard(
                 Row {
 
                     Text(
-                        text = "${playerDetails.rankDetails.rankText} (+${playerDetails.vpCurrent})",
+                        text = claimedPlayer.rankText,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.ExtraBold,
-                        color = playerDetails.rankDetails.rankColor
+                        color = claimedPlayer.rankColor
                     )
-                    if (playerStats.winRate.isNotEmpty()) {
+                    if (claimedPlayer.winRate.isNotEmpty()) {
                         Text(
                             text = " | ",
                             style = MaterialTheme.typography.bodySmall,
@@ -102,7 +95,7 @@ fun ClaimedPlayerCard(
                         )
 
                         Text(
-                            text = "Win Rate:${playerStats.winRate}",
+                            text = "Win Rate:${claimedPlayer.winRate}",
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.secondary
@@ -126,8 +119,7 @@ fun ClaimedPlayerCardPreview(
             ) {
                 ClaimedPlayerCard(
                     playerName = "heatcreep.tv",
-                    playerDetails = claimedPlayerState.playerDetails,
-                    playerStats = claimedPlayerState.playerStats,
+                    claimedPlayer = claimedPlayerState.claimedPlayer,
                     navigateToPlayerDetails = {}
                 )
             }

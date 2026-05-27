@@ -25,7 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.core.model.data.PlayerDetails
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.feature.search.impl.components.PlayerResultCard
 import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 import kotlinx.coroutines.launch
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PlayerSearchSection(
     uiState: SearchScreenUiState,
-    handleAddToRecentSearch: (PlayerDetails) -> Unit = {},
+    handleAddToRecentSearch: (PlayerInfo.PlayerDetails) -> Unit = {},
     navigateToPlayerDetails: (String) -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()

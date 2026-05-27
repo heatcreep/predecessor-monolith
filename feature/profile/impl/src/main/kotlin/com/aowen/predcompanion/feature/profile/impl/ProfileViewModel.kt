@@ -7,9 +7,9 @@ import com.aowen.predcompanion.core.data.repository.user.UserRepository
 import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.predcompanion.core.datastore.ThemePreferences
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
-import com.aowen.predcompanion.core.model.network.UserState
-import com.aowen.predcompanion.data.Console
-import com.aowen.predcompanion.data.UserInfo
+import com.aowen.predcompanion.core.model.ui.theme.Console
+import com.aowen.predcompanion.core.network.model.NetworkUserInfo
+import com.aowen.predcompanion.core.network.model.NetworkUserState
 import com.aowen.predcompanion.logDebug
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,14 +33,14 @@ abstract class ProfileScreenState {
     data class UserInfoLoaded(
         val console: Console,
         val theme: Theme,
-        val userInfo: UserInfo?
+        val userInfo: NetworkUserInfo?
     ) : ProfileScreenState()
 }
 
 data class ProfileScreenUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
-    val userInfo: UserInfo? = null,
+    val userInfo: NetworkUserInfo? = null,
     val console: Console = Console.PC
 )
 
@@ -78,16 +78,16 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun observeUserState() {
-        authRepository.userState
+        authRepository.networkUserState
             .onEach { userState ->
                 val console = userPreferencesDataStore.console.first()
                 val theme = themePreferences.theme.first()
                 when (userState) {
-                    is UserState.Loading -> {
+                    is NetworkUserState.Loading -> {
                         _uiState.update { ProfileScreenState.Loading }
                     }
 
-                    is UserState.Unauthenticated -> {
+                    is NetworkUserState.Unauthenticated -> {
                         _uiState.update {
                             ProfileScreenState.UserInfoLoaded(
                                 console = console,
@@ -97,7 +97,7 @@ class ProfileViewModel @Inject constructor(
                         }
                     }
 
-                    is UserState.Authenticated -> {
+                    is NetworkUserState.Authenticated -> {
                         val user = userRepository.getUser()
                         _uiState.update {
                             if (user != null) {

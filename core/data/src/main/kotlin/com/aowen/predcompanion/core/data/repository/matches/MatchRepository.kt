@@ -1,7 +1,7 @@
 package com.aowen.predcompanion.core.data.repository.matches
 
-import com.aowen.monolith.data.MatchDetails
-import com.aowen.monolith.data.MatchesDetails
+import com.aowen.predcompanion.core.model.data.MatchDetails
+import com.aowen.predcompanion.core.model.data.MatchesDetails
 import com.aowen.predcompanion.core.network.Resource
 
 interface MatchRepository {

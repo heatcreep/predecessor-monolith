@@ -1,10 +1,10 @@
 package com.aowen.predcompanion.feature.home.impl.usecase
 
+import com.aowen.predcompanion.core.data.model.asFavoriteBuildListItem
+import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
-import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
 import com.aowen.predcompanion.core.network.Resource
-import com.aowen.predcompanion.data.asFavoriteBuildListItem
 import javax.inject.Inject
 
 /**

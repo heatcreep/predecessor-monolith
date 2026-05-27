@@ -27,6 +27,7 @@ import com.aowen.predcompanion.ui.theme.BadgeBlueGreen
 import com.aowen.predcompanion.ui.theme.BadgePurple
 import com.aowen.predcompanion.ui.theme.NeroBlack
 import com.aowen.predcompanion.ui.theme.WarmWhite
+import kotlin.collections.isNotEmpty
 
 @Composable
 fun ItemSearchSection(

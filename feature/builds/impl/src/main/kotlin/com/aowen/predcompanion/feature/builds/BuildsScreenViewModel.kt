@@ -4,23 +4,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import com.aowen.predcompanion.core.data.model.HeroUiModel
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
-import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.data.model.HeroUiModel
-import com.aowen.predcompanion.core.model.data.Hero
 import com.aowen.predcompanion.core.model.data.HeroRole
-import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class HeroDropDownUiModel(
+    val id: Long,
+    val name: String,
+    val imageSrc: String? = null
+)
+
 data class BuildsUiState(
     val allHeroes: List<HeroUiModel> = emptyList(),
     val searchFieldValue: String = "",
-    val selectedHeroFilter: Hero? = null,
+    val selectedHeroFilter: HeroDropDownUiModel? = null,
     val selectedRoleFilter: HeroRole? = null,
     val selectedSortOrder: String = "Popular",
     val hasSkillOrderSelected: Boolean = false,
@@ -43,11 +47,11 @@ class BuildsScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val allHeroes = omedaCityHeroRepository.fetchAllHeroes().getOrThrow().map {
+            val allHeroes = omedaCityHeroRepository.getAllHeroes().map {
                 HeroUiModel(
                     heroId = it.id,
                     name = it.displayName,
-                    imageId = it.imageId
+                    imageSrc = it.imageUrl
                 )
             }
             _uiState.update {
@@ -65,7 +69,7 @@ class BuildsScreenViewModel @Inject constructor(
                 .trim(),
             role = uiState.value.selectedRoleFilter?.name?.lowercase(),
             order = uiState.value.selectedSortOrder.lowercase(),
-            heroId = uiState.value.selectedHeroFilter?.heroId,
+            heroId = uiState.value.selectedHeroFilter?.id,
             skillOrder = if (uiState.value.hasSkillOrderSelected) 1 else null,
             modules = if (uiState.value.hasModulesSelected) 1 else null,
             currentVersion = if (uiState.value.hasCurrentVersionSelected) 1 else null,
@@ -100,8 +104,8 @@ class BuildsScreenViewModel @Inject constructor(
 
     fun updateSelectedHero(heroValue: String) {
         _uiState.update {
-            it.copy(selectedHeroFilter = Hero.entries.first { hero ->
-                hero.heroName == heroValue
+            it.copy(selectedHeroFilter = omedaCityHeroRepository.getHeroByName(heroValue)?.let {
+                HeroDropDownUiModel(id = it.id, name = it.displayName, imageSrc = it.imageUrl)
             })
         }
         buildsPagingSource.invalidate()

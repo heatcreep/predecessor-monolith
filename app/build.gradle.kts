@@ -100,8 +100,6 @@ dependencies {
     implementation(projects.feature.home.impl)
     implementation(projects.feature.items.api)
     implementation(projects.feature.items.impl)
-    implementation(projects.feature.matches.api)
-    implementation(projects.feature.matches.impl)
     implementation(projects.feature.profile.api)
     implementation(projects.feature.profile.impl)
     implementation(projects.feature.search.api)
@@ -111,25 +109,16 @@ dependencies {
     implementation(projects.core.analytics)
     implementation(projects.core.common)
     implementation(projects.core.data)
-    implementation(projects.core.database)
     implementation(projects.core.datastore)
     implementation(projects.core.designsystem)
-    implementation(projects.core.model)
     implementation(projects.core.navigation)
     implementation(projects.core.network)
     implementation(projects.core.resources)
-    implementation(projects.core.ui)
 
     // Android / Kotlin
-
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.kotlinx.immutable.collections)
-
-    // Compose
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.navigation)
 
     // Navigation
     implementation(libs.androidx.navigation3.ui)
@@ -142,40 +131,13 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.work)
 
-    // Markdown (used by feature screens still in app)
-    implementation(libs.meetup.markdown)
-
-
-    // Image loading (used by feature screens still in app)
-    implementation(libs.coil.compose)
-
-    // Serialization + Retrofit (AppModule.kt creates Json & Retrofit instances)
+    // Serialization
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.retrofit.serialization.converter)
 
-    // Supabase (AppModule.kt creates SupabaseClient)
+    // Supabase (deep link handling)
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.gotrue)
-    implementation(libs.supabase.postgres)
-    implementation(libs.supabase.functions)
-    implementation(libs.ktor.client.android)
-    implementation(libs.ktor.client.okhttp)
 
     // WorkManager
     implementation(libs.androidx.work)
-
-    // Test
-    testImplementation(libs.junit4)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.androidx.paging.testing)
-    testImplementation(libs.androidx.paging.testing.android)
-    testImplementation(libs.mockk)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.androidx.test.rules)
-    androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.ext)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test)
-    debugImplementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.test)
 }

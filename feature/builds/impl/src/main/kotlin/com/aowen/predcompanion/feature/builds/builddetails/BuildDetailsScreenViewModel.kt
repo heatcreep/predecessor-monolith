@@ -2,24 +2,24 @@ package com.aowen.predcompanion.feature.builds.builddetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
+import com.aowen.predcompanion.core.model.data.HeroBuild
 import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.network.getOrThrow
-import com.aowen.predcompanion.data.Console
+import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 data class BuildDetailsErrors(
     val errorMessage: String? = null,
@@ -53,11 +53,6 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
     private val _uiState = MutableStateFlow(BuildDetailsUiState())
     val uiState = _uiState
 
-    private val _console = MutableStateFlow(Console.PC)
-    val console = _console
-
-    val allItems = omedaCityItemRepository.allItems.value
-
     init {
         initViewModel()
     }
@@ -65,7 +60,6 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
-            _console.emit(userPreferencesDataStore.console.first())
             val buildsDeferred = async { omedaCityBuildRepository.fetchBuildById(buildId) }
 
             val favoritedBuilds = userFavoriteBuildsRepository.fetchFavoriteBuildIds()
@@ -102,7 +96,7 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
 
     fun onAddBuildToFavorites(build: BuildUiListItem) {
         viewModelScope.launch {
-            userFavoriteBuildsRepository.addFavoriteBuild(build)
+            userFavoriteBuildsRepository.addFavoriteBuild(build.toHeroBuild())
             _uiState.update {
                 it.copy(isFavorited = true)
             }
@@ -123,4 +117,30 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
             it.copy(selectedItemDetails = omedaCityItemRepository.getItemById(itemId))
         }
     }
+
+    private fun BuildUiListItem.toHeroBuild(): HeroBuild =
+        HeroBuild(
+            id = buildId,
+            title = title,
+            author = author,
+            role = role?.name ?: "unknown",
+            description = description,
+            heroId = heroId,
+            crestId = crest.id,
+            buildItemIds = buildItems.map { it.id },
+            skillOrder = skillOrder,
+            netVotes = 0,
+            upvotes = 0,
+            downvotes = 0,
+            modules = modules.map {
+                HeroBuild.ItemModule(
+                    id = UUID.randomUUID().toString(),
+                    title = it.title,
+                    itemIds = it.items.map { item -> item.id }
+                )
+            },
+            createdAt = createdAt,
+            updatedAt = updatedAt,
+            version = version
+        )
 }

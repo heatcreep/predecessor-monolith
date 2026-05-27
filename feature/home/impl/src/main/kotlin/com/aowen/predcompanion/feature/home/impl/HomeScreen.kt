@@ -41,19 +41,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.core.data.repository.user.FavoriteBuildsState
+import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.ui.cards.HeroUiInfo
 import com.aowen.predcompanion.core.ui.cards.HomeScreenHeroesCard
 import com.aowen.predcompanion.core.ui.cards.builds.BuildListCard
-import com.aowen.predcompanion.core.ui.cards.claimedplayer.ClaimedPlayerCard
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.data.repository.user.ClaimedPlayerState
+import com.aowen.predcompanion.core.ui.model.mapper.ClaimedPlayerCardUiModel
 import com.aowen.predcompanion.ui.components.MonolithAlertDialog
 import com.aowen.predcompanion.ui.components.PlayerLoadingCard
-import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.PlayerStats
-import com.aowen.predcompanion.core.model.data.RankDetails
-import com.aowen.predcompanion.core.model.network.ClaimedPlayer
 
 @Composable
 internal fun HomeScreenRoute(
@@ -66,15 +60,9 @@ internal fun HomeScreenRoute(
     navigateToBuildDetails: (Int) -> Unit
 ) {
     val homeUiState by homeScreenViewModel.uiState.collectAsState()
-    val favoriteBuildsState by homeScreenViewModel.favoriteBuildsState.collectAsState()
-    val claimedPlayerState by homeScreenViewModel.claimedPlayerState.collectAsState()
-    val claimedPlayerName by homeScreenViewModel.claimedPlayerName.collectAsState()
 
     HomeScreen(
         uiState = homeUiState,
-        favoriteBuildsSharedState = favoriteBuildsState,
-        claimedPlayerState = claimedPlayerState,
-        claimedPlayerName = claimedPlayerName,
         navigateToSearch = navigateToSearch,
         navigateToPlayerDetails = navigateToPlayerDetails,
         navigateToHeroDetails = navigateToHeroDetails,
@@ -91,9 +79,6 @@ internal fun HomeScreenRoute(
 fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: HomeScreenUiState,
-    favoriteBuildsSharedState: FavoriteBuildsState,
-    claimedPlayerState: ClaimedPlayerState,
-    claimedPlayerName: String?,
     navigateToSearch: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
     navigateToHeroDetails: (Long, String) -> Unit,
@@ -200,8 +185,7 @@ fun HomeScreen(
             ) {
                 item {
                     ClaimedPlayerSection(
-                        claimedPlayerState = claimedPlayerState,
-                        claimedPlayerName = claimedPlayerName,
+                        claimedPlayerUiState = uiState.claimedPlayerUiState,
                         navigateToPlayerDetails = navigateToPlayerDetails,
                         onOpenBottomSheet = {
                             openBottomSheet = true
@@ -211,8 +195,8 @@ fun HomeScreen(
                 item {
                     FavoriteBuildsSection(
                         modifier = Modifier.animateItem(),
-                        uiState = uiState,
-                        favoriteBuildsSharedState = favoriteBuildsSharedState,
+                        isLoading = uiState.isLoading,
+                        favoriteBuildsUiState = uiState.favoriteBuildsUiState,
                         navigateToBuildDetails = navigateToBuildDetails,
                         handleOpenDialog = {
                             clearAllFavoriteBuildsDialogIsOpen = true
@@ -227,6 +211,7 @@ fun HomeScreen(
                             HeroUiInfo(
                                 heroName = heroStats.heroName,
                                 heroPathName = heroStats.name,
+                                heroImageSrc = heroStats.heroImageSrc ?: "",
                                 heroImageId = heroStats.heroId.toInt(),
                                 winRate = heroStats.winRate
                             )
@@ -243,6 +228,7 @@ fun HomeScreen(
                             HeroUiInfo(
                                 heroName = heroStats.heroName,
                                 heroPathName = heroStats.name,
+                                heroImageSrc = heroStats.heroImageSrc ?: "",
                                 heroImageId = heroStats.heroId.toInt(),
                                 winRate = heroStats.winRate
                             )
@@ -260,13 +246,11 @@ fun HomeScreen(
 @Composable
 fun FavoriteBuildsSection(
     modifier: Modifier = Modifier,
-    uiState: HomeScreenUiState,
-    favoriteBuildsSharedState: FavoriteBuildsState,
+    isLoading: Boolean,
+    favoriteBuildsUiState: FavoriteBuildsUiState,
     handleOpenDialog: () -> Unit = {},
     navigateToBuildDetails: (Int) -> Unit
 ) {
-
-    var isReloadingSection by remember { mutableStateOf(false) }
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
@@ -280,7 +264,7 @@ fun FavoriteBuildsSection(
                 color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.titleMedium
             )
-            if (favoriteBuildsSharedState is FavoriteBuildsState.Success) {
+            if (favoriteBuildsUiState is FavoriteBuildsUiState.Success) {
                 TextButton(onClick = handleOpenDialog) {
                     Text(
                         text = "Clear All",
@@ -289,7 +273,7 @@ fun FavoriteBuildsSection(
                 }
             }
         }
-        AnimatedContent(targetState = uiState.isLoading || isReloadingSection, label = "") {
+        AnimatedContent(targetState = isLoading, label = "") {
             if (it) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -304,43 +288,32 @@ fun FavoriteBuildsSection(
                     )
                 }
             } else {
-                val error =
-                    uiState.homeScreenError.firstOrNull { errorType -> errorType is HomeScreenError.FavoriteBuildsErrorMessage }
-                val errorMessage = error?.errorMessage
-                if (errorMessage != null) {
-                    Text(
-                        text = errorMessage,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                } else {
-                    when (favoriteBuildsSharedState) {
-                        is FavoriteBuildsState.Error -> {
-                            Text(
-                                text = "Error loading favorite builds",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
+                when (favoriteBuildsUiState) {
+                    is FavoriteBuildsUiState.Error -> {
+                        Text(
+                            text = favoriteBuildsUiState.message,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
 
-                        is FavoriteBuildsState.Empty -> {
-                            Text(
-                                text = "No favorite builds found",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
+                    is FavoriteBuildsUiState.Empty -> {
+                        Text(
+                            text = "No favorite builds found",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
 
-                        is FavoriteBuildsState.Success -> {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                favoriteBuildsSharedState.favoriteBuilds.forEach { build ->
-                                    BuildListCard(
-                                        build = build,
-                                        navigateToBuildDetails = navigateToBuildDetails
-                                    )
-                                }
+                    is FavoriteBuildsUiState.Success -> {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            favoriteBuildsUiState.favoriteBuilds.forEach { build ->
+                                BuildListCard(
+                                    build = build,
+                                    navigateToBuildDetails = navigateToBuildDetails
+                                )
                             }
                         }
                     }
@@ -352,25 +325,26 @@ fun FavoriteBuildsSection(
 
 @PreviewLightDark
 @Composable
-fun ClaimedPlayerCardPreview() {
+fun ClaimedPlayerSectionPreview() {
     MonolithTheme {
         Surface(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .padding(32.dp)
-
         ) {
-            ClaimedPlayerCard(
-                playerName = "heatcreep.tv",
-                playerDetails = PlayerDetails(
+            ClaimedPlayerSection(
+                claimedPlayerUiState = ClaimedPlayerUiState.Claimed(
                     playerName = "heatcreep.tv",
-                    region = "naeast",
-                    mmr = "1379",
+                    player = ClaimedPlayerCardUiModel(
+                        playerId = "1",
+                        heroImageUrl = null,
+                        winRate = "55%",
+                        rankText = "Gold (+100)",
+                        rankColor = Color.Yellow,
+                        rankImageModel = ""
+                    )
                 ),
                 navigateToPlayerDetails = {},
-                playerStats = PlayerStats(
-                    favoriteHero = "Narbash",
-                )
             )
         }
     }
@@ -386,11 +360,10 @@ fun SearchScreenPreview() {
         Surface {
             HomeScreen(
                 uiState = HomeScreenUiState(
-                    isLoading = false
+                    isLoading = false,
+                    favoriteBuildsUiState = FavoriteBuildsUiState.Success(emptyList()),
+                    claimedPlayerUiState = ClaimedPlayerUiState.NoClaimed,
                 ),
-                claimedPlayerName = "heatcreep.tv",
-                favoriteBuildsSharedState = FavoriteBuildsState.Success(emptyList()),
-                claimedPlayerState = ClaimedPlayerState.NoClaimedPlayer,
                 navigateToSearch = {},
                 navigateToPlayerDetails = {},
                 navigateToHeroDetails = { _, _ -> },
@@ -413,25 +386,21 @@ fun SearchScreenRecentSearchPreview() {
             HomeScreen(
                 uiState = HomeScreenUiState(
                     isLoading = false,
-                ),
-                favoriteBuildsSharedState = FavoriteBuildsState.Success(
-                    emptyList()
-                ),
-                claimedPlayerState = ClaimedPlayerState.Claimed(
-                    claimedPlayer = ClaimedPlayer(
-                        playerDetails = PlayerDetails(
-                            playerName = "heatcreep.tv",
-                            region = "naeast",
-                            rank = 31,
-                            rankDetails = RankDetails.PARAGON,
-                            mmr = "1379",
-                        ),
-                        playerStats = PlayerStats(
-                            favoriteHero = "Narbash",
+                    favoriteBuildsUiState = FavoriteBuildsUiState.Success(
+                        emptyList()
+                    ),
+                    claimedPlayerUiState = ClaimedPlayerUiState.Claimed(
+                        playerName = "heatcreep.tv",
+                        player = ClaimedPlayerCardUiModel(
+                            playerId = "1",
+                            heroImageUrl = null,
+                            winRate = "55%",
+                            rankText = "Paragon (+100)",
+                            rankColor = Color.Yellow,
+                            rankImageModel = ""
                         )
-                    )
+                    ),
                 ),
-                claimedPlayerName = "heatcreep.tv",
                 navigateToSearch = {},
                 navigateToPlayerDetails = {},
                 navigateToHeroDetails = { _, _ -> },

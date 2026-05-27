@@ -20,6 +20,8 @@ dependencies {
     implementation(projects.feature.auth.api)
     implementation(projects.feature.search.api)
     implementation(projects.feature.profile.api)
+
+    testImplementation(projects.core.testing)
 }
 
 val versionName = providers.fileContents(

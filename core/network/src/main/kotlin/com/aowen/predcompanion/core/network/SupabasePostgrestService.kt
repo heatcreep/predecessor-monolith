@@ -1,10 +1,10 @@
 package com.aowen.predcompanion.core.network
 
-import com.aowen.predcompanion.core.model.data.PlayerSearchDto
-import com.aowen.predcompanion.data.FavoriteBuildDto
-import com.aowen.predcompanion.data.UserInfo
+import com.aowen.predcompanion.core.network.model.NetworkFavoriteHeroBuild
+import com.aowen.predcompanion.core.network.model.NetworkPlayerSearchResult
+import com.aowen.predcompanion.core.network.model.NetworkUserInfo
+import com.aowen.predcompanion.core.network.model.NetworkUserProfile
 import com.aowen.predcompanion.logDebug
-import com.aowen.predcompanion.network.UserProfile
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
@@ -17,32 +17,32 @@ import javax.inject.Inject
 
 interface SupabasePostgrestService {
 
-    suspend fun fetchPlayer(userId: String): UserProfile?
+    suspend fun fetchPlayer(userId: String): NetworkUserProfile?
 
     /**
      * Links a player to a user in supabase as their claimed player
      */
     suspend fun savePlayer(playerId: String, userId: String)
 
-    suspend fun fetchUserInfo(email: String): UserInfo?
+    suspend fun fetchUserInfo(email: String): NetworkUserInfo?
 
-    suspend fun fetchRecentSearches(id: UUID): List<PlayerSearchDto>
+    suspend fun fetchRecentSearches(id: UUID): List<NetworkPlayerSearchResult>
 
     suspend fun deleteAllRecentSearches(userId: UUID)
 
     suspend fun deleteRecentSearch(userId: UUID, recentPlayerId: UUID)
 
-    suspend fun insertRecentSearch(playerSearchDto: PlayerSearchDto)
+    suspend fun insertRecentSearch(networkPlayerSearchResult: NetworkPlayerSearchResult)
 
     suspend fun updateRecentSearch(
         userId: UUID,
         recentPlayerId: UUID,
-        playerSearchDto: PlayerSearchDto
+        networkPlayerSearchResult: NetworkPlayerSearchResult
     )
 
-    suspend fun fetchFavoriteBuilds(userId: UUID): List<FavoriteBuildDto>
+    suspend fun fetchFavoriteBuilds(userId: UUID): List<NetworkFavoriteHeroBuild>
 
-    suspend fun insertFavoriteBuild(favoriteBuildDto: FavoriteBuildDto)
+    suspend fun insertFavoriteBuild(networkFavoriteHeroBuild: NetworkFavoriteHeroBuild)
 
     suspend fun deleteFavoriteBuild(userId: UUID, buildId: Int)
 
@@ -55,17 +55,17 @@ class SupabasePostgrestServiceImpl @Inject constructor(
     private val postgrest: Postgrest
 ) : SupabasePostgrestService {
 
-    override suspend fun fetchPlayer(userId: String): UserProfile? {
+    override suspend fun fetchPlayer(userId: String): NetworkUserProfile? {
         return try {
             postgrest.from(TABLE_PROFILES)
                 .select(columns = Columns.raw("player_id")) {
                     filter {
                         eq("id", userId)
                     }
-                }.decodeList<UserProfile>().firstOrNull()
+                }.decodeList<NetworkUserProfile>().firstOrNull()
         } catch (e: HttpRequestTimeoutException) {
             logDebug("$e : the error")
-            UserProfile()
+            NetworkUserProfile()
         }
     }
 
@@ -83,7 +83,7 @@ class SupabasePostgrestServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchUserInfo(email: String): UserInfo? {
+    override suspend fun fetchUserInfo(email: String): NetworkUserInfo? {
         return try {
             postgrest.from(TABLE_PROFILES)
                 .select(
@@ -100,14 +100,14 @@ class SupabasePostgrestServiceImpl @Inject constructor(
                     filter {
                         eq("email", email)
                     }
-                }.decodeList<UserInfo>().firstOrNull()
+                }.decodeList<NetworkUserInfo>().firstOrNull()
         } catch (e: HttpRequestTimeoutException) {
             logDebug("$e : the error2")
-            UserInfo()
+            NetworkUserInfo()
         }
     }
 
-    override suspend fun fetchRecentSearches(id: UUID): List<PlayerSearchDto> {
+    override suspend fun fetchRecentSearches(id: UUID): List<NetworkPlayerSearchResult> {
 
         return postgrest[TABLE_RECENT_PROFILES].select {
             filter {
@@ -138,9 +138,9 @@ class SupabasePostgrestServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertRecentSearch(playerSearchDto: PlayerSearchDto) {
+    override suspend fun insertRecentSearch(networkPlayerSearchResult: NetworkPlayerSearchResult) {
         try {
-            postgrest[TABLE_RECENT_PROFILES].insert(playerSearchDto)
+            postgrest[TABLE_RECENT_PROFILES].insert(networkPlayerSearchResult)
         } catch (e: RestException) {
             logDebug("Error inserting recent search: ${e.localizedMessage ?: "Unknown error"}")
         } catch (e: HttpRequestTimeoutException) {
@@ -153,12 +153,12 @@ class SupabasePostgrestServiceImpl @Inject constructor(
     override suspend fun updateRecentSearch(
         userId: UUID,
         recentPlayerId: UUID,
-        playerSearchDto: PlayerSearchDto
+        networkPlayerSearchResult: NetworkPlayerSearchResult
     ) {
         postgrest[TABLE_RECENT_PROFILES].update(update = {
             set(TABLE_CREATED_AT, Timestamp(System.currentTimeMillis()).toString())
-            set(COLUMN_RANK, playerSearchDto.rank)
-            set(COLUMN_MMR, playerSearchDto.mmr)
+            set(COLUMN_RANK, networkPlayerSearchResult.rank)
+            set(COLUMN_MMR, networkPlayerSearchResult.mmr)
         }) {
             filter {
                 eq(TABLE_ID, userId)
@@ -167,7 +167,7 @@ class SupabasePostgrestServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchFavoriteBuilds(userId: UUID): List<FavoriteBuildDto> {
+    override suspend fun fetchFavoriteBuilds(userId: UUID): List<NetworkFavoriteHeroBuild> {
         return postgrest[TABLE_FAVORITE_BUILDS].select {
             filter {
                 eq(TABLE_USER_ID, userId)
@@ -176,8 +176,8 @@ class SupabasePostgrestServiceImpl @Inject constructor(
         }.decodeList()
     }
 
-    override suspend fun insertFavoriteBuild(favoriteBuildDto: FavoriteBuildDto) {
-        postgrest[TABLE_FAVORITE_BUILDS].insert(favoriteBuildDto)
+    override suspend fun insertFavoriteBuild(networkFavoriteHeroBuild: NetworkFavoriteHeroBuild) {
+        postgrest[TABLE_FAVORITE_BUILDS].insert(networkFavoriteHeroBuild)
     }
 
     override suspend fun deleteFavoriteBuild(userId: UUID, buildId: Int) {

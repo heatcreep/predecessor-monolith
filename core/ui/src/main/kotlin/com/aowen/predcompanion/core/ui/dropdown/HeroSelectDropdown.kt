@@ -1,7 +1,6 @@
 package com.aowen.predcompanion.core.ui.dropdown
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -31,9 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.data.model.HeroUiModel
 import com.aowen.predcompanion.ui.theme.dropDownDefaults
 
@@ -42,7 +41,7 @@ import com.aowen.predcompanion.ui.theme.dropDownDefaults
 fun HeroSelectDropdown(
     modifier: Modifier = Modifier,
     heroName: String,
-    heroImageId: Int? = null,
+    heroImageSrc: String? = null,
     onSelect: (String) -> Unit,
     heroes: List<HeroUiModel>
 ) {
@@ -71,9 +70,9 @@ fun HeroSelectDropdown(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                heroImageId?.let { image ->
-                    Image(
-                        painter = painterResource(id = image),
+                heroImageSrc?.let { image ->
+                    AsyncImage(
+                        model = image,
                         modifier = Modifier
                             .clip(CircleShape)
                             .size(36.dp),
@@ -105,13 +104,12 @@ fun HeroSelectDropdown(
             onDismissRequest = { expanded = false }
         ) {
             heroes.forEach { hero ->
-                val image = hero.imageId
                 DropdownMenuItem(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            image?.let {
-                                Image(
-                                    painter = painterResource(id = image),
+                            hero.imageSrc?.let {
+                                AsyncImage(
+                                    model = it,
                                     modifier = Modifier
                                         .clip(CircleShape)
                                         .size(36.dp),

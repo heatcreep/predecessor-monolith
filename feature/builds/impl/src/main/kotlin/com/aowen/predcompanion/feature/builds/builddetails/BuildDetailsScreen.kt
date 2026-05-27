@@ -55,16 +55,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
-import com.aowen.predcompanion.core.data.model.mapper.ItemModuleUi
+import com.aowen.predcompanion.core.data.model.getLevelingAbilities
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import com.aowen.predcompanion.core.model.data.getHeroImage
-import com.aowen.predcompanion.core.model.data.getHeroRole
+import com.aowen.predcompanion.core.model.ui.theme.Console
+import com.aowen.predcompanion.core.ui.common.PlayerIcon
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
+import com.aowen.predcompanion.core.ui.model.mapper.ItemModuleUi
 import com.aowen.predcompanion.core.ui.shared.ItemDetailsBottomSheet
-import com.aowen.predcompanion.data.Console
-import com.aowen.predcompanion.data.getLevelingAbilities
-import com.aowen.predcompanion.ui.common.PlayerIcon
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.meetup.twain.MarkdownText
@@ -276,9 +275,9 @@ fun BuildDetailsScreen(
 fun PlayerCardWithRole(
     buildDetails: BuildUiListItem
 ) {
-    getHeroRole(buildDetails.role)?.let { role ->
+    buildDetails.role?.let { role ->
         PlayerIcon(
-            heroImageId = getHeroImage(buildDetails.heroId),
+            heroImageUrl = buildDetails.heroImageUrl,
             heroIconSize = 64.dp,
         ) {
             Image(
@@ -450,7 +449,7 @@ fun BuildDetailsScreenPreview() {
                     buildId = 1,
                     title = "Narbash Test Build",
                     author = "heatcreep.tv",
-                    role = "Support",
+                    role = HeroRole.Support,
                     description = """
                         # Core Items\n\nFIRST we add ***\"Crystal Tear\"*** with very good base stats and a passive ability that works great on Narbash and boosts healing again.\nSo after ***\"Crystal Tear\"*** you go to ***\"Violet Brooch\"*** and finish building ***\"Truesilver\"***. From ***\"Truesilver\"*** onwards we are a bit safer against CC in the ult for the first time, which we should already have at level 6.  The third item is ***\"Wellspring\"*** every time we use our abilities or mostly the healing , we heal from Wellspring again. We also manage the passive of the item quite well as Narbash, because we also stack our own passive through auto attacks.\n\n*If you have problems with the of Mana then you can also build \"Requiem\" first to stack it quite early*\n___________________________________\n\n# Mid/Late game Items (Flex)\n\nThen first situationally build ***\"Tainted Totem\"*** situationally as a strong anti-healing agent in group fights.\nIf I'm playing with a carry that relies on attack speed or builds more towards attack speed, then I build ***\"Marshall\"*** earlier. You either have to do the carry according to whether he needs or wants the extra attack speed or you look at what kind of build the carry builds, early items etc. We can also build ***\"Windcaller\"*** for a little more mobility and a little more heal power\n___________________________________\n\n# Situational items \n***\"Frosted Lure\"*** we can build to get a shield during the ult after the passive of the item is used\nDepending on the situation, we can now build ***\"Stonewall\"*** against Physical Dmg on you or we can build ***\"Void Helm\"*** against Magical Dmg.\n**\"Frost Guardian\"*** Depending on the situation, opponents should have a lot of atk speed heroes and have a strong focus on you, then you can build the item. \n___________________________________\n\n# Crest\n\nCrest is ***\"Santification\"*** through the maximum life we have, we give our mates and ourselves up to 700 shields. We can also build ***\"Leafsong\"*** depending on the situation to have more mobility as a team\n___________________________________\n\n# other Crest Situational\n\nDepending on the situation, we can build ***\"Silentium\"*** for a little more CC or ***\"Rift Walkers\"*** to have a little engage or disengage or ***\"Reclamation\"*** to cleanse you and your Teammates. from CC.\n___________________________________\n\n\n
                     """.trimIndent(),

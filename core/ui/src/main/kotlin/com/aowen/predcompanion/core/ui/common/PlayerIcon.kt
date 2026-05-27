@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.ui.common
+package com.aowen.predcompanion.core.ui.common
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -13,10 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.QuestionMark
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -24,21 +20,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
 fun PlayerIcon(
     modifier: Modifier = Modifier,
-    heroImageId: Int? = null,
+    heroImageUrl: String? = null,
     bordered: Boolean = true,
-    fallbackIcon: ImageVector = Icons.Default.QuestionMark,
     heroIconSize: Dp = 52.dp,
     onClick: (() -> Unit)? = null,
     roleIcon: (@Composable BoxScope.() -> Unit)? = null
@@ -54,40 +49,26 @@ fun PlayerIcon(
                     Modifier
                 }),
     ) {
-        heroImageId?.let { image ->
-            Image(
-                modifier = Modifier
-                    .padding(bottom = if (roleIcon != null) 8.dp else 0.dp)
-                    .size(heroIconSize)
-                    .clip(CircleShape)
-                    .then(
-                        if (bordered) {
-                            Modifier.border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.secondary,
-                                shape = CircleShape
-                            )
-                        } else {
-                            Modifier
-                        }
-                    ),
-                contentScale = ContentScale.Crop,
-                painter = painterResource(id = heroImageId),
-                contentDescription = null
-            )
-        } ?: Icon(
-            imageVector = fallbackIcon,
+        AsyncImage(
             modifier = Modifier
                 .padding(bottom = if (roleIcon != null) 8.dp else 0.dp)
                 .size(heroIconSize)
                 .clip(CircleShape)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    shape = CircleShape
+                .then(
+                    if (bordered) {
+                        Modifier.border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.secondary,
+                            shape = CircleShape
+                        )
+                    } else {
+                        Modifier
+                    }
                 ),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.secondary
+            contentScale = ContentScale.Crop,
+            model = heroImageUrl,
+            fallback = painterResource(id = coreResources.drawable.unknown),
+            contentDescription = null
         )
 
         if (roleIcon != null) {
@@ -105,7 +86,7 @@ fun PlayerIconNoHeroPreview() {
     MonolithTheme {
         Surface {
             PlayerIcon(
-                heroImageId = coreResources.drawable.narbash
+                heroImageUrl = "https://pred.gg/assets/ae6f5a33a6ca0197.webp"
             ) {
                 Image(
                     modifier = Modifier
@@ -137,7 +118,7 @@ fun PlayerIconPreview() {
     MonolithTheme {
         Surface {
             PlayerIcon(
-                heroImageId = null
+                heroImageUrl = "https://pred.gg/assets/ae6f5a33a6ca0197.webp"
             ) {
                 Image(
                     modifier = Modifier
@@ -169,8 +150,7 @@ fun PlayerIconAddPreview() {
     MonolithTheme {
         Surface {
             PlayerIcon(
-                heroImageId = null,
-                fallbackIcon = Icons.Default.Add
+                heroImageUrl = "https://pred.gg/assets/ae6f5a33a6ca0197.webp"
             )
         }
     }

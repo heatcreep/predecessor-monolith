@@ -1,9 +1,5 @@
 package com.aowen.predcompanion.data
 
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.util.Locale
-
 data class PlayerHeroStats(
     val heroId: Long = 0,
     val displayName: String = "",
@@ -59,66 +55,3 @@ data class PlayerHeroStats(
     val avgWardsDestroyed: Int? = 0,
     val maxWardsDestroyed: Int? = 0
 )
-
-fun PlayerHeroStatsDto.asPlayerHeroStats(): PlayerHeroStats {
-
-    val symbols = DecimalFormatSymbols(Locale.US)
-    val df = DecimalFormat("#.##", symbols)
-
-
-    return PlayerHeroStats(
-        heroId,
-        displayName,
-        matchCount,
-        winRate = df.format(winRate?.let { it * 100 } ?: 0).toDouble(),
-        csMin,
-        goldMin,
-        largestKillingSpree,
-        largestMultiKill,
-        largestCriticalStrike,
-        totalPerformanceScore,
-        avgPerformanceScore,
-        maxPerformanceScore,
-        kills,
-        avgKills,
-        maxKills,
-        deaths,
-        avgDeaths,
-        maxDeaths,
-        assists,
-        avgAssists,
-        maxAssists,
-        avgKdar,
-        maxKdar,
-        minionsKilled,
-        avgMinionsKilled,
-        maxMinionsKilled,
-        goldEarned,
-        avgGoldEarned,
-        maxGoldEarned,
-        totalHealingDone,
-        avgHealingDone,
-        maxHealingDone,
-        totalDamageMitigated,
-        avgDamageMitigated,
-        maxDamageMitigated,
-        totalDamageDealtToHeroes,
-        avgDamageDealtToHeroes,
-        maxDamageDealtToHeroes,
-        totalDamageTakenFromHeroes,
-        avgDamageTakenFromHeroes,
-        maxDamageTakenFromHeroes,
-        totalDamageDealtToStructures,
-        avgDamageDealtToStructures,
-        maxDamageDealtToStructures,
-        totalDamageDealtToObjectives,
-        avgDamageDealtToObjectives,
-        maxDamageDealtToObjectives,
-        wardsPlaced,
-        avgWardsPlaced,
-        maxWardsPlaced,
-        wardsDestroyed,
-        avgWardsDestroyed,
-        maxWardsDestroyed
-    )
-}

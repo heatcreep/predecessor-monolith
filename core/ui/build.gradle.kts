@@ -12,7 +12,7 @@ dependencies {
     api(projects.core.designsystem)
     api(projects.core.model)
     api(projects.core.resources)
-    implementation(project(":core:data"))
+    implementation(projects.core.data)
     implementation(project(":core:datastore"))
 
     implementation(libs.coil.compose)

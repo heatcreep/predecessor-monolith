@@ -12,4 +12,6 @@ dependencies {
     implementation(projects.feature.heroes.api)
     implementation(projects.feature.search.api)
 
+    testImplementation(projects.core.testing)
+
 }

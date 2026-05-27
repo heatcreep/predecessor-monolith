@@ -1,22 +1,20 @@
 package com.aowen.predcompanion.core.data.repository.user
 
+import com.aowen.predcompanion.core.data.model.asNetworkPlayerSearchResult
+import com.aowen.predcompanion.core.data.model.asPlayerDetails
 import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.model.data.PlayerSearchDto
-import com.aowen.predcompanion.core.model.data.RankDetails
-import com.aowen.predcompanion.core.model.data.create
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
 import com.aowen.predcompanion.core.network.TABLE_MAX_ROWS
 import com.aowen.predcompanion.core.network.getOrThrow
 import com.aowen.predcompanion.logDebug
-import java.sql.Timestamp
 import java.util.UUID
 import javax.inject.Inject
 
 interface UserRecentSearchRepository {
 
-    suspend fun getRecentSearches(): List<PlayerDetails>
-    suspend fun addRecentSearch(playerDetails: PlayerDetails)
+    suspend fun getRecentSearches(): List<PlayerInfo.PlayerDetails>
+    suspend fun addRecentSearch(playerDetails: PlayerInfo.PlayerDetails)
     suspend fun removeRecentSearch(playerId: String)
 
     suspend fun removeAllRecentSearches()
@@ -28,51 +26,40 @@ class NetworkUserRecentSearchRepository @Inject constructor(
     private val userRepository: UserRepository
 ) : UserRecentSearchRepository {
 
-    override suspend fun getRecentSearches(): List<PlayerDetails> {
+    override suspend fun getRecentSearches(): List<PlayerInfo.PlayerDetails> {
         val user = userRepository.getUser()
         return try {
             if (user?.id == null) {
                 return emptyList()
             } else {
                 postgrestService.fetchRecentSearches(user.id!!)
-                    .map { it.create() }
+                    .map { it.asPlayerDetails() }
             }
         } catch (_: Exception) {
             emptyList()
         }
     }
 
-    override suspend fun addRecentSearch(playerDetails: PlayerDetails) {
+    override suspend fun addRecentSearch(playerDetails: PlayerInfo.PlayerDetails) {
         val user = userRepository.getUser()
         return try {
             if (user?.id == null) {
                 return
             } else {
-                val playerSearchDto = PlayerSearchDto(
-                    createdAt = Timestamp(System.currentTimeMillis()).toString(),
-                    id = user.id!!,
-                    playerId = UUID.fromString(playerDetails.playerId),
-                    displayName = playerDetails.playerName,
-                    region = playerDetails.region,
-                    rank = playerDetails.rank,
-                    rankTitle = playerDetails.rankDetails.rankText,
-                    rankImage = playerDetails.rankDetails.rankText,
-                    isRanked = playerDetails.rankDetails != RankDetails.UNRANKED,
-                    mmr = playerDetails.mmr?.toFloat(),
-                )
+                val networkPlayerSearchResult = playerDetails.asNetworkPlayerSearchResult()
                 val recentSearches = postgrestService.fetchRecentSearches(user.id!!)
 
                 // If the player is not already in the recent searches, add it
-                if (!recentSearches.any { it.playerId == playerSearchDto.playerId }) {
+                if (!recentSearches.any { it.playerId == networkPlayerSearchResult.playerId }) {
                     // If the table is full, update the oldest search
                     if (recentSearches.size >= TABLE_MAX_ROWS) {
                         postgrestService.updateRecentSearch(
                             userId = user.id!!,
-                            recentPlayerId = playerSearchDto.playerId,
-                            playerSearchDto
+                            recentPlayerId = networkPlayerSearchResult.playerId,
+                            networkPlayerSearchResult
                         )
                     }
-                    postgrestService.insertRecentSearch(playerSearchDto)
+                    postgrestService.insertRecentSearch(networkPlayerSearchResult)
 
                 } else {
                     val updatedPlayerDetailsResult =
@@ -82,8 +69,8 @@ class NetworkUserRecentSearchRepository @Inject constructor(
                     postgrestService.updateRecentSearch(
                         userId = user.id!!,
                         recentPlayerId = UUID.fromString(updatedPlayerId)
-                            ?: playerSearchDto.playerId,
-                        playerSearchDto
+                            ?: networkPlayerSearchResult.playerId,
+                        networkPlayerSearchResult
                     )
                 }
 

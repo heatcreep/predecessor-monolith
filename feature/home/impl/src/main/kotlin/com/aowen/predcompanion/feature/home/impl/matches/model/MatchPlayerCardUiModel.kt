@@ -1,0 +1,60 @@
+package com.aowen.predcompanion.feature.home.impl.matches.model
+
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.graphics.Color
+
+data class MatchPlayerCardUiModel(
+    val playerId: String,
+    val playerName: String,
+    val rank: String,
+    val rankColor: Color,
+    val vpTotal: Int,
+    val vpChange: String,
+    val heroImageUrl: String,
+    val items: List<PlayerItem>,
+    @param:DrawableRes val heroRoleImageId: Int,
+    val performanceTitle: String,
+    val performanceScore: Int,
+    val minionsKilled: Int,
+    val kills: String,
+    val deaths: String,
+    val assists: String,
+    val kdaValue: String,
+    val goldEarned: String,
+    val creepScorePerMinute: String,
+    val goldEarnedPerMinute: String,
+    val laneMinionsKilled: Int,
+    val neutralMinionsEnemyJungle: Int,
+    val neutralMinionsTeamJungle: Int,
+    val totalDamageDealt: Int,
+    val totalDamageDealtToHeroes: Int,
+    val physicalDamageDealt: Int,
+    val physicalDamageDealtToHeroes: Int,
+    val magicalDamageDealt: Int,
+    val magicalDamageDealtToHeroes: Int,
+    val trueDamageDealt: Int,
+    val trueDamageDealtToHeroes: Int,
+    val totalDamageDealtToStructures: Int,
+    val totalDamageDealtToObjectives: Int,
+    val totalDamageTaken: Int,
+    val physicalDamageTaken: Int,
+    val magicalDamageTaken: Int,
+    val trueDamageTaken: Int,
+    val totalDamageTakenFromHeroes: Int,
+    val physicalDamageTakenFromHeroes: Int,
+    val magicalDamageTakenFromHeroes: Int,
+    val trueDamageTakenFromHeroes: Int,
+    val totalDamageMitigated: Int,
+    val totalHealingDone: Int,
+    val itemHealingDone: Int,
+    val crestHealingDone: Int,
+    val utilityHealingDone: Int,
+    val totalShieldingReceived: Int,
+    val wardsPlaced: Int,
+    val wardsDestroyed: Int,
+) {
+    data class PlayerItem(
+        val itemName: String,
+        val imageSrc: String
+    )
+}

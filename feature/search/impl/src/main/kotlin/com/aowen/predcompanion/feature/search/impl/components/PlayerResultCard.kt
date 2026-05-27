@@ -1,6 +1,5 @@
 package com.aowen.predcompanion.feature.search.impl.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
@@ -20,13 +20,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.core.model.data.PlayerDetails
+import coil.compose.AsyncImage
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 
 @Composable
 fun PlayerResultCard(
-    playerDetails: PlayerDetails,
+    playerDetails: PlayerInfo.PlayerDetails,
     modifier: Modifier = Modifier,
     navigateToPlayerDetails: (String) -> Unit,
     handleClearSingleSearch: (() -> Unit)? = null
@@ -61,9 +61,10 @@ fun PlayerResultCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row {
-                    Image(
-                        painter = painterResource(id = playerDetails.rankDetails.rankImageAssetId),
-                        contentDescription = playerDetails.rankDetails.rankText
+                    AsyncImage(
+                        modifier = Modifier.size(24.dp),
+                        model = playerDetails.rankImage,
+                        contentDescription = playerDetails.rankTitle
                     )
                 }
                 Column {

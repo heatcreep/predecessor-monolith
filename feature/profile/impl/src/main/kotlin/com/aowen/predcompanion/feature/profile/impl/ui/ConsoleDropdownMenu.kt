@@ -25,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.data.Console
+import com.aowen.predcompanion.core.model.ui.theme.Console
 import com.aowen.predcompanion.ui.theme.dropDownDefaults
 import com.aowen.predcompanion.ui.theme.inputFieldDefaults
 

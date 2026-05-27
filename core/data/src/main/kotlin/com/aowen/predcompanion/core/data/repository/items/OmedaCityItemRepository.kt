@@ -1,8 +1,8 @@
 package com.aowen.predcompanion.core.data.repository.items
 
+import com.aowen.predcompanion.core.data.model.asItemDetails
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import com.aowen.predcompanion.core.model.data.asItemDetails
-import com.aowen.predcompanion.core.network.OmedaCityService
+import com.aowen.predcompanion.core.network.PredCompanionNetworkDataSource
 import com.aowen.predcompanion.core.network.Resource
 import com.aowen.predcompanion.core.network.safeApiCall
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +13,7 @@ import javax.inject.Singleton
 
 @Singleton
 class OmedaCityItemRepository @Inject constructor(
-    private val omedaCityService: OmedaCityService
+    private val networkDataSource: PredCompanionNetworkDataSource
 ) : ItemRepository {
 
     private val _allItems: MutableStateFlow<Map<Int, ItemDetails>> = MutableStateFlow(emptyMap())
@@ -22,7 +22,7 @@ class OmedaCityItemRepository @Inject constructor(
     override suspend fun fetchAllItems() {
         if (_allItems.value.isNotEmpty()) return
         val result = safeApiCall(
-            apiCall = omedaCityService::getAllItems,
+            apiCall = networkDataSource::getAllItems,
             transform = { items -> items.map { it.asItemDetails() } }
         )
         if (result is Resource.Success) {

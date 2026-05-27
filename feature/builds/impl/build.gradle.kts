@@ -17,4 +17,7 @@ dependencies {
     implementation(libs.androidx.paging.compose)
     implementation(libs.kotlinx.immutable.collections)
     implementation(libs.meetup.markdown)
+
+    testImplementation(projects.core.testing)
+    testImplementation(libs.androidx.paging.testing)
 }

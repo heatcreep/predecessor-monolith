@@ -29,6 +29,7 @@ dependencies {
     implementation(libs.supabase.functions)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.okhttp)
+    implementation(libs.okhttp.logging)
     implementation(libs.retrofit.serialization.converter)
 }
 

@@ -1,7 +1,6 @@
 package com.aowen.predcompanion.feature.home.impl.winrate
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,14 +35,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.getHeroImage
-import com.aowen.predcompanion.data.HeroStatistics
+import com.aowen.predcompanion.core.model.data.HeroStatistics
 import com.aowen.predcompanion.feature.home.impl.HomeScreenUiState
 import com.aowen.predcompanion.feature.home.impl.TimeFrame
 import com.aowen.predcompanion.ui.components.HeroInlineStatsRateBar
@@ -233,18 +230,12 @@ fun HeroWinPickRateScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 // Player Favorite Hero
-                                Image(
+                                AsyncImage(
+                                    model = heroStats.heroImageSrc,
                                     modifier = Modifier
-                                        .size(36.dp)
                                         .clip(CircleShape)
-                                        .border(
-                                            width = 1.dp,
-                                            color = MaterialTheme.colorScheme.secondary,
-                                            shape = CircleShape
-                                        ),
-                                    contentScale = ContentScale.Crop,
-                                    painter = painterResource(id = getHeroImage(heroStats.heroId)),
-                                    contentDescription = null
+                                        .size(36.dp),
+                                    contentDescription = heroStats.heroName
                                 )
                                 Text(
                                     text = heroStats.heroName,
@@ -284,6 +275,7 @@ fun HeroWinRateScreenPreview() {
                 heroStats = listOf(
                     HeroStatistics(
                         1,
+                        "https://example.com/countess.jpg",
                         "Countess",
                         "Countess",
                         56.45f,
@@ -291,6 +283,7 @@ fun HeroWinRateScreenPreview() {
                     ),
                     HeroStatistics(
                         23,
+                        "https://example.com/iggy-scorch.jpg",
                         "Iggy & Scorch",
                         "Iggy & Scorch",
                         12.45f,

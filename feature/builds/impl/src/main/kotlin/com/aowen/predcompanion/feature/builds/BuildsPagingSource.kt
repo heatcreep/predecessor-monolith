@@ -2,8 +2,8 @@ package com.aowen.predcompanion.feature.builds
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
+import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.network.getOrThrow
 

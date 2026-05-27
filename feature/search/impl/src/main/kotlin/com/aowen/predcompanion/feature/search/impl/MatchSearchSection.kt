@@ -27,7 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.aowen.monolith.data.MatchDetails
+import com.aowen.predcompanion.core.model.data.MatchDetails
 import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 import com.aowen.predcompanion.ui.theme.BadgeBlueGreen
 import com.aowen.predcompanion.ui.theme.NeroBlack

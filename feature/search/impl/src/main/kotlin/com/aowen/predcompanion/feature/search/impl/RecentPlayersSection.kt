@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.core.model.data.PlayerDetails
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.feature.search.impl.components.PlayerResultCard
 import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 
@@ -23,7 +23,7 @@ import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 fun RecentPlayersSection(
     uiState: SearchScreenUiState,
     handleOpenAlertDialog: () -> Unit = {},
-    handleAddToRecentSearch: (PlayerDetails) -> Unit = {},
+    handleAddToRecentSearch: (PlayerInfo.PlayerDetails) -> Unit = {},
     handleClearSingleSearch: (String) -> Unit = {},
     navigateToPlayerDetails: (String) -> Unit = {}
 ) {

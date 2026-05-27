@@ -7,9 +7,9 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.aowen.predcompanion.feature.builds.api.navigation.navigateToBuildDetails
 import com.aowen.predcompanion.feature.heroes.api.navigation.navigateToHeroDetails
+import com.aowen.predcompanion.feature.home.api.navigation.navigateToMatchDetails
 import com.aowen.predcompanion.feature.home.api.navigation.navigateToPlayerDetails
 import com.aowen.predcompanion.feature.items.api.navigation.navigateToItemDetails
-import com.aowen.predcompanion.feature.matches.api.navigation.navigateToMatchDetails
 import com.aowen.predcompanion.feature.search.api.navigation.SearchNavKey
 import com.aowen.predcompanion.feature.search.impl.SearchScreen
 import com.aowen.predcompanion.feature.search.impl.SearchScreenViewModel

@@ -11,4 +11,6 @@ dependencies {
     implementation(projects.core.resources)
     implementation(projects.feature.items.api)
     implementation(projects.feature.search.api)
+
+    testImplementation(projects.core.testing)
 }

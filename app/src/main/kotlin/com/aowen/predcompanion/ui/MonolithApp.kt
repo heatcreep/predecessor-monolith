@@ -27,10 +27,9 @@ import com.aowen.predcompanion.core.navigation.toEntries
 import com.aowen.predcompanion.feature.builds.navigation.buildsEntry
 import com.aowen.predcompanion.feature.heroes.impl.navigation.heroesEntry
 import com.aowen.predcompanion.feature.home.impl.navigation.homeEntry
-import com.aowen.predcompanion.feature.home.impl.playerdetails.navigation.playerDetailsEntry
+import com.aowen.predcompanion.feature.home.impl.navigation.matchesEntry
 import com.aowen.predcompanion.feature.items.impl.itemdetails.navigation.itemDetailsEntry
 import com.aowen.predcompanion.feature.items.impl.navigation.itemsEntry
-import com.aowen.predcompanion.feature.matches.impl.navigation.matchesEntry
 import com.aowen.predcompanion.feature.profile.impl.navigation.profileEntry
 import com.aowen.predcompanion.feature.search.impl.navigation.searchEntry
 import com.aowen.predcompanion.navigation.Navigator
@@ -51,20 +50,19 @@ fun MonolithApp(
                 )
             },
         ) { padding ->
-            val entryProvider = entryProvider {
+            val topLevelEntryProvider = entryProvider {
                 homeEntry(navigator)
                 matchesEntry(navigator)
                 heroesEntry(navigator)
                 itemsEntry(navigator)
+                itemDetailsEntry()
                 buildsEntry(navigator)
                 searchEntry(navigator)
                 profileEntry(navigator, appState::showSnackbar)
-                playerDetailsEntry(navigator)
-                itemDetailsEntry()
             }
             NavDisplay(
                 modifier = Modifier.padding(padding),
-                entries = appState.navigationState.toEntries(entryProvider),
+                entries = appState.navigationState.toEntries(topLevelEntryProvider),
                 onBack = { navigator.goBack() }
             )
         }

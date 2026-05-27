@@ -25,15 +25,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.model.data.RankDetails
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
 fun PlayerProfileTitleCard(
     modifier: Modifier = Modifier,
-    playerDetails: PlayerDetails
+    playerDetails: PlayerInfo.PlayerDetails
     // Add other parameters as needed
 ) {
     Card(
@@ -90,10 +90,10 @@ fun PlayerProfileTitleCard(
                                         fontWeight = FontWeight.ExtraBold
                                     )
                                 )
-                                Image(
+                                AsyncImage(
                                     modifier = Modifier
                                         .size(64.dp),
-                                    painter = painterResource(id = playerDetails.rankDetails.rankImageAssetId),
+                                    model = playerDetails.rankImage,
                                     contentDescription = null
                                 )
                             }
@@ -121,10 +121,10 @@ fun PlayerProfileTitleCardPreview() {
         Surface {
             PlayerProfileTitleCard(
                 modifier = Modifier.padding(16.dp),
-                playerDetails = PlayerDetails(
+                playerDetails = PlayerInfo.PlayerDetails(
                     playerName = "heatcreep.tv",
                     vpCurrent = 63,
-                    rankDetails = RankDetails.GOLD_III
+                    rankTitle = "Gold III",
                 )
             )
         }

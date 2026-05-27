@@ -60,21 +60,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.data.model.HeroUiModel
-import com.aowen.predcompanion.core.data.model.mapper.StatLine
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.model.data.PlayerStats
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfilePlayerStatsCard
 import com.aowen.predcompanion.core.ui.components.UnclaimPlayerDialog
 import com.aowen.predcompanion.core.ui.dropdown.HeroSelectDropdown
+import com.aowen.predcompanion.core.ui.model.mapper.StatLine
 import com.aowen.predcompanion.data.PlayerHeroStats
-import com.aowen.predcompanion.feature.matches.api.ui.MatchesList
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 import com.aowen.predcompanion.ui.utils.animateHorizontalAlignmentAsState
 import kotlinx.coroutines.launch
-import com.aowen.predcompanion.feature.heroes.api.R as heroResources
 
 
 @Composable
@@ -302,7 +299,7 @@ fun PlayerStatsTab(
                         ),
                         StatLine.SingleStatLine(
                             "Favorite hero",
-                            uiState.stats?.favoriteHero ?: "N/A"
+                            uiState.stats?.favoriteHero?.name ?: "N/A"
                         ),
                         StatLine.SingleStatLine(
                             "Favorite role",
@@ -329,11 +326,12 @@ fun PlayerStatsTab(
             }
         }
         item {
-            MatchesList(
+            PlayerDetailsRecentMatchList(
+                modifier = Modifier.fillMaxSize(),
                 playerId = uiState.playerId,
                 matches = uiState.matches,
-                navigateToMatchDetails = navigateToMatchDetails,
-                navigateToMoreMatches = navigateToMoreMatches
+                navigateToMoreMatches = navigateToMoreMatches,
+                navigateToMatchDetails = navigateToMatchDetails
             )
         }
     }
@@ -349,7 +347,7 @@ fun PlayerHeroStatsTab(
     var selectedHero by remember {
         mutableStateOf(
             uiState.allHeroes.firstOrNull {
-                it.name == uiState.stats?.favoriteHero
+                it.name == uiState.stats?.favoriteHero?.name
             }
         )
     }
@@ -369,7 +367,7 @@ fun PlayerHeroStatsTab(
     ) {
         HeroSelectDropdown(
             heroName = selectedHero?.name ?: "Select Hero",
-            heroImageId = selectedHero?.imageId,
+            heroImageSrc = selectedHero?.imageSrc,
             onSelect = {
                 selectedHero = uiState.allHeroes.firstOrNull { hero ->
                     hero.name == it
@@ -663,11 +661,14 @@ fun HomeScreenPreview() {
         PlayerDetailScreen(
             uiState = PlayerDetailsUiState(
                 isLoading = false,
-                player = PlayerDetails(
+                player = PlayerInfo.PlayerDetails(
                     playerName = "heatcreep.tv",
                 ),
-                stats = PlayerStats(
-                    favoriteHero = "Narbash"
+                stats = PlayerInfo.PlayerStats(
+                    favoriteHero = PlayerInfo.PlayerStats.FavoriteHero(
+                        name = "Narbash",
+                        imageUrl = "https://cdn.predcompanion.com/heroes/narbash.png"
+                    )
                 ),
             )
         )
@@ -685,7 +686,7 @@ fun HomeScreenPreview2() {
         PlayerDetailScreen(
             uiState = PlayerDetailsUiState(
                 isLoading = false,
-                player = PlayerDetails(
+                player = PlayerInfo.PlayerDetails(
                     playerName = "heatcreep.tv"
                 )
             )
@@ -710,14 +711,14 @@ fun PlayerHeroStatsPreview() {
             PlayerHeroStatsTab(
                 uiState = PlayerDetailsUiState(
                     isLoading = false,
-                    player = PlayerDetails(
+                    player = PlayerInfo.PlayerDetails(
                         playerName = "heatcreep.tv"
                     ),
                     allHeroes = listOf(
                         HeroUiModel(
                             heroId = 1,
                             name = "Narbash",
-                            imageId = heroResources.drawable.narbash
+                            imageSrc = "https://cdn.predcompanion.com/heroes/narbash.png"
                         )
                     ),
                     heroStats = listOf(

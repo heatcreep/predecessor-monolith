@@ -12,18 +12,6 @@ enum class HeroRole(val roleName: String, val drawableId: Int, val simpleDrawabl
     Unknown("unknown", coreResources.drawable.unknown, coreResources.drawable.unknown),
 }
 
-fun getHeroName(heroId: Long) = Hero.entries.firstOrNull {
-    it.heroId == heroId
-}?.heroName ?: "Hero"
-
-fun getHeroRole(roleName: String? = ""): HeroRole? = HeroRole.entries.firstOrNull {
-    it.roleName.equals(roleName, ignoreCase = true)
-}
-
-fun getHeroImage(heroId: Long) = Hero.entries.firstOrNull {
-    it.heroId == heroId
-}?.drawableId ?: coreResources.drawable.unknown
-
 enum class Hero(
     val heroName: String,
     val pathName: String,

@@ -1,6 +1,6 @@
 package com.aowen.predcompanion.core.data.repository.builds
 
-import com.aowen.predcompanion.data.BuildListItem
+import com.aowen.predcompanion.core.model.data.HeroBuild
 import com.aowen.predcompanion.core.network.Resource
 
 interface BuildRepository {
@@ -15,9 +15,9 @@ interface BuildRepository {
         modules: Int? = null,
         page: Int? = 1,
 
-        ): Resource<List<BuildListItem>>
+        ): Resource<List<HeroBuild>>
 
     suspend fun fetchBuildById(
         buildId: String
-    ): Resource<BuildListItem>
+    ): Resource<HeroBuild>
 }

@@ -64,24 +64,23 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
-import com.aowen.predcompanion.core.ui.cards.builds.BuildListCard
-import com.aowen.predcompanion.core.ui.components.SpiderChart
-import com.aowen.predcompanion.data.Console
+import com.aowen.predcompanion.core.data.model.getAbilityKey
+import com.aowen.predcompanion.core.data.model.getAbilityName
+import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.HeroRole
-import com.aowen.predcompanion.data.getAbilityKey
-import com.aowen.predcompanion.data.getAbilityName
-import com.aowen.predcompanion.core.model.data.getHeroImage
+import com.aowen.predcompanion.core.model.ui.theme.Console
+import com.aowen.predcompanion.core.ui.cards.builds.BuildListCard
+import com.aowen.predcompanion.core.ui.common.PlayerIcon
+import com.aowen.predcompanion.core.ui.components.SpiderChart
 import com.aowen.predcompanion.feature.heroes.api.R
 import com.aowen.predcompanion.feature.heroes.impl.herodetails.preview.heroBuildsLoadingState
 import com.aowen.predcompanion.feature.heroes.impl.herodetails.preview.heroBuildsState
-import com.aowen.predcompanion.ui.common.PlayerIcon
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 import com.aowen.predcompanion.ui.theme.BadgeBlueGreen
-import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.ui.theme.NeroBlack
 import kotlinx.coroutines.launch
 
@@ -230,7 +229,7 @@ fun HeroOverviewScreen(
             ) {
 
                 PlayerIcon(
-                    heroImageId = getHeroImage(uiState.hero.id),
+                    heroImageUrl = uiState.hero.imageUrl,
                     heroIconSize = 64.dp
                 )
 

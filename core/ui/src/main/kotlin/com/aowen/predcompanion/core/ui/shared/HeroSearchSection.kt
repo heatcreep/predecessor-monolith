@@ -1,7 +1,6 @@
 package com.aowen.predcompanion.core.ui.shared
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,10 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.model.data.HeroDetails
-import com.aowen.predcompanion.core.model.data.getHeroImage
 import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 import com.aowen.predcompanion.ui.theme.BadgeBlueGreen
 import com.aowen.predcompanion.ui.theme.NeroBlack
@@ -126,7 +124,7 @@ fun HeroResultCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Hero Image
-                Image(
+                AsyncImage(
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
@@ -136,7 +134,7 @@ fun HeroResultCard(
                             shape = CircleShape
                         ),
                     contentScale = ContentScale.Crop,
-                    painter = painterResource(id = getHeroImage(heroDetails.id)),
+                    model = heroDetails.imageUrl,
                     contentDescription = null
                 )
                 Column {

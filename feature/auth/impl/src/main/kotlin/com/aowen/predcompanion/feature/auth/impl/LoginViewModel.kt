@@ -25,7 +25,7 @@ class LoginViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState
 
-    val userState = authRepo.userState
+    val userState = authRepo.networkUserState
 
     init {
         initViewModel()

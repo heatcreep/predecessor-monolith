@@ -24,13 +24,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+
 import com.aowen.predcompanion.core.ui.shared.HeroSearchSection
 import com.aowen.predcompanion.core.ui.shared.ItemSearchSection
-import com.aowen.predcompanion.core.model.data.PlayerDetails
 import com.aowen.predcompanion.ui.components.MonolithAlertDialog
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +40,7 @@ internal fun SearchScreen(
     setSearchValue: (String) -> Unit,
     handleSubmitSearch: () -> Unit,
     handleClearSearch: () -> Unit,
-    handleAddToRecentSearch: (PlayerDetails) -> Unit,
+    handleAddToRecentSearch: (PlayerInfo.PlayerDetails) -> Unit,
     handleClearSingleRecentSearch: (String) -> Unit,
     handleClearAllRecentSearches: () -> Unit,
     handlePullRefresh: () -> Unit,

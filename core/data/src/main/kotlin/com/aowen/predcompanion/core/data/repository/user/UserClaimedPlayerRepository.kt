@@ -1,20 +1,20 @@
 package com.aowen.predcompanion.core.data.repository.user
 
-import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
+import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
 import com.aowen.predcompanion.core.database.dao.ClaimedPlayerDao
 import com.aowen.predcompanion.core.database.model.ClaimedPlayerEntity
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.model.data.PlayerStats
-import com.aowen.predcompanion.core.model.network.ClaimedPlayer
-import com.aowen.predcompanion.core.model.network.UserState
+import com.aowen.predcompanion.core.model.data.ClaimedPlayer
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
 import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.core.network.model.NetworkUserState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+import javax.inject.Singleton
 
 sealed interface ClaimedPlayerState {
     data object Loading : ClaimedPlayerState
@@ -34,11 +34,12 @@ interface UserClaimedPlayerRepository {
     suspend fun setClaimedPlayerName(playerName: String?)
     suspend fun setClaimedUser(
         isRemoving: Boolean,
-        playerStats: PlayerStats?,
-        playerDetails: PlayerDetails?
+        playerStats: PlayerInfo.PlayerStats?,
+        playerDetails: PlayerInfo.PlayerDetails?
     )
 }
 
+@Singleton
 class OfflineFirstUserClaimedPlayerRepository @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
@@ -60,12 +61,12 @@ class OfflineFirstUserClaimedPlayerRepository @Inject constructor(
 
     override suspend fun getClaimedPlayer() {
         _claimedPlayerState.update { ClaimedPlayerState.Loading }
-        val playerId = when (authRepository.userState.value) {
-            is UserState.Authenticated -> {
+        val playerId = when (authRepository.networkUserState.value) {
+            is NetworkUserState.Authenticated -> {
                 userRepository.getUser()?.playerId
             }
 
-            is UserState.Unauthenticated -> {
+            is NetworkUserState.Unauthenticated -> {
                 claimedPlayerDao.getClaimedPlayerIds().firstOrNull()?.firstOrNull()
             }
 
@@ -97,11 +98,11 @@ class OfflineFirstUserClaimedPlayerRepository @Inject constructor(
 
     override suspend fun setClaimedUser(
         isRemoving: Boolean,
-        playerStats: PlayerStats?,
-        playerDetails: PlayerDetails?
+        playerStats: PlayerInfo.PlayerStats?,
+        playerDetails: PlayerInfo.PlayerDetails?
     ) {
-        when (authRepository.userState.value) {
-            is UserState.Authenticated -> {
+        when (authRepository.networkUserState.value) {
+            is NetworkUserState.Authenticated -> {
                 try {
                     val userId = userRepository.getUser()?.id.toString()
                     playerDetails?.playerId?.let {

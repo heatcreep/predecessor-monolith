@@ -8,8 +8,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.core.designsystem.MonolithTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

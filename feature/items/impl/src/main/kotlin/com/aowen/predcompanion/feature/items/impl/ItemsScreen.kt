@@ -56,7 +56,6 @@ import coil.compose.SubcomposeAsyncImageContent
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import com.aowen.predcompanion.core.model.data.StatDetails
 import com.aowen.predcompanion.core.ui.components.ShimmerCard
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionFilterDropdown
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionSortDropdown
@@ -310,7 +309,7 @@ fun ItemsScreenLoadingPreview() {
                         displayName = "Ashbringer",
                         heroClass = HeroClass.FIGHTER,
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -344,7 +343,7 @@ fun ItemsScreenNoItemsPreview() {
                         displayName = "Ashbringer",
                         heroClass = HeroClass.FIGHTER,
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -376,7 +375,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -389,7 +388,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -402,7 +401,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -415,7 +414,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -428,7 +427,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -441,7 +440,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -456,7 +455,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -469,7 +468,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -482,7 +481,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -495,7 +494,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -508,7 +507,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -521,7 +520,7 @@ fun ItemsScreenScreenSizePreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -551,7 +550,7 @@ fun ItemsScreenPreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health
@@ -566,7 +565,7 @@ fun ItemsScreenPreview() {
                         heroClass = HeroClass.FIGHTER,
 
                         stats = listOf(
-                            StatDetails(
+                            ItemDetails.StatDetails(
                                 name = "Max Health",
                                 value = "400",
                                 iconId = coreResources.drawable.max_health

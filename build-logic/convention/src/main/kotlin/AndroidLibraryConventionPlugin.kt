@@ -1,3 +1,4 @@
+
 import com.android.build.api.dsl.LibraryExtension
 import com.aowen.predcompanion.configureKotlinAndroid
 import com.aowen.predcompanion.libs
@@ -27,6 +28,7 @@ class AndroidLibraryConventionPlugin: Plugin<Project> {
             dependencies {
                 "androidTestImplementation"(libs.findLibrary("kotlin.test").get())
                 "testImplementation"(libs.findLibrary("kotlin.test").get())
+                "testImplementation"(libs.findLibrary("junit4").get())
             }
         }
     }

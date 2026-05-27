@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.ui.components
+package com.aowen.predcompanion.core.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

@@ -1,7 +1,5 @@
 package com.aowen.predcompanion.core.ui.content
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -17,19 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.getHeroImage
 import com.aowen.predcompanion.ui.components.HeroInlineStatsRateBar
 
 @Composable
 fun HeroPercentageTile(
     modifier: Modifier = Modifier,
     heroName: String,
-    heroImageId: Int,
+    heroImageSrc: String,
     winRate: Float,
     onClick: () -> Unit
 ) {
@@ -55,18 +51,12 @@ fun HeroPercentageTile(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Player Favorite Hero
-                Image(
+                AsyncImage(
+                    model = heroImageSrc,
                     modifier = Modifier
-                        .size(48.dp)
                         .clip(CircleShape)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.secondary,
-                            shape = CircleShape
-                        ),
-                    contentScale = ContentScale.Crop,
-                    painter = painterResource(id = getHeroImage(heroImageId.toLong())),
-                    contentDescription = null
+                        .size(36.dp),
+                    contentDescription = heroName
                 )
                 Text(
                     text = heroName,
@@ -89,7 +79,7 @@ fun HeroPercentageTilePreview() {
     MonolithTheme {
         HeroPercentageTile(
             heroName = "Invoker",
-            heroImageId = 1,
+            heroImageSrc = "https://example.com/hero-image.jpg",
             winRate = 75f,
             onClick = {}
         )

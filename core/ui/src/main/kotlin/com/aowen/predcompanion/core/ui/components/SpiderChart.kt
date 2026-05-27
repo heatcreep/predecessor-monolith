@@ -60,6 +60,8 @@ fun SpiderChart(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
+        if(statPoints.isEmpty()) return@Row
         Text(
             text = "Durability",
             style = MaterialTheme.typography.bodySmall,
@@ -76,6 +78,7 @@ fun SpiderChart(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary
             )
+
             Canvas(
                 modifier = modifier
                     .size(168.dp)

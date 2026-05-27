@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.data
+package com.aowen.predcompanion.core.model.data
 
 import java.math.BigDecimal
 
@@ -15,18 +15,3 @@ data class HeroBaseStats(
     val cleave: Float = 0f,
     val attackRange: Float = 0f,
 )
-
-fun BaseStatsDto.create(): HeroBaseStats =
-    HeroBaseStats(
-        maxHealth = maxHealth.map { it.toBigDecimal() },
-        healthRegen = healthRegen.map { it.toBigDecimal() },
-        maxMana = maxMana?.map { it.toBigDecimal() } ?: emptyList(),
-        manaRegen = manaRegen?.map { it.toBigDecimal() } ?: emptyList(),
-        attackSpeed = attackSpeed.map { it.toBigDecimal() },
-        physicalArmor = physicalArmor.map { it.toBigDecimal() },
-        magicalArmor = magicalArmor.map { it.toBigDecimal() },
-        physicalPower = physicalPower.map { it.toBigDecimal() },
-        movementSpeed = movementSpeed.first(),
-        cleave = cleave.first(),
-        attackRange = attackRange.first(),
-    )

@@ -2,8 +2,6 @@ package com.aowen.predcompanion.feature.home.impl.playerdetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.monolith.data.MatchDetails
-import com.aowen.predcompanion.core.common.di.IoDispatcher
 import com.aowen.predcompanion.core.data.model.HeroUiModel
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
@@ -13,18 +11,17 @@ import com.aowen.predcompanion.core.data.repository.user.UserClaimedPlayerReposi
 import com.aowen.predcompanion.core.data.repository.user.UserRepository
 import com.aowen.predcompanion.core.database.dao.ClaimedPlayerDao
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.core.model.data.PlayerStats
-import com.aowen.predcompanion.core.model.network.UserState
+import com.aowen.predcompanion.core.model.data.PlayerInfo
+import com.aowen.predcompanion.feature.home.impl.matches.model.MatchListItemUiModel
+import com.aowen.predcompanion.feature.home.impl.matches.model.mapper.MatchListItemUiMapper
 import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.core.network.model.NetworkUserState
 import com.aowen.predcompanion.data.PlayerHeroStats
 import com.aowen.predcompanion.logDebug
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,11 +35,11 @@ data class PlayerDetailsUiState(
     val isEditingPlayerName: Boolean = false,
     val playerNameField: String = "",
     val errorMessage: String? = null,
-    val player: PlayerDetails? = null,
+    val player: PlayerInfo.PlayerDetails? = null,
     val heroStats: List<PlayerHeroStats> = emptyList(),
     val selectedHeroStats: PlayerHeroStats? = null,
-    val stats: PlayerStats? = null,
-    val matches: List<MatchDetails> = emptyList(),
+    val stats: PlayerInfo.PlayerStats? = null,
+    val matches: List<MatchListItemUiModel> = emptyList(),
     val allHeroes: List<HeroUiModel> = emptyList(),
     val allHeroIds: List<Long> = emptyList(),
     val playerId: String = "",
@@ -51,7 +48,6 @@ data class PlayerDetailsUiState(
 
 @HiltViewModel(assistedFactory = PlayerDetailsViewModel.Factory::class)
 class PlayerDetailsViewModel @AssistedInject constructor(
-    @param:IoDispatcher val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     @Assisted private val playerId: String,
     private val omedaCityHeroRepository: HeroRepository,
     private val omedaCityMatchRepository: MatchRepository,
@@ -61,6 +57,7 @@ class PlayerDetailsViewModel @AssistedInject constructor(
     private val userRepository: UserRepository,
     private val claimedPlayerDao: ClaimedPlayerDao,
     private val userClaimedPlayerRepository: UserClaimedPlayerRepository,
+    private val matchListItemUiMapper: MatchListItemUiMapper,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -143,7 +140,7 @@ class PlayerDetailsViewModel @AssistedInject constructor(
 
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             try {
                 val playerId = playerId ?: getFreshPlayerId()
                 if (playerId == null) {
@@ -162,10 +159,9 @@ class PlayerDetailsViewModel @AssistedInject constructor(
                 val playerHeroStatsDeferred =
                     async { omedaCityPlayerRepository.fetchAllPlayerHeroStats(playerId) }
                 val matchesDeferred = async { omedaCityMatchRepository.fetchMatchesById(playerId) }
-                val heroesDeferred = async { omedaCityHeroRepository.fetchAllHeroes() }
 
 
-                val heroes = heroesDeferred.await().getOrThrow()
+                val heroes = omedaCityHeroRepository.getAllHeroes()
                 val matchesDetails = matchesDeferred.await().getOrThrow()
                 val playerInfo = playerInfoDeferred.await().getOrThrow()
                 val playerHeroStats = playerHeroStatsDeferred.await().getOrThrow()
@@ -184,12 +180,14 @@ class PlayerDetailsViewModel @AssistedInject constructor(
                         player = playerInfo.playerDetails,
                         heroStats = playerHeroStats,
                         stats = playerInfo.playerStats,
-                        matches = matchesDetails.matches,
+                        matches = matchesDetails.matches.mapNotNull {
+                            matchListItemUiMapper.buildFrom(it, playerId)
+                        },
                         allHeroes = heroes.map {
                             HeroUiModel(
                                 heroId = it.id,
                                 name = it.displayName,
-                                imageId = it.imageId
+                                imageSrc = it.imageUrl
                             )
                         }
                     )
@@ -208,12 +206,12 @@ class PlayerDetailsViewModel @AssistedInject constructor(
     }
 
     private suspend fun getFreshPlayerId(): String? {
-        return when (authRepository.userState.value) {
-            is UserState.Authenticated -> {
+        return when (authRepository.networkUserState.value) {
+            is NetworkUserState.Authenticated -> {
                 userRepository.getUser()?.playerId
             }
 
-            is UserState.Unauthenticated -> {
+            is NetworkUserState.Unauthenticated -> {
                 claimedPlayerDao.getClaimedPlayerIds().firstOrNull()?.firstOrNull()
             }
 

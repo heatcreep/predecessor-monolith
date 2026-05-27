@@ -2,8 +2,8 @@ package com.aowen.predcompanion.feature.items.impl.itemdetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

@@ -39,16 +39,15 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.aowen.predcompanion.core.ui.cards.heroes.HeroTileCard
-import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
-import com.aowen.predcompanion.core.model.data.Hero
+import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.core.ui.cards.heroes.HeroTileCard
+import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
 import com.aowen.predcompanion.ui.common.MonolithCollapsableGridColumn
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
-import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -227,53 +226,53 @@ fun HeroesScreenPreview() {
                     isLoading = true,
                     allHeroes = listOf(
                         HeroDetails(
-                            imageId = Hero.NARBASH.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
                             displayName = "Narbash"
                         ),
                         HeroDetails(
-                            imageId = Hero.BELICA.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
                             displayName = " Lt. Belica"
                         ),
                         HeroDetails(
-                            imageId = Hero.MORIGESH.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
                             displayName = "Morigesh"
                         ),
                         HeroDetails(
-                            imageId = Hero.TWINBLAST.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
                             displayName = "TwinBlast"
                         ),
                         HeroDetails(
-                            imageId = Hero.GREYSTONE.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
                             displayName = "Greystone"
                         ),
                         HeroDetails(
-                            imageId = Hero.GRUX.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
                             displayName = "Grux"
                         ),
                     ),
                     currentHeroes = listOf(
                         HeroDetails(
-                            imageId = Hero.NARBASH.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
                             displayName = "Narbash"
                         ),
                         HeroDetails(
-                            imageId = Hero.BELICA.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
                             displayName = " Lt. Belica"
                         ),
                         HeroDetails(
-                            imageId = Hero.MORIGESH.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
                             displayName = "Morigesh"
                         ),
                         HeroDetails(
-                            imageId = Hero.TWINBLAST.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
                             displayName = "TwinBlast"
                         ),
                         HeroDetails(
-                            imageId = Hero.GREYSTONE.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
                             displayName = "Greystone"
                         ),
                         HeroDetails(
-                            imageId = Hero.GRUX.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
                             displayName = "Grux"
                         ),
                     )
@@ -295,53 +294,53 @@ fun HeroesScreenPreviewDeviceSizes() {
                     isLoading = false,
                     allHeroes = listOf(
                         HeroDetails(
-                            imageId = Hero.NARBASH.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
                             displayName = "Narbash"
                         ),
                         HeroDetails(
-                            imageId = Hero.BELICA.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
                             displayName = " Lt. Belica"
                         ),
                         HeroDetails(
-                            imageId = Hero.MORIGESH.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
                             displayName = "Morigesh"
                         ),
                         HeroDetails(
-                            imageId = Hero.TWINBLAST.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
                             displayName = "TwinBlast"
                         ),
                         HeroDetails(
-                            imageId = Hero.GREYSTONE.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
                             displayName = "Greystone"
                         ),
                         HeroDetails(
-                            imageId = Hero.GRUX.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
                             displayName = "Grux"
                         ),
                     ),
                     currentHeroes = listOf(
                         HeroDetails(
-                            imageId = Hero.NARBASH.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
                             displayName = "Narbash"
                         ),
                         HeroDetails(
-                            imageId = Hero.BELICA.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
                             displayName = " Lt. Belica"
                         ),
                         HeroDetails(
-                            imageId = Hero.MORIGESH.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
                             displayName = "Morigesh"
                         ),
                         HeroDetails(
-                            imageId = Hero.TWINBLAST.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
                             displayName = "TwinBlast"
                         ),
                         HeroDetails(
-                            imageId = Hero.GREYSTONE.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
                             displayName = "Greystone"
                         ),
                         HeroDetails(
-                            imageId = Hero.GRUX.drawableId,
+                            imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
                             displayName = "Grux"
                         ),
                     )

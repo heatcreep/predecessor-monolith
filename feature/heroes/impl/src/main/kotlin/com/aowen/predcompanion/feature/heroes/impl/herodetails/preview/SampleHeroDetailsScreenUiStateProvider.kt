@@ -1,13 +1,12 @@
 package com.aowen.predcompanion.feature.heroes.impl.herodetails.preview
 
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.model.data.AbilityDetails
 import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.core.model.data.HeroStatistics
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import com.aowen.predcompanion.data.HeroBaseStats
-import com.aowen.predcompanion.data.HeroStatistics
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.feature.heroes.impl.herodetails.HeroDetailsUiState
 import java.math.BigDecimal
 
@@ -31,7 +30,7 @@ val heroBuildsLoadingState = HeroDetailsUiState(
                 gameDescription = ""
             )
         ),
-        baseStats = HeroBaseStats(
+        baseStats = HeroDetails.HeroBaseStats(
             maxHealth = listOf(BigDecimal.TEN),
             healthRegen = listOf(BigDecimal.TEN),
             maxMana = listOf(BigDecimal.TEN),
@@ -72,7 +71,7 @@ val heroBuildsState = HeroDetailsUiState(
             updatedAt = "2021-01-01",
             author = "heatcreep.tv",
             crest = ItemDetails(),
-            role = "Support"
+            role = HeroRole.Support
         )
     ),
     hero = HeroDetails(
@@ -89,7 +88,7 @@ val heroBuildsState = HeroDetailsUiState(
                 gameDescription = ""
             )
         ),
-        baseStats = HeroBaseStats(
+        baseStats = HeroDetails.HeroBaseStats(
             maxHealth = listOf(BigDecimal.TEN),
             healthRegen = listOf(BigDecimal.TEN),
             maxMana = listOf(BigDecimal.TEN),

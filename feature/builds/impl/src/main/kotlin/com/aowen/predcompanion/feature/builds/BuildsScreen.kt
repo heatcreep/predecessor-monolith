@@ -55,13 +55,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.ui.R
 import com.aowen.predcompanion.core.ui.cards.builds.BuildListCard
 import com.aowen.predcompanion.core.ui.dropdown.HeroSelectDropdown
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionSortDropdown
 import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
-import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.ui.common.MonolithCollapsableListColumn
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
@@ -140,9 +140,9 @@ fun BuildsScreen(
                     ) {
                         HeroSelectDropdown(
                             modifier = Modifier.weight(1f),
-                            heroName = uiState.selectedHeroFilter?.heroName ?: "All Heroes",
+                            heroName = uiState.selectedHeroFilter?.name ?: "All Heroes",
                             heroes = uiState.allHeroes,
-                            heroImageId = uiState.selectedHeroFilter?.drawableId,
+                            heroImageSrc = uiState.selectedHeroFilter?.imageSrc,
                             onSelect = onSelectHeroFilter
                         )
                         AnimatedVisibility(visible = uiState.selectedHeroFilter != null) {

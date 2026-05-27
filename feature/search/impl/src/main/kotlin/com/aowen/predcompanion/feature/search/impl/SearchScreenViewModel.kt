@@ -2,20 +2,20 @@ package com.aowen.predcompanion.feature.search.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.monolith.data.MatchDetails
-import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
-import com.aowen.predcompanion.core.data.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.data.model.mapper.BuildUiListItem
+import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
+import com.aowen.predcompanion.core.data.repository.user.UserRecentSearchRepository
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import com.aowen.predcompanion.core.model.data.PlayerDetails
-import com.aowen.predcompanion.logDebug
+import com.aowen.predcompanion.core.model.data.MatchDetails
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.network.Resource
-import com.aowen.predcompanion.core.data.repository.user.UserRecentSearchRepository
+import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
+import com.aowen.predcompanion.logDebug
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +38,7 @@ sealed interface AllHeroesState {
 }
 
 sealed interface PlayersListState {
-    data class Success(val players: List<PlayerDetails>) : PlayersListState
+    data class Success(val players: List<PlayerInfo.PlayerDetails>) : PlayersListState
     data class Error(val errorMessage: String?) : PlayersListState
     data object Empty : PlayersListState
     data object Loading : PlayersListState
@@ -79,7 +79,7 @@ data class SearchScreenUiState(
     val foundMatch: MatchSearchState = MatchSearchState.None,
     val matchesError: String? = null,
     val playersList: PlayersListState = PlayersListState.Empty,
-    val recentSearchesList: List<PlayerDetails?> = emptyList(),
+    val recentSearchesList: List<PlayerInfo.PlayerDetails?> = emptyList(),
 )
 
 @HiltViewModel
@@ -108,28 +108,14 @@ class SearchScreenViewModel @Inject constructor(
             val itemsWarmupDeferred =
                 async { omedaCityItemRepository.fetchAllItems() }
 
-            val heroesDeferredResult =
-                async { omedaCityHeroRepository.fetchAllHeroes() }
+            val allItems = omedaCityItemRepository.getAllItems()
 
             val recentSearches = recentSearchesDeferredResult.await()
             itemsWarmupDeferred.await()
-            val allItems = omedaCityItemRepository.getAllItems()
-            val heroesState = when (val heroesResource = heroesDeferredResult.await()) {
-                is Resource.Success -> {
-                    if (heroesResource.data.isEmpty()) {
-                        AllHeroesState.Empty
-                    } else {
-                        AllHeroesState.Success(heroesResource.data)
-                    }
-                }
-
-                is Resource.NetworkError -> {
-                    AllHeroesState.Error(heroesResource.errorMessage)
-                }
-
-                is Resource.GenericError -> {
-                    AllHeroesState.Error(heroesResource.errorMessage)
-                }
+            val allHeroes = omedaCityHeroRepository.getAllHeroes()
+            val heroesState = when {
+                allHeroes.isEmpty() ->  AllHeroesState.Empty
+                else -> AllHeroesState.Success(allHeroes)
             }
 
             val itemsState = if (allItems.isEmpty()) {
@@ -205,7 +191,7 @@ class SearchScreenViewModel @Inject constructor(
         }
     }
 
-    fun handleAddToRecentSearch(playerDetails: PlayerDetails) {
+    fun handleAddToRecentSearch(playerDetails: PlayerInfo.PlayerDetails) {
         viewModelScope.launch {
             try {
                 val addRecentSearchDeferred =
