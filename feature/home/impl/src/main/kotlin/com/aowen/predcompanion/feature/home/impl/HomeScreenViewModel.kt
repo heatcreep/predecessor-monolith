@@ -144,7 +144,6 @@ class HomeScreenViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            omedaCityHeroRepository.fetchAllHeroes()
             claimedPlayerRepository.getClaimedPlayerName()
             val favoriteBuildsDeferredResult =
                 async { verifyFavoriteBuildsUseCase() }

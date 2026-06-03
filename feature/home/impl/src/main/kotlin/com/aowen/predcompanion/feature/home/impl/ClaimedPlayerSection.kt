@@ -46,7 +46,7 @@ class SampleClaimedPlayerUiStateProvider : PreviewParameterProvider<ClaimedPlaye
                 winRate = "55%",
                 rankText = "Gold (+100)",
                 rankColor = Color.Yellow,
-                rankImageModel = ""
+                rankImageModel = com.aowen.predcompanion.core.resources.R.drawable.gold_200
             )
         )
     )

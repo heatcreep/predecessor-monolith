@@ -19,6 +19,10 @@ data class NetworkPlayer(
     val displayName: String,
     val region: String?,
     val rank: Int,
+    @SerialName("rank_title")
+    val rankTitle: String,
+    @SerialName("rank_image")
+    val rankImage: String,
     @SerialName("vp_total")
     val vpTotal: Int?,
     @SerialName("vp_current")

@@ -3,6 +3,7 @@ package com.aowen.predcompanion.core.ui.model.mapper
 import androidx.compose.ui.graphics.Color
 import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.ui.model.toRankColor
+import com.aowen.predcompanion.core.ui.model.toRankDetails
 import javax.inject.Inject
 
 data class ClaimedPlayerCardUiModel(
@@ -11,7 +12,7 @@ data class ClaimedPlayerCardUiModel(
     val winRate: String,
     val rankText: String,
     val rankColor: Color,
-    val rankImageModel: String
+    val rankImageModel: Int,
 )
 
 class PlayerCardMapper @Inject constructor() {
@@ -26,6 +27,6 @@ class PlayerCardMapper @Inject constructor() {
             winRate = playerStats.winRate,
             rankText = "${playerDetails.rankTitle} (+${playerDetails.vpCurrent})",
             rankColor = playerDetails.rank.toRankColor(),
-            rankImageModel = playerDetails.rankImage
+            rankImageModel = playerDetails.rank.toRankDetails().rankImageAssetId
         )
 }

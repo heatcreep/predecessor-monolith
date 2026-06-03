@@ -47,14 +47,35 @@ fun Int?.toRankColor(): Color =
         else -> LightKhaki
     }
 
+fun Int?.toRankDetails(): RankDetails =
+    when (this) {
+        10 -> RankDetails.BRONZE_III
+        11 -> RankDetails.BRONZE_II
+        12 -> RankDetails.BRONZE_I
+        20 -> RankDetails.SILVER_III
+        21 -> RankDetails.SILVER_II
+        22 -> RankDetails.SILVER_I
+        30 -> RankDetails.GOLD_III
+        31 -> RankDetails.GOLD_II
+        32 -> RankDetails.GOLD_I
+        40 -> RankDetails.PLATINUM_III
+        41 -> RankDetails.PLATINUM_II
+        42 -> RankDetails.PLATINUM_I
+        50 -> RankDetails.DIAMOND_III
+        51 -> RankDetails.DIAMOND_II
+        52 -> RankDetails.DIAMOND_I
+        70 -> RankDetails.PARAGON
+        else -> RankDetails.UNRANKED
+    }
+
 fun Int?.toRankTitle(): String =
     when (this) {
-        10 -> "Bronze III"
-        11 -> "Bronze II"
-        12 -> "Bronze I"
-        20 -> "Silver III"
-        21 -> "Silver II"
-        22 -> "Silver I"
+        10 -> RankDetails.BRONZE_III.rankText
+        11 -> RankDetails.BRONZE_II.rankText
+        12 -> RankDetails.BRONZE_I.rankText
+        20 -> RankDetails.SILVER_III.rankText
+        21 -> RankDetails.SILVER_II.rankText
+        22 -> RankDetails.SILVER_I.rankText
         30 -> "Gold III"
         31 -> "Gold II"
         32 -> "Gold I"

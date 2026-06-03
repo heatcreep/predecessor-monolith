@@ -17,8 +17,11 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -52,7 +55,18 @@ class HeroDetailsViewModel @AssistedInject constructor(
     }
 
     private val _uiState = MutableStateFlow(HeroDetailsUiState())
-    val uiState: StateFlow<HeroDetailsUiState> = _uiState
+    val uiState: StateFlow<HeroDetailsUiState> = combine(
+        _uiState,
+        omedaCityHeroRepository.allHeroes
+    ) { state, heroes ->
+        state.copy(
+            hero = heroes.values.find { it.id == heroId.toLong() } ?: HeroDetails()
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = HeroDetailsUiState()
+    )
 
     private val _console = MutableStateFlow(Console.PC)
     val console: StateFlow<Console> = _console
@@ -65,7 +79,6 @@ class HeroDetailsViewModel @AssistedInject constructor(
         _uiState.value = HeroDetailsUiState(isLoading = true, heroDetailsErrors = null)
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
-            val heroes = omedaCityHeroRepository.getAllHeroes()
             val statistics =
                 async { omedaCityHeroRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
             val heroBuildsDeferred = async {
@@ -76,13 +89,10 @@ class HeroDetailsViewModel @AssistedInject constructor(
                 )
             }
             try {
-                val heroResult =
-                    heroes.firstOrNull { it.id == heroId.toLong() }
                 val statisticsResult = statistics.await().getOrThrow()
                 val heroBuilds = heroBuildsDeferred.await().getOrThrow()
                 _uiState.update {
                     it.copy(
-                        hero = heroResult ?: HeroDetails(),
                         statistics = statisticsResult ?: HeroStatistics(),
                         heroBuilds = heroBuilds.take(5)
                             .map { buildListItem -> buildListItemUiMapper.buildFrom(buildListItem) },

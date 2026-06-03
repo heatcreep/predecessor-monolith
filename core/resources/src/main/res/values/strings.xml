@@ -8,10 +8,10 @@
     <string name="core_resources_icon_profile">Profile</string>
     <string name="core_resources_icon_builds">Builds</string>
     <string name="core_resources_player_profile_average_kda">Average KDA:</string>
-    <string name="core_resources_match_performance_score">%1$d PS</string>
+    <string name="core_resources_match_performance_score">%1$s PS</string>
     <string name="core_resources_match_minions_killed">%1$d CS</string>
-    <string name="core_resources_match_kda">%1$d KDA</string>
-    <string name="core_resources_match_gold_earned_per_minute">%1$d Gold/min</string>
-    <string name="core_resources_match_creep_score_per_minute">%1$d CS/min</string>
+    <string name="core_resources_match_kda">%1$s KDA</string>
+    <string name="core_resources_match_gold_earned_per_minute">%1$s Gold/min</string>
+    <string name="core_resources_match_creep_score_per_minute">%1$s CS/min</string>
 
 </resources>

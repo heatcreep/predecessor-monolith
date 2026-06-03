@@ -341,7 +341,7 @@ fun ClaimedPlayerSectionPreview() {
                         winRate = "55%",
                         rankText = "Gold (+100)",
                         rankColor = Color.Yellow,
-                        rankImageModel = ""
+                        rankImageModel = com.aowen.predcompanion.core.resources.R.drawable.gold_200
                     )
                 ),
                 navigateToPlayerDetails = {},
@@ -397,7 +397,7 @@ fun SearchScreenRecentSearchPreview() {
                             winRate = "55%",
                             rankText = "Paragon (+100)",
                             rankColor = Color.Yellow,
-                            rankImageModel = ""
+                            rankImageModel = com.aowen.predcompanion.core.resources.R.drawable.paragon_200
                         )
                     ),
                 ),

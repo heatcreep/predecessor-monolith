@@ -11,8 +11,11 @@ import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HeroDropDownUiModel(
@@ -41,24 +44,25 @@ class BuildsScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<BuildsUiState> = MutableStateFlow(BuildsUiState())
-    val uiState = _uiState
-
-    lateinit var buildsPagingSource: BuildsPagingSource
-
-    init {
-        viewModelScope.launch {
-            val allHeroes = omedaCityHeroRepository.getAllHeroes().map {
+    val uiState: StateFlow<BuildsUiState> = combine(
+        _uiState,
+        omedaCityHeroRepository.allHeroes
+    ) { state, heroes ->
+        state.copy(
+            allHeroes = heroes.values.map {
                 HeroUiModel(
                     heroId = it.id,
                     name = it.displayName,
                     imageSrc = it.imageUrl
                 )
-            }
-            _uiState.update {
-                it.copy(allHeroes = allHeroes)
-            }
-        }
-    }
+            })
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = BuildsUiState()
+    )
+
+    lateinit var buildsPagingSource: BuildsPagingSource
 
     val buildsPager = Pager(
         config = PagingConfig(pageSize = PAGE_SIZE)

@@ -3,9 +3,10 @@ package com.aowen.predcompanion.core.data.repository.heroes
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.HeroStatistics
 import com.aowen.predcompanion.core.network.Resource
+import kotlinx.coroutines.flow.StateFlow
 
 interface HeroRepository {
-    fun getAllHeroes(): List<HeroDetails>
+    val allHeroes: StateFlow<Map<Long, HeroDetails>>
     fun getHeroByName(heroName: String): HeroDetails?
     fun getHeroImageSrcById(heroId: Long): String
     suspend fun fetchAllHeroes()

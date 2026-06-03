@@ -14,7 +14,7 @@ data class MatchPlayerCardUiModel(
     val items: List<PlayerItem>,
     @param:DrawableRes val heroRoleImageId: Int,
     val performanceTitle: String,
-    val performanceScore: Int,
+    val performanceScore: String,
     val minionsKilled: Int,
     val kills: String,
     val deaths: String,

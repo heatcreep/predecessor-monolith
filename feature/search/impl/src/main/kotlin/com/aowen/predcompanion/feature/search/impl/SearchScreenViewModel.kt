@@ -19,6 +19,10 @@ import com.aowen.predcompanion.logDebug
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -94,7 +98,22 @@ class SearchScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchScreenUiState())
-    val uiState = _uiState
+    val uiState: StateFlow<SearchScreenUiState> = combine(
+        _uiState,
+        omedaCityItemRepository.allItems,
+        omedaCityHeroRepository.allHeroes
+    ) { state, items, heroes ->
+        state.copy(
+            allItems = if (items.isEmpty()) AllItemsState.Empty else AllItemsState.Success(items.values.toList()),
+            allHeroes = if (heroes.isEmpty()) AllHeroesState.Empty else AllHeroesState.Success(
+                heroes.values.toList()
+            )
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        initialValue = SearchScreenUiState()
+    )
 
     init {
         initViewModel()
@@ -105,24 +124,7 @@ class SearchScreenViewModel @Inject constructor(
             val recentSearchesDeferredResult =
                 async { userRecentSearchesRepository.getRecentSearches() }
 
-            val itemsWarmupDeferred =
-                async { omedaCityItemRepository.fetchAllItems() }
-
-            val allItems = omedaCityItemRepository.getAllItems()
-
             val recentSearches = recentSearchesDeferredResult.await()
-            itemsWarmupDeferred.await()
-            val allHeroes = omedaCityHeroRepository.getAllHeroes()
-            val heroesState = when {
-                allHeroes.isEmpty() ->  AllHeroesState.Empty
-                else -> AllHeroesState.Success(allHeroes)
-            }
-
-            val itemsState = if (allItems.isEmpty()) {
-                AllItemsState.Empty
-            } else {
-                AllItemsState.Success(allItems)
-            }
 
             _uiState.update {
                 it.copy(
@@ -130,8 +132,6 @@ class SearchScreenViewModel @Inject constructor(
                     isLoadingRecentSearches = false,
                     isLoadingItemsAndHeroes = false,
                     recentSearchesList = recentSearches,
-                    allItems = itemsState,
-                    allHeroes = heroesState
                 )
             }
         }

@@ -40,11 +40,11 @@ class SupabaseAuthRepository @Inject constructor(
     private val userPreferencesManager: UserPreferencesManager
 ) : AuthRepository {
 
-    private val _Network_userState = MutableStateFlow<NetworkUserState>(NetworkUserState.Loading)
-    override val networkUserState: StateFlow<NetworkUserState> = _Network_userState
+    private val _networkUserState = MutableStateFlow<NetworkUserState>(NetworkUserState.Loading)
+    override val networkUserState: StateFlow<NetworkUserState> = _networkUserState
 
     override suspend fun handleSuccessfulLoginFromDiscord() {
-        _Network_userState.update { NetworkUserState.Authenticated }
+        _networkUserState.update { NetworkUserState.Authenticated }
     }
 
     override suspend fun getCurrentSessionStatus() {
@@ -52,10 +52,10 @@ class SupabaseAuthRepository @Inject constructor(
         try {
             val sessionStatus = authService.awaitAuthService().first()
             when (sessionStatus) {
-                is SessionStatus.LoadingFromStorage -> _Network_userState.update { NetworkUserState.Loading }
-                is SessionStatus.Authenticated -> _Network_userState.update { NetworkUserState.Authenticated }
+                is SessionStatus.LoadingFromStorage -> _networkUserState.update { NetworkUserState.Loading }
+                is SessionStatus.Authenticated -> _networkUserState.update { NetworkUserState.Authenticated }
                 is SessionStatus.NotAuthenticated -> {
-                    _Network_userState.update {
+                    _networkUserState.update {
                         NetworkUserState.Unauthenticated(hasSkippedOnboarding = hasSkippedOnboarding)
                     }
                 }

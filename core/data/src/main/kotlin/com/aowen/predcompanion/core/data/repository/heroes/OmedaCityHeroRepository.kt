@@ -8,6 +8,7 @@ import com.aowen.predcompanion.core.network.Resource
 import com.aowen.predcompanion.core.network.safeApiCall
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,7 +20,7 @@ class OmedaCityHeroRepository @Inject constructor(
 ) : HeroRepository {
 
     private val _allHeroes: MutableStateFlow<Map<Long, HeroDetails>> = MutableStateFlow(emptyMap())
-    val allHeroes: StateFlow<Map<Long, HeroDetails>> = _allHeroes
+    override val allHeroes: StateFlow<Map<Long, HeroDetails>> = _allHeroes
 
     override suspend fun fetchAllHeroes() {
         val result = safeApiCall(
@@ -30,9 +31,6 @@ class OmedaCityHeroRepository @Inject constructor(
             _allHeroes.update { result.data.associateBy { it.id } }
         }
     }
-
-    override fun getAllHeroes(): List<HeroDetails> =
-        allHeroes.value.values.toList()
 
 
     override fun getHeroByName(heroName: String): HeroDetails? =
@@ -48,7 +46,7 @@ class OmedaCityHeroRepository @Inject constructor(
             apiCall = { retrofitOmedaCityNetwork.getAllHeroStatistics(timeFrame) },
             transform = { stats ->
                 stats.heroStatistics.mapNotNull { networkHeroStatistics ->
-                    val heroFromMap = allHeroes.value[networkHeroStatistics.heroId]
+                    val heroFromMap = allHeroes.first { it.isNotEmpty() }[networkHeroStatistics.heroId]
                     heroFromMap?.let {
                         HeroStatistics(
                             heroId = heroFromMap.id,

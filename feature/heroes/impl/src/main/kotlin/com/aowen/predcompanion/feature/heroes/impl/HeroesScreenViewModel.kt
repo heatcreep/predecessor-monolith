@@ -8,9 +8,11 @@ import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.ui.utils.filterOrOriginal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class HeroesScreenUiState(
@@ -24,11 +26,27 @@ data class HeroesScreenUiState(
 
 @HiltViewModel
 class HeroesScreenViewModel @Inject constructor(
-    private val omedaCityHeroRepository: HeroRepository
+    omedaCityHeroRepository: HeroRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HeroesScreenUiState())
-    val uiState: StateFlow<HeroesScreenUiState> = _uiState
+    val uiState: StateFlow<HeroesScreenUiState> = combine(
+        _uiState,
+        omedaCityHeroRepository.allHeroes
+    ) { state, heroes ->
+        val sortedHeroes = heroes.values.sortedBy { it.displayName }
+        val currentHeroes = sortedHeroes.filter { it.roles.any(state.selectedRoleFilters::contains) }
+        state.copy(
+            allHeroes = sortedHeroes,
+            currentHeroes = currentHeroes.ifEmpty { sortedHeroes },
+            isLoading = false
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = HeroesScreenUiState()
+
+    )
 
     fun updateRoleOption(option: HeroRole, isChecked: Boolean) {
         if (isChecked) {
@@ -55,35 +73,6 @@ class HeroesScreenViewModel @Inject constructor(
 
         _uiState.update {
             it.copy(currentHeroes = heroesBySearch)
-        }
-    }
-
-    init {
-        initViewModel()
-    }
-
-    fun initViewModel() {
-        _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                val heroesResource = omedaCityHeroRepository.getAllHeroes()
-                val heroesSortedByName = heroesResource.sortedBy { it.displayName }
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = null,
-                        allHeroes = heroesSortedByName,
-                        currentHeroes = heroesSortedByName
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = e.message
-                    )
-                }
-            }
         }
     }
 }

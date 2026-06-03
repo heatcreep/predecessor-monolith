@@ -17,7 +17,7 @@ class ClaimedPlayerCardPreviewProvider : PreviewParameterProvider<ClaimedPlayerC
                 rankColor = 32.toRankColor(),
                 winRate = "53%",
                 heroImageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
-                rankImageModel = "https://cdn.monolith.gg/assets/ranks/bronze_200.png",
+                rankImageModel = com.aowen.predcompanion.core.resources.R.drawable.bronze_200
             ),
         ),
         ClaimedPlayerCardPreviewState(
@@ -27,7 +27,7 @@ class ClaimedPlayerCardPreviewProvider : PreviewParameterProvider<ClaimedPlayerC
                 rankColor = 32.toRankColor(),
                 winRate = "53%",
                 heroImageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
-                rankImageModel = "https://cdn.monolith.gg/assets/ranks/bronze_200.png",
+                rankImageModel = com.aowen.predcompanion.core.resources.R.drawable.bronze_200
             ),
         ),
         ClaimedPlayerCardPreviewState(
@@ -37,7 +37,7 @@ class ClaimedPlayerCardPreviewProvider : PreviewParameterProvider<ClaimedPlayerC
                 rankColor = 32.toRankColor(),
                 winRate = "53%",
                 heroImageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
-                rankImageModel = "https://cdn.monolith.gg/assets/ranks/bronze_200.png",
+                rankImageModel = com.aowen.predcompanion.core.resources.R.drawable.bronze_200
             ),
         ),
         ClaimedPlayerCardPreviewState(
@@ -47,7 +47,7 @@ class ClaimedPlayerCardPreviewProvider : PreviewParameterProvider<ClaimedPlayerC
                 rankColor = 32.toRankColor(),
                 winRate = "53%",
                 heroImageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
-                rankImageModel = "https://cdn.monolith.gg/assets/ranks/bronze_200.png",
+                rankImageModel = com.aowen.predcompanion.core.resources.R.drawable.bronze_200,
             ),
         ),
     )

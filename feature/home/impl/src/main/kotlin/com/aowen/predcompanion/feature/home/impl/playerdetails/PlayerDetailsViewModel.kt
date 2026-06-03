@@ -12,11 +12,12 @@ import com.aowen.predcompanion.core.data.repository.user.UserRepository
 import com.aowen.predcompanion.core.database.dao.ClaimedPlayerDao
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
 import com.aowen.predcompanion.core.model.data.PlayerInfo
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchListItemUiModel
-import com.aowen.predcompanion.feature.home.impl.matches.model.mapper.MatchListItemUiMapper
 import com.aowen.predcompanion.core.network.getOrThrow
 import com.aowen.predcompanion.core.network.model.NetworkUserState
+import com.aowen.predcompanion.core.ui.model.RankDetails
 import com.aowen.predcompanion.data.PlayerHeroStats
+import com.aowen.predcompanion.feature.home.impl.matches.model.MatchListItemUiModel
+import com.aowen.predcompanion.feature.home.impl.matches.model.mapper.MatchListItemUiMapper
 import com.aowen.predcompanion.logDebug
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -24,13 +25,26 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+data class PlayerDetailsUiModel(
+    val playerName: String,
+    val isConsolePlayer: Boolean,
+    val rankDetails: RankDetails
+)
+
+sealed interface PlayerDetailsState {
+    data object Loading: PlayerDetailsState
+    data class Loaded(val uiState: PlayerDetailsUiState): PlayerDetailsState
+    data class Error(val errorMessage: String?): PlayerDetailsState
+}
+
 data class PlayerDetailsUiState(
-    val isLoading: Boolean = true,
     val claimedPlayerName: String? = null,
     val isEditingPlayerName: Boolean = false,
     val playerNameField: String = "",
@@ -65,33 +79,109 @@ class PlayerDetailsViewModel @AssistedInject constructor(
         fun create(@Assisted playerId: String): PlayerDetailsViewModel
     }
 
-    private val _uiState = MutableStateFlow(PlayerDetailsUiState())
-    val uiState: StateFlow<PlayerDetailsUiState> = _uiState
+    // Internal state only holds the one-shot data
+    private val _uiState = MutableStateFlow<PlayerDetailsState>(PlayerDetailsState.Loading)
+
+    // Public state layers the heroes flow on top reactively
+    val uiState: StateFlow<PlayerDetailsState> = combine(
+        _uiState,
+        omedaCityHeroRepository.allHeroes
+    ) { state, heroes ->
+        val heroUiModels = heroes.values.map {
+            HeroUiModel(
+                heroId = it.id,
+                name = it.displayName,
+                imageSrc = it.imageUrl
+            )
+        }
+        // Only enrich the Loaded state — pass Loading and Error through untouched
+        when (state) {
+            is PlayerDetailsState.Loaded -> state.copy(
+                uiState = state.uiState.copy(allHeroes = heroUiModels)
+            )
+            else -> state
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = PlayerDetailsState.Loading
+    )
+
+    init {
+        loadPlayerDetails()
+    }
+
+    fun handleRetry() {
+        loadPlayerDetails()
+    }
+
+    private fun loadPlayerDetails() {
+        viewModelScope.launch {
+            try {
+                val resolvedPlayerId = playerId.ifEmpty { getFreshPlayerId() }
+                if (resolvedPlayerId == null) {
+                    _uiState.value = PlayerDetailsState.Error("No player ID found. Please claim a player.")
+                    return@launch
+                }
+
+                val claimedPlayerName = userPreferencesManager.claimedPlayerName.firstOrNull()
+
+                val userProfileDeferred = async { authRepository.getPlayer() }
+                val playerInfoDeferred = async { omedaCityPlayerRepository.fetchPlayerInfo(resolvedPlayerId) }
+                val playerHeroStatsDeferred = async { omedaCityPlayerRepository.fetchAllPlayerHeroStats(resolvedPlayerId) }
+                val matchesDeferred = async { omedaCityMatchRepository.fetchMatchesById(resolvedPlayerId) }
+
+                val matchesDetails = matchesDeferred.await().getOrThrow()
+                val playerInfo = playerInfoDeferred.await().getOrThrow()
+                val playerHeroStats = playerHeroStatsDeferred.await().getOrThrow()
+                val userProfile = userProfileDeferred.await().getOrThrow()
+
+                _uiState.value = PlayerDetailsState.Loaded(
+                    PlayerDetailsUiState(
+                        claimedPlayerName = claimedPlayerName,
+                        playerId = resolvedPlayerId,
+                        isClaimed = userProfile?.playerId == resolvedPlayerId,
+                        player = playerInfo.playerDetails,
+                        heroStats = playerHeroStats,
+                        stats = playerInfo.playerStats,
+                        matches = matchesDetails.matches.mapNotNull {
+                            matchListItemUiMapper.buildFrom(it, resolvedPlayerId)
+                        }
+                    )
+                )
+            } catch (e: Exception) {
+                _uiState.value = PlayerDetailsState.Error(e.message)
+            }
+        }
+    }
+
+    // Helper to read the current Loaded state safely for update functions
+    private fun updateLoaded(block: PlayerDetailsUiState.() -> PlayerDetailsUiState) {
+        val current = _uiState.value
+        if (current is PlayerDetailsState.Loaded) {
+            _uiState.value = current.copy(uiState = block(current.uiState))
+        }
+    }
 
     fun onEditPlayerName() {
-        _uiState.update {
-            it.copy(
-                isEditingPlayerName = !uiState.value.isEditingPlayerName
-            )
+        updateLoaded {
+            copy(isEditingPlayerName = !isEditingPlayerName)
         }
     }
 
     fun handlePlayerNameFieldChange(playerName: String) {
-        _uiState.update {
-            it.copy(
-                playerNameField = playerName
-            )
-        }
+        updateLoaded { copy(playerNameField = playerName) }
     }
 
     fun handleSaveClaimedPlayerName() {
-        val playerName = uiState.value.playerNameField.ifEmpty { null }
         viewModelScope.launch {
+            val playerName = ((_uiState.value as? PlayerDetailsState.Loaded)
+                ?.uiState?.playerNameField).orEmpty().ifEmpty { null }
             userPreferencesManager.saveClaimedPlayerName(playerName)
             userClaimedPlayerRepository.setClaimedPlayerName(playerName)
-            _uiState.update {
-                it.copy(
-                    claimedPlayerName = uiState.value.playerNameField,
+            updateLoaded {
+                copy(
+                    claimedPlayerName = playerNameField,
                     isEditingPlayerName = false
                 )
             }
@@ -100,121 +190,35 @@ class PlayerDetailsViewModel @AssistedInject constructor(
 
     fun handleClaimPlayerStatus(isRemoving: Boolean = false) {
         viewModelScope.launch {
-            async { handleSavePlayer(isRemoving = isRemoving) }.await()
+            handleSavePlayer(isRemoving = isRemoving)
         }
     }
 
     fun handlePlayerHeroStatsSelect(heroId: Long) {
-        _uiState.update {
-            it.copy(
-                selectedHeroStats = uiState.value.heroStats.find { stat ->
-                    stat.heroId == heroId
-                }
-            )
+        updateLoaded {
+            copy(selectedHeroStats = heroStats.find { it.heroId == heroId })
         }
     }
 
     private suspend fun handleSavePlayer(isRemoving: Boolean = false) {
-
         try {
+            val state = (_uiState.value as? PlayerDetailsState.Loaded)?.uiState ?: return
             userClaimedPlayerRepository.setClaimedUser(
                 isRemoving = isRemoving,
-                uiState.value.stats,
-                uiState.value.player
+                state.stats,
+                state.player
             )
             userClaimedPlayerRepository.setClaimedPlayerName(null)
-            _uiState.update {
-                it.copy(
-                    isClaimed = !isRemoving
-                )
-            }
+            updateLoaded { copy(isClaimed = !isRemoving) }
         } catch (e: Exception) {
             logDebug(e.toString())
-        }
-
-    }
-
-    init {
-        initViewModel()
-    }
-
-    fun initViewModel() {
-        _uiState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            try {
-                val playerId = playerId ?: getFreshPlayerId()
-                if (playerId == null) {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "No player ID found. Please claim a player."
-                        )
-                    }
-                    return@launch
-                }
-                val claimedPlayerName = userPreferencesManager.claimedPlayerName.firstOrNull()
-                val userProfileDeferred = async { authRepository.getPlayer() }
-                val playerInfoDeferred =
-                    async { omedaCityPlayerRepository.fetchPlayerInfo(playerId) }
-                val playerHeroStatsDeferred =
-                    async { omedaCityPlayerRepository.fetchAllPlayerHeroStats(playerId) }
-                val matchesDeferred = async { omedaCityMatchRepository.fetchMatchesById(playerId) }
-
-
-                val heroes = omedaCityHeroRepository.getAllHeroes()
-                val matchesDetails = matchesDeferred.await().getOrThrow()
-                val playerInfo = playerInfoDeferred.await().getOrThrow()
-                val playerHeroStats = playerHeroStatsDeferred.await().getOrThrow()
-                val userProfile = userProfileDeferred.await().getOrThrow()
-
-                val isClaimed = userProfile?.playerId == playerId
-
-
-                _uiState.update { playerDetailsUiState ->
-                    playerDetailsUiState.copy(
-                        isLoading = false,
-                        claimedPlayerName = claimedPlayerName,
-                        errorMessage = null,
-                        playerId = playerId,
-                        isClaimed = isClaimed,
-                        player = playerInfo.playerDetails,
-                        heroStats = playerHeroStats,
-                        stats = playerInfo.playerStats,
-                        matches = matchesDetails.matches.mapNotNull {
-                            matchListItemUiMapper.buildFrom(it, playerId)
-                        },
-                        allHeroes = heroes.map {
-                            HeroUiModel(
-                                heroId = it.id,
-                                name = it.displayName,
-                                imageSrc = it.imageUrl
-                            )
-                        }
-                    )
-                }
-
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message,
-                    )
-                }
-            }
-
         }
     }
 
     private suspend fun getFreshPlayerId(): String? {
         return when (authRepository.networkUserState.value) {
-            is NetworkUserState.Authenticated -> {
-                userRepository.getUser()?.playerId
-            }
-
-            is NetworkUserState.Unauthenticated -> {
-                claimedPlayerDao.getClaimedPlayerIds().firstOrNull()?.firstOrNull()
-            }
-
+            is NetworkUserState.Authenticated -> userRepository.getUser()?.playerId
+            is NetworkUserState.Unauthenticated -> claimedPlayerDao.getClaimedPlayerIds().firstOrNull()?.firstOrNull()
             else -> null
         }
     }

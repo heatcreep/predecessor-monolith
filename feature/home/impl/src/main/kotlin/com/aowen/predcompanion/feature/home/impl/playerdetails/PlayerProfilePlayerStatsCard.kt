@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.core.ui.cards.playerprofile
+package com.aowen.predcompanion.feature.home.impl.playerdetails
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +39,7 @@ import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.ui.components.StatListItem
 import com.aowen.predcompanion.core.ui.model.mapper.StatLine
 import com.aowen.predcompanion.core.ui.components.KDAText
+import com.aowen.predcompanion.core.ui.model.toRankDetails
 import com.aowen.predcompanion.ui.theme.inputFieldDefaults
 import com.aowen.predcompanion.core.resources.R as coreResources
 
@@ -57,6 +58,7 @@ fun PlayerProfilePlayerStatsCard(
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val rankDetails = playerDetails.rank.toRankDetails()
     ElevatedCard(
         modifier = modifier
     ) {
@@ -75,19 +77,14 @@ fun PlayerProfilePlayerStatsCard(
                     Text(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.secondary,
-                        text = playerDetails.rankTitle,
-                    )
-                    Text(
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondary,
-                        text = "+${playerDetails.vpCurrent} VP"
+                        text = rankDetails.rankText,
                     )
 
                 }
                 AsyncImage(
                     modifier = Modifier
                         .size(200.dp),
-                    model = playerDetails.rankImage,
+                    model = rankDetails.rankImageAssetId,
                     contentDescription = null
                 )
             }

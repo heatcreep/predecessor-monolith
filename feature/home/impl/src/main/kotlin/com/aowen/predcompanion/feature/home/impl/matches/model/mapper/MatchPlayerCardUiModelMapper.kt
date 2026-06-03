@@ -39,9 +39,9 @@ class MatchPlayerCardUiModelMapper @Inject constructor(
                         )
                     }
                 },
-                heroRoleImageId = HeroRole.valueOf(matchPlayer.role).drawableId,
-                performanceTitle = "",
-                performanceScore = 0,
+                heroRoleImageId = HeroRole.entries.find { it.roleName == matchPlayer.role }?.drawableId ?: 0,
+                performanceTitle = matchPlayer.performanceTitle,
+                performanceScore = matchPlayer.performanceScore,
                 minionsKilled = matchPlayer.minionsKilled,
                 kills = matchPlayer.kills.toString(),
                 deaths = matchPlayer.deaths.toString(),

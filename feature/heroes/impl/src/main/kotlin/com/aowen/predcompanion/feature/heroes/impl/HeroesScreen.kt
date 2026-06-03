@@ -63,7 +63,6 @@ fun HeroesScreenRoute(
 
     HeroesScreen(
         uiState = heroesScreenUiState,
-        handleRetry = viewModel::initViewModel,
         onFilterRole = viewModel::updateRoleOption,
         onFilterHeroes = viewModel::getFilteredHeroes,
         modifier = modifier,

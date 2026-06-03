@@ -62,7 +62,6 @@ import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.data.model.HeroUiModel
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.PlayerInfo
-import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfilePlayerStatsCard
 import com.aowen.predcompanion.core.ui.components.UnclaimPlayerDialog
 import com.aowen.predcompanion.core.ui.dropdown.HeroSelectDropdown
 import com.aowen.predcompanion.core.ui.model.mapper.StatLine
@@ -86,8 +85,8 @@ internal fun PlayerDetailsRoute(
     val uiState by viewModel.uiState.collectAsState()
 
     PlayerDetailScreen(
-        uiState = uiState,
-        handleRetry = viewModel::initViewModel,
+        playerDetailsState = uiState,
+        handleRetry = viewModel::handleRetry,
         modifier = modifier,
         handleClaimPlayerStatus = viewModel::handleClaimPlayerStatus,
         handleSavePlayerName = viewModel::handleSaveClaimedPlayerName,
@@ -103,7 +102,7 @@ internal fun PlayerDetailsRoute(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PlayerDetailScreen(
-    uiState: PlayerDetailsUiState,
+    playerDetailsState: PlayerDetailsState,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
     handleClaimPlayerStatus: (Boolean) -> Unit = {},
@@ -143,68 +142,67 @@ fun PlayerDetailScreen(
         )
     }
 
-
-    Scaffold(
-        topBar = {
-            MonolithTopAppBar(
-                title = "Player Details",
-                titleStyle = MaterialTheme.typography.bodyLarge,
-                backAction = {
-                    IconButton(onClick = navigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "navigate up"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        if (uiState.isClaimed) {
-                            isUnclaimPlayerDialogOpen = true
-                        } else {
-                            handleClaimPlayerStatus(false)
-                        }
-                    }) {
-                        if (uiState.isClaimed) {
-                            Icon(
-                                imageVector = Icons.Filled.Favorite,
-                                contentDescription = "unclaim player",
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Filled.FavoriteBorder,
-                                contentDescription = "claim player",
-                            )
-                        }
-
-                    }
-                }
-            )
-        },
-    ) {
-        Surface(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(it),
-            color = MaterialTheme.colorScheme.background
+    when (playerDetailsState) {
+        is PlayerDetailsState.Loading -> FullScreenLoadingIndicator("Player Details")
+        is PlayerDetailsState.Error -> FullScreenErrorWithRetry(
+            errorMessage = playerDetailsState.errorMessage
         ) {
-            if (uiState.errorMessage != null) {
-                val errorMessage = uiState.errorMessage
-                FullScreenErrorWithRetry(
-                    errorMessage = errorMessage
+            handleRetry()
+        }
+
+        is PlayerDetailsState.Loaded -> {
+            val uiState = playerDetailsState.uiState
+            Scaffold(
+                topBar = {
+                    MonolithTopAppBar(
+                        title = "Player Details",
+                        titleStyle = MaterialTheme.typography.bodyLarge,
+                        backAction = {
+                            IconButton(onClick = navigateBack) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "navigate up"
+                                )
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = {
+                                if (uiState.isClaimed) {
+                                    isUnclaimPlayerDialogOpen = true
+                                } else {
+                                    handleClaimPlayerStatus(false)
+                                }
+                            }) {
+                                if (uiState.isClaimed) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Favorite,
+                                        contentDescription = "unclaim player",
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Filled.FavoriteBorder,
+                                        contentDescription = "claim player",
+                                    )
+                                }
+
+                            }
+                        }
+                    )
+                },
+            ) {
+                Surface(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(it),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    handleRetry()
-                }
-            } else {
-                PullToRefreshBox(
-                    modifier = Modifier.fillMaxSize(),
-                    isRefreshing = isRefreshing,
-                    onRefresh = handleRetry
-                ) {
-                    Column(modifier = Modifier.fillMaxHeight()) {
-                        if (uiState.isLoading) {
-                            FullScreenLoadingIndicator("Player Details")
-                        } else {
+                    PullToRefreshBox(
+                        modifier = Modifier.fillMaxSize(),
+                        isRefreshing = isRefreshing,
+                        onRefresh = handleRetry
+                    ) {
+                        Column(modifier = Modifier.fillMaxHeight()) {
+
                             uiState.player?.let {
                                 TabRow(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -260,13 +258,16 @@ fun PlayerDetailScreen(
                                     )
                                 }
                             }
-                        }
 
+
+                        }
                     }
+
                 }
             }
         }
     }
+
 
 }
 
@@ -288,9 +289,9 @@ fun PlayerStatsTab(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            uiState.player?.let { playerDetails ->
+            uiState.player?.let {
                 PlayerProfilePlayerStatsCard(
-                    playerDetails = playerDetails,
+                    playerDetails = uiState.player,
                     stats = listOf(
                         StatLine.SingleStatLine("Win rate", uiState.stats?.winRate ?: "0%"),
                         StatLine.SingleStatLine(
@@ -659,17 +660,18 @@ fun LongHeroStatCard(
 fun HomeScreenPreview() {
     MonolithTheme {
         PlayerDetailScreen(
-            uiState = PlayerDetailsUiState(
-                isLoading = false,
-                player = PlayerInfo.PlayerDetails(
-                    playerName = "heatcreep.tv",
-                ),
-                stats = PlayerInfo.PlayerStats(
-                    favoriteHero = PlayerInfo.PlayerStats.FavoriteHero(
-                        name = "Narbash",
-                        imageUrl = "https://cdn.predcompanion.com/heroes/narbash.png"
-                    )
-                ),
+            playerDetailsState = PlayerDetailsState.Loaded(
+                uiState = PlayerDetailsUiState(
+                    player = PlayerInfo.PlayerDetails(
+                        playerName = "heatcreep.tv",
+                    ),
+                    stats = PlayerInfo.PlayerStats(
+                        favoriteHero = PlayerInfo.PlayerStats.FavoriteHero(
+                            name = "Narbash",
+                            imageUrl = "https://cdn.predcompanion.com/heroes/narbash.png"
+                        )
+                    ),
+                )
             )
         )
     }
@@ -684,10 +686,11 @@ fun HomeScreenPreview() {
 fun HomeScreenPreview2() {
     MonolithTheme {
         PlayerDetailScreen(
-            uiState = PlayerDetailsUiState(
-                isLoading = false,
-                player = PlayerInfo.PlayerDetails(
-                    playerName = "heatcreep.tv"
+            playerDetailsState = PlayerDetailsState.Loaded(
+                uiState = PlayerDetailsUiState(
+                    player = PlayerInfo.PlayerDetails(
+                        playerName = "heatcreep.tv"
+                    )
                 )
             )
         )
@@ -710,7 +713,6 @@ fun PlayerHeroStatsPreview() {
         ) {
             PlayerHeroStatsTab(
                 uiState = PlayerDetailsUiState(
-                    isLoading = false,
                     player = PlayerInfo.PlayerDetails(
                         playerName = "heatcreep.tv"
                     ),

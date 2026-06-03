@@ -111,7 +111,7 @@ private fun PCNavigationSuiteScaffold(
         navigationBarItemColors = NavigationBarItemDefaults.colors(
             selectedIconColor = PCNavigationDefaults.navigationSelectedContentColor(),
             unselectedIconColor = PCNavigationDefaults.navigationUnselectedContentColor(),
-            selectedTextColor = PCNavigationDefaults.navigationSelectedContentColor(),
+            selectedTextColor = PCNavigationDefaults.navigationSelectedTextColor(),
             unselectedTextColor = PCNavigationDefaults.navigationUnselectedContentColor(),
             indicatorColor = PCNavigationDefaults.navigationIndicatorColor()
         ),
@@ -185,7 +185,10 @@ object PCNavigationDefaults {
     fun navigationContentColor() = MaterialTheme.colorScheme.secondary
 
     @Composable
-    fun navigationSelectedContentColor() = MaterialTheme.colorScheme.secondary
+    fun navigationSelectedContentColor() = MaterialTheme.colorScheme.primary
+
+    @Composable
+    fun navigationSelectedTextColor() = MaterialTheme.colorScheme.secondary
 
     @Composable
     fun navigationUnselectedContentColor() = MaterialTheme.colorScheme.tertiary

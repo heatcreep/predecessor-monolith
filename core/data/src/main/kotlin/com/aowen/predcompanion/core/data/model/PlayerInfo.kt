@@ -16,6 +16,8 @@ fun NetworkPlayer.asPlayerDetails(): PlayerInfo.PlayerDetails {
         playerName = this.displayName,
         region = this.region,
         rank = this.rank,
+        rankTitle = this.rankTitle,
+        rankImage = this.rankImage,
         vpTotal = this.vpTotal ?: 0,
         vpCurrent = this.vpCurrent ?: 0,
         mmr = this.mmr?.toDecimal(),
@@ -57,15 +59,15 @@ fun NetworkPlayerStats.asPlayerStats(): PlayerInfo.PlayerStats {
     return PlayerInfo.PlayerStats(
         matchesPlayed = matchesPlayed.toString(),
         hoursPlayed = hoursPlayed.toString(),
-        averagePerformanceScore = averagePerformanceScore.toString(),
-        averageKda = averageKda.map { it.toString() },
-        averageKdaRatio = averageKdaRatio.toString(),
+        averagePerformanceScore = averagePerformanceScore.toPlainString(),
+        averageKda = averageKda.map { it.toPlainString() },
+        averageKdaRatio = averageKdaRatio.toPlainString(),
         favoriteHero = PlayerInfo.PlayerStats.FavoriteHero(
             name = favoriteHero.name,
             imageUrl = "https://omeda.city/${favoriteHero.image}"
         ),
-        favoriteRole = favoriteRole ?: "",
-        winRate = winRate.toDecimal()
+        favoriteRole = favoriteRole?.replaceFirstChar { it.uppercase() } ?: "",
+        winRate = winRate.toPercentageString()
     )
 }
 
