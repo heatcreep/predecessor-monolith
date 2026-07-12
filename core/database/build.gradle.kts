@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.predcompanion.android.library)
     alias(libs.plugins.predcompanion.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -13,4 +14,6 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    implementation(libs.kotlinx.serialization.json)
 }

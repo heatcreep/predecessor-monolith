@@ -1,0 +1,26 @@
+fragment ItemFragment on Item {
+    data {
+        id
+        gameId
+        name
+        displayName
+        icon
+        price
+        totalPrice
+        slotType
+        rarity
+        aggressionType
+        class
+        stats {
+            stat
+            value
+        }
+        effects {
+            name
+            active
+            condition
+            cooldown
+            text
+        },
+    }
+}

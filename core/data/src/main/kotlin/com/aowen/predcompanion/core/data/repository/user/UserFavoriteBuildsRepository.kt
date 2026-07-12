@@ -7,12 +7,14 @@ import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.database.dao.FavoriteBuildDao
 import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
 import com.aowen.predcompanion.core.model.data.HeroBuild
+import com.aowen.predcompanion.core.network.SupabaseAuthService
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
 import com.aowen.predcompanion.core.network.model.NetworkUserState
 import com.aowen.predcompanion.logDebug
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
+import java.util.UUID
 import javax.inject.Inject
 
 abstract class FavoriteBuildsState {
@@ -35,11 +37,14 @@ interface UserFavoriteBuildsRepository {
 
 class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
     private val postgrestService: SupabasePostgrestService,
-    private val userRepository: UserRepository,
+    private val authService: SupabaseAuthService,
     private val authRepository: AuthRepository,
     private val favoriteBuildDao: FavoriteBuildDao,
     private val buildListItemDataMapper: BuildListItemDataMapper
 ) : UserFavoriteBuildsRepository {
+
+    private suspend fun currentUserId(): UUID? =
+        authService.currentSession()?.user?.id?.let { UUID.fromString(it) }
 
     private val _favoriteBuildsState: MutableStateFlow<FavoriteBuildsState> =
         MutableStateFlow(FavoriteBuildsState.Empty)
@@ -67,9 +72,8 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             }
             // Supabase User
             is NetworkUserState.Authenticated -> {
-                val user = userRepository.getUser()
                 return try {
-                    val userId = user?.id ?: return Result.failure(Exception("User not found"))
+                    val userId = currentUserId() ?: return Result.failure(Exception("User not found"))
                     val favoriteBuilds = postgrestService.fetchFavoriteBuilds(userId)
                         .map { networkFavoriteBuild ->
                             buildListItemDataMapper.createFavoriteBuildListItemFrom(
@@ -127,25 +131,19 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             // Supabase User
             is NetworkUserState.Authenticated -> {
                 return try {
-                    val user = userRepository.getUser()
-                    if (user?.id == null) {
-                        return
-                    } else {
-                        val favoriteBuildDto = heroBuild.asNetworkFavoriteBuild(user.id!!)
-                        val favoriteBuildListItem =
-                            buildListItemDataMapper.createFavoriteBuildListItemFrom(
-                                favoriteBuildDto
+                    val userId = currentUserId() ?: return
+                    val favoriteBuildDto = heroBuild.asNetworkFavoriteBuild(userId)
+                    val favoriteBuildListItem =
+                        buildListItemDataMapper.createFavoriteBuildListItemFrom(
+                            favoriteBuildDto
+                        )
+                    postgrestService.insertFavoriteBuild(favoriteBuildDto)
+                    _favoriteBuildsState.update { state ->
+                        (state as FavoriteBuildsState.Success).copy(
+                            favoriteBuilds = state.favoriteBuilds.plus(
+                                favoriteBuildListItem
                             )
-                        postgrestService.insertFavoriteBuild(favoriteBuildDto)
-                        _favoriteBuildsState.update { state ->
-                            (state as FavoriteBuildsState.Success).copy(
-                                favoriteBuilds = state.favoriteBuilds.plus(
-                                    state.favoriteBuilds.plus(
-                                        favoriteBuildListItem
-                                    )
-                                )
-                            )
-                        }
+                        )
                     }
                 } catch (e: Exception) {
                     logDebug(e.toString())
@@ -188,34 +186,29 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             // Supabase User
             is NetworkUserState.Authenticated -> {
                 return try {
-                    val user = userRepository.getUser()
-                    if (user?.id == null) {
-                        return
-                    } else {
-                        postgrestService.deleteFavoriteBuild(user.id!!, buildId)
-                        _favoriteBuildsState.update { state ->
-                            when (state) {
-                                is FavoriteBuildsState.Success -> {
-                                    if (state.favoriteBuilds.size == 1) {
-                                        FavoriteBuildsState.Empty
-                                    } else {
-                                        val buildFromState = state.favoriteBuilds.find {
-                                            it.buildId == buildId
-                                        }
-                                        buildFromState?.let { build ->
-                                            state.copy(
-                                                favoriteBuilds = state.favoriteBuilds.minus(
-                                                    build
-                                                )
-                                            )
-                                        } ?: state
+                    val userId = currentUserId() ?: return
+                    postgrestService.deleteFavoriteBuild(userId, buildId)
+                    _favoriteBuildsState.update { state ->
+                        when (state) {
+                            is FavoriteBuildsState.Success -> {
+                                if (state.favoriteBuilds.size == 1) {
+                                    FavoriteBuildsState.Empty
+                                } else {
+                                    val buildFromState = state.favoriteBuilds.find {
+                                        it.buildId == buildId
                                     }
+                                    buildFromState?.let { build ->
+                                        state.copy(
+                                            favoriteBuilds = state.favoriteBuilds.minus(
+                                                build
+                                            )
+                                        )
+                                    } ?: state
                                 }
-
-                                else -> state
                             }
-                        }
 
+                            else -> state
+                        }
                     }
                 } catch (e: Exception) {
                     logDebug(e.toString())
@@ -239,15 +232,11 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             // Supabase User
             is NetworkUserState.Authenticated -> {
                 return try {
-                    val user = userRepository.getUser()
-                    if (user?.id == null) {
-                        return
-                    } else {
-                        _favoriteBuildsState.update {
-                            FavoriteBuildsState.Empty
-                        }
-                        postgrestService.deleteAllFavoriteBuilds(user.id!!)
+                    val userId = currentUserId() ?: return
+                    _favoriteBuildsState.update {
+                        FavoriteBuildsState.Empty
                     }
+                    postgrestService.deleteAllFavoriteBuilds(userId)
                 } catch (e: Exception) {
                     logDebug(e.toString())
                 }

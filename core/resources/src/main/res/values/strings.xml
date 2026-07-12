@@ -13,5 +13,10 @@
     <string name="core_resources_match_kda">%1$s KDA</string>
     <string name="core_resources_match_gold_earned_per_minute">%1$s Gold/min</string>
     <string name="core_resources_match_creep_score_per_minute">%1$s CS/min</string>
+    <string name="core_resources_match_type_ranked">Ranked</string>
+    <string name="core_resources_match_type_unranked">Unranked</string>
+    <string name="core_resources_match_type_aram">ARAM</string>
+    <string name="core_resources_match_type_daybreak">Daybreak</string>
+    <string name="core_resources_match_type_practice">Practice</string>
 
 </resources>

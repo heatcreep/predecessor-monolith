@@ -1,0 +1,10 @@
+fragment PlayerRatingFragment on PlayerRating {
+    points
+    rank {
+        icon
+        abbreviation
+        name
+        tierName
+    }
+
+}

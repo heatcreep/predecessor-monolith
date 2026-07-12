@@ -16,7 +16,7 @@ data class HeroDetails(
     val name: String = "",
     val displayName: String = "",
     val imageUrl: String? = null,
-    val posterImageId: Int? = null,
+    val posterImageId: String? = null,
     val stats: List<Int> = emptyList(),
     val classes: List<HeroClass> = emptyList(),
     val roles: List<HeroRole> = emptyList(),

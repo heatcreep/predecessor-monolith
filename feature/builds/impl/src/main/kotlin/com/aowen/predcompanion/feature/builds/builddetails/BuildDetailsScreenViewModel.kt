@@ -17,6 +17,13 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -48,6 +55,19 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
     interface Factory {
         fun create(buildId: String): BuildDetailsScreenViewModel
     }
+
+    val foo = MutableStateFlow("")
+
+    val bar: StateFlow<String> = foo
+        .debounce(500L)
+        .flatMapLatest {
+            // Do something with the value
+            if (it.isEmpty()) return@flatMapLatest flow { emit("") }
+            flow { emit(it) }
+        }.catch { e ->
+            emit("Error: ${e.message}")
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "")
 
 
     private val _uiState = MutableStateFlow(BuildDetailsUiState())
@@ -126,8 +146,8 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
             role = role?.name ?: "unknown",
             description = description,
             heroId = heroId,
-            crestId = crest.id,
-            buildItemIds = buildItems.map { it.id },
+            crestId = crest.id.toInt(),
+            buildItemIds = buildItems.map { it.id.toInt() },
             skillOrder = skillOrder,
             netVotes = 0,
             upvotes = 0,
@@ -136,7 +156,7 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
                 HeroBuild.ItemModule(
                     id = UUID.randomUUID().toString(),
                     title = it.title,
-                    itemIds = it.items.map { item -> item.id }
+                    itemIds = it.items.map { item -> item.id.toInt() }
                 )
             },
             createdAt = createdAt,

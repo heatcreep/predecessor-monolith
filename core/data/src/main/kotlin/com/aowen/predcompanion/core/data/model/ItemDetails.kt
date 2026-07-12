@@ -1,17 +1,73 @@
 package com.aowen.predcompanion.core.data.model
 
 import com.aowen.predcompanion.core.common.network.RetrofitHelper
+import com.aowen.predcompanion.core.data.helpers.ImageHelpers
 import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.model.data.Rarity
 import com.aowen.predcompanion.core.model.data.SlotType
+import com.aowen.predcompanion.core.network.apollo.fragment.ItemFragment
+import com.aowen.predcompanion.core.network.apollo.type.ItemDescriptionStat
+import com.aowen.predcompanion.core.network.apollo.type.ItemRarity
 import com.aowen.predcompanion.core.network.model.NetworkItem
+import com.aowen.predcompanion.core.network.apollo.type.HeroClass as ApolloHeroClass
+import com.aowen.predcompanion.core.network.apollo.type.SlotType as ApolloSlotType
 import com.aowen.predcompanion.core.resources.R as coreResources
+
+fun ItemFragment.Data.asItemDetails(): ItemDetails {
+    val rarity = when (this.rarity) {
+        ItemRarity.UNCOMMON -> Rarity.UNCOMMON
+        ItemRarity.RARE -> Rarity.RARE
+        ItemRarity.EPIC -> Rarity.EPIC
+        ItemRarity.LEGENDARY -> Rarity.LEGENDARY
+        else -> Rarity.COMMON
+    }
+
+    val heroClass = when (this.`class`) {
+        ApolloHeroClass.FIGHTER -> HeroClass.FIGHTER
+        ApolloHeroClass.TANK -> HeroClass.TANK
+        ApolloHeroClass.ASSASSIN -> HeroClass.ASSASSIN
+        ApolloHeroClass.MAGE -> HeroClass.MAGE
+        ApolloHeroClass.SUPPORT -> HeroClass.SUPPORT
+        ApolloHeroClass.SHARPSHOOTER -> HeroClass.SHARPSHOOTER
+        else -> HeroClass.UNKNOWN
+    }
+
+    val slotType = when (this.slotType) {
+        ApolloSlotType.TRINKET -> SlotType.TRINKET
+        ApolloSlotType.CREST -> SlotType.CREST
+        ApolloSlotType.ACTIVE -> SlotType.ACTIVE
+        else -> SlotType.PASSIVE
+    }
+    return ItemDetails(
+        id = this.id,
+        gameId = this.gameId,
+        name = this.name,
+        displayName = this.displayName,
+        imageSrc = ImageHelpers.buildAssetsUrl(this.icon),
+        price = this.price,
+        totalPrice = this.totalPrice,
+        slotType = slotType,
+        rarity = rarity,
+        aggressionType = null,
+        heroClass = heroClass,
+        stats = this.stats.map { it.createStatDetails() },
+        effects = this.effects.map {
+            ItemDetails.EffectDetails(
+                name = it.name,
+                active = it.active,
+                condition = it.condition,
+                cooldown = it.cooldown,
+                menuDescription = it.text,
+            )
+
+        }
+    )
+}
 
 fun NetworkItem.asItemDetails(): ItemDetails {
 
     val rarity = when (this.rarity) {
-        "Common" -> Rarity.COMMON
         "Uncommon" -> Rarity.UNCOMMON
         "Rare" -> Rarity.RARE
         "Epic" -> Rarity.EPIC
@@ -36,7 +92,7 @@ fun NetworkItem.asItemDetails(): ItemDetails {
         else -> SlotType.PASSIVE
     }
     return ItemDetails(
-        id = this.id,
+        id = this.id.toString(),
         gameId = this.gameId ?: 0,
         name = this.name,
         displayName = this.displayName,
@@ -45,7 +101,7 @@ fun NetworkItem.asItemDetails(): ItemDetails {
         totalPrice = this.totalPrice,
         slotType = slotType,
         rarity = rarity,
-        aggressionType = this.aggressionType,
+        aggressionType = null,
         heroClass = heroClass,
         requiredLevel = this.requiredLevel,
         stats = this.stats.createStatDetails(),
@@ -58,9 +114,7 @@ fun NetworkItem.asItemDetails(): ItemDetails {
                 menuDescription = it.menuDescription,
             )
 
-        },
-        requirements = this.requirements,
-        buildPath = this.buildPath,
+        }
     )
 }
 
@@ -77,10 +131,90 @@ fun Float.toPercentageString(): String {
     return "${(this * 100).toInt()}%"
 }
 
+private fun ItemFragment.Stat.createStatDetails(): ItemDetails.StatDetails {
+    return when (this.stat) {
+        ItemDescriptionStat.HEALTH -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.max_health,
+            name = "Max Health",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.MANA -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.max_mana,
+            name = "Max Mana",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.BASE_HEALTH_REGENERATION -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.health_regen,
+            name = "Health Regen",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.BASE_MANA_REGENERATION -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.mana_regen,
+            name = "Mana Regen",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.PHYSICAL_POWER -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.physical_power,
+            name = "Physical Power",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.MAGICAL_POWER -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.magical_power,
+            name = "Magical Power",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.ATTACK_SPEED -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.attack_speed,
+            name = "Attack Speed",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.PHYSICAL_ARMOR -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.physical_armor,
+            name = "Physical Armor",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.MAGICAL_ARMOR -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.magical_armor,
+            name = "Magical Armor",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.PHYSICAL_PENETRATION -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.physical_pen,
+            name = "Physical Penetration",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.MAGICAL_PENETRATION -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.magical_pen,
+            name = "Magical Penetration",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.CRITICAL_CHANCE -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.critical_chance,
+            name = "Critical Chance",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.GOLD_PER_SECOND -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.gold_per_second,
+            name = "Gold Per Second",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.TENACITY -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.tenacity,
+            name = "Tenacity",
+            value = this.value.toStatValue()
+        )
+        else -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.unknown,
+            name = "Unknown",
+            value = this.value.toStatValue()
+        )
+    }
+}
+
 private fun Map<String, Double>?.createStatDetails(): List<ItemDetails.StatDetails> {
     val listOfStats = mutableListOf<ItemDetails.StatDetails>()
     for ((key, value) in this ?: emptyMap()) {
-        val statDetails = when (key) {
+        val statDetails = when (key.lowercase()) {
             "max_health" -> ItemDetails.StatDetails(
                 iconId = coreResources.drawable.max_health,
                 name = "Max Health",

@@ -1,6 +1,7 @@
 package com.aowen.predcompanion.core.data.model
 
 import com.aowen.predcompanion.core.model.data.PlayerInfo
+import com.aowen.predcompanion.core.network.apollo.fragment.PlayerFragment
 import com.aowen.predcompanion.core.network.model.NetworkPlayer
 import com.aowen.predcompanion.core.network.model.NetworkPlayerSearchResult
 import com.aowen.predcompanion.core.network.model.NetworkPlayerStats
@@ -9,6 +10,13 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 import java.util.UUID
+
+fun PlayerFragment.asPlayerDetails(): PlayerInfo.PlayerDetails {
+    return PlayerInfo.PlayerDetails(
+        playerId = this.id,
+        playerName = this.name ?: "",
+    )
+}
 
 fun NetworkPlayer.asPlayerDetails(): PlayerInfo.PlayerDetails {
     return PlayerInfo.PlayerDetails(

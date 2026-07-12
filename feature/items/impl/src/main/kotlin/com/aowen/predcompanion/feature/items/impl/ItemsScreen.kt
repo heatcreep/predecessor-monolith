@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
@@ -50,9 +51,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImagePainter
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
+import coil3.compose.AsyncImagePainter
+import coil3.compose.AsyncImagePainter.State.Empty.painter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.ItemDetails
@@ -200,7 +204,10 @@ fun ItemsScreen(
                         ) {
                             items(uiState.filteredItems) { item ->
                                 SubcomposeAsyncImage(
-                                    model = item.imageSrc,
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(item.imageSrc)
+                                        .crossfade(true)
+                                        .build(),
                                     contentDescription = "Item image",
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
@@ -305,7 +312,7 @@ fun ItemsScreenLoadingPreview() {
                 allStats = listOf("Max Health", "Max Mana", "Health Regen", "Mana Regen"),
                 allItems = listOf(
                     ItemDetails(
-                        id = 1,
+                        id = "1",
                         displayName = "Ashbringer",
                         heroClass = HeroClass.FIGHTER,
                         stats = listOf(
@@ -339,7 +346,7 @@ fun ItemsScreenNoItemsPreview() {
                 allStats = listOf("Max Health", "Max Mana", "Health Regen", "Mana Regen"),
                 allItems = listOf(
                     ItemDetails(
-                        id = 1,
+                        id = "1",
                         displayName = "Ashbringer",
                         heroClass = HeroClass.FIGHTER,
                         stats = listOf(
@@ -370,7 +377,7 @@ fun ItemsScreenScreenSizePreview() {
                 allStats = listOf("Max Health", "Max Mana", "Health Regen", "Mana Regen"),
                 allItems = listOf(
                     ItemDetails(
-                        id = 1,
+                        id = "1",
                         displayName = "Ashbringer",
                         heroClass = HeroClass.FIGHTER,
 
@@ -383,7 +390,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 2,
+                        id = "2",
                         displayName = "Witchstalker",
                         heroClass = HeroClass.FIGHTER,
 
@@ -396,7 +403,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 3,
+                        id = "3",
                         displayName = "Item 3",
                         heroClass = HeroClass.FIGHTER,
 
@@ -409,7 +416,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 4,
+                        id = "4",
                         displayName = "Item 4",
                         heroClass = HeroClass.FIGHTER,
 
@@ -422,7 +429,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 5,
+                        id = "5",
                         displayName = "Item 5",
                         heroClass = HeroClass.FIGHTER,
 
@@ -435,7 +442,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 6,
+                        id = "6",
                         displayName = "Item 6",
                         heroClass = HeroClass.FIGHTER,
 
@@ -450,7 +457,7 @@ fun ItemsScreenScreenSizePreview() {
                 ),
                 filteredItems = listOf(
                     ItemDetails(
-                        id = 1,
+                        id = "1",
                         displayName = "Ashbringer",
                         heroClass = HeroClass.FIGHTER,
 
@@ -463,7 +470,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 2,
+                        id = "2",
                         displayName = "The Witchstalker",
                         heroClass = HeroClass.FIGHTER,
 
@@ -476,7 +483,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 3,
+                        id = "3",
                         displayName = "Item 3",
                         heroClass = HeroClass.FIGHTER,
 
@@ -489,7 +496,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 4,
+                        id = "4",
                         displayName = "Item 4",
                         heroClass = HeroClass.FIGHTER,
 
@@ -502,7 +509,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 5,
+                        id = "5",
                         displayName = "Item 5",
                         heroClass = HeroClass.FIGHTER,
 
@@ -515,7 +522,7 @@ fun ItemsScreenScreenSizePreview() {
                         )
                     ),
                     ItemDetails(
-                        id = 6,
+                        id = "6",
                         displayName = "Item 6",
                         heroClass = HeroClass.FIGHTER,
 
@@ -545,7 +552,7 @@ fun ItemsScreenPreview() {
                 allStats = listOf("Max Health", "Max Mana", "Health Regen", "Mana Regen"),
                 allItems = listOf(
                     ItemDetails(
-                        id = 1,
+                        id = "1",
                         displayName = "Ashbringer",
                         heroClass = HeroClass.FIGHTER,
 
@@ -560,7 +567,7 @@ fun ItemsScreenPreview() {
                 ),
                 filteredItems = listOf(
                     ItemDetails(
-                        id = 1,
+                        id = "1",
                         displayName = "Ashbringer",
                         heroClass = HeroClass.FIGHTER,
 

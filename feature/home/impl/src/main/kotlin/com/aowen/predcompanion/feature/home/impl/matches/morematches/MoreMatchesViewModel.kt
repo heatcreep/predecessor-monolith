@@ -10,8 +10,8 @@ import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
 import com.aowen.predcompanion.core.model.data.Hero
 import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.network.getOrThrow
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchListItemUiModel
-import com.aowen.predcompanion.feature.home.impl.matches.model.mapper.MatchListItemUiMapper
+import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
+import com.aowen.predcompanion.core.ui.model.mapper.MatchListItemUiMapper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

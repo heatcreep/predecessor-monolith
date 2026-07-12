@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.ui.components.StatListItem

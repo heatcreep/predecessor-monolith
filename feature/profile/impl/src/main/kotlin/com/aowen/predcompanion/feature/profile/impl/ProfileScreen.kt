@@ -1,53 +1,57 @@
 package com.aowen.predcompanion.feature.profile.impl
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,28 +59,136 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
-import coil.request.ImageRequest
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.data.CurrentUser
 import com.aowen.predcompanion.core.model.ui.theme.Console
-import com.aowen.predcompanion.core.network.model.NetworkUserInfo
-import com.aowen.predcompanion.core.ui.shared.SignInDiscordButton
+import com.aowen.predcompanion.core.ui.components.MatchPlayerCard
+import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
+import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.feature.profile.impl.ui.ConsoleDropdownMenu
+import com.aowen.predcompanion.feature.profile.impl.ui.PlayerProfileCard
 import com.aowen.predcompanion.feature.profile.impl.ui.ThemeDropdownMenu
+import com.aowen.predcompanion.feature.profile.impl.ui.toPlayerProfileCardUiModel
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithAlertDialog
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 import com.aowen.predcompanion.ui.theme.DiscordBlurple
-import com.aowen.predcompanion.ui.theme.DiscordDarkBackground
-import com.aowen.predcompanion.ui.theme.RedDanger
 import com.aowen.predcompanion.ui.theme.WarmWhite
 import com.aowen.predcompanion.ui.theme.YellowHighlight
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import com.aowen.predcompanion.core.datastore.Theme as ThemeDataStore
 import com.aowen.predcompanion.core.resources.R as coreResources
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsBottomSheet(
+    modifier: Modifier = Modifier,
+    console: Console,
+    theme: ThemeDataStore,
+    sheetState: SheetState,
+    handleSaveConsole: (Console) -> Unit,
+    handleSaveTheme: (ThemeDataStore) -> Unit,
+    handleSignOut: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val uriHandler = LocalUriHandler.current
+
+    ModalBottomSheet(
+        modifier = modifier,
+        sheetState = sheetState,
+        onDismissRequest = onDismissRequest,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "Settings",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
+            IconButton(
+                onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) onDismissRequest()
+                    }
+                },
+                modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.secondary,
+                )
+            }
+        }
+        Spacer(modifier = Modifier.size(24.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            ConsoleDropdownMenu(
+                console = console,
+                handleSaveConsole = handleSaveConsole
+            )
+            ThemeDropdownMenu(
+                theme = theme,
+                handleSaveTheme = handleSaveTheme
+            )
+            Text(
+                text = "App Version: ${BuildConfig.VERSION_NAME}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+            ClickableText(
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = MaterialTheme.colorScheme.secondary,
+                    textDecoration = TextDecoration.Underline
+                ),
+                text = AnnotatedString("Privacy Policy"),
+                onClick = {
+                    uriHandler.openUri("https://monolith-app.dev/privacy")
+                }
+            )
+            ElevatedButton(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                onClick = handleSignOut
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                    contentDescription = "Sign Out",
+                    tint = MaterialTheme.colorScheme.secondary,
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(text = "Sign Out")
+            }
+            Spacer(modifier = Modifier.size(16.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenRoute(
     showSnackbar: (String, SnackbarDuration) -> Unit,
@@ -84,6 +196,9 @@ fun ProfileScreenRoute(
     navigateToSearch: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
+
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember {
         SnackbarHostState()
@@ -95,12 +210,10 @@ fun ProfileScreenRoute(
             when (show) {
                 ProfileToastState.DELETE -> {
                     showSnackbar("Account deleted successfully", SnackbarDuration.Short)
-                    navigateToLoginFromLogout()
                 }
 
                 ProfileToastState.LOGOUT -> {
                     showSnackbar("Successfully logged out", SnackbarDuration.Short)
-                    navigateToLoginFromLogout()
                 }
 
                 ProfileToastState.ERROR -> {
@@ -117,6 +230,8 @@ fun ProfileScreenRoute(
     }
 
     val uiState by viewModel.uiState.collectAsState()
+    val startAuth = rememberAuthLauncher(viewModel::loginIntent, viewModel::onLoginResult)
+    val matches = viewModel.matchHistory.collectAsLazyPagingItems()
 
     Scaffold(
         topBar = {
@@ -129,19 +244,39 @@ fun ProfileScreenRoute(
                             contentDescription = "Search"
                         )
                     }
+                    IconButton(onClick = {
+                        showBottomSheet = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Settings"
+                        )
+                    }
                 }
             )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
-    ) {
+    ) { contentPadding ->
+        if (showBottomSheet) {
+            SettingsBottomSheet(
+                sheetState = sheetState,
+                console = uiState.console,
+                theme = uiState.theme,
+                handleSaveConsole = viewModel::saveConsole,
+                handleSaveTheme = viewModel::saveTheme,
+                handleSignOut = viewModel::handleLogout,
+                onDismissRequest = { showBottomSheet = false }
+            )
+        }
         ProfileScreen(
             uiState = uiState,
+            matches = matches,
             modifier = Modifier
-                .padding(it)
+                .padding(contentPadding)
                 .padding(horizontal = 16.dp),
-            submitLogin = viewModel::submitLogin,
+            submitLogin = startAuth,
             handleSaveConsole = viewModel::saveConsole,
             handleSaveTheme = viewModel::saveTheme,
             handleRetry = {},
@@ -156,6 +291,7 @@ fun ProfileScreenRoute(
 @Composable
 fun ProfileScreen(
     uiState: ProfileScreenState,
+    matches: LazyPagingItems<MatchListItemUiModel>,
     modifier: Modifier = Modifier,
     submitLogin: () -> Unit,
     handleSaveConsole: (Console) -> Unit,
@@ -165,9 +301,14 @@ fun ProfileScreen(
     onDelete: () -> Unit,
 ) {
 
-    val uriHandler = LocalUriHandler.current
 
     var deleteModalOpen by remember { mutableStateOf(false) }
+    val tabList = listOf(
+        R.string.feature_profile_impl_nav_matches,
+        R.string.feature_profile_impl_nav_heroes,
+        R.string.feature_profile_impl_nav_friends_enemies
+    )
+    var selectedTab by rememberSaveable { mutableStateOf(0) }
 
     if (deleteModalOpen) {
         MonolithAlertDialog(
@@ -186,96 +327,87 @@ fun ProfileScreen(
         modifier = modifier,
         color = MaterialTheme.colorScheme.background
     ) {
-        when (uiState) {
-            is ProfileScreenState.Loading -> {
+        when (val userState = uiState.user) {
+            is UserUiState.Loading -> {
                 FullScreenLoadingIndicator("Profile")
             }
 
-            is ProfileScreenState.Error -> {
+            is UserUiState.Error -> {
                 FullScreenErrorWithRetry(
-                    errorMessage = uiState.message
+                    errorMessage = userState.message
                 ) {
                     handleRetry()
                 }
             }
 
-            is ProfileScreenState.UserInfoLoaded -> {
-                if (uiState.userInfo != null) {
+            is UserUiState.SignedOut -> {
+                ElevatedButton(
+                    onClick = submitLogin,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = WarmWhite
+                    ),
+                    contentPadding = PaddingValues(24.dp)
+                ) {
+                    Icon(
+                        modifier = Modifier.size(36.dp),
+                        tint = Color.Unspecified,
+                        painter = painterResource(id = coreResources.drawable.predgg_icon_only),
+                        contentDescription = null
+                    )
+                    Spacer(modifier = Modifier.size(12.dp))
+                    Text(
+                        text = "Sign in to Pred.gg",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                }
+            }
+
+            is UserUiState.UserInfoLoaded -> {
+                if (userState.userInfo != null) {
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .verticalScroll(state = rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                            .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Surface(shape = RoundedCornerShape(5.dp)) {
-                            ProfileCard(userInfo = uiState.userInfo)
-                        }
-                        ConsoleDropdownMenu(
-                            console = uiState.console,
-                            handleSaveConsole = handleSaveConsole
+
+                        PlayerProfileCard(
+                            playerProfileCardUiModel = userState.userInfo.players.first()
+                                .toPlayerProfileCardUiModel(),
                         )
-                        ThemeDropdownMenu(
-                            theme = uiState.theme,
-                            handleSaveTheme = handleSaveTheme
-                        )
-                        Text(
-                            text = "FAQ",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        FaqPanel(
-                            questionText = "How does the \"Claim Player\" button work?",
-                            answerText = """
-                                    The "Claim Player" button allows you to claim a player's profile as your own. However, due to limitations 
-                                    of the OmedaCity API, it isn't actually tied to your game account or your OmedaCity account. Think of it as a favorites menu of
-                                    one that serves as a convenient way to access your own stats without having to search for yourself everytime.",
-                                """.trimIndent()
-                        )
-                        FaqPanel(
-                            questionText = "Why don't I see all the stats that OmedaCity has?",
-                            answerText = """
-                                    The OmedaCity API exposes a lot of data, but not all of it. Both this app and the OmedaCity API/Website are managed by one person.
-                                    We are working to hopefully expose more data in the future, but for now, we are limited to what is available.
-                                """.trimIndent()
-                        )
-                        Text(
-                            text = "App Version: ${BuildConfig.VERSION_NAME}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.secondary,
-                        )
-                        ClickableText(
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.secondary,
-                                textDecoration = TextDecoration.Underline
-                            ),
-                            text = AnnotatedString("Privacy Policy"),
-                            onClick = {
-                                uriHandler.openUri("https://monolith-app.dev/privacy")
-                            }
-                        )
-                        ElevatedButton(
-                            onClick = { deleteModalOpen = true },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = RedDanger,
-                                contentColor = WarmWhite
-                            )
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Text(
-                                text = "Delete Account",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
+                            itemsIndexed(
+                                tabList
+                            ) { index, item ->
+                                PredCompanionChipFilter(
+                                    text = stringResource(item),
+                                    selected = selectedTab == index,
+                                    onClick = { selectedTab = index }
+                                )
+                            }
                         }
-                        TextButton(onClick = {
-                            onLogout()
-                        }) {
-                            Text(
-                                text = "Sign Out",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+                        when (selectedTab) {
+                            0 -> {
+                                LazyColumn(
+                                    state = rememberLazyListState(),
+                                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    items(matches.itemCount) {
+                                        matches[it]?.let { matchItem ->
+                                            MatchPlayerCard(
+                                                matchListItem = matchItem,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            1 -> {}
+                            2 -> {}
                         }
                     }
                 } else {
@@ -286,25 +418,6 @@ fun ProfileScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        ConsoleDropdownMenu(
-                            console = uiState.console,
-                            handleSaveConsole = handleSaveConsole
-                        )
-                        ThemeDropdownMenu(
-                            theme = uiState.theme,
-                            handleSaveTheme = handleSaveTheme
-                        )
-                        Text(
-                            text = "Sign in to create a profile and save your claimed player, favorite builds, and recent searches to the cloud!",
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                        SignInDiscordButton(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            submitLogin()
-                        }
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
@@ -329,131 +442,30 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileCard(
-    userInfo: NetworkUserInfo
+    userInfo: CurrentUser
 ) {
-
-    val context = LocalContext.current
-
     Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(DiscordBlurple)
-                .padding(
-                    24.dp
-                ),
+                .padding(24.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(
-                    text = "signed in with Discord",
+                    text = "Signed in",
                     style = MaterialTheme.typography.titleSmall,
                     color = WarmWhite,
                 )
                 Text(
-                    text = userInfo.fullName,
+                    text = userInfo.name,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
                     color = WarmWhite,
                 )
             }
-            val model = ImageRequest.Builder(context)
-                .data(userInfo.avatarUrl)
-                .placeholder(coreResources.drawable.unknown)
-                .crossfade(true)
-                .build()
-            SubcomposeAsyncImage(
-                modifier = Modifier.size(64.dp),
-                model = model,
-                contentDescription = null
-            ) {
-                SubcomposeAsyncImageContent()
-            }
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(DiscordDarkBackground)
-                .padding(24.dp),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Column {
-                Text(
-                    text = "Email",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = WarmWhite,
-                )
-                Text(
-                    text = userInfo.email,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = WarmWhite,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun FaqPanel(
-    questionText: String,
-    answerText: String,
-    modifier: Modifier = Modifier
-) {
-
-    var expanded by remember { mutableStateOf(false) }
-    val rotationAngle = remember { Animatable(0f) }
-
-    LaunchedEffect(expanded) {
-        this.launch {
-            rotationAngle.animateTo(
-                targetValue = if (expanded) 45f else 0f,
-                animationSpec = tween(durationMillis = 200, easing = LinearEasing),
-            )
-        }
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    expanded = !expanded
-                },
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = questionText,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                color = MaterialTheme.colorScheme.secondary
-            )
-            Icon(
-                imageVector = Icons.Filled.Add,
-                modifier = Modifier
-                    .size(28.dp)
-                    .rotate(rotationAngle.value),
-                tint = MaterialTheme.colorScheme.secondary,
-                contentDescription = null
-            )
-
-        }
-        HorizontalDivider(modifier.padding(vertical = 8.dp))
-        AnimatedVisibility(visible = expanded) {
-            Text(
-                modifier = Modifier.padding(vertical = 16.dp),
-                text = answerText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
         }
     }
 }
@@ -464,17 +476,21 @@ fun FaqPanel(
 )
 @Composable
 fun ProfileCardPreview() {
+
+    val fakePagingData = flowOf(PagingData.empty<MatchListItemUiModel>())
+    val fakeMatches = fakePagingData.collectAsLazyPagingItems()
     MonolithTheme {
         ProfileScreen(
-            uiState = ProfileScreenState.UserInfoLoaded(
-                console = Console.PC,
-                theme = ThemeDataStore.SYSTEM,
-                userInfo = NetworkUserInfo(
-                    email = "test@gmail.com",
-                    avatarUrl = "https://cdn.discordapp.com/avatars/1234567890/abcdef1234567890.png",
-                    fullName = "Test User"
+            uiState = ProfileScreenState(
+                user = UserUiState.UserInfoLoaded(
+                    userInfo = CurrentUser(
+                        id = "preview-id",
+                        name = "Test User",
+                        players = emptyList(),
+                    )
                 )
             ),
+            matches = fakeMatches,
             submitLogin = {},
             handleSaveConsole = {},
             handleSaveTheme = {},

@@ -1,6 +1,5 @@
 package com.aowen.predcompanion.core.ui.cards.heroes
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,26 +27,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.ui.theme.WarmWhite
-import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
 fun HeroTileCard(
     modifier: Modifier = Modifier,
     hero: HeroDetails,
-    heroImageId: Int? = hero.posterImageId,
+    heroImageUrl: String? = hero.posterImageId,
     labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     isSelected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
 
-    val image = heroImageId ?: coreResources.drawable.unknown
+    val image = heroImageUrl ?: ""
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -58,10 +56,10 @@ fun HeroTileCard(
         contentAlignment = Alignment.BottomCenter,
         propagateMinConstraints = true
     ) {
-        Image(
-            painter = painterResource(id = image),
+        AsyncImage(
+            model = image,
             contentScale = ContentScale.FillWidth,
-            contentDescription = hero.displayName
+            contentDescription = hero.displayName,
         )
         if (isSelected) {
             Box(

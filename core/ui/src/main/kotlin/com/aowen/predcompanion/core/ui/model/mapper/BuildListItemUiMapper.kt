@@ -1,6 +1,5 @@
 package com.aowen.predcompanion.core.ui.model.mapper
 
-import com.aowen.predcompanion.core.data.model.mapper.HeroMapper
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.database.model.FavoriteBuildListEntity
@@ -44,10 +43,12 @@ data class BuildUiListItem(
 class BuildListItemUiMapper @Inject constructor(
     itemRepository: ItemRepository,
     private val heroRepository: HeroRepository,
-    private val heroMapper: HeroMapper,
 ) {
 
     val items = itemRepository.allItems.value
+
+    val heroRoleMap = HeroRole.entries.associateBy { it.roleName }
+
 
     fun buildFrom(
         heroBuild: HeroBuild,
@@ -57,7 +58,7 @@ class BuildListItemUiMapper @Inject constructor(
             userId = heroBuild.userId,
             title = heroBuild.title,
             author = heroBuild.author,
-            role = heroMapper.getHeroRole(heroBuild.role),
+            role = heroRoleMap[heroBuild.role.lowercase()],
             description = heroBuild.description,
             heroId = heroBuild.heroId,
             heroImageUrl = heroRepository.getHeroImageSrcById(heroBuild.heroId),
@@ -81,7 +82,7 @@ class BuildListItemUiMapper @Inject constructor(
             buildId = favoriteBuildListItem.buildId,
             title = favoriteBuildListItem.title,
             author = favoriteBuildListItem.author,
-            role = heroMapper.getHeroRole(favoriteBuildListItem.role),
+            role = heroRoleMap[favoriteBuildListItem.role.lowercase()],
             description = favoriteBuildListItem.description,
             heroId = favoriteBuildListItem.heroId,
             heroImageUrl = heroRepository.getHeroImageSrcById(favoriteBuildListItem.heroId),
@@ -106,8 +107,8 @@ fun BuildUiListItem.asFavoriteBuildDto(userId: UUID): NetworkFavoriteHeroBuild {
         title = title,
         description = description,
         author = author,
-        crestId = crest.id,
-        itemIds = buildItems.map { it.id },
+        crestId = crest.id.toInt(),
+        itemIds = buildItems.map { it.id.toInt() },
         upvotesCount = upvotes,
         downvotesCount = downvotes,
         gameVersion = version ?: ""
@@ -122,8 +123,8 @@ fun BuildUiListItem.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
         title = title,
         description = description,
         author = author,
-        crestId = crest.id,
-        itemIds = buildItems.map { it.id },
+        crestId = crest.id.toInt(),
+        itemIds = buildItems.map { it.id.toInt() },
         upvotesCount = upvotes,
         downvotesCount = downvotes,
         createdAt = createdAt,

@@ -15,8 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.aowen.predcompanion.feature.home.impl.matches.MatchPlayerCard
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchListItemUiModel
+import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
+import com.aowen.predcompanion.core.ui.components.MatchPlayerCard
 
 @Composable
 fun PlayerDetailsRecentMatchList(

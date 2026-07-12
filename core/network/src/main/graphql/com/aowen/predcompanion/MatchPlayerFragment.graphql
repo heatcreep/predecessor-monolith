@@ -1,0 +1,10 @@
+fragment MatchPlayerFragment on MatchPlayer {
+    team
+    player {
+        ...PlayerFragment
+    }
+    match {
+        id
+        winningTeam
+    }
+}

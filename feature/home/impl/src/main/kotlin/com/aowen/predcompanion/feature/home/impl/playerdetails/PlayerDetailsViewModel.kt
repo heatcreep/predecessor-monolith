@@ -14,10 +14,10 @@ import com.aowen.predcompanion.core.datastore.UserPreferencesManager
 import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.network.getOrThrow
 import com.aowen.predcompanion.core.network.model.NetworkUserState
+import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.core.ui.model.RankDetails
 import com.aowen.predcompanion.data.PlayerHeroStats
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchListItemUiModel
-import com.aowen.predcompanion.feature.home.impl.matches.model.mapper.MatchListItemUiMapper
+import com.aowen.predcompanion.core.ui.model.mapper.MatchListItemUiMapper
 import com.aowen.predcompanion.logDebug
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -217,7 +217,10 @@ class PlayerDetailsViewModel @AssistedInject constructor(
 
     private suspend fun getFreshPlayerId(): String? {
         return when (authRepository.networkUserState.value) {
-            is NetworkUserState.Authenticated -> userRepository.getUser()?.playerId
+            is NetworkUserState.Authenticated -> {
+                userRepository.sync()
+                ""
+            }
             is NetworkUserState.Unauthenticated -> claimedPlayerDao.getClaimedPlayerIds().firstOrNull()?.firstOrNull()
             else -> null
         }

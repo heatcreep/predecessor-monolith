@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface HeroRepository {
     val allHeroes: StateFlow<Map<Long, HeroDetails>>
+    fun getHeroName(heroId: Long): String
     fun getHeroByName(heroName: String): HeroDetails?
     fun getHeroImageSrcById(heroId: Long): String
     suspend fun fetchAllHeroes()

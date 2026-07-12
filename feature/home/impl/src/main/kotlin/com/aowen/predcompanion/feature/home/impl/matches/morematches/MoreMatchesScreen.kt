@@ -42,10 +42,10 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.predcompanion.core.model.data.Hero
 import com.aowen.predcompanion.core.model.data.HeroRole
+import com.aowen.predcompanion.core.ui.components.MatchPlayerCard
+import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.core.ui.shared.FilterDropdown
 import com.aowen.predcompanion.core.ui.shared.SearchBar
-import com.aowen.predcompanion.feature.home.impl.matches.MatchPlayerCard
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchListItemUiModel
 import com.aowen.predcompanion.ui.common.MonolithCollapsableListColumn
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator

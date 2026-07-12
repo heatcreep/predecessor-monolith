@@ -6,7 +6,7 @@ import com.aowen.predcompanion.core.network.SupabaseAuthService
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
 import com.aowen.predcompanion.core.network.model.NetworkUserProfile
 import com.aowen.predcompanion.core.network.model.NetworkUserState
-import io.github.jan.supabase.gotrue.SessionStatus
+import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -52,7 +52,7 @@ class SupabaseAuthRepository @Inject constructor(
         try {
             val sessionStatus = authService.awaitAuthService().first()
             when (sessionStatus) {
-                is SessionStatus.LoadingFromStorage -> _networkUserState.update { NetworkUserState.Loading }
+                is SessionStatus.Initializing -> _networkUserState.update { NetworkUserState.Loading }
                 is SessionStatus.Authenticated -> _networkUserState.update { NetworkUserState.Authenticated }
                 is SessionStatus.NotAuthenticated -> {
                     _networkUserState.update {

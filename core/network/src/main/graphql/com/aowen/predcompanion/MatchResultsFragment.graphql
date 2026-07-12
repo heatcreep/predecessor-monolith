@@ -1,0 +1,26 @@
+fragment MatchResultsFragment on PaginatedPlayerMatches {
+    results {
+        role
+        kills
+        deaths
+        assists
+        team
+        player {
+            id
+        }
+        heroData {
+            displayName
+            icon
+        }
+        rating {
+            newPoints
+            points
+        }
+        match {
+            id
+            winningTeam
+            gameMode
+            endTime
+        }
+    }
+}

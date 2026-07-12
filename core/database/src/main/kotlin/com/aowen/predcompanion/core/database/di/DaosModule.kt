@@ -2,6 +2,7 @@ package com.aowen.predcompanion.core.database.di
 
 import com.aowen.predcompanion.core.database.MonolithDatabase
 import com.aowen.predcompanion.core.database.dao.ClaimedPlayerDao
+import com.aowen.predcompanion.core.database.dao.CurrentUserDao
 import com.aowen.predcompanion.core.database.dao.FavoriteBuildDao
 import dagger.Module
 import dagger.Provides
@@ -20,4 +21,9 @@ object DaosModule {
     fun providesClaimedPlayerDao(
         database: MonolithDatabase
     ): ClaimedPlayerDao = database.claimedPlayerDao()
+
+    @Provides
+    fun providesCurrentUserDao(
+        database: MonolithDatabase
+    ): CurrentUserDao = database.currentUserDao()
 }

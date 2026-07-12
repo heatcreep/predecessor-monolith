@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.ui.cards.claimedplayer.preview.ClaimedPlayerCardPreviewProvider
 import com.aowen.predcompanion.core.ui.cards.claimedplayer.preview.ClaimedPlayerCardPreviewState

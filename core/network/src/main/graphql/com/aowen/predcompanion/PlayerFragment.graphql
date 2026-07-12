@@ -1,0 +1,17 @@
+fragment PlayerFragment on Player {
+    id
+    name
+    favRole
+    ratings {
+        ...PlayerRatingFragment
+    }
+    generalStatistic {
+       result {
+           matchesPlayed
+           matchesWon
+       }
+    }
+    favHero {
+        ...HeroFragment
+    }
+}

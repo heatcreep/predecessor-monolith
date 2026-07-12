@@ -8,8 +8,7 @@ import com.aowen.predcompanion.core.data.repository.user.UserRecentSearchReposit
 import com.aowen.predcompanion.core.testing.fakes.data.network.fakeNetworkExistingPlayerSearch
 import com.aowen.predcompanion.core.testing.fakes.data.network.fakeNetworkPlayer
 import com.aowen.predcompanion.core.testing.fakes.repository.FakeOmedaCityPlayerRepository
-import com.aowen.predcompanion.core.testing.fakes.repository.FakeUserRepository
-import com.aowen.predcompanion.core.testing.fakes.repository.UserScenario
+import com.aowen.predcompanion.core.testing.fakes.service.FakeSupabaseAuthService
 import com.aowen.predcompanion.core.testing.fakes.service.FakeSupabasePostgrestService
 import com.aowen.predcompanion.core.testing.fakes.service.RecentSearchStatus
 import kotlinx.coroutines.test.runTest
@@ -27,7 +26,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository()
+            authService = FakeSupabaseAuthService(resCode = 200)
         )
         val actual = userRecentSearchRepository.getRecentSearches()
         val expected  = listOf(fakeNetworkExistingPlayerSearch.create())
@@ -40,7 +39,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository(UserScenario.UserNotFound)
+            authService = FakeSupabaseAuthService()
         )
         val actual = userRecentSearchRepository.getRecentSearches()
         val expected  = emptyList<PlayerDetails>()
@@ -54,7 +53,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository()
+            authService = FakeSupabaseAuthService(resCode = 200)
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
         userRecentSearchRepository.removeAllRecentSearches()
@@ -67,7 +66,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository()
+            authService = FakeSupabaseAuthService(resCode = 200)
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
         userRecentSearchRepository.removeRecentSearch("addc8bb3-20ad-462a-a9f8-8b32bbf57514")
@@ -80,7 +79,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository(UserScenario.UserNotFound)
+            authService = FakeSupabaseAuthService()
         )
         userRecentSearchRepository.removeRecentSearch("addc8bb3-20ad-462a-a9f8-8b32bbf57514")
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
@@ -92,7 +91,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository()
+            authService = FakeSupabaseAuthService(resCode = 200)
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
         userRecentSearchRepository.addRecentSearch(fakeNetworkPlayer.asPlayerDetails())
@@ -105,7 +104,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository()
+            authService = FakeSupabaseAuthService(resCode = 200)
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
         userRecentSearchRepository.addRecentSearch(fakeNetworkPlayer.asPlayerDetails())
@@ -118,7 +117,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository()
+            authService = FakeSupabaseAuthService(resCode = 200)
         )
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)
         userRecentSearchRepository.addRecentSearch(fakeNetworkPlayer.asPlayerDetails())
@@ -131,7 +130,7 @@ class UserRecentSearchRepositoryTest {
         userRecentSearchRepository = NetworkUserRecentSearchRepository(
             postgrestService = fakeSupabasePostgrestService,
             omedaCityPlayerRepository = FakeOmedaCityPlayerRepository(),
-            userRepository = FakeUserRepository(UserScenario.UserNotFound)
+            authService = FakeSupabaseAuthService()
         )
         userRecentSearchRepository.addRecentSearch(fakeNetworkPlayer.asPlayerDetails())
         assertTrue(fakeSupabasePostgrestService.searchCount.value == 5)

@@ -1,3 +1,4 @@
+
 import com.android.build.api.variant.BuildConfigField
 import java.io.StringReader
 import java.util.Properties
@@ -20,6 +21,8 @@ dependencies {
     implementation(projects.feature.auth.api)
     implementation(projects.feature.search.api)
     implementation(projects.feature.profile.api)
+
+    implementation(libs.androidx.paging.compose)
 
     testImplementation(projects.core.testing)
 }

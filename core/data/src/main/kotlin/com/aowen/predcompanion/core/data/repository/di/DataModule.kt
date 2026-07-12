@@ -1,15 +1,19 @@
 package com.aowen.predcompanion.core.data.repository.di
 
+import com.aowen.predcompanion.core.data.repository.auth.AppAuthRepository
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
+import com.aowen.predcompanion.core.data.repository.auth.NewAuthRepository
+import com.aowen.predcompanion.core.data.repository.auth.PredGgAuthTokenProvider
 import com.aowen.predcompanion.core.data.repository.auth.SupabaseAuthRepository
 import com.aowen.predcompanion.core.data.repository.user.NetworkUserRecentSearchRepository
-import com.aowen.predcompanion.core.data.repository.user.NetworkUserRepository
+import com.aowen.predcompanion.core.data.repository.user.OfflineFirstUserRepository
 import com.aowen.predcompanion.core.data.repository.user.OfflineFirstUserClaimedPlayerRepository
 import com.aowen.predcompanion.core.data.repository.user.OfflineFirstUserFavoriteBuildsRepository
 import com.aowen.predcompanion.core.data.repository.user.UserClaimedPlayerRepository
 import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
 import com.aowen.predcompanion.core.data.repository.user.UserRecentSearchRepository
 import com.aowen.predcompanion.core.data.repository.user.UserRepository
+import com.aowen.predcompanion.core.network.AuthTokenProvider
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -21,6 +25,15 @@ import javax.inject.Singleton
 abstract class DataModule {
 
     @Binds
+    internal abstract fun bindAuthTokenProvider(tokenProvider: PredGgAuthTokenProvider): AuthTokenProvider
+
+    @Binds
+    @Singleton
+    internal abstract fun bindsNewAuthRepository(
+        authRepository: AppAuthRepository
+    ): NewAuthRepository
+
+    @Binds
     @Singleton
     internal abstract fun bindsAuthRepository(
         authRepository: SupabaseAuthRepository
@@ -29,7 +42,7 @@ abstract class DataModule {
     @Binds
     @Singleton
     internal abstract fun bindsUserRepository(
-        userRepository: NetworkUserRepository
+        userRepository: OfflineFirstUserRepository
     ): UserRepository
 
     @Binds

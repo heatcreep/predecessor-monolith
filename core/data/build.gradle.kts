@@ -9,19 +9,31 @@ android {
     namespace = "com.aowen.monolith.core.data"
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
+    }
+}
+
 dependencies {
-    api(project(":core:common"))
-    api(project(":core:database"))
-    api(project(":core:datastore"))
-    api(project(":core:network"))
-    api(project(":core:model"))
+    api(projects.core.common)
+    api(projects.core.database)
+    api(projects.core.datastore)
+    api(projects.core.model)
+    api(projects.core.network)
     api(projects.core.resources)
 
     implementation(libs.retrofit.core)
 
     // Supabase (for SessionStatus reference in AuthRepository)
     implementation(platform(libs.supabase.bom))
-    implementation(libs.supabase.gotrue)
+    implementation(libs.supabase.auth)
+
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
+    implementation("net.openid:appauth:0.11.1")
+
 
     testImplementation(projects.core.testing)
 }

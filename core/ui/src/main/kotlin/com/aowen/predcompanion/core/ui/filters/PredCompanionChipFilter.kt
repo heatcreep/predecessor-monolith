@@ -30,7 +30,7 @@ import com.aowen.predcompanion.core.ui.filters.preview.ChipFilterPreviewState
 fun PredCompanionChipFilter(
     modifier: Modifier = Modifier,
     text: String,
-    @DrawableRes iconRes: Int,
+    @DrawableRes iconRes: Int? = null,
     selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
@@ -47,13 +47,15 @@ fun PredCompanionChipFilter(
                 leadingIconColor = MaterialTheme.colorScheme.secondary,
                 selectedLeadingIconColor = MaterialTheme.colorScheme.primary,
             ),
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(iconRes),
-                    contentDescription = null,
-                    modifier = Modifier.size(FilterChipDefaults.IconSize),
-
+            leadingIcon = iconRes?.let {
+                {
+                    Icon(
+                        painter = painterResource(it),
+                        contentDescription = null,
+                        modifier = Modifier.size(FilterChipDefaults.IconSize),
                     )
+                }
+
             },
             label = {
                 Text(
@@ -100,7 +102,7 @@ fun RoleFilterLightPreview(
 )
 @Composable
 fun RoleFilterDarkPreview(
-    @PreviewParameter(ChipFilterPreviewProvider ::class) uiState: List<ChipFilterPreviewState>
+    @PreviewParameter(ChipFilterPreviewProvider::class) uiState: List<ChipFilterPreviewState>
 ) {
     MonolithTheme {
         LazyRow(
@@ -111,11 +113,11 @@ fun RoleFilterDarkPreview(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items(uiState) {
-                    PredCompanionChipFilter(
-                        text = it.text,
-                        selected = it.selected,
-                        iconRes = it.iconRes,
-                    )
+                PredCompanionChipFilter(
+                    text = it.text,
+                    selected = it.selected,
+                    iconRes = it.iconRes,
+                )
             }
         }
     }

@@ -54,7 +54,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.data.model.getLevelingAbilities
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.HeroRole
@@ -84,8 +84,8 @@ fun BuildDetailsScreen(
         skipPartiallyExpanded = true
     )
 
-    fun openItemDetailsBottomSheet(itemId: Int) {
-        onItemClicked(itemId)
+    fun openItemDetailsBottomSheet(itemId: String) {
+        onItemClicked(itemId.toInt())
         openBottomSheet = true
     }
 

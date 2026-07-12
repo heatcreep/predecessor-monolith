@@ -16,16 +16,16 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
+import com.aowen.predcompanion.core.data.repository.user.UserRepository
 import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.predcompanion.core.datastore.ThemePreferences
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.network.model.NetworkUserState
 import com.aowen.predcompanion.feature.auth.api.navigation.AuthNavKey
 import com.aowen.predcompanion.feature.auth.impl.navigation.loginEntry
 import com.aowen.predcompanion.ui.MonolithApp
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.handleDeeplinks
+import io.github.jan.supabase.auth.handleDeeplinks
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,6 +37,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var authRepository: AuthRepository
+
+    @Inject
+    lateinit var userRepository: UserRepository
 
     @Inject
     lateinit var themePreferences: ThemePreferences
@@ -52,33 +55,27 @@ class MainActivity : ComponentActivity() {
                         authRepository.handleSuccessfulLoginFromDiscord()
                     }
                 }
+            },
+            onError = { error ->
+                // Handle error
+                logDebug(error.toString())
             }
         )
 
         lifecycleScope.launch {
-            runCatching { authRepository.getCurrentSessionStatus() }
+            // Sync user data after session status is checked
+            userRepository.sync()
         }
 
         setContent {
             val localTheme by themePreferences.theme.collectAsStateWithLifecycle(initialValue = Theme.SYSTEM)
-            val userState by authRepository.networkUserState.collectAsStateWithLifecycle()
 
             MonolithTheme(localTheme = localTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    when (val state = userState) {
-                        is NetworkUserState.Authenticated -> MonolithApp()
-                        is NetworkUserState.Unauthenticated -> {
-                            if (state.hasSkippedOnboarding) {
-                                MonolithApp()
-                            } else {
-                                UnauthenticatedRoot()
-                            }
-                        }
-                        is NetworkUserState.Loading -> Unit // splash
-                    }
+                   MonolithApp()
                 }
             }
         }

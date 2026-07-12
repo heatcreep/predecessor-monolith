@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.ui.components.ItemEffectRow
 import com.aowen.predcompanion.ui.components.ItemStatRow

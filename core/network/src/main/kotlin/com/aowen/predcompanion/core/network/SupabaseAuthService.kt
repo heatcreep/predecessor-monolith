@@ -1,14 +1,14 @@
 package com.aowen.predcompanion.core.network
 
 import com.aowen.predcompanion.core.common.di.SupabaseApiKey
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.providers.Discord
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.auth.user.UserInfo
+import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.functions.Functions
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.SessionStatus
-import io.github.jan.supabase.gotrue.providers.Discord
-import io.github.jan.supabase.gotrue.user.UserInfo
-import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders

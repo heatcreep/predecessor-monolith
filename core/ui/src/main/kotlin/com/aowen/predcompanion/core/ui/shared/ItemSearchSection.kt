@@ -20,14 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 import com.aowen.predcompanion.ui.theme.BadgeBlueGreen
 import com.aowen.predcompanion.ui.theme.BadgePurple
 import com.aowen.predcompanion.ui.theme.NeroBlack
 import com.aowen.predcompanion.ui.theme.WarmWhite
-import kotlin.collections.isNotEmpty
 
 @Composable
 fun ItemSearchSection(
@@ -165,7 +164,7 @@ fun ItemResultCard(
                         // Aggression Type (e.g. Scaling, Mobility, etc.)
                         itemDetails.aggressionType?.let { aggressionType ->
                             Text(
-                                text = aggressionType,
+                                text = aggressionType.value,
                                 modifier = Modifier
                                     .background(
                                         MaterialTheme.colorScheme.secondary,

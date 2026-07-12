@@ -169,8 +169,8 @@ class RetrofitOmedaCityNetwork @Inject constructor(
     override suspend fun getAllHeroStatistics(timeFrame: String?): Response<NetworkHeroStatisticsResponse> =
         networkApi.getAllHeroStatistics(timeFrame)
 
-    override suspend fun getHeroStatisticsById(heroIds: String): Response<NetworkHeroStatisticsResponse> =
-        networkApi.getHeroStatisticsById(heroIds)
+    override suspend fun getHeroStatisticsById(heroId: String): Response<NetworkHeroStatisticsResponse> =
+        networkApi.getHeroStatisticsById("[$heroId]")
 
     override suspend fun getAllItems(): Response<List<NetworkItem>> =
         networkApi.getAllItems()

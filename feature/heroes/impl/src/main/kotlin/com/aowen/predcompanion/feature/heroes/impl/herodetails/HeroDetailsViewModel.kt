@@ -80,7 +80,7 @@ class HeroDetailsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             _console.emit(userPreferencesDataStore.console.first())
             val statistics =
-                async { omedaCityHeroRepository.fetchHeroStatisticsById("${listOf(heroId)}") }
+                async { omedaCityHeroRepository.fetchHeroStatisticsById(heroId) }
             val heroBuildsDeferred = async {
                 omedaCityBuildRepository.fetchAllBuilds(
                     heroId = heroId.toLong(),

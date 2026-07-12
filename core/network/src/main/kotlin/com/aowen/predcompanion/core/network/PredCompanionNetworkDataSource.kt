@@ -45,7 +45,7 @@ interface PredCompanionNetworkDataSource {
 
     suspend fun getAllHeroStatistics(timeFrame: String?): Response<NetworkHeroStatisticsResponse>
 
-    suspend fun getHeroStatisticsById(heroIds: String): Response<NetworkHeroStatisticsResponse>
+    suspend fun getHeroStatisticsById(heroId: String): Response<NetworkHeroStatisticsResponse>
 
     suspend fun getAllItems(): Response<List<NetworkItem>>
 

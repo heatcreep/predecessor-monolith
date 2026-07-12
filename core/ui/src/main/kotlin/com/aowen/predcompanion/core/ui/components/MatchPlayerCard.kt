@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.feature.home.impl.matches
+package com.aowen.predcompanion.core.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,15 +24,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.aowen.predcompanion.core.ui.common.PlayerIcon
+import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.ui.theme.DarkGreenHighlight35
 import com.aowen.predcompanion.ui.theme.GreenHighlight
 import com.aowen.predcompanion.ui.theme.RedHighlight
-import com.aowen.predcompanion.core.ui.common.PlayerIcon
-import com.aowen.predcompanion.core.ui.components.KDAText
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchListItemUiModel
 
 @Composable
 fun MatchPlayerCard(
@@ -89,12 +89,12 @@ fun MatchPlayerCard(
                         )
                     }
                     Spacer(modifier = Modifier.size(4.dp))
-                    matchListItem.matchTypeText?.let { typeText ->
+                    matchListItem.gameModeStringRes?.let { gameMode ->
                         Text(
                             style = MaterialTheme.typography.bodySmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.tertiary,
-                            text = typeText
+                            text = stringResource(id = gameMode)
                         )
                         if (matchListItem.isRanked) {
                             Text(
@@ -138,20 +138,12 @@ fun MatchPlayerCard(
                             }
                         }
                         Spacer(modifier = Modifier.size(8.dp))
-                        Column {
-                            Text(
-                                text = matchListItem.heroName,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                            Text(
-                                text = "${matchListItem.performanceScore} PS",
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
+                        Text(
+                            text = matchListItem.heroName,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+
                     }
                 }
             }

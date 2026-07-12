@@ -12,4 +12,6 @@ dependencies {
     implementation(projects.core.model)
     api(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
+
+    implementation("net.openid:appauth:0.11.1")
 }

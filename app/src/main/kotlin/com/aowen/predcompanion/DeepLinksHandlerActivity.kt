@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.handleDeeplinks
+import io.github.jan.supabase.auth.handleDeeplinks
 import javax.inject.Inject
 
 @AndroidEntryPoint

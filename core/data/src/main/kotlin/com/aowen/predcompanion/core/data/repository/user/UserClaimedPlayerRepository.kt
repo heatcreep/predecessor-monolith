@@ -7,6 +7,7 @@ import com.aowen.predcompanion.core.database.model.ClaimedPlayerEntity
 import com.aowen.predcompanion.core.datastore.UserPreferencesManager
 import com.aowen.predcompanion.core.model.data.ClaimedPlayer
 import com.aowen.predcompanion.core.model.data.PlayerInfo
+import com.aowen.predcompanion.core.network.SupabaseAuthService
 import com.aowen.predcompanion.core.network.SupabasePostgrestService
 import com.aowen.predcompanion.core.network.getOrThrow
 import com.aowen.predcompanion.core.network.model.NetworkUserState
@@ -43,6 +44,7 @@ interface UserClaimedPlayerRepository {
 class OfflineFirstUserClaimedPlayerRepository @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
+    private val authService: SupabaseAuthService,
     private val userPreferencesManager: UserPreferencesManager,
     private val postgrestService: SupabasePostgrestService,
     private val claimedPlayerDao: ClaimedPlayerDao,
@@ -63,7 +65,8 @@ class OfflineFirstUserClaimedPlayerRepository @Inject constructor(
         _claimedPlayerState.update { ClaimedPlayerState.Loading }
         val playerId = when (authRepository.networkUserState.value) {
             is NetworkUserState.Authenticated -> {
-                userRepository.getUser()?.playerId
+                userRepository.sync()
+                ""
             }
 
             is NetworkUserState.Unauthenticated -> {
@@ -104,7 +107,7 @@ class OfflineFirstUserClaimedPlayerRepository @Inject constructor(
         when (authRepository.networkUserState.value) {
             is NetworkUserState.Authenticated -> {
                 try {
-                    val userId = userRepository.getUser()?.id.toString()
+                    val userId = authService.currentSession()?.user?.id ?: return
                     playerDetails?.playerId?.let {
                         postgrestService.savePlayer(if (isRemoving) "" else it, userId)
                     }

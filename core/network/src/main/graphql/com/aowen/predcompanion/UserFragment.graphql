@@ -1,0 +1,7 @@
+fragment UserFragment on User {
+    id
+    name
+    players {
+        ...PlayerFragment
+    }
+}

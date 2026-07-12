@@ -13,6 +13,7 @@ class HiltConventionPlugin : Plugin<Project> {
 
             dependencies {
                 "ksp"(libs.findLibrary("hilt.compiler").get())
+                "ksp"(libs.findLibrary("kotlin.metadata.jvm").get())
             }
 
             // Add support for Jvm Module, base on org.jetbrains.kotlin.jvm

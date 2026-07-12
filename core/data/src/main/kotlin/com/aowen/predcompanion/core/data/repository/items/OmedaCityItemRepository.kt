@@ -3,8 +3,9 @@ package com.aowen.predcompanion.core.data.repository.items
 import com.aowen.predcompanion.core.data.model.asItemDetails
 import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.network.PredCompanionNetworkDataSource
+import com.aowen.predcompanion.core.network.PredGGNetworkDataSource
 import com.aowen.predcompanion.core.network.Resource
-import com.aowen.predcompanion.core.network.safeApiCall
+import com.aowen.predcompanion.core.network.safeGraphQlCall
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -13,20 +14,24 @@ import javax.inject.Singleton
 
 @Singleton
 class OmedaCityItemRepository @Inject constructor(
-    private val networkDataSource: PredCompanionNetworkDataSource
+    private val networkDataSource: PredCompanionNetworkDataSource,
+    private val predGGNetwork: PredGGNetworkDataSource,
 ) : ItemRepository {
 
     private val _allItems: MutableStateFlow<Map<Int, ItemDetails>> = MutableStateFlow(emptyMap())
     override val allItems: StateFlow<Map<Int, ItemDetails>> = _allItems
 
     override suspend fun fetchAllItems() {
-        if (_allItems.value.isNotEmpty()) return
-        val result = safeApiCall(
-            apiCall = networkDataSource::getAllItems,
-            transform = { items -> items.map { it.asItemDetails() } }
+        val result = safeGraphQlCall(
+            apiCall = predGGNetwork::getAllItems,
+            transform = { data -> data.items.mapNotNull { it.itemFragment.data?.asItemDetails() } }
         )
         if (result is Resource.Success) {
-            _allItems.update { result.data.associateBy { it.id } }
+            _allItems.update {
+                result.data
+                    .filter { it.id.isNotBlank() }
+                    .associateBy { it.id.toInt() }
+            }
         }
     }
 

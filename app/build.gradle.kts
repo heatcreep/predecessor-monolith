@@ -25,7 +25,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.aowen.predcompanion"
+        buildConfigField("String", "AUTH_BASE_URL", "${getEnvironmentVariable("AUTH_BASE_URL")}")
         buildConfigField("String", "SUPABASE_URL", "${getEnvironmentVariable("SUPABASE_URL")}")
         buildConfigField("String", "SUPABASE_API_KEY", "${getEnvironmentVariable("SUPABASE_KEY")}   ")
     }
@@ -136,7 +137,11 @@ dependencies {
 
     // Supabase (deep link handling)
     implementation(platform(libs.supabase.bom))
-    implementation(libs.supabase.gotrue)
+    implementation(libs.supabase.auth)
+
+    // Image Loading
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // WorkManager
     implementation(libs.androidx.work)

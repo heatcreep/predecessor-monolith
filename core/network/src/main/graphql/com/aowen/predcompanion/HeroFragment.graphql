@@ -1,0 +1,34 @@
+fragment HeroFragment on Hero {
+    id
+    name
+    data {
+        displayName
+        defaultSkin {
+            portrait
+            smallPortrait
+        }
+        icon
+        classes
+        roles
+        mainAttributes {
+            abilityPower
+            attackPower
+            durability
+            mobility
+        }
+        abilities {
+            key
+            displayName
+            icon
+            gameDescription
+            menuDescription
+            cooldown
+            cost
+        }
+        attributes {
+            stat
+            values
+        }
+    }
+
+}

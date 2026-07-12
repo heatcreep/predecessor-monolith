@@ -1,9 +1,9 @@
 package com.aowen.predcompanion.core.testing.fakes.service
 
 import com.aowen.predcompanion.core.network.SupabaseAuthService
-import io.github.jan.supabase.gotrue.SessionStatus
-import io.github.jan.supabase.gotrue.user.UserInfo
-import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.auth.user.UserInfo
+import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Instant
@@ -32,7 +32,7 @@ class FakeSupabaseAuthService(
             expiresIn = 3000,
             tokenType = "fakeTokenType",
             user = UserInfo(
-                id = "fakeId",
+                id = "addc8bb3-20ad-462a-a9f8-8b32bbf57511",
                 appMetadata = JsonObject(
                     mapOf(
                         "provider" to JsonPrimitive("fakeProvider"),
