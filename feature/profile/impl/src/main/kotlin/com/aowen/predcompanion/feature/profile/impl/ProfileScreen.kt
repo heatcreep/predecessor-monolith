@@ -70,7 +70,7 @@ import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.feature.profile.impl.ui.ConsoleDropdownMenu
 import com.aowen.predcompanion.feature.profile.impl.ui.PlayerProfileCard
 import com.aowen.predcompanion.feature.profile.impl.ui.ThemeDropdownMenu
-import com.aowen.predcompanion.feature.profile.impl.ui.toPlayerProfileCardUiModel
+import com.aowen.predcompanion.core.ui.model.toPlayerProfileCardUiModel
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar

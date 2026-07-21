@@ -37,32 +37,10 @@ import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePreviewHandler
 import coil3.compose.LocalAsyncImagePreviewHandler
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.Player
 import com.aowen.predcompanion.core.ui.common.PlayerIcon
+import com.aowen.predcompanion.core.ui.model.PlayerProfileCardUiModel
 import com.aowen.predcompanion.feature.profile.impl.R
 import com.aowen.predcompanion.core.resources.R as coreResources
-
-data class PlayerProfileCardUiModel(
-    val rankIconUrl: String,
-    val playerName: String,
-    val rankPoints: String,
-    val rankTitle: String,
-    val winPercentage: String,
-    val region: String,
-    val favoriteHeroIconUrl: String,
-)
-
-fun Player.toPlayerProfileCardUiModel(): PlayerProfileCardUiModel {
-    return PlayerProfileCardUiModel(
-        playerName = name,
-        rankIconUrl = rankIconUrl,
-        rankPoints = currentRankPoints,
-        rankTitle = currentRankTitle,
-        winPercentage = winRate,
-        region = "NA",
-        favoriteHeroIconUrl = favoriteHero?.imageUrl ?: "",
-    )
-}
 
 @Composable
 fun PlayerProfileCard(
