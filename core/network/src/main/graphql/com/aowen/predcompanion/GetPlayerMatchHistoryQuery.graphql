@@ -1,0 +1,10 @@
+query GetPlayerMatchHistoryQuery(
+    $playerKey: PlayerKey!,
+    $limit: Int!,
+    $offset: Int!,
+    $filter: PlayerMatchesFilterInput
+) {
+    player(by: $playerKey) {
+        ...MatchesPaginatedFragment
+    }
+}

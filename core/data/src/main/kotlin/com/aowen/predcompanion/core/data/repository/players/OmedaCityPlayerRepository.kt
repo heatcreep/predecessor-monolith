@@ -1,10 +1,13 @@
 package com.aowen.predcompanion.core.data.repository.players
 
+import com.aowen.predcompanion.core.data.model.asPlayer
 import com.aowen.predcompanion.core.data.model.asPlayerDetails
 import com.aowen.predcompanion.core.data.model.asPlayerHeroStats
 import com.aowen.predcompanion.core.data.model.asPlayerStats
+import com.aowen.predcompanion.core.model.data.Player
 import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.network.Resource
+import com.aowen.predcompanion.core.network.apollo.ApolloKotlinPredGGNetwork
 import com.aowen.predcompanion.core.network.model.NetworkPlayer
 import com.aowen.predcompanion.core.network.model.NetworkPlayerStats
 import com.aowen.predcompanion.core.network.retrofit.RetrofitOmedaCityNetwork
@@ -13,7 +16,9 @@ import com.aowen.predcompanion.core.network.safeApiCallsConcurrent
 import com.aowen.predcompanion.data.PlayerHeroStats
 import javax.inject.Inject
 
-class OmedaCityPlayerRepository @Inject constructor(private val retrofitOmedaCityNetwork: RetrofitOmedaCityNetwork) :
+class OmedaCityPlayerRepository @Inject constructor(
+    private val predGGNetwork: ApolloKotlinPredGGNetwork,
+    private val retrofitOmedaCityNetwork: RetrofitOmedaCityNetwork) :
     PlayerRepository {
     override suspend fun fetchPlayersByName(playerName: String): Resource<List<PlayerInfo.PlayerDetails>> =
         safeApiCall(
@@ -35,6 +40,10 @@ class OmedaCityPlayerRepository @Inject constructor(private val retrofitOmedaCit
                 PlayerInfo(playerDetails, playerStats)
             }
         )
+
+    override suspend fun fetchPlayerById(playerId: String): Player? {
+        return predGGNetwork.getPlayer(playerId).data?.player?.playerFragment?.asPlayer()
+    }
 
 
     override suspend fun fetchAllPlayerHeroStats(playerId: String): Resource<List<PlayerHeroStats>> =

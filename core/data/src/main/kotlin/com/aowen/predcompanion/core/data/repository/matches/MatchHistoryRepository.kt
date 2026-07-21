@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.aowen.predcompanion.core.data.model.MatchHistoryPagingSource
+import com.aowen.predcompanion.core.data.model.MatchHistoryTarget
 import com.aowen.predcompanion.core.model.data.MatchHistoryItem
 import com.apollographql.apollo.ApolloClient
 import kotlinx.coroutines.flow.Flow
@@ -19,11 +20,16 @@ class MatchHistoryRepository @Inject constructor(
 
     private var currentSource: MatchHistoryPagingSource? = null
 
-    fun getMatchHistory(): Flow<PagingData<MatchHistoryItem>> =
+    fun getMatchHistoryFor(
+        matchHistoryTarget: MatchHistoryTarget
+    ): Flow<PagingData<MatchHistoryItem>> =
         Pager(
             config = PagingConfig(pageSize = PAGE_SIZE),
             pagingSourceFactory = {
-                MatchHistoryPagingSource(apolloClient).also { currentSource = it }
+                MatchHistoryPagingSource(
+                    client = apolloClient,
+                    target = matchHistoryTarget
+                ).also { currentSource = it }
             }
         ).flow
 

@@ -50,4 +50,4 @@ captures/
 
 # Signing keys — NEVER commit
 *.jks
-*.keystore
+*.keystore.superpowers/

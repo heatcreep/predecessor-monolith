@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.aowen.predcompanion.core.data.model.MatchHistoryTarget
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.data.repository.auth.NewAuthRepository
 import com.aowen.predcompanion.core.data.repository.matches.MatchHistoryRepository
@@ -95,7 +96,9 @@ class ProfileViewModel @Inject constructor(
         userRepository.currentUserState
             .flatMapLatest { userState ->
                 when (userState) {
-                    is UserState.SignedIn -> matchHistoryRepository.getMatchHistory().map { pagingData ->
+                    is UserState.SignedIn -> matchHistoryRepository.getMatchHistoryFor(
+                        MatchHistoryTarget.CurrentUser
+                    ).map { pagingData ->
                         pagingData.map {
                             matchListItemUiMapper.buildFrom(it)
                         }

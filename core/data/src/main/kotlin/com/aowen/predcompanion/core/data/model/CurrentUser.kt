@@ -37,12 +37,7 @@ fun UserFragment.asCurrentUser(): CurrentUser {
         id = this.id,
         name = this.name,
         players = this.players.map {
-            Player(
-                id = it.playerFragment.id,
-                name = it.playerFragment.name ?: "",
-                favoriteRole = it.playerFragment.favRole?.toFavoriteRole() ?: "",
-                favoriteHero = it.playerFragment.favHero?.heroFragment?.asHeroDetails(),
-            )
+            it.playerFragment.asPlayer()
         },
     )
 }

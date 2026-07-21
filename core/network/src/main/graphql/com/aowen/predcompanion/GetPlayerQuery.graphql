@@ -1,0 +1,5 @@
+query GetPlayerQuery($playerKey: PlayerKey!) {
+    player(by: $playerKey) {
+        ...PlayerFragment
+    }
+}

@@ -5,14 +5,7 @@ query CurrentUserMatchHistoryQuery(
 ) {
     currentUser {
         players {
-            matchesPaginated(
-                limit: $limit,
-                offset: $offset,
-                filter: $filter
-            ) {
-                totalCount
-                ...MatchResultsFragment
-            }
+            ...MatchesPaginatedFragment
         }
     }
 }

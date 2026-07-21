@@ -1,0 +1,10 @@
+fragment MatchesPaginatedFragment on Player {
+    matchesPaginated(
+        limit: $limit,
+        offset: $offset,
+        filter: $filter
+    ) {
+        totalCount
+        ...MatchResultsFragment
+    }
+}

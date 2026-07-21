@@ -1,8 +1,10 @@
 package com.aowen.predcompanion.core.network.apollo
 
 import com.aowen.predcompanion.core.network.PredGGNetworkDataSource
+import com.aowen.predcompanion.core.network.apollo.type.PlayerKey
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.ApolloResponse
+import com.apollographql.apollo.api.Optional
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,8 +14,12 @@ class ApolloKotlinPredGGNetwork @Inject constructor(
 ) : PredGGNetworkDataSource {
 
     // USER -->
-    override suspend fun getUser(): ApolloResponse<AuthedUserQuery.Data> =
+    override suspend fun getCurrentUser(): ApolloResponse<AuthedUserQuery.Data> =
         apolloClient.query(AuthedUserQuery()).execute()
+
+    // PLAYER -->
+    override suspend fun getPlayer(playerId: String): ApolloResponse<GetPlayerQuery.Data> =
+        apolloClient.query(GetPlayerQuery(PlayerKey(uuid = Optional.present(playerId)))).execute()
 
     // ITEMS
     override suspend fun getAllItems(): ApolloResponse<ItemsQuery.Data> =
