@@ -18,5 +18,7 @@
     <string name="core_resources_match_type_aram">ARAM</string>
     <string name="core_resources_match_type_daybreak">Daybreak</string>
     <string name="core_resources_match_type_practice">Practice</string>
+    <string name="core_resources_player_profile_win_percentage">Winrate: %1$s</string>
+    <string name="core_resources_player_profile_region">Region: %1$s</string>
 
 </resources>

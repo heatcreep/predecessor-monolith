@@ -106,7 +106,7 @@ fun PlayerProfileCard(
                 ) {
                     Text(
                         text = stringResource(
-                            R.string.feature_profile_impl_region,
+                            coreResources.string.core_resources_player_profile_region,
                             playerProfileCardUiModel.region
                         ),
                         style = MaterialTheme.typography.labelSmall,
@@ -118,7 +118,7 @@ fun PlayerProfileCard(
                     )
                     Text(
                         text = stringResource(
-                            R.string.feature_profile_impl_win_percentage,
+                            coreResources.string.core_resources_player_profile_win_percentage,
                             playerProfileCardUiModel.winPercentage
                         ),
                         style = MaterialTheme.typography.labelSmall,
