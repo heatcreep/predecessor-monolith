@@ -2,6 +2,14 @@ package com.aowen.predcompanion.core.model.data
 
 import androidx.annotation.StringRes
 
+sealed class InventoryItem {
+    abstract val imageSrc: String
+
+    data class Crest(override val imageSrc: String) : InventoryItem()
+    data class Trinket(override val imageSrc: String) : InventoryItem()
+    data class Passive(override val imageSrc: String) : InventoryItem()
+}
+
 data class MatchHistoryItem(
     val matchId: String,
     val playerId: String,
@@ -9,6 +17,13 @@ data class MatchHistoryItem(
     @param:StringRes val gameModeStringRes: Int,
     val isRanked: Boolean,
     val vpChange: String,
+    val augmentImageSrc: String?,
+    val eternalImageSrc: String?,
+    val crest: InventoryItem.Crest?,
+    val trinket: InventoryItem.Trinket?,
+    val items: List<InventoryItem.Passive?>,
+    val matchDurationInMinutes: Int,
+    val minionsKilled: Int,
     val timeSinceMatch: String,
     val heroImageSrc: String,
     val heroName: String,
@@ -17,4 +32,6 @@ data class MatchHistoryItem(
     val deaths: Int,
     val assists: Int,
     val kdaText: String
-)
+) {
+    val csPerMin = minionsKilled.toFloat() / matchDurationInMinutes.toFloat()
+}

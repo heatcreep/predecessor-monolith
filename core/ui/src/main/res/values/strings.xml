@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="core_ui_all_roles">All Roles</string>
+    <string name="core_ui_game_mode_aram">ARAM</string>
+    <string name="core_ui_minions_killed">%1$d CS</string>
+    <string name="core_ui_cs_per_min">%1$s CS/min</string>
+    <string name="core_ui_vp_change">(%1$s VP)</string>
 </resources>

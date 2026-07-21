@@ -1,10 +1,13 @@
 package com.aowen.predcompanion.core.data.model
 
 import com.aowen.predcompanion.core.data.helpers.ImageHelpers
+import com.aowen.predcompanion.core.model.data.InventoryItem
 import com.aowen.predcompanion.core.model.data.MatchHistoryItem
 import com.aowen.predcompanion.core.network.apollo.fragment.MatchResultsFragment
 import com.aowen.predcompanion.core.network.apollo.type.GameMode
+import com.aowen.predcompanion.core.network.apollo.type.PerkSlot
 import com.aowen.predcompanion.core.network.apollo.type.Role
+import com.aowen.predcompanion.core.network.apollo.type.SlotType
 import com.aowen.predcompanion.core.resources.R
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -19,9 +22,38 @@ fun MatchResultsFragment.Result.asMatchHistoryItem(): MatchHistoryItem {
     val vpChange =
         this.rating?.newPoints?.let { newPoints ->
             this.rating?.points?.let { points ->
-                newPoints - points
+                val diff = (newPoints - points).toInt()
+                if (diff >= 0) "+$diff" else "$diff"
             }
-        }?.toString() ?: "-"
+        } ?: "-"
+    val augmentImageSrc =
+        this.perkData?.firstOrNull { it?.slot == PerkSlot.HERO_SPECIFIC_1 }?.icon?.let {
+            ImageHelpers.buildAssetsUrl(it)
+        }
+    val eternalImageSrc = this.perkData?.firstOrNull { it?.slot == PerkSlot.ETERNAL_1 }?.icon?.let {
+        ImageHelpers.buildAssetsUrl(it)
+    }
+    val crest =
+        this.inventoryItemDataFragment.inventoryItemData?.firstOrNull { it?.item?.data?.slotType == SlotType.CREST }
+            ?.let {
+                InventoryItem.Crest(ImageHelpers.buildAssetsUrl(it.item.data?.icon ?: ""))
+            }
+    val trinket =
+        this.inventoryItemDataFragment.inventoryItemData?.firstOrNull { it?.item?.data?.slotType == SlotType.TRINKET }
+            ?.let {
+                InventoryItem.Trinket(ImageHelpers.buildAssetsUrl(it.item.data?.icon ?: ""))
+            }
+    val items =
+        List(6) { index ->
+            this.inventoryItemDataFragment.inventoryItemData?.filter { it?.item?.data?.slotType == SlotType.PASSIVE }
+                ?.getOrNull(index)?.let {
+                    InventoryItem.Passive(
+                        ImageHelpers.buildAssetsUrl(
+                            it.item.data?.icon ?: ""
+                        )
+                    )
+                }
+        }
 
     return MatchHistoryItem(
         matchId = this.match.id,
@@ -30,6 +62,13 @@ fun MatchResultsFragment.Result.asMatchHistoryItem(): MatchHistoryItem {
         gameModeStringRes = getGameModeStringRes(this.match.gameMode),
         isRanked = isRanked,
         vpChange = vpChange,
+        augmentImageSrc = augmentImageSrc,
+        eternalImageSrc = eternalImageSrc,
+        crest = crest,
+        trinket = trinket,
+        items = items,
+        matchDurationInMinutes = minutesBetween(this.match.startTime, this.match.endTime),
+        minionsKilled = this.minionsKilled,
         timeSinceMatch = handleTimeSinceMatch(this.match.endTime),
         heroImageSrc = this.heroData?.icon?.let { ImageHelpers.buildAssetsUrl(it) } ?: "",
         heroName = this.heroData?.displayName ?: "",
@@ -68,7 +107,12 @@ private fun MatchResultsFragment.Result.getKda(): String {
     return if (kda.isNaN()) 0.0.toString() else kda.toDecimal("#.##")
 }
 
-fun handleTimeSinceMatch(endTime: Instant): String {
+private fun minutesBetween(start: Instant, end: Instant): Int {
+    val duration = end - start
+    return duration.inWholeMinutes.toInt()
+}
+
+private fun handleTimeSinceMatch(endTime: Instant): String {
 
     val tz = TimeZone.currentSystemDefault()
 

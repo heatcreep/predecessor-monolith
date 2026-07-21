@@ -5,8 +5,14 @@ fragment MatchResultsFragment on PaginatedPlayerMatches {
         deaths
         assists
         team
+        minionsKilled
         player {
             id
+        }
+        ...InventoryItemDataFragment
+        perkData {
+            slot
+            icon
         }
         heroData {
             displayName
@@ -21,6 +27,7 @@ fragment MatchResultsFragment on PaginatedPlayerMatches {
             winningTeam
             gameMode
             endTime
+            startTime
         }
     }
 }

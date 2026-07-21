@@ -1,0 +1,11 @@
+fragment InventoryItemDataFragment on MatchPlayer {
+    inventoryItemData {
+        item {
+            data {
+                slotType
+                displayName
+                icon
+            }
+        }
+    }
+}

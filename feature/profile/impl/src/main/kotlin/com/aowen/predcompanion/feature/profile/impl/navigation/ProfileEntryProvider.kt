@@ -3,7 +3,6 @@ package com.aowen.predcompanion.feature.profile.impl.navigation
 import androidx.compose.material3.SnackbarDuration
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.aowen.predcompanion.feature.auth.api.navigation.navigateToAuth
 import com.aowen.predcompanion.feature.profile.api.navigation.ProfileNavKey
 import com.aowen.predcompanion.feature.profile.impl.ProfileScreenRoute
 import com.aowen.predcompanion.feature.search.api.navigation.navigateToSearch
@@ -16,7 +15,6 @@ fun EntryProviderScope<NavKey>.profileEntry(
     entry<ProfileNavKey> {
         ProfileScreenRoute(
             navigateToSearch = navigator::navigateToSearch,
-            navigateToLoginFromLogout = navigator::navigateToAuth,
             showSnackbar = showSnackbar
         )
     }

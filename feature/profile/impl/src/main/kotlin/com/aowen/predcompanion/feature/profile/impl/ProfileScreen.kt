@@ -1,7 +1,6 @@
 package com.aowen.predcompanion.feature.profile.impl
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -53,7 +53,6 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,9 +73,7 @@ import com.aowen.predcompanion.feature.profile.impl.ui.ThemeDropdownMenu
 import com.aowen.predcompanion.feature.profile.impl.ui.toPlayerProfileCardUiModel
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
-import com.aowen.predcompanion.ui.components.MonolithAlertDialog
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
-import com.aowen.predcompanion.ui.theme.DiscordBlurple
 import com.aowen.predcompanion.ui.theme.WarmWhite
 import com.aowen.predcompanion.ui.theme.YellowHighlight
 import kotlinx.coroutines.flow.flowOf
@@ -192,7 +189,6 @@ fun SettingsBottomSheet(
 @Composable
 fun ProfileScreenRoute(
     showSnackbar: (String, SnackbarDuration) -> Unit,
-    navigateToLoginFromLogout: () -> Unit,
     navigateToSearch: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -277,11 +273,7 @@ fun ProfileScreenRoute(
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp),
             submitLogin = startAuth,
-            handleSaveConsole = viewModel::saveConsole,
-            handleSaveTheme = viewModel::saveTheme,
-            handleRetry = {},
-            onLogout = viewModel::handleLogout,
-            onDelete = viewModel::deleteUserAccount,
+            handleRetry = {}
         )
     }
 
@@ -294,34 +286,15 @@ fun ProfileScreen(
     matches: LazyPagingItems<MatchListItemUiModel>,
     modifier: Modifier = Modifier,
     submitLogin: () -> Unit,
-    handleSaveConsole: (Console) -> Unit,
-    handleSaveTheme: (ThemeDataStore) -> Unit,
     handleRetry: () -> Unit,
-    onLogout: () -> Unit,
-    onDelete: () -> Unit,
 ) {
 
-
-    var deleteModalOpen by remember { mutableStateOf(false) }
     val tabList = listOf(
         R.string.feature_profile_impl_nav_matches,
         R.string.feature_profile_impl_nav_heroes,
         R.string.feature_profile_impl_nav_friends_enemies
     )
-    var selectedTab by rememberSaveable { mutableStateOf(0) }
-
-    if (deleteModalOpen) {
-        MonolithAlertDialog(
-            bodyText = "Are you sure you want to delete your account? This action is irreversible.",
-            confirmText = "Delete",
-            cancelText = "Cancel",
-            onConfirm = {
-                onDelete()
-                deleteModalOpen = false
-            },
-            onDismissRequest = { deleteModalOpen = false },
-        )
-    }
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
     Surface(
         modifier = modifier,
@@ -440,36 +413,6 @@ fun ProfileScreen(
     }
 }
 
-@Composable
-fun ProfileCard(
-    userInfo: CurrentUser
-) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(DiscordBlurple)
-                .padding(24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = "Signed in",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = WarmWhite,
-                )
-                Text(
-                    text = userInfo.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = WarmWhite,
-                )
-            }
-        }
-    }
-}
-
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
@@ -492,11 +435,7 @@ fun ProfileCardPreview() {
             ),
             matches = fakeMatches,
             submitLogin = {},
-            handleSaveConsole = {},
-            handleSaveTheme = {},
-            handleRetry = { /*TODO*/ },
-            onLogout = { /*TODO*/ },
-            onDelete = { /*TODO*/ }
+            handleRetry = { /*TODO*/ }
         )
     }
 }

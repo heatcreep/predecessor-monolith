@@ -1,15 +1,20 @@
 package com.aowen.predcompanion.core.ui.model.mapper
 
+import android.content.Context
 import com.aowen.predcompanion.core.data.model.getKda
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.MatchDetails
 import com.aowen.predcompanion.core.model.data.MatchHistoryItem
+import com.aowen.predcompanion.core.ui.R
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.ui.utils.handleTimeSinceMatch
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.Locale
 import javax.inject.Inject
 
 class MatchListItemUiMapper @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val heroRepository: HeroRepository,
 ) {
 
@@ -38,26 +43,45 @@ class MatchListItemUiMapper @Inject constructor(
             deaths = playerHero.deaths.toString(),
             assists = playerHero.assists.toString(),
             kdaValue = playerHero.getKda(),
+            minionsKilled = context.getString(
+                R.string.core_ui_minions_killed,
+                playerHero.minionsKilled
+            ),
+            csPerMin = "",
         )
     }
 
     fun buildFrom(
         matchHistoryItem: MatchHistoryItem
     ): MatchListItemUiModel {
+        val csPerMin = String.format(Locale.US, "%.1f", matchHistoryItem.csPerMin)
         return MatchListItemUiModel(
             matchId = matchHistoryItem.matchId,
             playerId = matchHistoryItem.playerId,
             isWinner = matchHistoryItem.isWinner,
             gameModeStringRes = matchHistoryItem.gameModeStringRes,
             isRanked = matchHistoryItem.isRanked,
-            vpChange = matchHistoryItem.vpChange,
+            vpChange = context.getString(R.string.core_ui_vp_change, matchHistoryItem.vpChange),
             timeSinceMatch = matchHistoryItem.timeSinceMatch,
             heroImageUrl = matchHistoryItem.heroImageSrc,
             heroName = matchHistoryItem.heroName,
+            augmentImageSrc = matchHistoryItem.augmentImageSrc,
+            eternalImageSrc = matchHistoryItem.eternalImageSrc,
+            crestImageUrl = matchHistoryItem.crest?.imageSrc,
+            trinketImageUrl = matchHistoryItem.trinket?.imageSrc,
+            itemsImageUrls = matchHistoryItem.items.map { it?.imageSrc },
             heroRoleDrawableId = matchHistoryItem.heroRoleDrawableId,
             kills = matchHistoryItem.kills.toString(),
             deaths = matchHistoryItem.deaths.toString(),
             assists = matchHistoryItem.assists.toString(),
+            minionsKilled = context.getString(
+                R.string.core_ui_minions_killed,
+                matchHistoryItem.minionsKilled
+            ),
+            csPerMin = context.getString(
+                R.string.core_ui_cs_per_min,
+                csPerMin
+            ),
             kdaValue = matchHistoryItem.kdaText,
         )
     }
