@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
@@ -51,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -65,10 +62,9 @@ import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.CurrentUser
 import com.aowen.predcompanion.core.model.ui.theme.Console
 import com.aowen.predcompanion.core.ui.components.MatchPlayerCard
-import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.feature.profile.impl.ui.ConsoleDropdownMenu
-import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfileCard
+import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfileLayout
 import com.aowen.predcompanion.feature.profile.impl.ui.ThemeDropdownMenu
 import com.aowen.predcompanion.core.ui.model.toPlayerProfileCardUiModel
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
@@ -340,30 +336,14 @@ fun ProfileScreen(
 
             is UserUiState.UserInfoLoaded -> {
                 if (userState.userInfo != null) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-
-                        PlayerProfileCard(
-                            playerProfileCardUiModel = userState.userInfo.players.first()
-                                .toPlayerProfileCardUiModel(),
-                        )
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            itemsIndexed(
-                                tabList
-                            ) { index, item ->
-                                PredCompanionChipFilter(
-                                    text = stringResource(item),
-                                    selected = selectedTab == index,
-                                    onClick = { selectedTab = index }
-                                )
-                            }
-                        }
-                        when (selectedTab) {
+                    PlayerProfileLayout(
+                        profileCard = userState.userInfo.players.first()
+                            .toPlayerProfileCardUiModel(),
+                        tabLabels = tabList,
+                        selectedTab = selectedTab,
+                        onTabSelected = { selectedTab = it },
+                    ) { tab ->
+                        when (tab) {
                             0 -> {
                                 LazyColumn(
                                     state = rememberLazyListState(),
@@ -378,7 +358,6 @@ fun ProfileScreen(
                                     }
                                 }
                             }
-
                             1 -> {}
                             2 -> {}
                         }
