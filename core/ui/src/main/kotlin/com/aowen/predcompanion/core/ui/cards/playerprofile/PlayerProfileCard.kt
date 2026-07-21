@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.feature.profile.impl.ui
+package com.aowen.predcompanion.core.ui.cards.playerprofile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +39,6 @@ import coil3.compose.LocalAsyncImagePreviewHandler
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.ui.common.PlayerIcon
 import com.aowen.predcompanion.core.ui.model.PlayerProfileCardUiModel
-import com.aowen.predcompanion.feature.profile.impl.R
 import com.aowen.predcompanion.core.resources.R as coreResources
 
 @Composable
