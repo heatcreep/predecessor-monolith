@@ -20,5 +20,8 @@
     <string name="core_resources_match_type_practice">Practice</string>
     <string name="core_resources_player_profile_win_percentage">Winrate: %1$s</string>
     <string name="core_resources_player_profile_region">Region: %1$s</string>
+    <string name="core_resources_player_profile_tab_matches">Matches</string>
+    <string name="core_resources_player_profile_tab_heroes">Heroes</string>
+    <string name="core_resources_player_profile_tab_friends_enemies"><![CDATA[Friends & Enemies]]></string>
 
 </resources>

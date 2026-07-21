@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="feature_profile_impl_nav_matches">Matches</string>
-    <string name="feature_profile_impl_nav_heroes">Heroes</string>
-    <string name="feature_profile_impl_nav_friends_enemies"><![CDATA[Friends & Enemies]]></string>
     <string name="feature_profile_impl_nav_general_stats">General Stats</string>
 </resources>

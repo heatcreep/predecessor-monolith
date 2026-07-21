@@ -286,9 +286,9 @@ fun ProfileScreen(
 ) {
 
     val tabList = listOf(
-        R.string.feature_profile_impl_nav_matches,
-        R.string.feature_profile_impl_nav_heroes,
-        R.string.feature_profile_impl_nav_friends_enemies
+        coreResources.string.core_resources_player_profile_tab_matches,
+        coreResources.string.core_resources_player_profile_tab_heroes,
+        coreResources.string.core_resources_player_profile_tab_friends_enemies,
     )
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
