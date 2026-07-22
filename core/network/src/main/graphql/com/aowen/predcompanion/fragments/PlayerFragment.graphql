@@ -5,12 +5,6 @@ fragment PlayerFragment on Player {
     ratings {
         ...PlayerRatingFragment
     }
-    generalStatistic {
-       result {
-           matchesPlayed
-           matchesWon
-       }
-    }
     favHero {
         ...HeroFragment
     }
