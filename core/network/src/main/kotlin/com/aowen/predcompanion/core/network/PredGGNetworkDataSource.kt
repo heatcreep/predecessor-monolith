@@ -4,6 +4,7 @@ import com.aowen.predcompanion.core.network.apollo.AuthedUserQuery
 import com.aowen.predcompanion.core.network.apollo.GetPlayerQuery
 import com.aowen.predcompanion.core.network.apollo.HeroesQuery
 import com.aowen.predcompanion.core.network.apollo.ItemsQuery
+import com.aowen.predcompanion.core.network.apollo.MatchByIdQuery
 import com.apollographql.apollo.api.ApolloResponse
 
 interface PredGGNetworkDataSource {
@@ -11,4 +12,5 @@ interface PredGGNetworkDataSource {
     suspend fun getPlayer(playerId: String): ApolloResponse<GetPlayerQuery.Data>
     suspend fun getAllItems(): ApolloResponse<ItemsQuery.Data>
     suspend fun getAllHeroes(): ApolloResponse<HeroesQuery.Data>
+    suspend fun getMatchById(matchId: String): ApolloResponse<MatchByIdQuery.Data>
 }

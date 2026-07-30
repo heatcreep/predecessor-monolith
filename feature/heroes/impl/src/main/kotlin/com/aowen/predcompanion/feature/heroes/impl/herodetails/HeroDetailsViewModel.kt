@@ -60,7 +60,7 @@ class HeroDetailsViewModel @AssistedInject constructor(
         omedaCityHeroRepository.allHeroes
     ) { state, heroes ->
         state.copy(
-            hero = heroes.values.find { it.id == heroId.toLong() } ?: HeroDetails()
+            hero = heroes.values.find { it.id == heroId } ?: HeroDetails()
         )
     }.stateIn(
         scope = viewModelScope,

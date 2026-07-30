@@ -1,6 +1,7 @@
 package com.aowen.predcompanion.core.network.apollo
 
 import com.aowen.predcompanion.core.network.PredGGNetworkDataSource
+import com.aowen.predcompanion.core.network.apollo.type.MatchKey
 import com.aowen.predcompanion.core.network.apollo.type.PlayerKey
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.ApolloResponse
@@ -28,4 +29,15 @@ class ApolloKotlinPredGGNetwork @Inject constructor(
     // HEROES
     override suspend fun getAllHeroes(): ApolloResponse<HeroesQuery.Data> =
         apolloClient.query(HeroesQuery()).execute()
+
+    // MATCHES
+    override suspend fun getMatchById(matchId: String): ApolloResponse<MatchByIdQuery.Data> =
+        apolloClient.query(
+            MatchByIdQuery(
+                MatchKey(
+                    id = Optional.present(matchId)
+                )
+            )
+        ).execute()
+
 }

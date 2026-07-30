@@ -43,15 +43,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.ui.common.PlayerIcon
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchPlayerCardUiModel
 import com.aowen.predcompanion.core.ui.components.KDAText
+import com.aowen.predcompanion.feature.home.impl.R
+import com.aowen.predcompanion.core.ui.model.MatchPlayerCardUiModel
 import com.aowen.predcompanion.ui.theme.GreenHighlight
 import com.aowen.predcompanion.ui.theme.NeroLightGrey
 import com.aowen.predcompanion.ui.theme.RedHighlight
 import com.aowen.predcompanion.core.resources.R as coreResources
-import com.aowen.predcompanion.feature.home.impl.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -115,23 +114,24 @@ fun PlayerRow(
                         },
                         heroImageUrl = matchPlayer.heroImageUrl,
                     ) {
-
-                        Image(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    shape = CircleShape
-                                )
-                                .align(Alignment.BottomEnd),
-                            contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
-                            painter = painterResource(id = matchPlayer.heroRoleImageId),
-                            contentDescription = null
-                        )
+                        matchPlayer.heroRoleImageId?.let { roleImageId ->
+                            Image(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        shape = CircleShape
+                                    )
+                                    .align(Alignment.BottomEnd),
+                                contentScale = ContentScale.Crop,
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                                painter = painterResource(id = roleImageId),
+                                contentDescription = null
+                            )
+                        }
 
                     }
                     Spacer(modifier = Modifier.size(8.dp))

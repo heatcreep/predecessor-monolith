@@ -6,7 +6,6 @@ import com.aowen.predcompanion.core.model.data.HeroStatistics
 import com.aowen.predcompanion.core.network.PredCompanionNetworkDataSource
 import com.aowen.predcompanion.core.network.PredGGNetworkDataSource
 import com.aowen.predcompanion.core.network.Resource
-import com.aowen.predcompanion.core.network.apollo.HeroesQuery
 import com.aowen.predcompanion.core.network.safeApiCall
 import com.aowen.predcompanion.core.network.safeGraphQlCall
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,11 +21,11 @@ class OmedaCityHeroRepository @Inject constructor(
     private val predGGNetwork: PredGGNetworkDataSource,
 ) : HeroRepository {
 
-    private val _allHeroes: MutableStateFlow<Map<Long, HeroDetails>> = MutableStateFlow(emptyMap())
-    override val allHeroes: StateFlow<Map<Long, HeroDetails>> = _allHeroes
+    private val _allHeroes: MutableStateFlow<Map<String, HeroDetails>> = MutableStateFlow(emptyMap())
+    override val allHeroes: StateFlow<Map<String, HeroDetails>> = _allHeroes
 
     override suspend fun fetchAllHeroes() {
-        val result = safeGraphQlCall<HeroesQuery.Data, List<HeroDetails>>(
+        val result = safeGraphQlCall(
             apiCall = { predGGNetwork.getAllHeroes() },
             transform = { data -> data.heroes.map {
                 it.heroFragment.asHeroDetails()
@@ -37,7 +36,7 @@ class OmedaCityHeroRepository @Inject constructor(
         }
     }
 
-    override fun getHeroName(heroId: Long): String =
+    override fun getHeroName(heroId: String): String =
         allHeroes.value[heroId]?.name ?: ""
 
     override fun getHeroByName(heroName: String): HeroDetails? =
@@ -45,7 +44,7 @@ class OmedaCityHeroRepository @Inject constructor(
             it.displayName == heroName
         }
 
-    override fun getHeroImageSrcById(heroId: Long): String =
+    override fun getHeroImageSrcById(heroId: String): String =
         allHeroes.value[heroId]?.imageUrl ?: ""
 
     override suspend fun fetchAllHeroStatistics(timeFrame: String?): Resource<List<HeroStatistics>> =
@@ -53,7 +52,7 @@ class OmedaCityHeroRepository @Inject constructor(
             apiCall = { retrofitOmedaCityNetwork.getAllHeroStatistics(timeFrame) },
             transform = { stats ->
                 stats.heroStatistics.mapNotNull { networkHeroStatistics ->
-                    val heroFromMap = allHeroes.first { it.isNotEmpty() }[networkHeroStatistics.heroId]
+                    val heroFromMap = allHeroes.first { it.isNotEmpty() }[networkHeroStatistics.heroId.toString()]
                     heroFromMap?.let {
                         HeroStatistics(
                             heroId = heroFromMap.id,
@@ -73,9 +72,9 @@ class OmedaCityHeroRepository @Inject constructor(
             apiCall = { retrofitOmedaCityNetwork.getHeroStatisticsById(heroId) },
             transform = { stats -> stats.heroStatistics.firstOrNull()?.let { networkHeroStatistics ->
                 HeroStatistics(
-                    heroId = networkHeroStatistics.heroId,
+                    heroId = networkHeroStatistics.heroId.toString(),
                     heroName = networkHeroStatistics.displayName,
-                    heroImageSrc = getHeroImageSrcById(networkHeroStatistics.heroId),
+                    heroImageSrc = getHeroImageSrcById(networkHeroStatistics.heroId.toString()),
                     name = networkHeroStatistics.displayName,
                     winRate = networkHeroStatistics.winRate,
                     pickRate = networkHeroStatistics.pickRate,

@@ -1,16 +1,21 @@
 package com.aowen.predcompanion.feature.profile.impl
 
 import android.content.res.Configuration
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
@@ -20,8 +25,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -50,23 +57,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.CurrentUser
 import com.aowen.predcompanion.core.model.ui.theme.Console
+import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfileLayout
+import com.aowen.predcompanion.core.ui.components.KDAText
 import com.aowen.predcompanion.core.ui.components.MatchPlayerCard
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.feature.profile.impl.ui.ConsoleDropdownMenu
-import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfileLayout
 import com.aowen.predcompanion.feature.profile.impl.ui.ThemeDropdownMenu
-import com.aowen.predcompanion.core.ui.model.toPlayerProfileCardUiModel
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
@@ -224,6 +232,7 @@ fun ProfileScreenRoute(
     val uiState by viewModel.uiState.collectAsState()
     val startAuth = rememberAuthLauncher(viewModel::loginIntent, viewModel::onLoginResult)
     val matches = viewModel.matchHistory.collectAsLazyPagingItems()
+    val heroStatsState by viewModel.heroStats.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -265,6 +274,7 @@ fun ProfileScreenRoute(
         ProfileScreen(
             uiState = uiState,
             matches = matches,
+            heroStatsState = heroStatsState,
             modifier = Modifier
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp),
@@ -280,6 +290,7 @@ fun ProfileScreenRoute(
 fun ProfileScreen(
     uiState: ProfileScreenState,
     matches: LazyPagingItems<MatchListItemUiModel>,
+    heroStatsState: HeroStatsUiState,
     modifier: Modifier = Modifier,
     submitLogin: () -> Unit,
     handleRetry: () -> Unit,
@@ -337,8 +348,7 @@ fun ProfileScreen(
             is UserUiState.UserInfoLoaded -> {
                 if (userState.userInfo != null) {
                     PlayerProfileLayout(
-                        profileCard = userState.userInfo.players.first()
-                            .toPlayerProfileCardUiModel(),
+                        profileCard = userState.userInfo.players.first(),
                         tabLabels = tabList,
                         selectedTab = selectedTab,
                         onTabSelected = { selectedTab = it },
@@ -358,7 +368,97 @@ fun ProfileScreen(
                                     }
                                 }
                             }
-                            1 -> {}
+                            1 -> {
+                                when (heroStatsState) {
+                                    is HeroStatsUiState.Loading -> {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.Center
+                                        ) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(48.dp),
+                                                color = MaterialTheme.colorScheme.tertiary,
+                                                strokeWidth = 8.dp
+                                            )
+                                        }
+                                    }
+
+                                    is HeroStatsUiState.Error -> {
+                                        FullScreenErrorWithRetry(heroStatsState.message) { }
+                                    }
+
+                                    is HeroStatsUiState.Loaded -> {
+                                        LazyColumn(
+                                            state = rememberLazyListState(),
+                                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                                        ) {
+
+                                            itemsIndexed(
+                                                heroStatsState.stats,
+                                                key = { _, heroStat -> heroStat.id }) { index, heroStat ->
+                                                Column(
+                                                    modifier = Modifier.fillMaxWidth()
+                                                ) {
+                                                    Row(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth(),
+                                                        Arrangement.SpaceBetween
+                                                    ) {
+                                                        Box(
+                                                            modifier = Modifier.weight(1f)
+                                                        ) {
+                                                            Text(
+                                                                text = heroStat.name,
+                                                                color = MaterialTheme.colorScheme.secondary,
+                                                                style = MaterialTheme.typography.bodyMedium
+                                                            )
+                                                        }
+                                                        Box(
+                                                            modifier = Modifier.weight(0.5f)
+                                                        ) {
+                                                            Text(
+                                                                text = heroStat.totalMatches,
+                                                                color = MaterialTheme.colorScheme.secondary,
+                                                                style = MaterialTheme.typography.bodyMedium
+                                                            )
+                                                        }
+                                                        Box(
+                                                            modifier = Modifier.weight(0.5f)
+                                                        ) {
+                                                            Text(
+                                                                text = heroStat.winRate,
+                                                                color = MaterialTheme.colorScheme.secondary,
+                                                                style = MaterialTheme.typography.bodyMedium
+                                                            )
+                                                        }
+                                                        Box(
+                                                            modifier = Modifier.weight(1f),
+                                                            contentAlignment = Alignment.CenterEnd
+                                                        ) {
+                                                            KDAText(
+                                                                averageKda = listOf(
+                                                                    heroStat.averageKills,
+                                                                    heroStat.averageDeaths,
+                                                                    heroStat.averageAssists
+                                                                )
+                                                            )
+                                                        }
+                                                    }
+                                                    Spacer(modifier = Modifier.size(8.dp))
+                                                    if(index != heroStatsState.stats.count() - 1) {
+                                                        HorizontalDivider(
+                                                            modifier = Modifier.fillMaxWidth(),
+                                                            color = MaterialTheme.colorScheme.secondary
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+
                             2 -> {}
                         }
                     }
@@ -392,6 +492,23 @@ fun ProfileScreen(
     }
 }
 
+@Composable
+fun RowScope.TableCell(
+    text: String,
+    weight: Float,
+    isHeader: Boolean = false
+) {
+    Text(
+        text = text,
+        fontWeight = if (isHeader) FontWeight.Bold else FontWeight.Normal,
+        modifier = Modifier
+            .weight(weight)
+            .border(0.5.dp, Color.Gray)
+            .padding(8.dp)
+            .fillMaxHeight() // Fill height allocated by IntrinsicSize.Min
+    )
+}
+
 @Preview(
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES
@@ -405,16 +522,16 @@ fun ProfileCardPreview() {
         ProfileScreen(
             uiState = ProfileScreenState(
                 user = UserUiState.UserInfoLoaded(
-                    userInfo = CurrentUser(
-                        id = "preview-id",
-                        name = "Test User",
-                        players = emptyList(),
+                    userInfo = CurrentUserUiModel(
+                        name = "heatcreep.tv",
+                        players = emptyList()
                     )
                 )
             ),
             matches = fakeMatches,
             submitLogin = {},
-            handleRetry = { /*TODO*/ }
+            handleRetry = { /*TODO*/ },
+            heroStatsState = HeroStatsUiState.Loading
         )
     }
 }

@@ -6,13 +6,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MatchDetailsNavKey(
-    val playerId: String,
     val matchId: String
 ) : NavKey
 
 fun Navigator.navigateToMatchDetails(
-    playerId: String,
     matchId: String,
 ) {
-    navigate(MatchDetailsNavKey(playerId, matchId))
+    navigate(MatchDetailsNavKey(matchId))
 }

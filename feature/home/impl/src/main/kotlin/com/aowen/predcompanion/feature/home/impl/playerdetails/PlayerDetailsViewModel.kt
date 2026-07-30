@@ -14,8 +14,9 @@ import com.aowen.predcompanion.core.database.dao.ClaimedPlayerDao
 import com.aowen.predcompanion.core.network.apollo.type.PlayerKey
 import com.aowen.predcompanion.core.network.model.NetworkUserState
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
-import com.aowen.predcompanion.core.ui.model.PlayerProfileCardUiModel
+import com.aowen.predcompanion.core.ui.model.PlayerProfileUiModel
 import com.aowen.predcompanion.core.ui.model.mapper.MatchListItemUiMapper
+import com.aowen.predcompanion.core.ui.model.toHeroStatisticsUiModel
 import com.aowen.predcompanion.core.ui.model.toPlayerProfileCardUiModel
 import com.apollographql.apollo.api.Optional
 import dagger.assisted.Assisted
@@ -31,7 +32,7 @@ import kotlinx.coroutines.launch
 
 sealed interface PlayerDetailsState {
     data object Loading : PlayerDetailsState
-    data class Loaded(val playerProfileCardUiModel: PlayerProfileCardUiModel) : PlayerDetailsState
+    data class Loaded(val playerProfileUiModel: PlayerProfileUiModel) : PlayerDetailsState
     data class Error(val errorMessage: String?) : PlayerDetailsState
 }
 
@@ -89,10 +90,12 @@ class PlayerDetailsViewModel @AssistedInject constructor(
                     return@launch
                 }
                 val player = omedaCityPlayerRepository.fetchPlayerById(playerId)
-                    ?.toPlayerProfileCardUiModel()
                 if (player != null) {
                     _uiState.value = PlayerDetailsState.Loaded(
-                        player
+                        PlayerProfileUiModel(
+                            profileCardUiModel = player.toPlayerProfileCardUiModel(),
+                            heroStatisticsList = player.heroStatistics.map { it.toHeroStatisticsUiModel() }
+                        )
                     )
                 }
 

@@ -204,7 +204,7 @@ fun HeroWinPickRateScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                navigateToHeroDetails(heroStats.heroId, heroStats.heroName)
+                                navigateToHeroDetails(heroStats.heroId.toLong(), heroStats.heroName)
                             }
                             .border(
                                 1.dp,
@@ -274,7 +274,7 @@ fun HeroWinRateScreenPreview() {
             uiState = HomeScreenUiState(
                 heroStats = listOf(
                     HeroStatistics(
-                        1,
+                        "1",
                         "https://example.com/countess.jpg",
                         "Countess",
                         "Countess",
@@ -282,7 +282,7 @@ fun HeroWinRateScreenPreview() {
                         18.56f
                     ),
                     HeroStatistics(
-                        23,
+                        "23",
                         "https://example.com/iggy-scorch.jpg",
                         "Iggy & Scorch",
                         "Iggy & Scorch",

@@ -80,7 +80,7 @@ fun MatchResultsFragment.Result.asMatchHistoryItem(): MatchHistoryItem {
     )
 }
 
-private fun getGameModeStringRes(gameMode: GameMode): Int {
+fun getGameModeStringRes(gameMode: GameMode): Int {
     return when (gameMode) {
         GameMode.RANKED -> R.string.core_resources_match_type_ranked
         GameMode.ARAM -> R.string.core_resources_match_type_aram

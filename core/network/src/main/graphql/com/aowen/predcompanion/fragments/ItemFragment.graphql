@@ -1,4 +1,5 @@
 fragment ItemFragment on Item {
+    id
     data {
         id
         gameId

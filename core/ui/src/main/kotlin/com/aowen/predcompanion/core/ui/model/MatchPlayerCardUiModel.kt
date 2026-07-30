@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.feature.home.impl.matches.model
+package com.aowen.predcompanion.core.ui.model
 
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
@@ -12,7 +12,7 @@ data class MatchPlayerCardUiModel(
     val vpChange: String,
     val heroImageUrl: String,
     val items: List<PlayerItem>,
-    @param:DrawableRes val heroRoleImageId: Int,
+    @param:DrawableRes val heroRoleImageId: Int?,
     val performanceTitle: String,
     val performanceScore: String,
     val minionsKilled: Int,

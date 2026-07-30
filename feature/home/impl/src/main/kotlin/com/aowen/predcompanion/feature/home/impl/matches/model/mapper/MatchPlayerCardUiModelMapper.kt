@@ -1,15 +1,13 @@
 package com.aowen.predcompanion.feature.home.impl.matches.model.mapper
 
-import androidx.compose.ui.graphics.Color
 import com.aowen.predcompanion.core.data.model.getKda
 import com.aowen.predcompanion.core.data.model.toDecimal
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.MatchDetails
+import com.aowen.predcompanion.core.ui.model.MatchPlayerCardUiModel
 import com.aowen.predcompanion.core.ui.model.toRankColor
-import com.aowen.predcompanion.core.ui.model.toRankTitle
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchPlayerCardUiModel
 import javax.inject.Inject
 
 class MatchPlayerCardUiModelMapper @Inject constructor(
@@ -25,8 +23,8 @@ class MatchPlayerCardUiModelMapper @Inject constructor(
             MatchPlayerCardUiModel(
                 playerId = matchPlayer.playerId,
                 playerName = matchPlayer.playerName,
-                rank = matchPlayer.rank?.toRankTitle() ?: "Unranked",
-                rankColor = matchPlayer.rank?.toRankColor() ?: Color.Transparent,
+                rank = matchPlayer.rank,
+                rankColor = matchPlayer.rank.toRankColor(),
                 vpTotal = matchPlayer.vpTotal,
                 vpChange = matchPlayer.vpChange,
                 heroImageUrl = heroRepository.getHeroImageSrcById(matchPlayer.heroId),
@@ -39,7 +37,7 @@ class MatchPlayerCardUiModelMapper @Inject constructor(
                         )
                     }
                 },
-                heroRoleImageId = HeroRole.entries.find { it.roleName == matchPlayer.role }?.drawableId ?: 0,
+                heroRoleImageId = HeroRole.entries.find { it.roleName == matchPlayer.role }?.drawableId,
                 performanceTitle = matchPlayer.performanceTitle,
                 performanceScore = matchPlayer.performanceScore,
                 minionsKilled = matchPlayer.minionsKilled,

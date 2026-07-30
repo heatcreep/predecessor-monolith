@@ -61,9 +61,9 @@ class BuildListItemUiMapper @Inject constructor(
             role = heroRoleMap[heroBuild.role.lowercase()],
             description = heroBuild.description,
             heroId = heroBuild.heroId,
-            heroImageUrl = heroRepository.getHeroImageSrcById(heroBuild.heroId),
-            crest = items[heroBuild.crestId] ?: ItemDetails(),
-            buildItems = heroBuild.buildItemIds.mapNotNull { items[it] },
+            heroImageUrl = heroRepository.getHeroImageSrcById(heroBuild.heroId.toString()),
+            crest = items[heroBuild.crestId.toString()] ?: ItemDetails(),
+            buildItems = heroBuild.buildItemIds.mapNotNull { items[it.toString()] },
             skillOrder = heroBuild.skillOrder,
             netVotes = heroBuild.netVotes,
             upvotes = heroBuild.upvotes,
@@ -85,9 +85,9 @@ class BuildListItemUiMapper @Inject constructor(
             role = heroRoleMap[favoriteBuildListItem.role.lowercase()],
             description = favoriteBuildListItem.description,
             heroId = favoriteBuildListItem.heroId,
-            heroImageUrl = heroRepository.getHeroImageSrcById(favoriteBuildListItem.heroId),
-            crest = items[favoriteBuildListItem.crestId] ?: ItemDetails(),
-            buildItems = favoriteBuildListItem.itemIds.mapNotNull { items[it] },
+            heroImageUrl = heroRepository.getHeroImageSrcById(favoriteBuildListItem.heroId.toString()),
+            crest = items[favoriteBuildListItem.crestId.toString()] ?: ItemDetails(),
+            buildItems = favoriteBuildListItem.itemIds.mapNotNull { items[it.toString()] },
             upvotes = favoriteBuildListItem.upvotesCount,
             downvotes = favoriteBuildListItem.downvotesCount,
             createdAt = favoriteBuildListItem.createdAt,
@@ -132,9 +132,9 @@ fun BuildUiListItem.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
     )
 }
 
-private fun HeroBuild.ItemModule.toUi(items: Map<Int, ItemDetails>): ItemModuleUi =
+private fun HeroBuild.ItemModule.toUi(items: Map<String, ItemDetails>): ItemModuleUi =
     ItemModuleUi(
         id = id,
         title = title,
-        items = itemIds.mapNotNull { items[it] },
+        items = itemIds.mapNotNull { items[it.toString()] },
     )

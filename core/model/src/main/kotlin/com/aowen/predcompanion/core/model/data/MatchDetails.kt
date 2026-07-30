@@ -7,11 +7,10 @@ data class MatchesDetails(
 
 data class MatchDetails(
     val matchId: String = "",
-    val matchType: MatchType? = null,
     val startTime: String = "",
     val endTime: String = "",
     val gameDuration: Int = 0,
-    val gameMode: String = "",
+    val gameMode: Int = 0,
     val region: String = "",
     val winningTeam: String = "",
     val dawn: Team = Team.Dawn(emptyList()),
@@ -26,7 +25,13 @@ data class MatchDetails(
         BRAWL("Brawl"),
     }
 
-    abstract class Team {
+    data class Perk(
+        val iconUrl: String,
+        val name: String,
+        val description: String
+    )
+
+    sealed class Team {
         abstract val players: List<MatchPlayerDetails>
 
         data class Dawn(override val players: List<MatchPlayerDetails>) : Team()
@@ -38,15 +43,16 @@ data class MatchDetails(
         val playerName: String = "",
         val vpTotal: Int = 0,
         val vpChange: String = "0",
-        val rank: Int? = 0,
-        val heroId: Long = 0,
-        val role: String = "",
+        val rank: String = "",
+        val heroId: String = "",
+        val role: String? = null,
         val performanceScore: String = "",
         val performanceTitle: String = "",
         val kills: Int = 0,
         val deaths: Int = 0,
         val assists: Int = 0,
         val minionsKilled: Int = 0,
+        val minionsKilledPerMin: Float = 0F,
         val laneMinionsKilled: Int = 0,
         val neutralMinionsKilled: Int = 0,
         val neutralMinionsTeamJungle: Int = 0,
@@ -81,8 +87,13 @@ data class MatchDetails(
         val wardsPlaced: Int = 0,
         val wardsDestroyed: Int = 0,
         val goldEarned: Int = 0,
+        val goldEarnedPerMin: Float = 0F,
         val goldSpent: Int = 0,
-        val itemIds: List<Int> = emptyList(),
+        val augment: Perk?,
+        val eternal: Perk?,
+        val minorBlessing1: Perk?,
+        val minorBlessing2: Perk?,
+        val itemIds: List<String> = emptyList(),
         val playerItems: List<ItemDetails> = emptyList()
         // stats
 

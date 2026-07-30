@@ -1,8 +1,13 @@
 package com.aowen.predcompanion.feature.home.impl.matches.model
 
-sealed class MatchTeamUiModel(
-    open val players: List<MatchPlayerCardUiModel>,
-) {
-    data class Dawn(override val players: List<MatchPlayerCardUiModel>) : MatchTeamUiModel(players)
-    data class Dusk(override val players: List<MatchPlayerCardUiModel>) : MatchTeamUiModel(players)
+import com.aowen.predcompanion.core.ui.model.MatchDetailsPlayerCardUiModel
+
+sealed class MatchTeamUiModel {
+    abstract val players: List<MatchDetailsPlayerCardUiModel>
+
+    data class Dawn(override val players: List<MatchDetailsPlayerCardUiModel>) :
+        MatchTeamUiModel()
+
+    data class Dusk(override val players: List<MatchDetailsPlayerCardUiModel>) :
+        MatchTeamUiModel()
 }

@@ -1,6 +1,7 @@
 package com.aowen.predcompanion.feature.home.impl.playerdetails
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -35,6 +36,7 @@ import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfileLayout
 import com.aowen.predcompanion.core.ui.components.MatchPlayerCard
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.core.ui.model.PlayerProfileCardUiModel
+import com.aowen.predcompanion.core.ui.model.PlayerProfileUiModel
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
@@ -47,7 +49,7 @@ internal fun PlayerDetailsRoute(
     modifier: Modifier = Modifier,
     viewModel: PlayerDetailsViewModel,
     navigateBack: () -> Unit,
-    navigateToMatchDetails: (String, String) -> Unit,
+    navigateToMatchDetails: (String) -> Unit,
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -71,7 +73,7 @@ fun PlayerDetailScreen(
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
     handlePlayerHeroStatsSelect: (Long) -> Unit = { },
-    navigateToMatchDetails: (String, String) -> Unit = { _, _ -> },
+    navigateToMatchDetails: (String) -> Unit = { },
     navigateBack: () -> Unit = {},
 ) {
 
@@ -87,7 +89,7 @@ fun PlayerDetailScreen(
         }
 
         is PlayerDetailsState.Loaded -> {
-            val uiState = playerDetailsState.playerProfileCardUiModel
+            val uiState = playerDetailsState.playerProfileUiModel.profileCardUiModel
             Scaffold(
                 topBar = {
                     MonolithTopAppBar(
@@ -144,6 +146,9 @@ fun PlayerDetailScreen(
                                             items(matches.itemCount) {
                                                 matches[it]?.let { matchItem ->
                                                     MatchPlayerCard(
+                                                        modifier = Modifier.clickable {
+                                                            navigateToMatchDetails(matchItem.matchId)
+                                                        },
                                                         matchListItem = matchItem,
                                                     )
                                                 }
@@ -174,14 +179,17 @@ fun PlayerDetailsScreenPreview() {
     MonolithTheme {
         PlayerDetailScreen(
             playerDetailsState = PlayerDetailsState.Loaded(
-                playerProfileCardUiModel = PlayerProfileCardUiModel(
-                    rankIconUrl = "",
-                    playerName = "",
-                    rankPoints = "",
-                    rankTitle = "",
-                    winPercentage = "",
-                    region = "",
-                    favoriteHeroIconUrl = "",
+                playerProfileUiModel = PlayerProfileUiModel(
+                    profileCardUiModel = PlayerProfileCardUiModel(
+                        rankIconUrl = "",
+                        playerName = "",
+                        rankPoints = "",
+                        rankTitle = "",
+                        winPercentage = "",
+                        region = "",
+                        favoriteHeroIconUrl = "",
+                    ),
+                    heroStatisticsList = emptyList()
                 )
             ),
             matches = fakeMatches

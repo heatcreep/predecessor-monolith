@@ -36,6 +36,17 @@ enum class RankDetails(
     PARAGON("Paragon", coreResources.drawable.paragon_200, Paragon),
 }
 
+fun String.toRankColor(): Color =
+    when {
+        contains("Bronze") -> Bronze
+        contains("Silver") -> Silver
+        contains("Gold") -> Gold
+        contains("Platinum") -> Platinum
+        contains("Diamond") -> Diamond
+        contains("Paragon") -> Paragon
+        else -> LightKhaki
+    }
+
 fun Int?.toRankColor(): Color =
     when (this) {
         in 10..12 -> Bronze

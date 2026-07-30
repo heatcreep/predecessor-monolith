@@ -12,12 +12,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.aowen.predcompanion.feature.home.api.navigation.MatchDetailsNavKey
-import com.aowen.predcompanion.feature.home.api.navigation.navigateToMatchDetails
 import com.aowen.predcompanion.feature.home.api.navigation.navigateToPlayerDetails
 import com.aowen.predcompanion.feature.home.impl.matches.matchdetails.MatchDetailsRoute
 import com.aowen.predcompanion.feature.home.impl.matches.matchdetails.MatchDetailsViewModel
-import com.aowen.predcompanion.feature.home.impl.matches.morematches.MoreMatchesRoute
-import com.aowen.predcompanion.feature.home.impl.matches.morematches.MoreMatchesViewModel
 import com.aowen.predcompanion.feature.items.api.navigation.navigateToItemDetails
 import com.aowen.predcompanion.navigation.Navigator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
@@ -50,16 +47,5 @@ fun EntryProviderScope<NavKey>.matchesEntry(navigator: Navigator) {
                 viewModel = viewModel
             )
         }
-    }
-
-    entry<MoreMatchesNavKey> { navKey ->
-        val viewModel = hiltViewModel<MoreMatchesViewModel, MoreMatchesViewModel.Factory> {
-            it.create(navKey.playerId)
-        }
-        MoreMatchesRoute(
-            playerId = navKey.playerId,
-            viewModel = viewModel,
-            navigateToMatchDetails = navigator::navigateToMatchDetails
-        )
     }
 }

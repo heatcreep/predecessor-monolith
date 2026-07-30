@@ -51,7 +51,7 @@ class BuildsScreenViewModel @Inject constructor(
         state.copy(
             allHeroes = heroes.values.map {
                 HeroUiModel(
-                    heroId = it.id,
+                    heroId = it.id.toLong(),
                     name = it.displayName,
                     imageSrc = it.imageUrl
                 )
@@ -107,9 +107,9 @@ class BuildsScreenViewModel @Inject constructor(
     }
 
     fun updateSelectedHero(heroValue: String) {
-        _uiState.update {
-            it.copy(selectedHeroFilter = omedaCityHeroRepository.getHeroByName(heroValue)?.let {
-                HeroDropDownUiModel(id = it.id, name = it.displayName, imageSrc = it.imageUrl)
+        _uiState.update { buildsUiState ->
+            buildsUiState.copy(selectedHeroFilter = omedaCityHeroRepository.getHeroByName(heroValue)?.let {
+                HeroDropDownUiModel(id = it.id.toLong(), name = it.displayName, imageSrc = it.imageUrl)
             })
         }
         buildsPagingSource.invalidate()

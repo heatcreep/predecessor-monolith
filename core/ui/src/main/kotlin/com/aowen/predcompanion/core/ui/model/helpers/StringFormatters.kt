@@ -1,4 +1,5 @@
 package com.aowen.predcompanion.core.ui.model.helpers
 
-object StringFormatters {
+fun Float.toPercentageString(decimals: Int = 0): String {
+    return "%.${decimals}f%%".format(this * 100)
 }

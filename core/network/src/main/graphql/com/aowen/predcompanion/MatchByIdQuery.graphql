@@ -1,0 +1,14 @@
+query MatchByIdQuery($matchId: MatchKey!) {
+    match(by: $matchId) {
+        id
+        gameMode
+        startTime
+        endTime
+        duration
+        region
+        winningTeam
+        matchPlayers {
+            ...MatchPlayerFragment
+        }
+    }
+}

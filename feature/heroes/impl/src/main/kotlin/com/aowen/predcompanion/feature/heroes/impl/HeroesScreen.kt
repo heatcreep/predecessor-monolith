@@ -198,7 +198,7 @@ fun HeroesScreen(
                                 HeroTileCard(
                                     hero = hero,
                                     onClick = {
-                                        navigateToHeroDetails(hero.id, hero.name)
+                                        navigateToHeroDetails(hero.id.toLong(), hero.name)
                                     }
                                 )
                             }

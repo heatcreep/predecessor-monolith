@@ -9,9 +9,9 @@ class HeroStatisticsMapper @Inject constructor(private val heroRepository: HeroR
 
     fun buildFrom(networkHeroStatistics: NetworkHeroStatistics): HeroStatistics {
         return HeroStatistics(
-            heroId = networkHeroStatistics.heroId,
+            heroId = networkHeroStatistics.heroId.toString(),
             heroName = networkHeroStatistics.displayName,
-            heroImageSrc = heroRepository.getHeroImageSrcById(networkHeroStatistics.heroId),
+            heroImageSrc = heroRepository.getHeroImageSrcById(networkHeroStatistics.heroId.toString()),
             name = networkHeroStatistics.displayName,
             winRate = networkHeroStatistics.winRate,
             pickRate = networkHeroStatistics.pickRate,

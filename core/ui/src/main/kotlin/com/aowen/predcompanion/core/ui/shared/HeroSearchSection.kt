@@ -97,7 +97,7 @@ fun HeroResultCard(
             .fillMaxWidth()
             .clickable {
                 navigateToHeroDetails(
-                    heroDetails.id,
+                    heroDetails.id.toLong(),
                     heroDetails.name
                 )
             }

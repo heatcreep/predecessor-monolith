@@ -12,6 +12,7 @@ import com.aowen.predcompanion.ui.utils.handleTimeSinceMatch
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import javax.inject.Inject
+import com.aowen.predcompanion.core.resources.R as coreResources
 
 class MatchListItemUiMapper @Inject constructor(
     @param:ApplicationContext private val context: Context,
@@ -33,12 +34,12 @@ class MatchListItemUiMapper @Inject constructor(
             playerId = playerHero.playerId,
             isWinner = isWinner,
             gameModeStringRes = null,
-            isRanked = match.matchType == MatchDetails.MatchType.RANKED,
+            isRanked = match.gameMode == coreResources.string.core_resources_match_type_ranked,
             vpChange = playerHero.vpChange,
             timeSinceMatch = handleTimeSinceMatch(match.endTime),
             heroImageUrl = heroRepository.getHeroImageSrcById(playerHero.heroId),
             heroName = heroRepository.getHeroName(playerHero.heroId),
-            heroRoleDrawableId = heroRoleMap[playerHero.role.lowercase()]?.drawableId,
+            heroRoleDrawableId = heroRoleMap[playerHero.role?.lowercase()]?.drawableId,
             kills = playerHero.kills.toString(),
             deaths = playerHero.deaths.toString(),
             assists = playerHero.assists.toString(),

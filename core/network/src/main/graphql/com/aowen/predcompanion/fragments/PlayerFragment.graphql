@@ -8,4 +8,22 @@ fragment PlayerFragment on Player {
     favHero {
         ...HeroFragment
     }
+    generalStatistic {
+        result {
+            matchesPlayed
+            matchesWon
+        }
+    }
+    heroStatistics {
+        results {
+            hero {
+                ...HeroFragment
+            }
+            matchesPlayed
+            matchesWon
+            totalKills
+            totalDeaths
+            totalAssists
+        }
+    }
 }

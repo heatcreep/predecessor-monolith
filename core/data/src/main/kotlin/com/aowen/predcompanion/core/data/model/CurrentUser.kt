@@ -55,6 +55,7 @@ fun CurrentUserEntity.asCurrentUser() = CurrentUser(
             currentRankTitle = it.currentRankTitle,
             currentRankPoints = it.currentRankPoints,
             favoriteHero = it.favoriteHero?.asHeroDetails(),
+            heroStatistics = emptyList()
         )
     },
 )

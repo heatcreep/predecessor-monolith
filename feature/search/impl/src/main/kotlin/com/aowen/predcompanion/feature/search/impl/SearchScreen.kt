@@ -16,7 +16,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,13 +23,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-
+import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.ui.shared.HeroSearchSection
 import com.aowen.predcompanion.core.ui.shared.ItemSearchSection
 import com.aowen.predcompanion.ui.components.MonolithAlertDialog
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
-import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.PlayerInfo
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +45,7 @@ internal fun SearchScreen(
     navigateToPlayerDetails: (String) -> Unit,
     navigateToItemDetails: (String) -> Unit,
     navigateToHeroDetails: (Long, String) -> Unit,
-    navigateToMatchDetails: (String, String) -> Unit,
+    navigateToMatchDetails: (String) -> Unit,
     navigateToBuildDetails: (Int) -> Unit,
     navigateBack: () -> Unit
 ) {
@@ -175,7 +173,7 @@ private fun SearchScreenPreview() {
             navigateToItemDetails = {},
             navigateToHeroDetails = { _, _ -> },
             navigateToBuildDetails = {},
-            navigateToMatchDetails = { _, _ -> },
+            navigateToMatchDetails = { },
             navigateBack = {}
         )
     }

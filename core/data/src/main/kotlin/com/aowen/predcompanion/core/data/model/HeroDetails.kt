@@ -12,7 +12,7 @@ import com.aowen.predcompanion.core.network.apollo.type.BaseAttribute
 
 fun HeroFragment.asHeroDetails(): HeroDetails {
     val heroData = this.data?: return HeroDetails(
-        id = 0L,
+        id = "",
         name = "",
     )
     val abilities = heroData.abilities
@@ -30,7 +30,7 @@ fun HeroFragment.asHeroDetails(): HeroDetails {
         attributesByType[stat]?.values?.firstOrNull()?.toFloat() ?: 0f
 
     return HeroDetails(
-        id = id.toLong(),
+        id = id,
         name = name,
         displayName = heroData.displayName,
         stats = listOf(
@@ -162,7 +162,7 @@ fun HeroDetails.asEntity() = HeroDetailsEntity(
 )
 
 fun HeroDetailsEntity.asHeroDetails() = HeroDetails(
-    id = id.toLong(),
+    id = id,
     name = name,
     displayName = displayName,
     imageUrl = imageUrl,

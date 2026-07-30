@@ -6,10 +6,10 @@ import com.aowen.predcompanion.core.network.Resource
 import kotlinx.coroutines.flow.StateFlow
 
 interface HeroRepository {
-    val allHeroes: StateFlow<Map<Long, HeroDetails>>
-    fun getHeroName(heroId: Long): String
+    val allHeroes: StateFlow<Map<String, HeroDetails>>
+    fun getHeroName(heroId: String): String
     fun getHeroByName(heroName: String): HeroDetails?
-    fun getHeroImageSrcById(heroId: Long): String
+    fun getHeroImageSrcById(heroId: String): String
     suspend fun fetchAllHeroes()
     suspend fun fetchAllHeroStatistics(timeFrame: String? = "1M"): Resource<List<HeroStatistics>>
     suspend fun fetchHeroStatisticsById(heroId: String): Resource<HeroStatistics?>

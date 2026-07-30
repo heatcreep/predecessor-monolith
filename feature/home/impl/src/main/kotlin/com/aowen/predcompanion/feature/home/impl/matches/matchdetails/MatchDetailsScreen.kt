@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.aowen.predcompanion.feature.home.impl.matches.ScoreboardPanel
 import com.aowen.predcompanion.feature.home.impl.matches.model.MatchDetailsUiModel
-import com.aowen.predcompanion.feature.home.impl.matches.model.MatchPlayerCardUiModel
 import com.aowen.predcompanion.feature.home.impl.matches.model.MatchTeamUiModel
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
@@ -167,14 +166,14 @@ fun MatchDetailsTab(
         ) {
             ScoreboardPanel(
                 teamName = "Dusk",
-                isWinningTeam = match.winningTeam == "Dusk",
+                isWinningTeam = match.winningTeam == "DUSK",
                 matchPlayerCards = match.duskTeam.players,
                 openItemDetails = onItemClicked,
                 navigateToPlayerDetails = navigateToPlayerDetails,
             )
             ScoreboardPanel(
                 teamName = "Dawn",
-                isWinningTeam = match.winningTeam == "Dawn",
+                isWinningTeam = match.winningTeam == "DAWN",
                 matchPlayerCards = match.dawnTeam.players,
                 openItemDetails = onItemClicked,
                 navigateToPlayerDetails = navigateToPlayerDetails,
@@ -315,7 +314,8 @@ fun MatchStatsTab(
                 )
                 team.players.forEach { player ->
                     MatchStatsPlayerImageRow(
-                        player = player
+                        heroImageSrc = player.heroAndItemDetails.heroImageSrc,
+                        playerName = player.heroAndItemDetails.playerName,
                     )
                 }
 
@@ -334,138 +334,137 @@ fun MatchStatsTab(
 
                 MatchStatsRow(
                     label = "Kills",
-                    stats = team.players.map { it.kills })
+                    stats = team.players.map { it.stats.kills })
                 MatchStatsRow(
                     label = "Deaths",
-                    stats = team.players.map { it.deaths })
+                    stats = team.players.map { it.stats.deaths })
                 MatchStatsRow(
                     label = "Assists",
-                    stats = team.players.map { it.assists })
+                    stats = team.players.map { it.stats.assists })
                 MatchStatsRow(
                     label = "Minions Killed",
-                    stats = team.players.map { it.minionsKilled.toString() })
+                    stats = team.players.map { it.stats.minionsKilled })
                 MatchStatsRow(
                     label = "Lane Minions",
-                    stats = team.players.map { it.laneMinionsKilled.toString() })
+                    stats = team.players.map { it.stats.laneMinionsKilled })
                 MatchStatsRow(
                     label = "Jungle Minions (Enemy)",
-                    stats = team.players.map { it.neutralMinionsEnemyJungle.toString() })
+                    stats = team.players.map { it.stats.neutralMinionsEnemyJungle })
                 MatchStatsRow(
                     label = "Jungle Minions (Team)",
-                    stats = team.players.map { it.neutralMinionsTeamJungle.toString() })
+                    stats = team.players.map { it.stats.neutralMinionsTeamJungle })
                 MatchStatsRow(
                     label = "CS / min",
-                    stats = team.players.map { it.creepScorePerMinute })
+                    stats = team.players.map { it.stats.minionsKilledPerMin })
                 MatchStatsRow(
                     label = "Total Gold Earned",
-                    stats = team.players.map { it.goldEarned }
-                )
+                    stats = team.players.map { it.stats.goldEarned })
                 MatchStatsRow(
                     label = "Gold / min",
-                    stats = team.players.map { it.goldEarnedPerMinute })
+                    stats = team.players.map { it.stats.goldEarnedPerMin })
                 MatchStatsRow(
                     label = "Total Damage Dealt",
-                    stats = team.players.map { it.totalDamageDealt.toString() }
+                    stats = team.players.map { it.stats.totalDamageDealt }
                 )
                 MatchStatsRow(
                     label = "Total Damage Dealt to Heroes",
-                    stats = team.players.map { it.totalDamageDealtToHeroes.toString() }
+                    stats = team.players.map { it.stats.totalDamageDealtToHeroes }
                 )
                 MatchStatsRow(
                     label = "Physical Damage Dealt",
-                    stats = team.players.map { it.physicalDamageDealt.toString() }
+                    stats = team.players.map { it.stats.physicalDamageDealt }
                 )
                 MatchStatsRow(
                     label = "Physical Damage Dealt to Heroes",
-                    stats = team.players.map { it.physicalDamageDealtToHeroes.toString() }
+                    stats = team.players.map { it.stats.physicalDamageDealtToHeroes }
                 )
                 MatchStatsRow(
                     label = "Magic Damage Dealt",
-                    stats = team.players.map { it.magicalDamageDealt.toString() }
+                    stats = team.players.map { it.stats.magicalDamageDealt }
                 )
                 MatchStatsRow(
                     label = "Magic Damage Dealt to Heroes",
-                    stats = team.players.map { it.magicalDamageDealtToHeroes.toString() }
+                    stats = team.players.map { it.stats.magicalDamageDealtToHeroes }
                 )
                 MatchStatsRow(
                     label = "True Damage Dealt",
-                    stats = team.players.map { it.trueDamageDealt.toString() }
+                    stats = team.players.map { it.stats.trueDamageDealt }
                 )
                 MatchStatsRow(
                     label = "True Damage Dealt to Heroes",
-                    stats = team.players.map { it.trueDamageDealtToHeroes.toString() }
+                    stats = team.players.map { it.stats.trueDamageDealtToHeroes }
                 )
                 MatchStatsRow(
                     label = "Damage Done to Structures",
-                    stats = team.players.map { it.totalDamageDealtToStructures.toString() }
+                    stats = team.players.map { it.stats.totalDamageDealtToStructures }
                 )
                 MatchStatsRow(
                     label = "Damage Done to Objectives",
-                    stats = team.players.map { it.totalDamageDealtToObjectives.toString() }
+                    stats = team.players.map { it.stats.totalDamageDealtToObjectives }
                 )
                 MatchStatsRow(
                     label = "Total Damage Taken",
-                    stats = team.players.map { it.totalDamageTaken.toString() }
+                    stats = team.players.map { it.stats.totalDamageTaken }
                 )
                 MatchStatsRow(
                     label = "Physical Damage Taken",
-                    stats = team.players.map { it.physicalDamageTaken.toString() }
+                    stats = team.players.map { it.stats.physicalDamageTaken }
                 )
                 MatchStatsRow(
                     label = "Magic Damage Taken",
-                    stats = team.players.map { it.magicalDamageTaken.toString() }
+                    stats = team.players.map { it.stats.magicalDamageTaken }
                 )
                 MatchStatsRow(
                     label = "True Damage Taken",
-                    stats = team.players.map { it.trueDamageTaken.toString() }
+                    stats = team.players.map { it.stats.trueDamageTaken }
                 )
                 MatchStatsRow(
                     label = "Total Damage Taken from Heroes",
-                    stats = team.players.map { it.totalDamageTakenFromHeroes.toString() }
+                    stats = team.players.map { it.stats.totalDamageTakenFromHeroes }
                 )
                 MatchStatsRow(
                     label = "Physical Damage Taken from Heroes",
-                    stats = team.players.map { it.physicalDamageTakenFromHeroes.toString() }
+                    stats = team.players.map { it.stats.physicalDamageTakenFromHeroes }
                 )
                 MatchStatsRow(
                     label = "Magic Damage Taken from Heroes",
-                    stats = team.players.map { it.magicalDamageTakenFromHeroes.toString() }
+                    stats = team.players.map { it.stats.magicalDamageTakenFromHeroes }
                 )
                 MatchStatsRow(
                     label = "True Damage Taken from Heroes",
-                    stats = team.players.map { it.trueDamageTakenFromHeroes.toString() }
+                    stats = team.players.map { it.stats.trueDamageTakenFromHeroes }
                 )
                 MatchStatsRow(
                     label = "Total Damage Mitigated",
-                    stats = team.players.map { it.totalDamageMitigated.toString() }
+                    stats = team.players.map { it.stats.totalDamageMitigated }
                 )
                 MatchStatsRow(
                     label = "Total Healing Done",
-                    stats = team.players.map { it.totalHealingDone.toString() }
+                    stats = team.players.map { it.stats.totalHealingDone }
                 )
                 MatchStatsRow(
                     label = "Item Healing Done",
-                    stats = team.players.map { it.itemHealingDone.toString() }
+                    stats = team.players.map { it.stats.itemHealingDone }
                 )
                 MatchStatsRow(
                     label = "Crest Healing Done",
-                    stats = team.players.map { it.crestHealingDone.toString() }
+                    stats = team.players.map { it.stats.crestHealingDone }
                 )
                 MatchStatsRow(
                     label = "Utility Healing Done",
-                    stats = team.players.map { it.utilityHealingDone.toString() }
+                    stats = team.players.map { it.stats.utilityHealingDone }
                 )
                 MatchStatsRow(
                     label = "Total Shielding Received",
-                    stats = team.players.map { it.totalShieldingReceived.toString() }
+                    stats = team.players.map { it.stats.totalShieldingReceived }
                 )
                 MatchStatsRow(
                     label = "Wards Placed",
-                    stats = team.players.map { it.wardsPlaced.toString() }
+                    stats = team.players.map { it.stats.wardsPlaced }
                 )
                 MatchStatsRow(
                     label = "Wards Destroyed",
-                    stats = team.players.map { it.wardsDestroyed.toString() }
+                    stats = team.players.map { it.stats.wardsDestroyed }
                 )
             }
 
@@ -515,7 +514,8 @@ fun MatchStatsRow(label: String, stats: List<String>) {
 
 @Composable
 fun RowScope.MatchStatsPlayerImageRow(
-    player: MatchPlayerCardUiModel
+    heroImageSrc: String,
+    playerName: String,
 ) {
     Box(
         modifier = Modifier
@@ -527,7 +527,7 @@ fun RowScope.MatchStatsPlayerImageRow(
                 .fillMaxWidth()
                 .aspectRatio(1f),
             contentScale = ContentScale.Crop,
-            model = player.heroImageUrl,
+            model = heroImageSrc,
             contentDescription = null
         )
 
@@ -547,7 +547,7 @@ fun RowScope.MatchStatsPlayerImageRow(
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = player.playerName,
+                text = playerName,
                 overflow = TextOverflow.Ellipsis,
                 softWrap = false,
                 style = MaterialTheme.typography.bodySmall,

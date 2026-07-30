@@ -2,7 +2,7 @@ package com.aowen.predcompanion.core.model.data
 
 data class ItemDetails(
     val id: String = "",
-    val gameId: Int = 0,
+    val gameId: String = "",
     val name: String = "",
     val displayName: String = "",
     val imageSrc: String = "",

@@ -1,7 +1,68 @@
 fragment MatchPlayerFragment on MatchPlayer {
     team
+    role
+    kills
+    deaths
+    assists
+    minionsKilled
+    laneMinionsKilled
+    neutralMinionsKilled
+    neutralMinionsTeamJungle
+    neutralMinionsEnemyJungle
+    largestKillingSpree
+    multiKill
+    totalDamageDealt
+    physicalDamageDealt
+    magicalDamageDealt
+    trueDamageDealt
+    largestCriticalStrike
+    heroDamage
+    physicalDamageDealtToHeroes
+    magicalDamageDealtToHeroes
+    trueDamageDealtToHeroes
+    totalDamageDealtToStructures
+    totalDamageDealtToObjectives
+    totalDamageTaken
+    physicalDamageTaken
+    magicalDamageTaken
+    trueDamageTaken
+    heroDamageTaken
+    physicalDamageTakenFromHeroes
+    magicalDamageTakenFromHeroes
+    trueDamageTakenFromHeroes
+    totalDamageMitigated
+    totalHealingDone
+    itemHealingDone
+    crestHealingDone
+    utilityHealingDone
+    totalShieldingReceived
+    wardsPlaced
+    wardsDestroyed
+    gold
+    goldSpent
+    inventoryItemData {
+        item {
+            id
+        }
+    }
+    rating {
+        points
+        rank {
+             name
+        }
+    }
+    perkData {
+        slot
+        icon
+        displayName
+        description
+
+    }
     player {
         ...PlayerFragment
+    }
+    hero {
+        ...HeroFragment
     }
     match {
         id

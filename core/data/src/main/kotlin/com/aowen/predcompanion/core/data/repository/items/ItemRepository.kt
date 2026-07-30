@@ -10,7 +10,7 @@ interface ItemRepository {
      * Reactive view of the in-memory item cache keyed by item id. Empty until
      * [fetchAllItems] has completed successfully at least once.
      */
-    val allItems: StateFlow<Map<Int, ItemDetails>>
+    val allItems: StateFlow<Map<String, ItemDetails>>
 
     /**
      * Populates the in-memory item caches from the network on first successful call.
@@ -29,15 +29,17 @@ interface ItemRepository {
     fun getItemByDisplayName(displayName: String): ItemDetails?
 
     /** Returns the cached item by its numeric id, or null if unknown / cache cold. */
-    fun getItemById(itemId: Int): ItemDetails?
+    fun getItemById(itemId: String): ItemDetails?
+
+    fun getCrestById(itemId: String): ItemDetails?
 
     /** Returns the cached item image source by its numeric id, or null if unknown / cache cold. */
-    fun getItemImageSrcById(itemId: Int): String
+    fun getItemImageSrcById(itemId: String): String
 
 
     /** Returns cached items matching the given ids, preserving input order; unknown ids are skipped. */
-    fun getItemsByIds(itemIds: List<Int>): List<ItemDetails>
+    fun getItemsByIds(itemIds: List<String>): List<ItemDetails>
 
     /** Returns cached item image sources matching the given ids, preserving input order; unknown ids are skipped. */
-    fun getItemImageSrcsByIds(itemIds: List<Int>): List<String>
+    fun getItemImageSrcsByIds(itemIds: List<String>): List<String>
 }

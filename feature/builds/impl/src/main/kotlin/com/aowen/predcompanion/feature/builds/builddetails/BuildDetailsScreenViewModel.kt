@@ -134,7 +134,7 @@ class BuildDetailsScreenViewModel @AssistedInject constructor(
 
     fun onItemClicked(itemId: Int) {
         _uiState.update {
-            it.copy(selectedItemDetails = omedaCityItemRepository.getItemById(itemId))
+            it.copy(selectedItemDetails = omedaCityItemRepository.getItemById(itemId.toString()))
         }
     }
 

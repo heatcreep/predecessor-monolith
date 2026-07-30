@@ -8,5 +8,6 @@ data class Player(
     val currentRankTitle: String = "",
     val currentRankPoints: String = "",
     val favoriteRole: String = "",
+    val heroStatistics: List<PlayerHeroStatistics>,
     val favoriteHero: HeroDetails? = null,
 )

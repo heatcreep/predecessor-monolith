@@ -22,6 +22,7 @@ fun PlayerFragment.asPlayer(): Player {
         currentRankPoints = ratings.last().playerRatingFragment.points.toString(),
         favoriteRole = favRole?.toFavoriteRole() ?: "",
         favoriteHero = favHero?.heroFragment?.asHeroDetails(),
+        heroStatistics = heroStatistics?.asPlayerHeroStatistics() ?: emptyList()
     )
 }
 

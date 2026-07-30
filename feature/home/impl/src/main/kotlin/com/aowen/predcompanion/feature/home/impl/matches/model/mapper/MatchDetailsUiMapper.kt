@@ -1,12 +1,13 @@
 package com.aowen.predcompanion.feature.home.impl.matches.model.mapper
 
 import com.aowen.predcompanion.core.model.data.MatchDetails
+import com.aowen.predcompanion.core.ui.model.mapper.MatchDetailsPlayerCardUiMapper
 import com.aowen.predcompanion.feature.home.impl.matches.model.MatchDetailsUiModel
 import com.aowen.predcompanion.feature.home.impl.matches.model.MatchTeamUiModel
 import javax.inject.Inject
 
 class MatchDetailsUiMapper @Inject constructor(
-    private val matchPlayerCardUiModelMapper: MatchPlayerCardUiModelMapper,
+    private val matchDetailsPlayerCardUiMapper: MatchDetailsPlayerCardUiMapper
 ) {
 
     operator fun invoke(match: MatchDetails): MatchDetailsUiModel {
@@ -14,10 +15,15 @@ class MatchDetailsUiMapper @Inject constructor(
             gameDuration = match.gameDuration,
             winningTeam = match.winningTeam,
             duskTeam = MatchTeamUiModel.Dusk(
-                matchPlayerCardUiModelMapper.invoke(match.dusk.players, match.gameDuration)
+                match.dusk.players.map {
+                    matchDetailsPlayerCardUiMapper.buildFrom(it)
+                }
+
             ),
             dawnTeam = MatchTeamUiModel.Dawn(
-                matchPlayerCardUiModelMapper.invoke(match.dawn.players, match.gameDuration)
+                match.dawn.players.map {
+                    matchDetailsPlayerCardUiMapper.buildFrom(it)
+                }
             ),
         )
     }

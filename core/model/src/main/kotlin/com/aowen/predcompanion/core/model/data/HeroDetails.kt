@@ -12,7 +12,7 @@ data class AbilityDetails(
 )
 
 data class HeroDetails(
-    val id: Long = 0,
+    val id: String = "",
     val name: String = "",
     val displayName: String = "",
     val imageUrl: String? = null,
