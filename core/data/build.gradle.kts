@@ -23,12 +23,6 @@ dependencies {
     api(projects.core.network)
     api(projects.core.resources)
 
-    implementation(libs.retrofit.core)
-
-    // Supabase (for SessionStatus reference in AuthRepository)
-    implementation(platform(libs.supabase.bom))
-    implementation(libs.supabase.auth)
-
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 

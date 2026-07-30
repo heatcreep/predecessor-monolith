@@ -32,8 +32,6 @@ firebaseBom = "33.2.0"
 firebasePlugin = "3.0.2"
 firebaseAppDistribution = "16.0.0-beta13"
 googleServices = "4.4.2"
-retrofit = "2.9.0"
-retrofitKotlinSerialization = "1.0.0"
 room = "2.7.1"
 kotlinBom = "2.4.0"
 kotlinSerialization = "1.6.3"
@@ -42,9 +40,7 @@ kotlinImmutableCollections = "0.3.7"
 ksp = "2.3.4"
 meetupMarkdown = "0.2.2"
 mockk = "1.14.9"
-supabaseBom = "3.6.0"
 ktor = "3.1.3"
-okhttp = "4.12.0"
 junit4 = "4.13.2"
 roomGradlePlugin = "2.8.4"
 
@@ -114,13 +110,6 @@ kotlinx-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collec
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 meetup-markdown = { module = "com.meetup:twain", version.ref = "meetupMarkdown" }
-okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
-retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinSerialization" }
-supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
-supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
-supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
-supabase-functions = { module = "io.github.jan-tennert.supabase:functions-kt" }
 
 # Test Libraries
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }

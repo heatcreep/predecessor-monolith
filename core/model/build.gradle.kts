@@ -11,7 +11,7 @@ android {
 dependencies {
     // Resources module provides shared drawables (R.drawable.*)
     implementation(project(":core:resources"))
-    // Common utilities (RetrofitHelper, BigDecimalSerializer, etc.)
+    // Common utilities (BigDecimalSerializer, etc.)
     implementation(project(":core:common"))
 
     implementation(libs.kotlinx.serialization.json)

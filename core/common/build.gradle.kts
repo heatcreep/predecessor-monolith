@@ -9,5 +9,4 @@ android {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
-    api(libs.retrofit.core)
 }
