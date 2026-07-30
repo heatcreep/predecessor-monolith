@@ -1,10 +1,8 @@
 package com.aowen.predcompanion.core.data.repository.di
 
 import com.aowen.predcompanion.core.data.repository.auth.AppAuthRepository
-import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.data.repository.auth.NewAuthRepository
 import com.aowen.predcompanion.core.data.repository.auth.PredGgAuthTokenProvider
-import com.aowen.predcompanion.core.data.repository.auth.SupabaseAuthRepository
 import com.aowen.predcompanion.core.data.repository.user.NetworkUserRecentSearchRepository
 import com.aowen.predcompanion.core.data.repository.user.OfflineFirstUserRepository
 import com.aowen.predcompanion.core.data.repository.user.OfflineFirstUserClaimedPlayerRepository
@@ -32,12 +30,6 @@ abstract class DataModule {
     internal abstract fun bindsNewAuthRepository(
         authRepository: AppAuthRepository
     ): NewAuthRepository
-
-    @Binds
-    @Singleton
-    internal abstract fun bindsAuthRepository(
-        authRepository: SupabaseAuthRepository
-    ): AuthRepository
 
     @Binds
     @Singleton
