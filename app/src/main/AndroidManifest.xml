@@ -45,14 +45,6 @@
                 <data android:scheme="monolith" />
                 <data android:host="player-detail" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:host="login"
-                    android:scheme="monolith" />
-            </intent-filter>
         </activity>
         <receiver android:name=".glance.HeroStatsReceiver" android:exported="true">
             <intent-filter>
