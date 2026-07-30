@@ -1,0 +1,32 @@
+query GetGuideQuery($by: GuideKey!) {
+    guide(by: $by) {
+        id
+        title
+        author {
+            ...UserFragment
+        }
+        hero {
+            ...HeroFragment
+        }
+        role
+        modules {
+            id
+            order
+            primary
+            primaryPerk
+            title
+            text
+            items {
+                ...ItemFragment
+            }
+            abilityOrder
+        }
+        averageScore
+        scoreCount
+        createdAt
+        updatedAt
+        version {
+            name
+        }
+    }
+}

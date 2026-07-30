@@ -1,7 +1,35 @@
-query BuildsQuery {
-    guidesPaginated(filter: {versions:[]}) {
+query BuildsQuery($filter: GuideFilterInput, $order: GuideOrderInput, $limit: Int, $offset: Int) {
+    guidesPaginated(filter: $filter, order: $order, limit: $limit, offset: $offset) {
         results {
+            id
             title
+            author {
+                ...UserFragment
+            }
+            hero {
+                ...HeroFragment
+            }
+            role
+            modules {
+                id
+                order
+                primary
+                primaryPerk
+                title
+                text
+                items {
+                    ...ItemFragment
+                }
+                abilityOrder
+            }
+            averageScore
+            scoreCount
+            createdAt
+            updatedAt
+            version {
+                name
+            }
         }
+        totalCount
     }
 }
