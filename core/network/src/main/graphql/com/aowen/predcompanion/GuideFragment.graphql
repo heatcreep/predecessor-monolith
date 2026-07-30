@@ -1,0 +1,25 @@
+fragment GuideFragment on Guide {
+    id
+    title
+    author {
+        name
+    }
+    role
+    hero {
+        id
+    }
+    averageScore
+    createdAt
+    updatedAt
+    version {
+        name
+    }
+    modules {
+        id
+        title
+        primary
+        items {
+            id
+        }
+    }
+}

@@ -1,0 +1,45 @@
+query PlayerQuery($playerId: ID!) {
+    player(by: {id: $playerId}) {
+        ...PlayerFragment
+        heroStatistics {
+            results {
+                hero {
+                    id
+                    data {
+                        displayName
+                    }
+                }
+                matchesPlayed
+                matchesWon
+                totalKills
+                totalDeaths
+                totalAssists
+                totalMinionsKilled
+                totalGold
+                totalHeroDamage
+                totalHeroDamageTaken
+                structureDamage
+                objectiveDamage
+                totalWardsPlaced
+                totalWardsDestroyed
+                maxKills
+                maxDeaths
+                maxAssists
+                maxMinionsKilled
+                maxGold
+                maxHeroDamage
+                maxHeroDamageTaken
+                maxStructureDamage
+                maxObjectiveDamage
+                maxWardsPlaced
+                maxWardsDestroyed
+                maxKillingSpree
+                maxLargestCritical
+                doubleKills
+                tripleKills
+                quadraKills
+                pentaKills
+            }
+        }
+    }
+}

@@ -81,6 +81,40 @@ fun HeroBuild.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
     )
 }
 
+fun FavoriteBuildListEntity.asFavoriteBuildListItem(): FavoriteBuildListItem {
+    return FavoriteBuildListItem(
+        buildId = buildId,
+        heroId = heroId,
+        role = role,
+        title = title,
+        description = description,
+        author = author,
+        crestId = crestId,
+        itemIds = itemIds,
+        upvotesCount = upvotesCount,
+        downvotesCount = downvotesCount,
+        createdAt = createdAt,
+        gameVersion = gameVersion
+    )
+}
+
+fun NetworkFavoriteHeroBuild.asFavoriteBuildListItem(): FavoriteBuildListItem {
+    return FavoriteBuildListItem(
+        buildId = buildId,
+        heroId = heroId,
+        role = role,
+        title = title,
+        description = description,
+        author = author,
+        crestId = crestId,
+        itemIds = itemIds,
+        upvotesCount = upvotesCount,
+        downvotesCount = downvotesCount,
+        createdAt = createdAt,
+        gameVersion = gameVersion
+    )
+}
+
 fun HeroBuild.asNetworkFavoriteBuild(userId: UUID): NetworkFavoriteHeroBuild {
     return NetworkFavoriteHeroBuild(
         id = UUID.randomUUID(),

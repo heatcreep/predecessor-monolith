@@ -1,8 +1,8 @@
 package com.aowen.predcompanion.core.data.repository.user
 
 import com.aowen.predcompanion.core.data.model.asFavoriteBuildListEntity
+import com.aowen.predcompanion.core.data.model.asFavoriteBuildListItem
 import com.aowen.predcompanion.core.data.model.asNetworkFavoriteBuild
-import com.aowen.predcompanion.core.data.repository.BuildListItemDataMapper
 import com.aowen.predcompanion.core.data.repository.auth.AuthRepository
 import com.aowen.predcompanion.core.database.dao.FavoriteBuildDao
 import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
@@ -40,7 +40,6 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
     private val authService: SupabaseAuthService,
     private val authRepository: AuthRepository,
     private val favoriteBuildDao: FavoriteBuildDao,
-    private val buildListItemDataMapper: BuildListItemDataMapper
 ) : UserFavoriteBuildsRepository {
 
     private suspend fun currentUserId(): UUID? =
@@ -59,7 +58,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             is NetworkUserState.Unauthenticated -> {
                 val favoriteBuilds =
                     favoriteBuildDao.getFavoriteBuildListItems().firstOrNull()?.map { buildEntity ->
-                        buildListItemDataMapper.createFavoriteBuildListItemFrom(buildEntity)
+                        buildEntity.asFavoriteBuildListItem()
                     } ?: emptyList()
                 if (favoriteBuilds.isEmpty()) {
                     _favoriteBuildsState.update { FavoriteBuildsState.Empty }
@@ -76,9 +75,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
                     val userId = currentUserId() ?: return Result.failure(Exception("User not found"))
                     val favoriteBuilds = postgrestService.fetchFavoriteBuilds(userId)
                         .map { networkFavoriteBuild ->
-                            buildListItemDataMapper.createFavoriteBuildListItemFrom(
-                                networkFavoriteBuild
-                            )
+                            networkFavoriteBuild.asFavoriteBuildListItem()
                         }
                     if (favoriteBuilds.isEmpty()) {
                         _favoriteBuildsState.update {
@@ -108,8 +105,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
             is NetworkUserState.Unauthenticated -> {
                 val favoriteBuildEntity = heroBuild.asFavoriteBuildListEntity()
                 favoriteBuildDao.insertFavoriteBuildListItem(favoriteBuildEntity)
-                val favoriteBuildListItem =
-                    buildListItemDataMapper.createFavoriteBuildListItemFrom(favoriteBuildEntity)
+                val favoriteBuildListItem = favoriteBuildEntity.asFavoriteBuildListItem()
                 _favoriteBuildsState.update { state ->
                     when (state) {
                         is FavoriteBuildsState.Empty -> {
@@ -133,10 +129,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
                 return try {
                     val userId = currentUserId() ?: return
                     val favoriteBuildDto = heroBuild.asNetworkFavoriteBuild(userId)
-                    val favoriteBuildListItem =
-                        buildListItemDataMapper.createFavoriteBuildListItemFrom(
-                            favoriteBuildDto
-                        )
+                    val favoriteBuildListItem = favoriteBuildDto.asFavoriteBuildListItem()
                     postgrestService.insertFavoriteBuild(favoriteBuildDto)
                     _favoriteBuildsState.update { state ->
                         (state as FavoriteBuildsState.Success).copy(

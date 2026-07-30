@@ -1,8 +1,8 @@
-query SearchPlayersQuery($filter: PlayerFilterInput!, $limit: Int, $offset: Int) {
-    playersPaginated(filter: $filter, limit: $limit, offset: $offset) {
+query SearchPlayersQuery($search: String!) {
+    playersPaginated(filter: {search: $search}) {
         results {
-            ...PlayerFragment
+            id
+            name
         }
-        totalCount
     }
 }

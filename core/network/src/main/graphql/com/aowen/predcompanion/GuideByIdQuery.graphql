@@ -1,0 +1,5 @@
+query GuideByIdQuery($buildId: ID!) {
+    guide(by: {id: $buildId}) {
+        ...GuideFragment
+    }
+}
