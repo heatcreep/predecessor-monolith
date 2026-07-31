@@ -16,19 +16,19 @@ class OmedaCityItemRepository @Inject constructor(
     private val predGGNetwork: PredGGNetworkDataSource,
 ) : ItemRepository {
 
-    private val _allItems: MutableStateFlow<Map<Int, ItemDetails>> = MutableStateFlow(emptyMap())
-    override val allItems: StateFlow<Map<Int, ItemDetails>> = _allItems
+    private val _allItems: MutableStateFlow<Map<String, ItemDetails>> = MutableStateFlow(emptyMap())
+    override val allItems: StateFlow<Map<String, ItemDetails>> = _allItems
 
     override suspend fun fetchAllItems() {
         val result = safeGraphQlCall(
             apiCall = predGGNetwork::getAllItems,
-            transform = { data -> data.items.mapNotNull { it.itemFragment.data?.asItemDetails() } }
+            transform = { data -> data.items.map { it.itemFragment.asItemDetails() } }
         )
         if (result is Resource.Success) {
             _allItems.update {
                 result.data
                     .filter { it.id.isNotBlank() }
-                    .associateBy { it.id.toInt() }
+                    .associateBy { it.id }
             }
         }
     }
@@ -41,14 +41,16 @@ class OmedaCityItemRepository @Inject constructor(
     override fun getItemByDisplayName(displayName: String): ItemDetails? =
         _allItems.value.values.firstOrNull { it.displayName == displayName }
 
-    override fun getItemById(itemId: Int): ItemDetails? = allItems.value[itemId]
+    override fun getItemById(itemId: String): ItemDetails? = allItems.value[itemId]
 
-    override fun getItemImageSrcById(itemId: Int): String = allItems.value[itemId]?.imageSrc ?: ""
+    override fun getCrestById(itemId: String): ItemDetails? = allItems.value[itemId]
 
-    override fun getItemsByIds(itemIds: List<Int>): List<ItemDetails> =
+    override fun getItemImageSrcById(itemId: String): String = allItems.value[itemId]?.imageSrc ?: ""
+
+    override fun getItemsByIds(itemIds: List<String>): List<ItemDetails> =
         itemIds.mapNotNull { allItems.value[it] }
 
-    override fun getItemImageSrcsByIds(itemIds: List<Int>): List<String> =
+    override fun getItemImageSrcsByIds(itemIds: List<String>): List<String> =
         itemIds.mapNotNull { allItems.value[it]?.imageSrc }
 
 }

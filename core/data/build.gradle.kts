@@ -23,6 +23,8 @@ dependencies {
     api(projects.core.network)
     api(projects.core.resources)
 
+    implementation(libs.kotlinx.datetime)
+
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 

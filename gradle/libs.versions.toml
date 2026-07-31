@@ -37,6 +37,7 @@ kotlinBom = "2.4.0"
 kotlinSerialization = "1.6.3"
 kotlinTest = "1.7.3"
 kotlinImmutableCollections = "0.3.7"
+kotlinXDateTime = "0.8.0"
 ksp = "2.3.4"
 meetupMarkdown = "0.2.2"
 mockk = "1.14.9"
@@ -104,6 +105,7 @@ junit4 = { module = "junit:junit", version.ref = "junit4" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlinBom" }
 kotlin-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlinBom" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlinBom" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinXDateTime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinTest" }
 kotlinx-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinImmutableCollections" }

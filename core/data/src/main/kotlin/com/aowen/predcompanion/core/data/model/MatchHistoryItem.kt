@@ -9,9 +9,6 @@ import com.aowen.predcompanion.core.network.apollo.type.PerkSlot
 import com.aowen.predcompanion.core.network.apollo.type.Role
 import com.aowen.predcompanion.core.network.apollo.type.SlotType
 import com.aowen.predcompanion.core.resources.R
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -113,15 +110,7 @@ private fun minutesBetween(start: Instant, end: Instant): Int {
 }
 
 private fun handleTimeSinceMatch(endTime: Instant): String {
-
-    val tz = TimeZone.currentSystemDefault()
-
-    val pastLocalInstant = endTime.toLocalDateTime(tz).toInstant(tz)
-
-    val nowInstant = Clock.System.now()
-    val nowLocalInstant = nowInstant.toLocalDateTime(tz).toInstant(tz)
-
-    val duration = nowLocalInstant.minus(pastLocalInstant)
+    val duration = Clock.System.now() - endTime
 
     return when {
         duration.inWholeDays > 1 -> "${duration.inWholeDays} days ago"

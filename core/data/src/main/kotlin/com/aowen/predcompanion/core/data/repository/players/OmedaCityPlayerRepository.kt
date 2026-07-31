@@ -2,7 +2,9 @@ package com.aowen.predcompanion.core.data.repository.players
 
 import com.aowen.predcompanion.core.data.helpers.ImageHelpers.buildAssetsUrl
 import com.aowen.predcompanion.core.data.model.asHeroDetails
+import com.aowen.predcompanion.core.data.model.asPlayer
 import com.aowen.predcompanion.core.data.model.toPercentageString
+import com.aowen.predcompanion.core.model.data.Player
 import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.network.PredGGNetworkDataSource
 import com.aowen.predcompanion.core.network.Resource
@@ -67,6 +69,10 @@ class OmedaCityPlayerRepository @Inject constructor(
                 PlayerInfo(playerDetails, playerStats)
             }
         )
+
+    override suspend fun fetchPlayerById(playerId: String): Player? {
+        return predGGNetwork.getPlayer(playerId).data?.player?.playerFragment?.asPlayer()
+    }
 
     override suspend fun fetchAllPlayerHeroStats(playerId: String): Resource<List<PlayerHeroStats>> =
         safeGraphQlCall(

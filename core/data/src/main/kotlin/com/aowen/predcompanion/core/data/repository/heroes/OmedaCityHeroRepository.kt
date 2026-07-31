@@ -18,8 +18,8 @@ class OmedaCityHeroRepository @Inject constructor(
     private val predGGNetwork: PredGGNetworkDataSource,
 ) : HeroRepository {
 
-    private val _allHeroes: MutableStateFlow<Map<Long, HeroDetails>> = MutableStateFlow(emptyMap())
-    override val allHeroes: StateFlow<Map<Long, HeroDetails>> = _allHeroes
+    private val _allHeroes: MutableStateFlow<Map<String, HeroDetails>> = MutableStateFlow(emptyMap())
+    override val allHeroes: StateFlow<Map<String, HeroDetails>> = _allHeroes
 
     override suspend fun fetchAllHeroes() {
         val result = safeGraphQlCall<HeroesQuery.Data, List<HeroDetails>>(
@@ -33,7 +33,7 @@ class OmedaCityHeroRepository @Inject constructor(
         }
     }
 
-    override fun getHeroName(heroId: Long): String =
+    override fun getHeroName(heroId: String): String =
         allHeroes.value[heroId]?.name ?: ""
 
     override fun getHeroByName(heroName: String): HeroDetails? =
@@ -41,7 +41,7 @@ class OmedaCityHeroRepository @Inject constructor(
             it.displayName == heroName
         }
 
-    override fun getHeroImageSrcById(heroId: Long): String =
+    override fun getHeroImageSrcById(heroId: String): String =
         allHeroes.value[heroId]?.imageUrl ?: ""
 
     // The GraphQL API does not expose server-side aggregated hero statistics, so these

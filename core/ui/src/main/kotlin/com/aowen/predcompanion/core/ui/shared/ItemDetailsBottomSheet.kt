@@ -40,7 +40,7 @@ fun ItemDetailsBottomSheetPreview() {
         Surface {
             ItemDetailsContent(
                 itemDetails = ItemDetails(
-                    imageSrc = "https://omeda.city/images/items/Refillable-Potion.webp",
+                    imageSrc = "",
                     name = "Refillable Potion",
                     displayName = "Malady",
                 ),

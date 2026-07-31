@@ -7,9 +7,6 @@ import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
 import com.aowen.predcompanion.core.model.data.HeroBuild
 import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import com.aowen.predcompanion.core.network.model.NetworkFavoriteHeroBuild
-import java.sql.Timestamp
-import java.util.UUID
 import javax.inject.Inject
 
 data class ItemModuleUi(
@@ -94,25 +91,6 @@ class BuildListItemUiMapper @Inject constructor(
             version = favoriteBuildListItem.gameVersion
         )
     }
-}
-
-fun BuildUiListItem.asFavoriteBuildDto(userId: UUID): NetworkFavoriteHeroBuild {
-    return NetworkFavoriteHeroBuild(
-        id = UUID.randomUUID(),
-        createdAt = Timestamp(System.currentTimeMillis()).toString(),
-        userId = userId,
-        buildId = buildId,
-        heroId = heroId,
-        role = role?.roleName ?: "",
-        title = title,
-        description = description,
-        author = author,
-        crestId = crest.id.toInt(),
-        itemIds = buildItems.map { it.id.toInt() },
-        upvotesCount = upvotes,
-        downvotesCount = downvotes,
-        gameVersion = version ?: ""
-    )
 }
 
 fun BuildUiListItem.asFavoriteBuildListEntity(): FavoriteBuildListEntity {

@@ -69,14 +69,14 @@ class OfflineFirstUserRepository @Inject constructor(
 
     override suspend fun fetchCurrentUser(): CurrentUser? {
         
-        val data = predGGNetwork.getCurrentUser().data
+        val data = predGGNetwork.getUser().data
         return data?.currentUser?.userFragment?.asCurrentUser()
     }
 
     override suspend fun sync() {
         _currentUserState.emit(UserState.Loading)
         try {
-            val data = predGGNetwork.getCurrentUser().data
+            val data = predGGNetwork.getUser().data
             val entity = data?.currentUser?.userFragment?.asEntity()
             if (entity != null) {
                 currentUserDao.upsertCurrentUser(entity)
