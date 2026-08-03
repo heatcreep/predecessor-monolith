@@ -30,7 +30,7 @@ fun EntryProviderScope<NavKey>.matchesEntry(navigator: Navigator) {
                     title = "Match Details",
                     titleStyle = MaterialTheme.typography.bodyLarge,
                     backAction = {
-                        IconButton(onClick = { navigator.goBack() }) {
+                        IconButton(onClick = navigator::goBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "navigate up"
