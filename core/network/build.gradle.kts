@@ -1,6 +1,5 @@
 import com.android.build.api.variant.BuildConfigField
-import java.io.StringReader
-import java.util.Properties
+import com.aowen.predcompanion.getEnvironmentVariable
 
 plugins {
     alias(libs.plugins.predcompanion.android.library)
@@ -36,13 +35,9 @@ dependencies {
 
 }
 
-val predGgToken = providers.fileContents(
-    isolated.rootProject.projectDirectory.file("local.properties")
-).asText.map { text ->
-    val properties = Properties()
-    properties.load(StringReader(text))
-    properties["PRED_GG_TOKEN"] as String
-}.orElse("")
+val predGgToken = project.provider {
+    project.getEnvironmentVariable("PRED_GG_TOKEN") ?: ""
+}
 
 apollo {
     service("predgg") {
@@ -56,20 +51,16 @@ apollo {
     }
 }
 
-val authBaseUrl = providers.fileContents(
-    isolated.rootProject.projectDirectory.file("local.properties")
-).asText.map { text ->
-    val properties = Properties()
-    properties.load(StringReader(text))
-    properties["AUTH_BASE_URL"]
-}.orElse("http://example.com")
+val authBaseUrl = project.provider {
+    project.getEnvironmentVariable("AUTH_BASE_URL") ?: "http://example.com"
+}
 
 
 
 androidComponents {
     onVariants {
         it.buildConfigFields!!.put("AUTH_BASE_URL", authBaseUrl.map { value ->
-            BuildConfigField(type = "String", value = "$value", comment = null)
+            BuildConfigField(type = "String", value = "\"$value\"", comment = null)
         })
     }
 }

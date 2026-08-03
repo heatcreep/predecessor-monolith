@@ -39,6 +39,8 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          AUTH_BASE_URL: ${{ secrets.AUTH_BASE_URL }}
+          PRED_GG_TOKEN: ${{ secrets.PRED_GG_TOKEN }}
         run: |
           ./gradlew bundleRelease
 

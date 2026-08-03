@@ -1,6 +1,31 @@
 # Release Notes
 
-## 1.9.7 - Latest
+## 2.0.0 - Latest
+
+### Architecture
+
+- Refactored the entire codebase to a multimodule architecture for better separation of concerns, faster build times, and improved testability
+- Migrated the entire networking layer from Retrofit/OkHttp to Apollo GraphQL (pred.gg API)
+- Removed all Supabase dependencies (auth, postgrest) in favor of pred.gg OAuth2 sign-in
+- Hero images are now fetched from the network and cached locally instead of being bundled in the APK
+
+### New Features
+
+- **Match Detail Stats Tab** — New tab in Match Details showing individual player stats including minion kills, damage dealt, healing, and more
+- **Shared Player Profile Layout** — Profile screen and Player Detail screen now share a unified layout for a consistent experience
+- **pred.gg OAuth2 Sign-In** — New sign-in flow using pred.gg accounts, replacing the old Supabase/Discord login
+- Added image for Akeron
+
+### Improvements & Bug Fixes
+
+- Unified the Profile and Player Detail screens with a shared PlayerProfileLayout composable
+- Fixed all broken routes, assets, and crashes introduced during multimodule migration
+- Fixed hero and item display issues and typography
+- Fixed crashing issue with hero stats tab on Player Detail page
+- Added ViewModel unit tests and test fakes for GraphQL-based repositories
+- Cleaned up dead Retrofit, Supabase, and network DTO code
+
+## 1.9.7
 
 #### New Features
 
@@ -9,7 +34,7 @@
 #### Improvements & Bug Fixes
 - Fix Player Detail page error due to missing mana info for Eden since she has no mana.
 
-## 1.9.5 - Latest
+## 1.9.5
 
 #### New Features
 
@@ -106,7 +131,7 @@
 
 - Fixes Auth Flow signing peoplem out and crashing the app
 
-## 1.7.0 - Latest
+## 1.7.0
 
 - Adds image for Terra
 - Filters builds on Hero Details by latest game version
@@ -207,7 +232,7 @@
 
 - Adds photo for Kwang
 
-## 0.7.1 - Latest
+## 0.7.1
 
 #### Improvements & Bug Fixes
 
@@ -281,7 +306,7 @@
 - fixes the relative timestamps on match history
 
 
-## 0.5.0 - Latest
+## 0.5.0
 
 #### New Features
 

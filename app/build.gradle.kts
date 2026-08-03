@@ -1,5 +1,5 @@
 
-import java.util.Properties
+import com.aowen.predcompanion.getEnvironmentVariableAsString
 
 plugins {
     alias(libs.plugins.predcompanion.android.application)
@@ -16,7 +16,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.aowen.predcompanion"
+        applicationId = "com.aowen.monolith"
         minSdk = 24
         targetSdk = 36
         versionCode = (System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1) + 1
@@ -26,7 +26,7 @@ android {
             useSupportLibrary = true
         }
         manifestPlaceholders["appAuthRedirectScheme"] = "com.aowen.predcompanion"
-        buildConfigField("String", "AUTH_BASE_URL", "${getEnvironmentVariable("AUTH_BASE_URL")}")
+        buildConfigField("String", "AUTH_BASE_URL", project.getEnvironmentVariableAsString("AUTH_BASE_URL"))
     }
     signingConfigs {
         register("release") {
@@ -68,21 +68,6 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-    }
-}
-
-fun getLocalProperty(key: String): String? {
-    val properties = Properties()
-    properties.load(project.rootProject.file("local.properties").inputStream())
-    return properties.getProperty(key)
-}
-
-fun getEnvironmentVariable(key: String): String? {
-    val isCi = System.getenv("CI")?.toBoolean() ?: false
-    return if (isCi) {
-        System.getenv(key)
-    } else {
-        getLocalProperty(key)
     }
 }
 

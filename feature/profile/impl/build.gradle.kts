@@ -40,7 +40,7 @@ val versionName = providers.fileContents(
 androidComponents {
     onVariants {
         it.buildConfigFields!!.put("VERSION_NAME", versionName.map { value ->
-            BuildConfigField(type = "String", value = """"$value"""", comment = null)
+            BuildConfigField(type = "String", value = "\"$value\"", comment = null)
         })
     }
 }
