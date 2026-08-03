@@ -84,6 +84,7 @@ private fun ItemFragment.Stat.createStatDetails(): ItemDetails.StatDetails {
             name = "Ability Haste",
             value = this.value.toStatValue()
         )
+
         ItemDescriptionStat.HEALTH -> ItemDetails.StatDetails(
             iconId = coreResources.drawable.max_health,
             name = "Max Health",
@@ -165,6 +166,12 @@ private fun ItemFragment.Stat.createStatDetails(): ItemDetails.StatDetails {
         ItemDescriptionStat.TENACITY -> ItemDetails.StatDetails(
             iconId = coreResources.drawable.tenacity,
             name = "Tenacity",
+            value = this.value.toStatValue()
+        )
+
+        ItemDescriptionStat.MOVEMENT_SPEED -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.movement_speed,
+            name = "Movement Speed",
             value = this.value.toStatValue()
         )
 
