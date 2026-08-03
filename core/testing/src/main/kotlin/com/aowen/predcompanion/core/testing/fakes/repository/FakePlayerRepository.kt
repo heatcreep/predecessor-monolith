@@ -19,7 +19,8 @@ class FakePlayerRepository : PlayerRepository {
     override suspend fun fetchPlayerInfo(playerId: String): Resource<PlayerInfo> =
         playerInfoToReturn
 
-    override suspend fun fetchPlayerById(playerId: String): Player? = playerByIdToReturn
+    override suspend fun fetchPlayerById(playerId: String): Resource<Player?> =
+        Resource.Success(playerByIdToReturn)
 
     override suspend fun fetchAllPlayerHeroStats(playerId: String): Resource<List<PlayerHeroStats>> =
         playerHeroStatsToReturn
