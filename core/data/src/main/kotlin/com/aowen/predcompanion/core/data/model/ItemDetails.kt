@@ -3,6 +3,7 @@ package com.aowen.predcompanion.core.data.model
 import com.aowen.predcompanion.core.data.helpers.ImageHelpers
 import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.ItemDetails.StatDetails
 import com.aowen.predcompanion.core.model.data.Rarity
 import com.aowen.predcompanion.core.model.data.SlotType
 import com.aowen.predcompanion.core.network.apollo.fragment.ItemFragment
@@ -79,103 +80,140 @@ fun Float.toPercentageString(): String {
 
 private fun ItemFragment.Stat.createStatDetails(): ItemDetails.StatDetails {
     return when (this.stat) {
-        ItemDescriptionStat.ABILITY_HASTE -> ItemDetails.StatDetails(
+        ItemDescriptionStat.ABILITY_HASTE -> StatDetails(
             iconId = coreResources.drawable.ability_haste,
             name = "Ability Haste",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.HEALTH -> ItemDetails.StatDetails(
+        ItemDescriptionStat.HEALTH -> StatDetails(
             iconId = coreResources.drawable.max_health,
             name = "Max Health",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.MANA -> ItemDetails.StatDetails(
+        ItemDescriptionStat.MANA -> StatDetails(
             iconId = coreResources.drawable.max_mana,
             name = "Max Mana",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.BASE_HEALTH_REGENERATION -> ItemDetails.StatDetails(
+        ItemDescriptionStat.BASE_HEALTH_REGENERATION -> StatDetails(
             iconId = coreResources.drawable.health_regen,
             name = "Health Regen",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.BASE_MANA_REGENERATION -> ItemDetails.StatDetails(
+        ItemDescriptionStat.BASE_MANA_REGENERATION -> StatDetails(
             iconId = coreResources.drawable.mana_regen,
             name = "Mana Regen",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.PHYSICAL_POWER -> ItemDetails.StatDetails(
+        ItemDescriptionStat.PHYSICAL_POWER -> StatDetails(
             iconId = coreResources.drawable.physical_power,
             name = "Physical Power",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.MAGICAL_POWER -> ItemDetails.StatDetails(
+        ItemDescriptionStat.MAGICAL_POWER -> StatDetails(
             iconId = coreResources.drawable.magical_power,
             name = "Magical Power",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.ATTACK_SPEED -> ItemDetails.StatDetails(
+        ItemDescriptionStat.ATTACK_SPEED -> StatDetails(
             iconId = coreResources.drawable.attack_speed,
             name = "Attack Speed",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.PHYSICAL_ARMOR -> ItemDetails.StatDetails(
+        ItemDescriptionStat.PHYSICAL_ARMOR -> StatDetails(
             iconId = coreResources.drawable.physical_armor,
             name = "Physical Armor",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.MAGICAL_ARMOR -> ItemDetails.StatDetails(
+        ItemDescriptionStat.MAGICAL_ARMOR -> StatDetails(
             iconId = coreResources.drawable.magical_armor,
             name = "Magical Armor",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.PHYSICAL_PENETRATION -> ItemDetails.StatDetails(
+        ItemDescriptionStat.PHYSICAL_PENETRATION -> StatDetails(
             iconId = coreResources.drawable.physical_pen,
             name = "Physical Penetration",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.MAGICAL_PENETRATION -> ItemDetails.StatDetails(
+        ItemDescriptionStat.MAGICAL_PENETRATION -> StatDetails(
             iconId = coreResources.drawable.magical_pen,
             name = "Magical Penetration",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.CRITICAL_CHANCE -> ItemDetails.StatDetails(
+        ItemDescriptionStat.CRITICAL_CHANCE -> StatDetails(
             iconId = coreResources.drawable.critical_chance,
             name = "Critical Chance",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.GOLD_PER_SECOND -> ItemDetails.StatDetails(
+        ItemDescriptionStat.GOLD_PER_SECOND -> StatDetails(
             iconId = coreResources.drawable.gold_per_second,
             name = "Gold Per Second",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.TENACITY -> ItemDetails.StatDetails(
+        ItemDescriptionStat.TENACITY -> StatDetails(
             iconId = coreResources.drawable.tenacity,
             name = "Tenacity",
             value = this.value.toStatValue()
         )
 
-        ItemDescriptionStat.MOVEMENT_SPEED -> ItemDetails.StatDetails(
+        ItemDescriptionStat.MOVEMENT_SPEED -> StatDetails(
             iconId = coreResources.drawable.movement_speed,
             name = "Movement Speed",
             value = this.value.toStatValue()
         )
 
-        else -> ItemDetails.StatDetails(
+        ItemDescriptionStat.LIFESTEAL -> StatDetails(
+            iconId = coreResources.drawable.lifesteal,
+            name = "Lifesteal",
+            value = this.value.toStatValue()
+        )
+
+        ItemDescriptionStat.DEFAULT -> StatDetails(
+            iconId = coreResources.drawable.unknown,
+            name = "Unknown",
+            value = this.value.toStatValue()
+        )
+
+        ItemDescriptionStat.PERC_PHYSICAL_PENETRATION -> StatDetails(
+            iconId = coreResources.drawable.physical_pen,
+            name = "% Physical Penetration",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.PERC_MAGICAL_PENETRATION -> StatDetails(
+            iconId = coreResources.drawable.magical_pen,
+            name = "% Magical Penetration",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.MAGICAL_LIFESTEAL -> StatDetails(
+            iconId = coreResources.drawable.magical_lifesteal,
+            name = "Magical Lifesteal",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.OMNIVAMP -> StatDetails(
+            iconId = coreResources.drawable.omnivamp,
+            name = "Omnivamp",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.HEAL_AND_SHIELD_POWER -> StatDetails(
+            iconId = coreResources.drawable.heal_shield_increase,
+            name = "Heal and Shield Increase",
+            value = this.value.toStatValue()
+        )
+        ItemDescriptionStat.UNKNOWN__ -> StatDetails(
             iconId = coreResources.drawable.unknown,
             name = "Unknown",
             value = this.value.toStatValue()
