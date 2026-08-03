@@ -113,6 +113,7 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(projects.core.network)
     implementation(projects.core.resources)
+    implementation(projects.core.ui)
 
     // Android / Kotlin
     implementation(libs.androidx.activity.compose)

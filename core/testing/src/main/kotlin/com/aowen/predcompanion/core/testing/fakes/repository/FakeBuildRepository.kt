@@ -13,11 +13,12 @@ class FakeBuildRepository : BuildRepository {
         name: String?,
         role: String?,
         order: String?,
-        heroId: Long?,
+        heroId: String?,
         skillOrder: Int?,
         currentVersion: Int?,
         modules: Int?,
         page: Int?,
+        limit: Int?,
     ): Resource<List<HeroBuild>> = buildsToReturn
 
     override suspend fun fetchBuildById(buildId: String): Resource<HeroBuild> = buildByIdToReturn

@@ -1,7 +1,7 @@
 package com.aowen.predcompanion.core.model.data
 
 data class FavoriteBuildListItem(
-    val buildId: Int,
+    val buildId: String,
     val heroId: Long,
     val role: String,
     val title: String,

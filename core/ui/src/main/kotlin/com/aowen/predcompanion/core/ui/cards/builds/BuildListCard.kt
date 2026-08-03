@@ -15,8 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ThumbDown
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,14 +41,12 @@ import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.ui.common.PlayerIcon
 import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
-import com.aowen.predcompanion.ui.theme.GreenHighlight
-import com.aowen.predcompanion.ui.theme.RedHighlight
 
 @Composable
 fun BuildListCard(
     modifier: Modifier = Modifier,
     build: BuildUiListItem,
-    navigateToBuildDetails: (Int) -> Unit
+    navigateToBuildDetails: (String) -> Unit
 ) {
 
     Card(
@@ -156,46 +153,23 @@ fun BuildListCard(
                 }
             }
             Spacer(modifier = Modifier.size(8.dp))
-            Column(
-                modifier = Modifier.fillMaxHeight(),
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.SpaceEvenly
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "${build.upvotes}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    Icon(
-                        modifier = Modifier.size(16.dp),
-                        imageVector = Icons.Filled.ThumbUp,
-                        contentDescription = "thumbs up",
-                        tint = GreenHighlight
-                    )
+                Text(
+                    text = build.fiveStarScore,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Icon(
+                    modifier = Modifier.size(16.dp),
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = "thumbs up",
+                    tint = MaterialTheme.colorScheme.secondary
+                )
 
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "${build.downvotes}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-
-                    Icon(
-                        modifier = Modifier.size(16.dp),
-                        imageVector = Icons.Filled.ThumbDown,
-                        contentDescription = "thumbs down",
-                        tint = RedHighlight
-                    )
-
-                }
             }
         }
     }
@@ -211,7 +185,7 @@ fun BuildListItemPreview() {
             ) {
                 BuildListCard(
                     build = BuildUiListItem(
-                        buildId = 1,
+                        buildId = "1",
                         title = "Muriel Support Build",
                         description = "Test Build Description",
                         heroId = 15,

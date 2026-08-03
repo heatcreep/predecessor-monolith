@@ -97,14 +97,12 @@ fun BuildDetailsScreen(
         )
     }
 
-    if (uiState.isLoading) {
-        FullScreenLoadingIndicator("Build Details")
-    } else {
-        if (uiState.error != null || uiState.buildDetails == null) {
-            FullScreenErrorWithRetry {
 
-            }
-        } else {
+    when (uiState.buildDetailsState) {
+        is BuildDetailsState.Loading -> FullScreenLoadingIndicator("Build Details")
+        is BuildDetailsState.Error -> FullScreenErrorWithRetry {}
+        is BuildDetailsState.Success -> {
+            val buildDetails = uiState.buildDetailsState.buildDetails
             Surface(
                 modifier = modifier
                     .background(MaterialTheme.colorScheme.background)
@@ -122,11 +120,11 @@ fun BuildDetailsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         PlayerCardWithRole(
-                            buildDetails = uiState.buildDetails
+                            buildDetails = buildDetails
                         )
                         Column {
                             Text(
-                                text = uiState.buildDetails.title,
+                                text = buildDetails.title,
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.secondary
                             )
@@ -135,11 +133,11 @@ fun BuildDetailsScreen(
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 Text(
-                                    text = "Author: ${uiState.buildDetails.author}",
+                                    text = "Author: ${buildDetails.author}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.secondary
                                 )
-                                uiState.buildDetails.version?.let { version ->
+                                buildDetails.version?.let { version ->
                                     Badge(
                                         containerColor = MaterialTheme.colorScheme.secondary,
                                         contentColor = MaterialTheme.colorScheme.primary
@@ -153,7 +151,7 @@ fun BuildDetailsScreen(
                             }
 
                             Text(
-                                text = "Role: ${uiState.buildDetails.role}",
+                                text = "Role: ${buildDetails.role}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.secondary
                             )
@@ -166,20 +164,7 @@ fun BuildDetailsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .clickable {
-                                    openItemDetailsBottomSheet(uiState.buildDetails.crest.id)
-                                },
-                        ) {
-                            AsyncImage(
-                                modifier = Modifier.size(48.dp),
-                                model = uiState.buildDetails.crest.imageSrc,
-                                contentDescription = null
-                            )
-                        }
-                        uiState.buildDetails.buildItems.forEach { item ->
+                        buildDetails.buildItems.forEach { item ->
                             Box(
                                 modifier = Modifier
                                     .background(MaterialTheme.colorScheme.primaryContainer)
@@ -204,7 +189,7 @@ fun BuildDetailsScreen(
                         color = MaterialTheme.colorScheme.secondary
                     )
                     Spacer(modifier = Modifier.size(8.dp))
-                    uiState.buildDetails.skillOrder?.let {
+                    buildDetails.skillOrder?.let {
                         SkillOrderScrollableRow(
                             skillOrder = it,
                             console = console
@@ -212,7 +197,7 @@ fun BuildDetailsScreen(
                     }
                     Spacer(modifier = Modifier.size(16.dp))
                     // Modules Section
-                    uiState.buildDetails.modules.forEach { module ->
+                    buildDetails.modules.forEach { module ->
                         Text(
                             text = module.title,
                             style = MaterialTheme.typography.titleSmall,
@@ -238,13 +223,13 @@ fun BuildDetailsScreen(
                                 }
                             }
                         }
-                        if (module != uiState.buildDetails.modules.last()) {
+                        if (module != buildDetails.modules.last()) {
                             Spacer(modifier = Modifier.size(16.dp))
                         }
                     }
                     Spacer(modifier = Modifier.size(16.dp))
                     // Notes Row
-                    uiState.buildDetails.description?.let {
+                    buildDetails.description?.let {
                         Text(
                             text = "Notes",
                             style = MaterialTheme.typography.titleSmall,
@@ -267,8 +252,6 @@ fun BuildDetailsScreen(
             }
         }
     }
-
-
 }
 
 @Composable
@@ -324,11 +307,12 @@ fun SkillOrderScrollableRow(
     var rowHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
     Box(modifier = modifier.fillMaxWidth()) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .onGloballyPositioned { coordinates ->
-                rowHeight = with(density) { coordinates.size.height.toDp() }
-            }) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { coordinates ->
+                    rowHeight = with(density) { coordinates.size.height.toDp() }
+                }) {
             Column(
                 modifier = Modifier.width(IntrinsicSize.Max),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -445,36 +429,36 @@ fun BuildDetailsScreenPreview() {
     MonolithTheme {
         BuildDetailsScreen(
             uiState = BuildDetailsUiState(
-                buildDetails = BuildUiListItem(
-                    buildId = 1,
-                    title = "Narbash Test Build",
-                    author = "heatcreep.tv",
-                    role = HeroRole.Support,
-                    description = """
+                buildDetailsState = BuildDetailsState.Success(
+                    buildDetails = BuildUiListItem(
+                        buildId = "1",
+                        title = "Narbash Test Build",
+                        author = "heatcreep.tv",
+                        role = HeroRole.Support,
+                        description = """
                         # Core Items\n\nFIRST we add ***\"Crystal Tear\"*** with very good base stats and a passive ability that works great on Narbash and boosts healing again.\nSo after ***\"Crystal Tear\"*** you go to ***\"Violet Brooch\"*** and finish building ***\"Truesilver\"***. From ***\"Truesilver\"*** onwards we are a bit safer against CC in the ult for the first time, which we should already have at level 6.  The third item is ***\"Wellspring\"*** every time we use our abilities or mostly the healing , we heal from Wellspring again. We also manage the passive of the item quite well as Narbash, because we also stack our own passive through auto attacks.\n\n*If you have problems with the of Mana then you can also build \"Requiem\" first to stack it quite early*\n___________________________________\n\n# Mid/Late game Items (Flex)\n\nThen first situationally build ***\"Tainted Totem\"*** situationally as a strong anti-healing agent in group fights.\nIf I'm playing with a carry that relies on attack speed or builds more towards attack speed, then I build ***\"Marshall\"*** earlier. You either have to do the carry according to whether he needs or wants the extra attack speed or you look at what kind of build the carry builds, early items etc. We can also build ***\"Windcaller\"*** for a little more mobility and a little more heal power\n___________________________________\n\n# Situational items \n***\"Frosted Lure\"*** we can build to get a shield during the ult after the passive of the item is used\nDepending on the situation, we can now build ***\"Stonewall\"*** against Physical Dmg on you or we can build ***\"Void Helm\"*** against Magical Dmg.\n**\"Frost Guardian\"*** Depending on the situation, opponents should have a lot of atk speed heroes and have a strong focus on you, then you can build the item. \n___________________________________\n\n# Crest\n\nCrest is ***\"Santification\"*** through the maximum life we have, we give our mates and ourselves up to 700 shields. We can also build ***\"Leafsong\"*** depending on the situation to have more mobility as a team\n___________________________________\n\n# other Crest Situational\n\nDepending on the situation, we can build ***\"Silentium\"*** for a little more CC or ***\"Rift Walkers\"*** to have a little engage or disengage or ***\"Reclamation\"*** to cleanse you and your Teammates. from CC.\n___________________________________\n\n\n
                     """.trimIndent(),
-                    heroId = 16,
-                    crest = ItemDetails(),
-                    buildItems = listOf(ItemDetails()),
-                    skillOrder = listOf(1, 4, 3, 2, 1, 1, 1, 2, 3, 4, 3, 2, 3, 2, 2, 2, 2, 1),
-                    upvotes = 0,
-                    downvotes = 0,
-                    modules = listOf(
-                        ItemModuleUi(
-                            title = "\\\\\\ Core Items ///",
-                            items = listOf(
-                                ItemDetails()
+                        heroId = 16,
+                        crest = ItemDetails(),
+                        buildItems = listOf(ItemDetails()),
+                        skillOrder = listOf(1, 4, 3, 2, 1, 1, 1, 2, 3, 4, 3, 2, 3, 2, 2, 2, 2, 1),
+                        modules = listOf(
+                            ItemModuleUi(
+                                title = "\\\\\\ Core Items ///",
+                                items = listOf(
+                                    ItemDetails()
+                                )
+                            ),
+                            ItemModuleUi(
+                                title = "First Core Item",
+                                items = listOf(
+                                    ItemDetails()
+                                )
                             )
                         ),
-                        ItemModuleUi(
-                            title = "First Core Item",
-                            items = listOf(
-                                ItemDetails()
-                            )
-                        )
-                    ),
-                    createdAt = "Test",
-                    updatedAt = "Test",
+                        createdAt = "Test",
+                        updatedAt = "Test",
+                    )
                 )
             ),
             onItemClicked = {},

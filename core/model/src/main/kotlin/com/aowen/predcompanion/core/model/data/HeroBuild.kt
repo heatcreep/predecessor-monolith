@@ -3,7 +3,7 @@ package com.aowen.predcompanion.core.model.data
 import java.util.UUID
 
 data class HeroBuild(
-    val id: Int = 0,
+    val id: String = "",
     val userId: String? = null,
     val title: String = "",
     val author: String = "",
@@ -13,9 +13,7 @@ data class HeroBuild(
     val crestId: Int = 0,
     val buildItemIds: List<Int> = emptyList(),
     val skillOrder: List<Int>? = null,
-    val netVotes: Int = 0,
-    val upvotes: Int = 0,
-    val downvotes: Int = 0,
+    val fiveStarScore: String = "0.0",
     val modules: List<ItemModule> = emptyList(),
     val createdAt: String? = "",
     val updatedAt: String? = "",

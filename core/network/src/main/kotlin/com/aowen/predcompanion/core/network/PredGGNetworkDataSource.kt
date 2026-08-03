@@ -17,6 +17,6 @@ interface PredGGNetworkDataSource {
     suspend fun searchPlayers(search: String): ApolloResponse<SearchPlayersQuery.Data>
     suspend fun getPlayer(playerId: String): ApolloResponse<PlayerQuery.Data>
     suspend fun getMatchById(matchId: String): ApolloResponse<MatchByIdQuery.Data>
-    suspend fun getBuilds(limit: Int, offset: Int): ApolloResponse<BuildsQuery.Data>
+    suspend fun getBuilds(heroId: String? = null, limit: Int, offset: Int): ApolloResponse<BuildsQuery.Data>
     suspend fun getBuildById(buildId: String): ApolloResponse<GuideByIdQuery.Data>
 }

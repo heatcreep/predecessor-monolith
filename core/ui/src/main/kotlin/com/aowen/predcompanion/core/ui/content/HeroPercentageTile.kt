@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.ui.components.HeroInlineStatsRateBar
+import com.aowen.predcompanion.core.ui.components.HeroInlineStatsRateBar
 
 @Composable
 fun HeroPercentageTile(

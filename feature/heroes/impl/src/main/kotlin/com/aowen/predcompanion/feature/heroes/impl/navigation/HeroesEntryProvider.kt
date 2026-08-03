@@ -2,7 +2,7 @@ package com.aowen.predcompanion.feature.heroes.impl.navigation
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.aowen.predcompanion.feature.builds.api.navigation.navigateToBuildDetails
@@ -25,7 +25,7 @@ fun EntryProviderScope<NavKey>.heroesEntry(navigator: Navigator) {
     entry<HeroDetailsNavKey> { key ->
         val viewModel: HeroDetailsViewModel =
             hiltViewModel<HeroDetailsViewModel, HeroDetailsViewModel.Factory> {
-                it.create(key.heroId.toString())
+                it.create(key.heroId)
             }
         val uiState by viewModel.uiState.collectAsState()
         val console by viewModel.console.collectAsState()

@@ -33,7 +33,7 @@ import com.aowen.predcompanion.ui.theme.NeroBlack
 fun HeroSearchSection(
     isLoading: Boolean,
     filteredHeroes: List<HeroDetails>,
-    navigateToHeroDetails: (Long, String) -> Unit = { _, _ -> }
+    navigateToHeroDetails: (String) -> Unit = { _ -> }
 ) {
     Column {
         Row(
@@ -88,7 +88,7 @@ fun HeroSearchSection(
 fun HeroResultCard(
     modifier: Modifier = Modifier,
     heroDetails: HeroDetails,
-    navigateToHeroDetails: (Long, String) -> Unit = { _, _ -> }
+    navigateToHeroDetails: (String) -> Unit = { _ -> }
 ) {
 
 
@@ -97,8 +97,7 @@ fun HeroResultCard(
             .fillMaxWidth()
             .clickable {
                 navigateToHeroDetails(
-                    heroDetails.id.toLong(),
-                    heroDetails.name
+                    heroDetails.id
                 )
             }
             .border(

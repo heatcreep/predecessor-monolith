@@ -14,8 +14,8 @@ fun HeroBuild.asFavoriteBuildListItem(): FavoriteBuildListItem {
         author = author,
         crestId = crestId,
         itemIds = buildItemIds,
-        upvotesCount = upvotes,
-        downvotesCount = downvotes,
+        upvotesCount = 0,
+        downvotesCount = 0,
         createdAt = createdAt,
         gameVersion = version ?: ""
     )
@@ -31,8 +31,8 @@ fun HeroBuild.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
         author = author,
         crestId = crestId,
         itemIds = buildItemIds,
-        upvotesCount = upvotes,
-        downvotesCount = downvotes,
+        upvotesCount = 0,
+        downvotesCount = 0,
         createdAt = createdAt,
         gameVersion = version ?: ""
     )

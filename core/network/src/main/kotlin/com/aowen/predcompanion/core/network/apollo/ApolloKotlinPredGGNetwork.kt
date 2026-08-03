@@ -37,9 +37,10 @@ class ApolloKotlinPredGGNetwork @Inject constructor(
         apolloClient.query(MatchByIdQuery(MatchKey(id = Optional.present(matchId)))).execute()
 
     // BUILDS
-    override suspend fun getBuilds(limit: Int, offset: Int): ApolloResponse<BuildsQuery.Data> =
+    override suspend fun getBuilds(heroId: String?, limit: Int, offset: Int): ApolloResponse<BuildsQuery.Data> =
         apolloClient.query(
             BuildsQuery(
+                heroId = Optional.present(heroId),
                 limit = Optional.present(limit),
                 offset = Optional.present(offset)
             )

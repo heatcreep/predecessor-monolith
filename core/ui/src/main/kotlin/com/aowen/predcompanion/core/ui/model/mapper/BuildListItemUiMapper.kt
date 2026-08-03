@@ -16,7 +16,7 @@ data class ItemModuleUi(
 )
 
 data class BuildUiListItem(
-    val buildId: Int,
+    val buildId: String,
     val userId: String? = null,
     val title: String,
     val author: String,
@@ -27,9 +27,7 @@ data class BuildUiListItem(
     val crest: ItemDetails = ItemDetails(),
     val buildItems: List<ItemDetails> = emptyList(),
     val skillOrder: List<Int>? = null,
-    val netVotes: Int = 0,
-    val upvotes: Int = 0,
-    val downvotes: Int = 0,
+    val fiveStarScore: String = "0.0",
     val modules: List<ItemModuleUi> = emptyList(),
     val createdAt: String? = null,
     val updatedAt: String? = null,
@@ -62,9 +60,7 @@ class BuildListItemUiMapper @Inject constructor(
             crest = items[heroBuild.crestId.toString()] ?: ItemDetails(),
             buildItems = heroBuild.buildItemIds.mapNotNull { items[it.toString()] },
             skillOrder = heroBuild.skillOrder,
-            netVotes = heroBuild.netVotes,
-            upvotes = heroBuild.upvotes,
-            downvotes = heroBuild.downvotes,
+            fiveStarScore = heroBuild.fiveStarScore,
             modules = heroBuild.modules.map { it.toUi(items) },
             createdAt = heroBuild.createdAt,
             updatedAt = heroBuild.updatedAt,
@@ -85,8 +81,6 @@ class BuildListItemUiMapper @Inject constructor(
             heroImageUrl = heroRepository.getHeroImageSrcById(favoriteBuildListItem.heroId.toString()),
             crest = items[favoriteBuildListItem.crestId.toString()] ?: ItemDetails(),
             buildItems = favoriteBuildListItem.itemIds.mapNotNull { items[it.toString()] },
-            upvotes = favoriteBuildListItem.upvotesCount,
-            downvotes = favoriteBuildListItem.downvotesCount,
             createdAt = favoriteBuildListItem.createdAt,
             version = favoriteBuildListItem.gameVersion
         )
@@ -103,8 +97,8 @@ fun BuildUiListItem.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
         author = author,
         crestId = crest.id.toInt(),
         itemIds = buildItems.map { it.id.toInt() },
-        upvotesCount = upvotes,
-        downvotesCount = downvotes,
+        upvotesCount = 0,
+        downvotesCount = 0,
         createdAt = createdAt,
         gameVersion = version ?: ""
     )

@@ -26,7 +26,7 @@ interface FavoriteBuildDao {
             WHERE buildId in (:buildIds)
         """
     )
-    suspend fun deleteFavoriteBuildListItems(buildIds: List<Int>)
+    suspend fun deleteFavoriteBuildListItems(buildIds: List<String>)
 
     @Query(
         value = """

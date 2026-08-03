@@ -93,6 +93,8 @@ data class MatchDetails(
         val eternal: Perk?,
         val minorBlessing1: Perk?,
         val minorBlessing2: Perk?,
+        val crestId: String? = null,
+        val trinketId: String? = null,
         val itemIds: List<String> = emptyList(),
         val playerItems: List<ItemDetails> = emptyList()
         // stats

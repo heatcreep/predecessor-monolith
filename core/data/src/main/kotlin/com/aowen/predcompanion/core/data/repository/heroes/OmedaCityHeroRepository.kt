@@ -46,8 +46,19 @@ class OmedaCityHeroRepository @Inject constructor(
 
     // The GraphQL API does not expose server-side aggregated hero statistics, so these
     // can no longer be computed client-side.
-    override suspend fun fetchAllHeroStatistics(timeFrame: String?): Resource<List<HeroStatistics>> =
-        Resource.Success(emptyList())
+    override suspend fun fetchAllHeroStatistics(timeFrame: String?): Resource<List<HeroStatistics>> {
+        val heroStats = allHeroes.value.values.map {
+            HeroStatistics(
+                heroId = it.id,
+                heroImageSrc = it.imageUrl,
+                name = it.name,
+                heroName = it.displayName,
+                winRate = it.generalStatistic?.winRate ?: 0f,
+                pickRate = 0f,
+            )
+        }
+        return Resource.Success(heroStats)
+    }
 
     override suspend fun fetchHeroStatisticsById(heroId: String): Resource<HeroStatistics?> =
         Resource.Success(null)

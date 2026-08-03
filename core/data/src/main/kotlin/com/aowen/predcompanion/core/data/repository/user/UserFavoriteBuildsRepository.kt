@@ -21,9 +21,9 @@ interface UserFavoriteBuildsRepository {
 
     val favoriteBuildsState: MutableStateFlow<FavoriteBuildsState>
 
-    suspend fun fetchFavoriteBuildIds(): Result<List<Int>>
+    suspend fun fetchFavoriteBuildIds(): Result<List<String>>
     suspend fun addFavoriteBuild(heroBuild: HeroBuild)
-    suspend fun removeFavoriteBuild(buildId: Int)
+    suspend fun removeFavoriteBuild(buildId: String)
     suspend fun removeAllFavoriteBuilds()
 }
 
@@ -36,7 +36,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
     override val favoriteBuildsState = _favoriteBuildsState
 
 
-    override suspend fun fetchFavoriteBuildIds(): Result<List<Int>> {
+    override suspend fun fetchFavoriteBuildIds(): Result<List<String>> {
         val favoriteBuilds =
             favoriteBuildDao.getFavoriteBuildListItems().firstOrNull()?.map { buildEntity ->
                 FavoriteBuildListItem(
@@ -100,7 +100,7 @@ class OfflineFirstUserFavoriteBuildsRepository @Inject constructor(
         }
     }
 
-    override suspend fun removeFavoriteBuild(buildId: Int) {
+    override suspend fun removeFavoriteBuild(buildId: String) {
         favoriteBuildDao.deleteFavoriteBuildListItems(listOf(buildId))
         _favoriteBuildsState.update { state ->
             when (state) {

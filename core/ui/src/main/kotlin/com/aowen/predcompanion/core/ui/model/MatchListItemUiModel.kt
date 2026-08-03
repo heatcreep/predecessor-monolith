@@ -13,6 +13,7 @@ data class MatchListItemUiModel(
     val timeSinceMatch: String,
     val heroImageUrl: String,
     val heroName: String,
+    val heroId: String,
     @param:DrawableRes val heroRoleDrawableId: Int?,
     val augmentImageSrc: String? = null,
     val eternalImageSrc: String? = null,

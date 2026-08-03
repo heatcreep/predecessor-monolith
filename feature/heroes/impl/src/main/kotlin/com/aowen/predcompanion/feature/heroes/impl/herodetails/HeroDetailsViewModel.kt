@@ -83,9 +83,10 @@ class HeroDetailsViewModel @AssistedInject constructor(
                 async { omedaCityHeroRepository.fetchHeroStatisticsById(heroId) }
             val heroBuildsDeferred = async {
                 omedaCityBuildRepository.fetchAllBuilds(
-                    heroId = heroId.toLong(),
+                    heroId = heroId,
                     order = "popular",
-                    currentVersion = 1
+                    currentVersion = 1,
+                    limit = 5
                 )
             }
             try {
@@ -94,8 +95,11 @@ class HeroDetailsViewModel @AssistedInject constructor(
                 _uiState.update {
                     it.copy(
                         statistics = statisticsResult ?: HeroStatistics(),
-                        heroBuilds = heroBuilds.take(5)
-                            .map { buildListItem -> buildListItemUiMapper.buildFrom(buildListItem) },
+                        heroBuilds = heroBuilds.map { buildListItem ->
+                            buildListItemUiMapper.buildFrom(
+                                buildListItem
+                            )
+                        },
                         isLoading = false,
                         isLoadingBuilds = false,
                         heroDetailsErrors = null

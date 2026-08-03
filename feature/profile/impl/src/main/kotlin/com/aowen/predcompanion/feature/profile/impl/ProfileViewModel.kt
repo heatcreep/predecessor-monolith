@@ -133,7 +133,7 @@ class ProfileViewModel @Inject constructor(
                 when (userState) {
                     is UserState.SignedIn -> {
                         userRepository.fetchCurrentUser()?.let {
-                            HeroStatsUiState.Loaded(it.players.first().heroStatistics.map { it.toHeroStatisticsUiModel() })
+                            HeroStatsUiState.Loaded(it.players.firstOrNull()?.heroStatistics?.map { it.toHeroStatisticsUiModel() } ?: emptyList())
                         } ?: HeroStatsUiState.Error("No current user")
                     }
                     else -> HeroStatsUiState.Loading

@@ -20,7 +20,7 @@ import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 @Composable
 fun BuildsSearchSection(
     uiState: SearchScreenUiState,
-    navigateToBuildDetails: (Int) -> Unit = {}
+    navigateToBuildDetails: (String) -> Unit = {}
 ) {
     Column {
         when (val buildsState = uiState.filteredBuilds) {

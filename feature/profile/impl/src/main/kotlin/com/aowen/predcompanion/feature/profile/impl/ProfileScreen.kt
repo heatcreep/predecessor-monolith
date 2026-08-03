@@ -1,15 +1,13 @@
 package com.aowen.predcompanion.feature.profile.impl
 
 import android.content.res.Configuration
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,13 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -54,12 +50,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -79,7 +78,6 @@ import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 import com.aowen.predcompanion.ui.theme.WarmWhite
-import com.aowen.predcompanion.ui.theme.YellowHighlight
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import com.aowen.predcompanion.core.datastore.Theme as ThemeDataStore
@@ -98,8 +96,6 @@ fun SettingsBottomSheet(
     onDismissRequest: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val uriHandler = LocalUriHandler.current
-
     ModalBottomSheet(
         modifier = modifier,
         sheetState = sheetState,
@@ -157,14 +153,22 @@ fun SettingsBottomSheet(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary,
             )
-            ClickableText(
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color = MaterialTheme.colorScheme.secondary,
-                    textDecoration = TextDecoration.Underline
-                ),
-                text = AnnotatedString("Privacy Policy"),
-                onClick = {
-                    uriHandler.openUri("https://monolith-app.dev/privacy")
+            val privacyPolicy =
+                stringResource(id = coreResources.string.core_resources_privacy_policy)
+            Text(
+                text = buildAnnotatedString {
+                    withLink(
+                        LinkAnnotation.Url(
+                            url = "https://monolith-app.dev/privacy",
+                            styles = TextLinkStyles(
+                                style = SpanStyle(
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            )
+                        )
+                    ) {
+                        append(privacyPolicy)
+                    }
                 }
             )
             ElevatedButton(
@@ -194,6 +198,8 @@ fun SettingsBottomSheet(
 fun ProfileScreenRoute(
     showSnackbar: (String, SnackbarDuration) -> Unit,
     navigateToSearch: () -> Unit,
+    navigateToMatchDetails: (String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
 
@@ -275,6 +281,8 @@ fun ProfileScreenRoute(
             uiState = uiState,
             matches = matches,
             heroStatsState = heroStatsState,
+            navigateToMatchDetails = navigateToMatchDetails,
+            navigateToHeroDetails = navigateToHeroDetails,
             modifier = Modifier
                 .padding(contentPadding)
                 .padding(horizontal = 16.dp),
@@ -294,7 +302,10 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     submitLogin: () -> Unit,
     handleRetry: () -> Unit,
+    navigateToMatchDetails: (String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
 ) {
+
 
     val tabList = listOf(
         coreResources.string.core_resources_player_profile_tab_matches,
@@ -346,7 +357,7 @@ fun ProfileScreen(
             }
 
             is UserUiState.UserInfoLoaded -> {
-                if (userState.userInfo != null) {
+                if (userState.userInfo != null && userState.userInfo.players.isNotEmpty()) {
                     PlayerProfileLayout(
                         profileCard = userState.userInfo.players.first(),
                         tabLabels = tabList,
@@ -362,12 +373,17 @@ fun ProfileScreen(
                                     items(matches.itemCount) {
                                         matches[it]?.let { matchItem ->
                                             MatchPlayerCard(
+                                                modifier = Modifier.clickable {
+                                                    navigateToMatchDetails(matchItem.matchId)
+                                                },
+                                                navigateToHeroDetails = navigateToHeroDetails,
                                                 matchListItem = matchItem,
                                             )
                                         }
                                     }
                                 }
                             }
+
                             1 -> {
                                 when (heroStatsState) {
                                     is HeroStatsUiState.Loading -> {
@@ -445,7 +461,7 @@ fun ProfileScreen(
                                                         }
                                                     }
                                                     Spacer(modifier = Modifier.size(8.dp))
-                                                    if(index != heroStatsState.stats.count() - 1) {
+                                                    if (index != heroStatsState.stats.count() - 1) {
                                                         HorizontalDivider(
                                                             modifier = Modifier.fillMaxWidth(),
                                                             color = MaterialTheme.colorScheme.secondary
@@ -459,7 +475,14 @@ fun ProfileScreen(
 
                             }
 
-                            2 -> {}
+                            2 -> {
+                                // TODO: Implement friends and enemies
+                                Text(
+                                    text = stringResource(id = coreResources.string.core_resources_player_profile_coming_soon),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                )
+                            }
                         }
                     }
                 } else {
@@ -470,21 +493,53 @@ fun ProfileScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        Text(
+                            text = stringResource(id = coreResources.string.core_resources_player_profile_claim_player),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary,
+                        )
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Warning,
-                                contentDescription = "Warning",
-                                tint = YellowHighlight
-                            )
-                            Text(
-                                text = "Data stored locally will be different from data stored in the cloud.",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+                            val claimInstructionsBulletOne =
+                                stringResource(id = coreResources.string.core_resources_player_profile_claim_instructions_visit_predgg)
+                            val claimInstructionsBulletTwo =
+                                stringResource(id = coreResources.string.core_resources_player_profile_claim_instructions_search_player)
+                            val claimInstructionsBulletThree =
+                                stringResource(id = coreResources.string.core_resources_player_profile_claim_instructions_claim_player)
+                            val claimInstructionsBulletFour =
+                                stringResource(id = coreResources.string.core_resources_player_profile_claim_instructions_complete_claim)
+                            BulletItem {
+
+                                append(claimInstructionsBulletOne)
+
+                                withLink(
+                                    LinkAnnotation.Url(
+                                        url = "https://pred.gg",
+                                        styles = TextLinkStyles(
+                                            style = SpanStyle(
+                                                textDecoration = TextDecoration.Underline
+                                            )
+                                        )
+                                    )
+                                ) {
+                                    append("https://pred.gg")
+                                }
+                            }
+                            BulletItem {
+                                append(claimInstructionsBulletTwo)
+
+                            }
+                            BulletItem {
+                                append(claimInstructionsBulletThree)
+                            }
+                            BulletItem {
+                                append(claimInstructionsBulletFour)
+
+                            }
                         }
+
                     }
                 }
             }
@@ -493,20 +548,19 @@ fun ProfileScreen(
 }
 
 @Composable
-fun RowScope.TableCell(
-    text: String,
-    weight: Float,
-    isHeader: Boolean = false
-) {
-    Text(
-        text = text,
-        fontWeight = if (isHeader) FontWeight.Bold else FontWeight.Normal,
-        modifier = Modifier
-            .weight(weight)
-            .border(0.5.dp, Color.Gray)
-            .padding(8.dp)
-            .fillMaxHeight() // Fill height allocated by IntrinsicSize.Min
-    )
+fun BulletItem(content: AnnotatedString.Builder.() -> Unit) {
+    Row {
+        Text(
+            text = "•  ",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+        Text(
+            text = buildAnnotatedString { content() },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.secondary,
+        )
+    }
 }
 
 @Preview(
@@ -531,7 +585,9 @@ fun ProfileCardPreview() {
             matches = fakeMatches,
             submitLogin = {},
             handleRetry = { /*TODO*/ },
-            heroStatsState = HeroStatsUiState.Loading
+            heroStatsState = HeroStatsUiState.Loading,
+            navigateToMatchDetails = { /*TODO*/ },
+            navigateToHeroDetails = { /*TODO*/ },
         )
     }
 }

@@ -9,14 +9,20 @@ fragment MatchResultsFragment on PaginatedPlayerMatches {
         player {
             id
         }
-        ...InventoryItemDataFragment
+        inventoryItemData {
+            ...ItemDataFragment
+        }
         perkData {
             slot
             icon
         }
         heroData {
+            hero {
+                id
+            }
             displayName
             icon
+            id
         }
         rating {
             newPoints

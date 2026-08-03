@@ -1,4 +1,13 @@
 fragment MatchPlayerFragment on MatchPlayer {
+    player {
+        ...PlayerFragment
+    }
+    hero {
+        ...HeroFragment
+    }
+    inventoryItemData {
+        ...ItemDataFragment
+    }
     team
     role
     kills
@@ -40,15 +49,10 @@ fragment MatchPlayerFragment on MatchPlayer {
     wardsDestroyed
     gold
     goldSpent
-    inventoryItemData {
-        item {
-            id
-        }
-    }
     rating {
         points
         rank {
-             name
+            name
         }
     }
     perkData {
@@ -57,12 +61,6 @@ fragment MatchPlayerFragment on MatchPlayer {
         displayName
         description
 
-    }
-    player {
-        ...PlayerFragment
-    }
-    hero {
-        ...HeroFragment
     }
     match {
         id

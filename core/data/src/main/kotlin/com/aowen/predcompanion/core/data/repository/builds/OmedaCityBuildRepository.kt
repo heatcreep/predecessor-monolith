@@ -5,6 +5,7 @@ import com.aowen.predcompanion.core.network.PredGGNetworkDataSource
 import com.aowen.predcompanion.core.network.Resource
 import com.aowen.predcompanion.core.network.apollo.fragment.GuideFragment
 import com.aowen.predcompanion.core.network.safeGraphQlCall
+import java.util.Locale
 import javax.inject.Inject
 
 class OmedaCityBuildRepository @Inject constructor(
@@ -17,17 +18,19 @@ class OmedaCityBuildRepository @Inject constructor(
         name: String?,
         role: String?,
         order: String?,
-        heroId: Long?,
+        heroId: String?,
         skillOrder: Int?,
         currentVersion: Int?,
         modules: Int?,
-        page: Int?
+        page: Int?,
+        limit : Int?,
     ): Resource<List<HeroBuild>> =
         safeGraphQlCall(
             apiCall = {
                 predGGNetwork.getBuilds(
-                    limit = pageSize,
-                    offset = ((page ?: 1) - 1) * pageSize
+                    heroId = heroId,
+                    limit = limit ?: pageSize,
+                    offset = ((page ?: 1) - 1) * (limit ?: pageSize)
                 )
             },
             transform = { data ->
@@ -47,17 +50,15 @@ class OmedaCityBuildRepository @Inject constructor(
 
 private fun GuideFragment.asHeroBuild(): HeroBuild {
     val primaryModule = modules.firstOrNull { it.primary } ?: modules.firstOrNull()
-    val score = averageScore?.let { kotlin.math.round(it).toInt() } ?: 0
+    val score = averageScore?.coerceIn(0.0, 100.0)?.div(100f)?.times(5f)?.toFloat()
     return HeroBuild(
-        id = id.toIntOrNull() ?: 0,
+        id = id,
         title = title,
         author = author.name,
         role = role.name.lowercase(),
         heroId = hero.id.toLongOrNull() ?: 999L,
         buildItemIds = primaryModule?.items?.mapNotNull { it.id.toIntOrNull() } ?: emptyList(),
-        netVotes = score,
-        upvotes = score.coerceAtLeast(0),
-        downvotes = if (score < 0) -score else 0,
+        fiveStarScore = String.format(Locale.US, "%.1f", score ?: 0.0),
         modules = modules.map { module ->
             HeroBuild.ItemModule(
                 id = module.id,

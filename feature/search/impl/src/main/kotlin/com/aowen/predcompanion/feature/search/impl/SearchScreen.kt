@@ -44,9 +44,9 @@ internal fun SearchScreen(
     handlePullRefresh: () -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
     navigateToItemDetails: (String) -> Unit,
-    navigateToHeroDetails: (Long, String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
     navigateToMatchDetails: (String) -> Unit,
-    navigateToBuildDetails: (Int) -> Unit,
+    navigateToBuildDetails: (String) -> Unit,
     navigateBack: () -> Unit
 ) {
 
@@ -171,7 +171,7 @@ private fun SearchScreenPreview() {
             handlePullRefresh = {},
             navigateToPlayerDetails = {},
             navigateToItemDetails = {},
-            navigateToHeroDetails = { _, _ -> },
+            navigateToHeroDetails = { _ -> },
             navigateToBuildDetails = {},
             navigateToMatchDetails = { },
             navigateBack = {}

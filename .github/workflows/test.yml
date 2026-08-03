@@ -22,4 +22,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Run Unit Tests
-        run: ./gradlew testFirebaseDistributionUnitTest
+        run: ./gradlew testDebugUnitTest

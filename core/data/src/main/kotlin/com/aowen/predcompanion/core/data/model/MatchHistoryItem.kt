@@ -31,22 +31,22 @@ fun MatchResultsFragment.Result.asMatchHistoryItem(): MatchHistoryItem {
         ImageHelpers.buildAssetsUrl(it)
     }
     val crest =
-        this.inventoryItemDataFragment.inventoryItemData?.firstOrNull { it?.item?.data?.slotType == SlotType.CREST }
+        inventoryItemData?.firstOrNull { it?.itemDataFragment?.item?.data?.slotType == SlotType.CREST }
             ?.let {
-                InventoryItem.Crest(ImageHelpers.buildAssetsUrl(it.item.data?.icon ?: ""))
+                InventoryItem.Crest(ImageHelpers.buildAssetsUrl(it.itemDataFragment.item.data?.icon ?: ""))
             }
     val trinket =
-        this.inventoryItemDataFragment.inventoryItemData?.firstOrNull { it?.item?.data?.slotType == SlotType.TRINKET }
+        inventoryItemData?.firstOrNull { it?.itemDataFragment?.item?.data?.slotType == SlotType.TRINKET }
             ?.let {
-                InventoryItem.Trinket(ImageHelpers.buildAssetsUrl(it.item.data?.icon ?: ""))
+                InventoryItem.Trinket(ImageHelpers.buildAssetsUrl(it.itemDataFragment.item.data?.icon ?: ""))
             }
     val items =
         List(6) { index ->
-            this.inventoryItemDataFragment.inventoryItemData?.filter { it?.item?.data?.slotType == SlotType.PASSIVE }
+            inventoryItemData?.filter { it?.itemDataFragment?.item?.data?.slotType == SlotType.PASSIVE }
                 ?.getOrNull(index)?.let {
                     InventoryItem.Passive(
                         ImageHelpers.buildAssetsUrl(
-                            it.item.data?.icon ?: ""
+                            it.itemDataFragment.item.data?.icon ?: ""
                         )
                     )
                 }
@@ -69,6 +69,7 @@ fun MatchResultsFragment.Result.asMatchHistoryItem(): MatchHistoryItem {
         timeSinceMatch = handleTimeSinceMatch(this.match.endTime),
         heroImageSrc = this.heroData?.icon?.let { ImageHelpers.buildAssetsUrl(it) } ?: "",
         heroName = this.heroData?.displayName ?: "",
+        heroId = this.heroData?.hero?.id ?: "",
         heroRoleDrawableId = getHeroRoleDrawableId(this.role),
         kills = this.kills,
         deaths = this.deaths,

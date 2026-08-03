@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.HeroStatistics
+import com.aowen.predcompanion.core.ui.components.HeroInlineStatsRateBar
 import com.aowen.predcompanion.feature.home.impl.HomeScreenUiState
 import com.aowen.predcompanion.feature.home.impl.TimeFrame
-import com.aowen.predcompanion.ui.components.HeroInlineStatsRateBar
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 
 const val WIN_RATE = "winRate"
@@ -55,7 +55,7 @@ const val PICK_RATE = "pickRate"
 fun HeroWinPickRateScreen(
     uiState: HomeScreenUiState,
     selectedStatFromNav: String,
-    navigateToHeroDetails: (heroId: Long, heroName: String) -> Unit,
+    navigateToHeroDetails: (heroId: String) -> Unit,
     updateHeroStatsByTime: (TimeFrame) -> Unit,
     navigateBack: () -> Unit
 ) {
@@ -204,7 +204,7 @@ fun HeroWinPickRateScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                navigateToHeroDetails(heroStats.heroId.toLong(), heroStats.heroName)
+                                navigateToHeroDetails(heroStats.heroId)
                             }
                             .border(
                                 1.dp,
@@ -291,7 +291,7 @@ fun HeroWinRateScreenPreview() {
                     )
                 )
             ),
-            navigateToHeroDetails = { _, _ -> },
+            navigateToHeroDetails = { _ -> },
             updateHeroStatsByTime = {},
             navigateBack = {},
             selectedStatFromNav = WIN_RATE

@@ -27,6 +27,7 @@ data class MatchHistoryItem(
     val timeSinceMatch: String,
     val heroImageSrc: String,
     val heroName: String,
+    val heroId: String,
     val heroRoleDrawableId: Int?,
     val kills: Int,
     val deaths: Int,

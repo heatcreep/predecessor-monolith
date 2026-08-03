@@ -26,6 +26,7 @@ import com.aowen.predcompanion.core.ui.content.HeroPercentageTile
 
 data class HeroUiInfo(
     val heroName: String,
+    val heroId: String,
     val heroPathName: String,
     val heroImageSrc: String,
     val heroImageId: Int,
@@ -37,7 +38,7 @@ fun HomeScreenHeroesCard(
     modifier: Modifier = Modifier,
     cardTitle: String,
     heroUiInfo: List<HeroUiInfo>,
-    onHeroClick: (Long, String) -> Unit = { _, _ -> },
+    onHeroClick: (String) -> Unit = { _ -> },
     onTitleActionClick: () -> Unit = { }
 ) {
     Column(
@@ -86,7 +87,7 @@ fun HomeScreenHeroesCard(
                         heroName = hero.heroName,
                         heroImageSrc = hero.heroImageSrc,
                         winRate = hero.winRate,
-                        onClick = { onHeroClick(hero.heroImageId.toLong(), hero.heroPathName ) }
+                        onClick = { onHeroClick(hero.heroId) }
                     )
                     if (hero != heroUiInfo.last()) {
                         HorizontalDivider(
@@ -119,28 +120,32 @@ fun HomeScreenHeroesCardPreview() {
                             heroPathName = "countess",
                             heroImageSrc = "https://example.com/countess.jpg",
                             heroImageId = 1,
-                            winRate = 55.0f
+                            winRate = 55.0f,
+                            heroId = "1"
                         ),
                         HeroUiInfo(
                             heroName = "Crunch",
                             heroPathName = "crunch",
                             heroImageSrc = "https://example.com/crunch.jpg",
                             heroImageId = 2,
-                            winRate = 50.0f
+                            winRate = 50.0f,
+                            heroId = "2"
                         ),
                         HeroUiInfo(
                             heroName = "Dekker",
                             heroPathName = "dekker",
                             heroImageSrc = "https://example.com/dekker.jpg",
                             heroImageId = 3,
-                            winRate = 55.0f
+                            winRate = 55.0f,
+                            heroId = "3"
                         ),
                         HeroUiInfo(
                             heroName = "Drongo",
                             heroPathName = "drongo",
                             heroImageSrc = "https://example.com/drongo.jpg",
                             heroImageId = 4,
-                            winRate = 50.0f
+                            winRate = 50.0f,
+                            heroId = "4"
                         ),
                     )
                 )

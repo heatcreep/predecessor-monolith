@@ -39,6 +39,8 @@ class MatchListItemUiMapper @Inject constructor(
             timeSinceMatch = handleTimeSinceMatch(match.endTime),
             heroImageUrl = heroRepository.getHeroImageSrcById(playerHero.heroId),
             heroName = heroRepository.getHeroName(playerHero.heroId),
+            heroId = playerHero.heroId,
+
             heroRoleDrawableId = heroRoleMap[playerHero.role?.lowercase()]?.drawableId,
             kills = playerHero.kills.toString(),
             deaths = playerHero.deaths.toString(),
@@ -66,6 +68,7 @@ class MatchListItemUiMapper @Inject constructor(
             timeSinceMatch = matchHistoryItem.timeSinceMatch,
             heroImageUrl = matchHistoryItem.heroImageSrc,
             heroName = matchHistoryItem.heroName,
+            heroId = matchHistoryItem.heroId,
             augmentImageSrc = matchHistoryItem.augmentImageSrc,
             eternalImageSrc = matchHistoryItem.eternalImageSrc,
             crestImageUrl = matchHistoryItem.crest?.imageSrc,

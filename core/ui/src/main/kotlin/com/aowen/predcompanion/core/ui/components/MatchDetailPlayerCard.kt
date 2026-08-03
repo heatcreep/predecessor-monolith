@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +55,7 @@ fun MatchDetailPlayerCard(
             color = MaterialTheme.colorScheme.secondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(0.5f),
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -93,35 +98,35 @@ fun MatchDetailPlayerCard(
                     }
                     Spacer(modifier = Modifier.size(2.dp))
                     // Crest and Trinket Column
-//                    Column {
-//                        ItemContainer(imageSrc = matchListItem.heroAndItemDetails.crestImageUrl)
-//                        Spacer(modifier = Modifier.size(2.dp))
-//                        if (matchListItem.heroAndItemDetails.trinketImageUrl != null) {
-//                            ItemContainer(imageSrc = matchListItem.heroAndItemDetails.trinketImageUrl)
-//                        } else {
-//                            Box(
-//                                modifier = modifier
-//                                    .size(ITEM_ICON_SIZE)
-//                                    .clip(RoundedCornerShape(4.dp))
-//                                    .background(MaterialTheme.colorScheme.primaryContainer)
-//
-//                            ) {
-//                                Icon(
-//                                    imageVector = Icons.Default.Close,
-//                                    contentDescription = null,
-//                                    modifier = modifier.size(ITEM_ICON_SIZE),
-//                                    tint = Color.Red
-//                                )
-//                            }
-//                        }
-//                    }
-//                    Spacer(modifier = Modifier.size(2.dp))
+                    Column {
+                        ItemContainer(imageSrc = matchListItem.heroAndItemDetails.crestImageUrl)
+                        Spacer(modifier = Modifier.size(2.dp))
+                        if (matchListItem.heroAndItemDetails.trinketImageUrl != null) {
+                            ItemContainer(imageSrc = matchListItem.heroAndItemDetails.trinketImageUrl)
+                        } else {
+                            Box(
+                                modifier = modifier
+                                    .size(ITEM_ICON_SIZE)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = null,
+                                    modifier = modifier.size(ITEM_ICON_SIZE),
+                                    tint = Color.Red
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.size(2.dp))
 
                     // Items Grid 3 x 2
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(2.dp),
                         verticalArrangement = Arrangement.spacedBy(2.dp),
-                        maxItemsInEachRow = 4,
+                        maxItemsInEachRow = 3,
                     ) {
                         matchListItem.heroAndItemDetails.itemsImageUrls.forEach { itemImageUrl ->
                             ItemContainer(imageSrc = itemImageUrl)

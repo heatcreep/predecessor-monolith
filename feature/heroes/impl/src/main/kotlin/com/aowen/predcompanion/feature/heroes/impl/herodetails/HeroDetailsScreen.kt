@@ -100,7 +100,7 @@ fun HeroDetailsScreen(
     console: Console,
     navigateBack: () -> Unit,
     onReloadScreen: () -> Unit,
-    navigateToBuildDetails: (Int) -> Unit
+    navigateToBuildDetails: (String) -> Unit
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -211,7 +211,7 @@ fun HeroDetailsScreen(
 fun HeroOverviewScreen(
     uiState: HeroDetailsUiState,
     modifier: Modifier = Modifier,
-    navigateToBuildDetails: (Int) -> Unit = {}
+    navigateToBuildDetails: (String) -> Unit = {}
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),

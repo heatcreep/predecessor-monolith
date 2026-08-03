@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BuildsScreenRoute(
-    navigateToBuildDetails: (Int) -> Unit,
+    navigateToBuildDetails: (String) -> Unit,
     navigateToSearch: () -> Unit,
     viewModel: BuildsScreenViewModel = hiltViewModel()
 ) {
@@ -110,7 +110,7 @@ fun BuildsScreen(
     onCheckHasModules: (Boolean) -> Unit,
     onCheckHasCurrentVersion: (Boolean) -> Unit,
     navigateToSearch: () -> Unit,
-    navigateToBuildDetails: (Int) -> Unit,
+    navigateToBuildDetails: (String) -> Unit,
 ) {
 
 

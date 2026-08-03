@@ -41,6 +41,8 @@ class MatchDetailsPlayerCardUiMapper @Inject constructor(
                 eternal = matchPlayerDetails.eternal?.toPlayerPerkUiModel(),
                 minorBlessing1 = matchPlayerDetails.minorBlessing1?.toPlayerPerkUiModel(),
                 minorBlessing2 = matchPlayerDetails.minorBlessing2?.toPlayerPerkUiModel(),
+                crestImageUrl = matchPlayerDetails.crestId?.let { itemRepository.getItemImageSrcById(it) },
+                trinketImageUrl = matchPlayerDetails.trinketId?.let { itemRepository.getItemImageSrcById(it) },
                 itemsImageUrls = matchPlayerDetails.itemIds.map {
                     itemRepository.getItemImageSrcById(
                         it

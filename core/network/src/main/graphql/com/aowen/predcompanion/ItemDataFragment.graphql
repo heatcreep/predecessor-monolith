@@ -1,0 +1,12 @@
+fragment ItemDataFragment on ItemData {
+    id
+    item {
+        id
+        data {
+            id
+            slotType
+            displayName
+            icon
+        }
+    }
+}

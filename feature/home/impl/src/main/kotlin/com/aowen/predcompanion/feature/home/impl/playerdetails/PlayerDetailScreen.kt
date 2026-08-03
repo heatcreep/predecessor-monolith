@@ -50,6 +50,8 @@ internal fun PlayerDetailsRoute(
     viewModel: PlayerDetailsViewModel,
     navigateBack: () -> Unit,
     navigateToMatchDetails: (String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
+
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -61,6 +63,7 @@ internal fun PlayerDetailsRoute(
         handleRetry = viewModel::handleRetry,
         modifier = modifier,
         navigateToMatchDetails = navigateToMatchDetails,
+        navigateToHeroDetails = navigateToHeroDetails,
         navigateBack = navigateBack,
     )
 }
@@ -74,6 +77,7 @@ fun PlayerDetailScreen(
     handleRetry: () -> Unit = {},
     handlePlayerHeroStatsSelect: (Long) -> Unit = { },
     navigateToMatchDetails: (String) -> Unit = { },
+    navigateToHeroDetails: (String) -> Unit = { },
     navigateBack: () -> Unit = {},
 ) {
 
@@ -150,6 +154,7 @@ fun PlayerDetailScreen(
                                                             navigateToMatchDetails(matchItem.matchId)
                                                         },
                                                         matchListItem = matchItem,
+                                                        navigateToHeroDetails = navigateToHeroDetails,
                                                     )
                                                 }
                                             }

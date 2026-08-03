@@ -8,6 +8,7 @@ import com.aowen.predcompanion.core.network.apollo.MatchByIdQuery
 import com.aowen.predcompanion.core.network.apollo.fragment.MatchPlayerFragment
 import com.aowen.predcompanion.core.network.apollo.type.MatchPlayerTeam
 import com.aowen.predcompanion.core.network.apollo.type.PerkSlot
+import com.aowen.predcompanion.core.network.apollo.type.SlotType
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
@@ -16,7 +17,15 @@ fun MatchPlayerFragment.asMatchPlayerDetails(duration: Int = 0): MatchDetails.Ma
 
     val playerFragment = player.playerFragment
     val heroFragment = hero?.heroFragment ?: return null
-    val itemIds = inventoryItemData?.mapNotNull { it?.item?.id } ?: emptyList()
+    val crestId =
+        inventoryItemData?.firstOrNull { it?.itemDataFragment?.item?.data?.slotType == SlotType.CREST }
+            ?.itemDataFragment?.item?.id
+    val trinketId =
+        inventoryItemData?.firstOrNull { it?.itemDataFragment?.item?.data?.slotType == SlotType.TRINKET }
+            ?.itemDataFragment?.item?.id
+    val itemIds =
+        inventoryItemData?.filter { it?.itemDataFragment?.item?.data?.slotType == SlotType.PASSIVE }
+            ?.mapNotNull { it?.itemDataFragment?.item?.id } ?: emptyList()
 
     return MatchDetails.MatchPlayerDetails(
         playerId = playerFragment.id,
@@ -67,6 +76,8 @@ fun MatchPlayerFragment.asMatchPlayerDetails(duration: Int = 0): MatchDetails.Ma
         goldEarnedPerMin = (this.gold.toFloat() / duration.toFloat()),
         goldSpent = this.goldSpent,
         itemIds = itemIds,
+        crestId = crestId,
+        trinketId = trinketId,
         augment = this.perkData?.toPerk(PerkSlot.HERO_SPECIFIC_1),
         eternal = this.perkData?.toPerk(PerkSlot.ETERNAL_1),
         minorBlessing1 = this.perkData?.toPerk(PerkSlot.BLESSING_MINOR_1),

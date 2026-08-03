@@ -1,6 +1,12 @@
 fragment HeroFragment on Hero {
     id
     name
+    generalStatistic {
+        result {
+            matchesPlayed
+            matchesWon
+        }
+    }
     data {
         displayName
         defaultSkin {

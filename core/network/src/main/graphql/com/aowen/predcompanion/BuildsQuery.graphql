@@ -1,5 +1,13 @@
-query BuildsQuery($limit: Int, $offset: Int) {
-    guidesPaginated(filter: {versions:[]}, limit: $limit, offset: $offset) {
+query BuildsQuery($heroId: ID, $limit: Int, $offset: Int) {
+    guidesPaginated(
+        filter: { hero: $heroId }
+        order: {
+            field: SCORE,
+            order: DESC
+        }
+        limit: $limit,
+        offset: $offset
+    ) {
         results {
             ...GuideFragment
         }

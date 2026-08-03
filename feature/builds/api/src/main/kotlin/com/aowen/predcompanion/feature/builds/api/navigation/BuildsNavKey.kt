@@ -5,15 +5,10 @@ import com.aowen.predcompanion.navigation.Navigator
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface BuildsNavKey : NavKey {
+data object BuildsListNavKey : NavKey
 
-    @Serializable
-    data object BuildsList : BuildsNavKey, NavKey
-
-    @Serializable
-    data class BuildDetails(val buildId: String) : BuildsNavKey, NavKey
-}
-
-fun Navigator.navigateToBuildDetails(buildId: Int) {
-    navigate(BuildsNavKey.BuildDetails(buildId.toString()))
+@Serializable
+    data class BuildDetailsNavKey(val buildId: String) : NavKey
+fun Navigator.navigateToBuildDetails(buildId: String) {
+    navigate(BuildDetailsNavKey(buildId))
 }

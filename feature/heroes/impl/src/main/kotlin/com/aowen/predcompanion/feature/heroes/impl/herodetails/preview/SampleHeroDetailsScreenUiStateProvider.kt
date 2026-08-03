@@ -62,7 +62,7 @@ val heroBuildsState = HeroDetailsUiState(
     ),
     heroBuilds = listOf(
         BuildUiListItem(
-            buildId = 1,
+            buildId = "1",
             title = "Muriel Support Build [0.13.1]",
             description = "Test Build Description",
             heroId = 15,

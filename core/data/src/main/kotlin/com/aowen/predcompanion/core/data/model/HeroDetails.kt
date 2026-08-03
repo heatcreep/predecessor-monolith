@@ -59,6 +59,11 @@ fun HeroFragment.asHeroDetails(): HeroDetails {
                 cost = it.cost.map { c -> c.toFloat() },
             )
         },
+        generalStatistic = this.generalStatistic?.result?.let {
+            HeroDetails.HeroGeneralStatistic(
+                winRate = (it.matchesWon.toFloat() / it.matchesPlayed.toFloat()).coerceIn(0f..1f),
+            )
+        },
         baseStats = HeroDetails.HeroBaseStats(
             maxHealth = attributeValues(BaseAttribute.MAX_HEALTH),
             healthRegen = attributeValues(BaseAttribute.HEALTH_REGEN),

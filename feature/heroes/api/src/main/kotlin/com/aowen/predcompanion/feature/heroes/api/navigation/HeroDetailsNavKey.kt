@@ -6,10 +6,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HeroDetailsNavKey(
-    val heroId: Long,
-    val heroName: String
+    val heroId: String,
 ) : NavKey
 
-fun Navigator.navigateToHeroDetails(heroId: Long, heroName: String) {
-    navigate(HeroDetailsNavKey(heroId, heroName))
+fun Navigator.navigateToHeroDetails(heroId: String) {
+    navigate(HeroDetailsNavKey(heroId = heroId))
 }

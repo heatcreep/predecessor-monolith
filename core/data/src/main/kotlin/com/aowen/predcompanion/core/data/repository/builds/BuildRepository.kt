@@ -9,11 +9,12 @@ interface BuildRepository {
         name: String? = null,
         role: String? = null,
         order: String? = null,
-        heroId: Long? = null,
+        heroId: String? = null,
         skillOrder: Int? = null,
         currentVersion: Int? = null,
         modules: Int? = null,
         page: Int? = 1,
+        limit: Int? = null,
 
         ): Resource<List<HeroBuild>>
 

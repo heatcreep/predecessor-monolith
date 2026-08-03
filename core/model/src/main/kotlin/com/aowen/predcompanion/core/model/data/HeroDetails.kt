@@ -18,11 +18,16 @@ data class HeroDetails(
     val imageUrl: String? = null,
     val posterImageId: String? = null,
     val stats: List<Int> = emptyList(),
+    val generalStatistic: HeroGeneralStatistic? = null,
     val classes: List<HeroClass> = emptyList(),
     val roles: List<HeroRole> = emptyList(),
     val abilities: List<AbilityDetails> = emptyList(),
     val baseStats: HeroBaseStats = HeroBaseStats()
 ) {
+
+    data class HeroGeneralStatistic(
+       val winRate: Float = 0f,
+    )
     data class HeroBaseStats(
         val maxHealth: List<BigDecimal> = emptyList(),
         val healthRegen: List<BigDecimal> = emptyList(),

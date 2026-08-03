@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.ui.components
+package com.aowen.predcompanion.core.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
@@ -28,7 +28,7 @@ fun HeroInlineStatsRateBar(
 
     var progress by rememberSaveable { mutableFloatStateOf(0f) }
     val animatedProgress by animateFloatAsState(
-        targetValue = progress,
+        targetValue = progress * 100,
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
         label = "animated winrate progress"
     )
@@ -47,7 +47,7 @@ fun HeroInlineStatsRateBar(
             drawStopIndicator = {}
         )
         Text(
-            text = "${rate.toInt()}%",
+            text = "${(rate * 100).toInt()}%",
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onTertiary

@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 )
 data class FavoriteBuildListEntity(
     @PrimaryKey
-    val buildId: Int,
+    val buildId: String,
     val heroId: Long,
     val role: String,
     val title: String,

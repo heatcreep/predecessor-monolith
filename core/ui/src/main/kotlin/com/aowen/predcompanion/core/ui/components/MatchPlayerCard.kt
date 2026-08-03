@@ -3,6 +3,7 @@ package com.aowen.predcompanion.core.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ val ITEM_ICON_SIZE = 24.dp
 @Composable
 fun MatchPlayerCard(
     modifier: Modifier = Modifier,
+    navigateToHeroDetails: (String) -> Unit,
     matchListItem: MatchListItemUiModel,
 ) {
     Box(
@@ -132,6 +134,9 @@ fun MatchPlayerCard(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         PlayerIcon(
+                            modifier = Modifier.clickable {
+                                navigateToHeroDetails(matchListItem.heroId)
+                            },
                             heroImageUrl = matchListItem.heroImageUrl
                         ) {
                             matchListItem.heroRoleDrawableId?.let { roleDrawableId ->
@@ -308,11 +313,13 @@ fun MatchPlayerCardPreview() {
         kdaValue = "1.67",
         minionsKilled = "37",
         csPerMin = "1.9",
+        heroId = "16",
     )
     MonolithTheme {
         CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) {
             MatchPlayerCard(
                 matchListItem = matchListItem,
+                navigateToHeroDetails = {},
             )
         }
     }

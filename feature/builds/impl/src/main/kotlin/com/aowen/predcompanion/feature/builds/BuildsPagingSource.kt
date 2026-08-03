@@ -2,10 +2,10 @@ package com.aowen.predcompanion.feature.builds
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 import com.aowen.predcompanion.core.data.repository.builds.BuildRepository
 import com.aowen.predcompanion.core.network.getOrThrow
+import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
+import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 
 const val PAGE_SIZE = 10
 
@@ -13,7 +13,7 @@ class BuildsPagingSource(
     private val name: String? = null,
     private val role: String? = null,
     private val order: String? = null,
-    private val heroId: Long? = null,
+    private val heroId: String? = null,
     private val skillOrder: Int? = null,
     private val currentVersion: Int? = null,
     private val modules: Int? = null,

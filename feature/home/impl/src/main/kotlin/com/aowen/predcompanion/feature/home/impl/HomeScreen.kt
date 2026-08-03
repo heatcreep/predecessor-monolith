@@ -39,7 +39,7 @@ internal fun HomeScreenRoute(
     modifier: Modifier = Modifier,
     homeScreenViewModel: HomeScreenViewModel,
     navigateToSearch: () -> Unit,
-    navigateToHeroDetails: (Long, String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
     navigateToHeroWinPickRate: (String) -> Unit,
 ) {
     val homeUiState by homeScreenViewModel.uiState.collectAsState()
@@ -61,7 +61,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     uiState: HomeScreenUiState,
     navigateToSearch: () -> Unit,
-    navigateToHeroDetails: (Long, String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
     navigateToHeroWinPickRate: (String) -> Unit,
     handlePullRefresh: () -> Unit,
     handleRemoveAllFavoriteBuilds: () -> Unit = {},
@@ -132,6 +132,7 @@ fun HomeScreen(
                         heroUiInfo = uiState.topFiveHeroesByWinRate.map { heroStats ->
                             HeroUiInfo(
                                 heroName = heroStats.heroName,
+                                heroId = heroStats.heroId,
                                 heroPathName = heroStats.name,
                                 heroImageSrc = heroStats.heroImageSrc ?: "",
                                 heroImageId = heroStats.heroId.toInt(),
@@ -149,6 +150,7 @@ fun HomeScreen(
                         heroUiInfo = uiState.topFiveHeroesByPickRate.map { heroStats ->
                             HeroUiInfo(
                                 heroName = heroStats.heroName,
+                                heroId = heroStats.heroId,
                                 heroPathName = heroStats.name,
                                 heroImageSrc = heroStats.heroImageSrc ?: "",
                                 heroImageId = heroStats.heroId.toInt(),
@@ -173,11 +175,9 @@ fun SearchScreenPreview() {
             HomeScreen(
                 uiState = HomeScreenUiState(
                     isLoading = false,
-                    favoriteBuildsUiState = FavoriteBuildsUiState.Success(emptyList()),
-                    claimedPlayerUiState = ClaimedPlayerUiState.NoClaimed,
                 ),
                 navigateToSearch = {},
-                navigateToHeroDetails = { _, _ -> },
+                navigateToHeroDetails = { _ -> },
                 navigateToHeroWinPickRate = {},
                 handlePullRefresh = {},
             )

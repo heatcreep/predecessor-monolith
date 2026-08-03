@@ -54,7 +54,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HeroesScreenRoute(
     modifier: Modifier = Modifier,
-    navigateToHeroDetails: (heroId: Long, heroName: String) -> Unit = { _, _ -> },
+    navigateToHeroDetails: (heroId: String) -> Unit = { _ -> },
     navigateToSearch: () -> Unit,
     viewModel: HeroesScreenViewModel = hiltViewModel()
 ) {
@@ -79,7 +79,7 @@ fun HeroesScreen(
     onFilterHeroes: () -> Unit,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
-    navigateToHeroDetails: (heroId: Long, heroName: String) -> Unit = { _, _ -> },
+    navigateToHeroDetails: (heroId: String) -> Unit = { _ -> },
     navigateToSearch: () -> Unit = { }
 ) {
     val density = LocalDensity.current
@@ -198,7 +198,7 @@ fun HeroesScreen(
                                 HeroTileCard(
                                     hero = hero,
                                     onClick = {
-                                        navigateToHeroDetails(hero.id.toLong(), hero.name)
+                                        navigateToHeroDetails(hero.id)
                                     }
                                 )
                             }

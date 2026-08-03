@@ -23,5 +23,12 @@
     <string name="core_resources_player_profile_tab_matches">Matches</string>
     <string name="core_resources_player_profile_tab_heroes">Heroes</string>
     <string name="core_resources_player_profile_tab_friends_enemies"><![CDATA[Friends & Enemies]]></string>
+    <string name="core_resources_player_profile_claim_player">It looks like you haven\'t claimed any players yet! To claim a player:</string>
+    <string name="core_resources_player_profile_claim_instructions_search_player">Search for your player at the top</string>
+    <string name="core_resources_player_profile_claim_instructions_visit_predgg">"Visit "</string>
+    <string name="core_resources_player_profile_claim_instructions_claim_player">Tap the \'Claim\' button below the player card</string>
+    <string name="core_resources_player_profile_claim_instructions_complete_claim">Follow the instructions shown, making sure to keep the window that pops up open.</string>
+    <string name="core_resources_privacy_policy">Privacy Policy</string>
+    <string name="core_resources_player_profile_coming_soon">Coming Soon!</string>
 
 </resources>

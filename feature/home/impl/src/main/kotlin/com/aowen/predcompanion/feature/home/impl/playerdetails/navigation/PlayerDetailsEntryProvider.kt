@@ -3,6 +3,7 @@ package com.aowen.predcompanion.feature.home.impl.playerdetails.navigation
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.aowen.predcompanion.feature.heroes.api.navigation.navigateToHeroDetails
 import com.aowen.predcompanion.feature.home.api.navigation.PlayerDetailsNavKey
 import com.aowen.predcompanion.feature.home.api.navigation.navigateToMatchDetails
 import com.aowen.predcompanion.feature.home.impl.playerdetails.PlayerDetailsRoute
@@ -16,7 +17,8 @@ fun EntryProviderScope<NavKey>.playerDetailsEntry(navigator: Navigator) {
         PlayerDetailsRoute(
             viewModel = viewModel,
             navigateBack = { navigator.goBack() },
-            navigateToMatchDetails = navigator::navigateToMatchDetails
+            navigateToMatchDetails = navigator::navigateToMatchDetails,
+            navigateToHeroDetails = navigator::navigateToHeroDetails,
         )
     }
 }
