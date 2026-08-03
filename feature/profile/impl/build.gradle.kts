@@ -21,6 +21,7 @@ dependencies {
     implementation(projects.feature.home.api)
     implementation(projects.feature.heroes.api)
     implementation(projects.feature.auth.api)
+    implementation(projects.feature.items.api)
     implementation(projects.feature.search.api)
     implementation(projects.feature.profile.api)
 

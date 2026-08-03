@@ -8,6 +8,7 @@ import com.aowen.predcompanion.feature.home.api.navigation.PlayerDetailsNavKey
 import com.aowen.predcompanion.feature.home.api.navigation.navigateToMatchDetails
 import com.aowen.predcompanion.feature.home.impl.playerdetails.PlayerDetailsRoute
 import com.aowen.predcompanion.feature.home.impl.playerdetails.PlayerDetailsViewModel
+import com.aowen.predcompanion.feature.items.api.navigation.navigateToItemDetails
 import com.aowen.predcompanion.navigation.Navigator
 
 fun EntryProviderScope<NavKey>.playerDetailsEntry(navigator: Navigator) {
@@ -19,6 +20,7 @@ fun EntryProviderScope<NavKey>.playerDetailsEntry(navigator: Navigator) {
             navigateBack = { navigator.goBack() },
             navigateToMatchDetails = navigator::navigateToMatchDetails,
             navigateToHeroDetails = navigator::navigateToHeroDetails,
+            navigateToItemDetails = navigator::navigateToItemDetails,
         )
     }
 }

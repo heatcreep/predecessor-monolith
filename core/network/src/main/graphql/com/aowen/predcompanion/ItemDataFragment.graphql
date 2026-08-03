@@ -2,10 +2,12 @@ fragment ItemDataFragment on ItemData {
     id
     item {
         id
+        name
         data {
             id
             slotType
             displayName
+            name
             icon
         }
     }

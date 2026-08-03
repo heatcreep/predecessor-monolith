@@ -25,6 +25,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.predcompanion.feature.heroes.api.navigation.navigateToHeroDetails
 import com.aowen.predcompanion.feature.home.api.navigation.navigateToMatchDetails
+import com.aowen.predcompanion.feature.items.api.navigation.navigateToItemDetails
 import com.aowen.predcompanion.feature.profile.api.navigation.ProfileNavKey
 import com.aowen.predcompanion.feature.profile.impl.ProfileScreen
 import com.aowen.predcompanion.feature.profile.impl.ProfileViewModel
@@ -92,6 +93,7 @@ fun EntryProviderScope<NavKey>.profileEntry(
                     heroStatsState = heroStatsState,
                     navigateToMatchDetails = navigator::navigateToMatchDetails,
                     navigateToHeroDetails = navigator::navigateToHeroDetails,
+                    navigateToItemDetails = navigator::navigateToItemDetails,
                     handleRetry = {}
                 )
             }

@@ -1,9 +1,7 @@
 package com.aowen.predcompanion.feature.profile.impl
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,17 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,9 +46,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.ui.theme.Console
+import com.aowen.predcompanion.core.ui.cards.playerprofile.HeroStatsTabState
 import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfileLayout
-import com.aowen.predcompanion.core.ui.components.KDAText
-import com.aowen.predcompanion.core.ui.components.MatchPlayerCard
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.feature.profile.impl.ui.ConsoleDropdownMenu
 import com.aowen.predcompanion.feature.profile.impl.ui.ThemeDropdownMenu
@@ -186,14 +178,9 @@ fun ProfileScreen(
     handleRetry: () -> Unit,
     navigateToMatchDetails: (String) -> Unit,
     navigateToHeroDetails: (String) -> Unit,
+    navigateToItemDetails: (String) -> Unit,
 ) {
 
-
-    val tabList = listOf(
-        coreResources.string.core_resources_player_profile_tab_matches,
-        coreResources.string.core_resources_player_profile_tab_heroes,
-        coreResources.string.core_resources_player_profile_tab_friends_enemies,
-    )
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
     Surface(
@@ -217,131 +204,14 @@ fun ProfileScreen(
                 if (userState.userInfo != null && userState.userInfo.players.isNotEmpty()) {
                     PlayerProfileLayout(
                         profileCard = userState.userInfo.players.first(),
-                        tabLabels = tabList,
+                        matches = matches,
+                        heroStatsTabState = heroStatsState.toTabState(),
                         selectedTab = selectedTab,
                         onTabSelected = { selectedTab = it },
-                    ) { tab ->
-                        when (tab) {
-                            0 -> {
-                                LazyColumn(
-                                    state = rememberLazyListState(),
-                                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    items(matches.itemCount) {
-                                        matches[it]?.let { matchItem ->
-                                            MatchPlayerCard(
-                                                modifier = Modifier.clickable {
-                                                    navigateToMatchDetails(matchItem.matchId)
-                                                },
-                                                navigateToHeroDetails = navigateToHeroDetails,
-                                                matchListItem = matchItem,
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            1 -> {
-                                when (heroStatsState) {
-                                    is HeroStatsUiState.Loading -> {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.Center
-                                        ) {
-                                            CircularProgressIndicator(
-                                                modifier = Modifier.size(48.dp),
-                                                color = MaterialTheme.colorScheme.tertiary,
-                                                strokeWidth = 8.dp
-                                            )
-                                        }
-                                    }
-
-                                    is HeroStatsUiState.Error -> {
-                                        FullScreenErrorWithRetry(heroStatsState.message) { }
-                                    }
-
-                                    is HeroStatsUiState.Loaded -> {
-                                        LazyColumn(
-                                            state = rememberLazyListState(),
-                                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                                        ) {
-
-                                            itemsIndexed(
-                                                heroStatsState.stats,
-                                                key = { _, heroStat -> heroStat.id }) { index, heroStat ->
-                                                Column(
-                                                    modifier = Modifier.fillMaxWidth()
-                                                ) {
-                                                    Row(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth(),
-                                                        Arrangement.SpaceBetween
-                                                    ) {
-                                                        Box(
-                                                            modifier = Modifier.weight(1f)
-                                                        ) {
-                                                            Text(
-                                                                text = heroStat.name,
-                                                                color = MaterialTheme.colorScheme.secondary,
-                                                                style = MaterialTheme.typography.bodyMedium
-                                                            )
-                                                        }
-                                                        Box(
-                                                            modifier = Modifier.weight(0.5f)
-                                                        ) {
-                                                            Text(
-                                                                text = heroStat.totalMatches,
-                                                                color = MaterialTheme.colorScheme.secondary,
-                                                                style = MaterialTheme.typography.bodyMedium
-                                                            )
-                                                        }
-                                                        Box(
-                                                            modifier = Modifier.weight(0.5f)
-                                                        ) {
-                                                            Text(
-                                                                text = heroStat.winRate,
-                                                                color = MaterialTheme.colorScheme.secondary,
-                                                                style = MaterialTheme.typography.bodyMedium
-                                                            )
-                                                        }
-                                                        Box(
-                                                            modifier = Modifier.weight(1f),
-                                                            contentAlignment = Alignment.CenterEnd
-                                                        ) {
-                                                            KDAText(
-                                                                averageKda = listOf(
-                                                                    heroStat.averageKills,
-                                                                    heroStat.averageDeaths,
-                                                                    heroStat.averageAssists
-                                                                )
-                                                            )
-                                                        }
-                                                    }
-                                                    Spacer(modifier = Modifier.size(8.dp))
-                                                    if (index != heroStatsState.stats.count() - 1) {
-                                                        HorizontalDivider(
-                                                            modifier = Modifier.fillMaxWidth(),
-                                                            color = MaterialTheme.colorScheme.secondary
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                            }
-
-                            2 -> {
-                                // TODO: Implement friends and enemies
-                                Text(
-                                    text = stringResource(id = coreResources.string.core_resources_player_profile_coming_soon),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                )
-                            }
-                        }
-                    }
+                        navigateToMatchDetails = navigateToMatchDetails,
+                        navigateToHeroDetails = navigateToHeroDetails,
+                        navigateToItemDetails = navigateToItemDetails,
+                    )
                 } else {
                     Column(
                         modifier = Modifier
@@ -407,6 +277,12 @@ fun ProfileScreen(
     }
 }
 
+private fun HeroStatsUiState.toTabState(): HeroStatsTabState = when (this) {
+    is HeroStatsUiState.Loading -> HeroStatsTabState.Loading
+    is HeroStatsUiState.Loaded -> HeroStatsTabState.Loaded(stats)
+    is HeroStatsUiState.Error -> HeroStatsTabState.Error(message)
+}
+
 @Composable
 fun BulletItem(content: AnnotatedString.Builder.() -> Unit) {
     Row {
@@ -447,6 +323,7 @@ fun ProfileCardPreview() {
             heroStatsState = HeroStatsUiState.Loading,
             navigateToMatchDetails = { /*TODO*/ },
             navigateToHeroDetails = { /*TODO*/ },
+            navigateToItemDetails = { /*TODO*/ },
         )
     }
 }

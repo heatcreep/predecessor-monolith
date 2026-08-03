@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +45,7 @@ import com.aowen.predcompanion.core.ui.common.PlayerIcon
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.ui.theme.DarkGreenHighlight35
 import com.aowen.predcompanion.ui.theme.GreenHighlight
+import com.aowen.predcompanion.ui.theme.NeroGrey
 import com.aowen.predcompanion.ui.theme.RedHighlight
 import com.aowen.predcompanion.core.resources.R as coreResources
 
@@ -58,6 +55,7 @@ val ITEM_ICON_SIZE = 24.dp
 fun MatchPlayerCard(
     modifier: Modifier = Modifier,
     navigateToHeroDetails: (String) -> Unit,
+    navigateToItemDetails: (String) -> Unit,
     matchListItem: MatchListItemUiModel,
 ) {
     Box(
@@ -168,26 +166,23 @@ fun MatchPlayerCard(
                         Spacer(modifier = Modifier.size(2.dp))
                         // Crest and Trinket Column
                         Column {
-                            ItemContainer(imageSrc = matchListItem.crestImageUrl)
+                            ItemContainer(
+                                imageSrc = matchListItem.crest?.imageSrc,
+                                onClick = {
+                                    if (matchListItem.crest != null) {
+                                        navigateToItemDetails(matchListItem.crest.id)
+                                    }
+                                },
+                            )
                             Spacer(modifier = Modifier.size(2.dp))
-                            if (matchListItem.trinketImageUrl != null) {
-                                ItemContainer(imageSrc = matchListItem.trinketImageUrl)
-                            } else {
-                                Box(
-                                    modifier = modifier
-                                        .size(ITEM_ICON_SIZE)
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(MaterialTheme.colorScheme.primaryContainer)
-
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = null,
-                                        modifier = modifier.size(ITEM_ICON_SIZE),
-                                        tint = Color.Red
-                                    )
-                                }
-                            }
+                            ItemContainer(
+                                imageSrc = matchListItem.trinket?.imageSrc,
+                                onClick = {
+                                    if (matchListItem.trinket != null) {
+                                        navigateToItemDetails(matchListItem.trinket.id)
+                                    }
+                                },
+                            )
                         }
                         Spacer(modifier = Modifier.size(2.dp))
 
@@ -197,8 +192,15 @@ fun MatchPlayerCard(
                             verticalArrangement = Arrangement.spacedBy(2.dp),
                             maxItemsInEachRow = 3,
                         ) {
-                            matchListItem.itemsImageUrls.forEach { itemImageUrl ->
-                                ItemContainer(imageSrc = itemImageUrl)
+                            matchListItem.items.forEach { item ->
+                                ItemContainer(
+                                    imageSrc = item?.imageSrc,
+                                    onClick = {
+                                        if (item?.imageSrc != null) {
+                                            navigateToItemDetails(item.id)
+                                        }
+                                    },
+                                )
                             }
                         }
                     }
@@ -247,14 +249,15 @@ fun MatchPlayerCard(
 @Composable
 fun ItemContainer(
     modifier: Modifier = Modifier,
-    imageSrc: String?
+    imageSrc: String?,
+    onClick: (() -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
             .size(ITEM_ICON_SIZE)
             .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-
+            .background(NeroGrey)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
     ) {
         imageSrc?.let {
             AsyncImage(
@@ -297,14 +300,15 @@ fun MatchPlayerCardPreview() {
         timeSinceMatch = "1 hour ago",
         heroImageUrl = heroIconUrl,
         heroName = "Hero Name",
-        crestImageUrl = crestIconUrl,
+        crest = MatchListItemUiModel.ItemBoxUiModel(id = "crest-id", imageSrc = crestIconUrl),
+        trinket = null,
         heroRoleDrawableId = coreResources.drawable.support,
         kills = "5",
         deaths = "3",
         assists = "12",
-        itemsImageUrls = listOf(
-            item1IconUrl,
-            item2IconUrl,
+        items = listOf(
+            MatchListItemUiModel.ItemBoxUiModel(id = "item1-id", imageSrc = item1IconUrl),
+            MatchListItemUiModel.ItemBoxUiModel(id = "item2-id", imageSrc = item2IconUrl),
             null,
             null,
             null,
@@ -320,6 +324,7 @@ fun MatchPlayerCardPreview() {
             MatchPlayerCard(
                 matchListItem = matchListItem,
                 navigateToHeroDetails = {},
+                navigateToItemDetails = {},
             )
         }
     }

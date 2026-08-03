@@ -33,21 +33,26 @@ fun MatchResultsFragment.Result.asMatchHistoryItem(): MatchHistoryItem {
     val crest =
         inventoryItemData?.firstOrNull { it?.itemDataFragment?.item?.data?.slotType == SlotType.CREST }
             ?.let {
-                InventoryItem.Crest(ImageHelpers.buildAssetsUrl(it.itemDataFragment.item.data?.icon ?: ""))
+                InventoryItem.Crest(
+                    name = it.itemDataFragment.item.name,
+                    imageSrc = ImageHelpers.buildAssetsUrl(it.itemDataFragment.item.data?.icon ?: "")
+                )
             }
     val trinket =
         inventoryItemData?.firstOrNull { it?.itemDataFragment?.item?.data?.slotType == SlotType.TRINKET }
             ?.let {
-                InventoryItem.Trinket(ImageHelpers.buildAssetsUrl(it.itemDataFragment.item.data?.icon ?: ""))
+                InventoryItem.Trinket(
+                    name = it.itemDataFragment.item.name,
+                    imageSrc = ImageHelpers.buildAssetsUrl(it.itemDataFragment.item.data?.icon ?: "")
+                )
             }
     val items =
         List(6) { index ->
             inventoryItemData?.filter { it?.itemDataFragment?.item?.data?.slotType == SlotType.PASSIVE }
                 ?.getOrNull(index)?.let {
                     InventoryItem.Passive(
-                        ImageHelpers.buildAssetsUrl(
-                            it.itemDataFragment.item.data?.icon ?: ""
-                        )
+                        name = it.itemDataFragment.item.name,
+                        imageSrc = ImageHelpers.buildAssetsUrl(it.itemDataFragment.item.data?.icon ?: "")
                     )
                 }
         }

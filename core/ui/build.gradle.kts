@@ -16,4 +16,5 @@ dependencies {
     implementation(project(":core:datastore"))
 
     implementation(libs.coil.compose)
+    implementation(libs.androidx.paging.compose)
 }

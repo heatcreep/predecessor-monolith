@@ -1,14 +1,9 @@
 package com.aowen.predcompanion.feature.home.impl.playerdetails
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -32,8 +27,8 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.ui.cards.playerprofile.HeroStatsTabState
 import com.aowen.predcompanion.core.ui.cards.playerprofile.PlayerProfileLayout
-import com.aowen.predcompanion.core.ui.components.MatchPlayerCard
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.core.ui.model.PlayerProfileCardUiModel
 import com.aowen.predcompanion.core.ui.model.PlayerProfileUiModel
@@ -41,7 +36,6 @@ import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 import kotlinx.coroutines.flow.flowOf
-import com.aowen.predcompanion.core.resources.R as coreResources
 
 
 @Composable
@@ -51,7 +45,7 @@ internal fun PlayerDetailsRoute(
     navigateBack: () -> Unit,
     navigateToMatchDetails: (String) -> Unit,
     navigateToHeroDetails: (String) -> Unit,
-
+    navigateToItemDetails: (String) -> Unit,
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
@@ -64,25 +58,24 @@ internal fun PlayerDetailsRoute(
         modifier = modifier,
         navigateToMatchDetails = navigateToMatchDetails,
         navigateToHeroDetails = navigateToHeroDetails,
+        navigateToItemDetails = navigateToItemDetails,
         navigateBack = navigateBack,
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PlayerDetailScreen(
     playerDetailsState: PlayerDetailsState,
     matches: LazyPagingItems<MatchListItemUiModel>,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
-    handlePlayerHeroStatsSelect: (Long) -> Unit = { },
     navigateToMatchDetails: (String) -> Unit = { },
     navigateToHeroDetails: (String) -> Unit = { },
+    navigateToItemDetails: (String) -> Unit = { },
     navigateBack: () -> Unit = {},
 ) {
 
     val isRefreshing by remember { mutableStateOf(false) }
-
 
     when (playerDetailsState) {
         is PlayerDetailsState.Loading -> FullScreenLoadingIndicator("Player Details")
@@ -128,52 +121,24 @@ fun PlayerDetailScreen(
                                 .fillMaxHeight()
                                 .padding(horizontal = 16.dp)
                         ) {
-                            val tabLabels = listOf(
-                                coreResources.string.core_resources_player_profile_tab_matches,
-                                coreResources.string.core_resources_player_profile_tab_heroes,
-                                coreResources.string.core_resources_player_profile_tab_friends_enemies,
-                            )
                             var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
                             PlayerProfileLayout(
                                 profileCard = uiState,
-                                tabLabels = tabLabels,
+                                matches = matches,
+                                heroStatsTabState = HeroStatsTabState.Loaded(emptyList()),
                                 selectedTab = selectedTab,
                                 onTabSelected = { selectedTab = it },
-                            ) { tab ->
-                                when (tab) {
-                                    0 -> {
-                                        LazyColumn(
-                                            state = rememberLazyListState(),
-                                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                                        ) {
-                                            items(matches.itemCount) {
-                                                matches[it]?.let { matchItem ->
-                                                    MatchPlayerCard(
-                                                        modifier = Modifier.clickable {
-                                                            navigateToMatchDetails(matchItem.matchId)
-                                                        },
-                                                        matchListItem = matchItem,
-                                                        navigateToHeroDetails = navigateToHeroDetails,
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    1 -> {}
-                                    2 -> {}
-                                }
-                            }
+                                navigateToMatchDetails = navigateToMatchDetails,
+                                navigateToHeroDetails = navigateToHeroDetails,
+                                navigateToItemDetails = navigateToItemDetails,
+                            )
                         }
                     }
-
                 }
             }
         }
     }
-
-
 }
 
 @PreviewLightDark

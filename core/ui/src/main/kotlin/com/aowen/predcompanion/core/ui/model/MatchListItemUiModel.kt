@@ -17,9 +17,9 @@ data class MatchListItemUiModel(
     @param:DrawableRes val heroRoleDrawableId: Int?,
     val augmentImageSrc: String? = null,
     val eternalImageSrc: String? = null,
-    val crestImageUrl: String? = null,
-    val trinketImageUrl: String? = null,
-    val itemsImageUrls: List<String?> = emptyList(),
+    val crest: ItemBoxUiModel? = null,
+    val trinket: ItemBoxUiModel? = null,
+    val items: List<ItemBoxUiModel?> = emptyList(),
     val performanceScore: String? = null,
     val minionsKilled: String,
     val csPerMin: String,
@@ -28,4 +28,9 @@ data class MatchListItemUiModel(
     val deaths: String,
     val assists: String,
     val kdaValue: String,
-)
+) {
+    data class ItemBoxUiModel(
+        val id: String,
+        val imageSrc: String
+    )
+}

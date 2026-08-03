@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":core:resources"))
     implementation(projects.core.datastore)
 
+    implementation(libs.androidx.core.ktx)
     api(libs.androidx.compose.material3)
     api(libs.androidx.compose.material3.adaptive)
     api(libs.androidx.compose.material3.navigationSuite)

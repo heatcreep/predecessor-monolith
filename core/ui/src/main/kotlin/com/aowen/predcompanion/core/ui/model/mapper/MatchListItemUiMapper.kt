@@ -71,9 +71,26 @@ class MatchListItemUiMapper @Inject constructor(
             heroId = matchHistoryItem.heroId,
             augmentImageSrc = matchHistoryItem.augmentImageSrc,
             eternalImageSrc = matchHistoryItem.eternalImageSrc,
-            crestImageUrl = matchHistoryItem.crest?.imageSrc,
-            trinketImageUrl = matchHistoryItem.trinket?.imageSrc,
-            itemsImageUrls = matchHistoryItem.items.map { it?.imageSrc },
+            crest = matchHistoryItem.crest?.let {
+                MatchListItemUiModel.ItemBoxUiModel(
+                    id = it.name,
+                    imageSrc = it.imageSrc
+                )
+            },
+            trinket = matchHistoryItem.trinket?.let {
+                MatchListItemUiModel.ItemBoxUiModel(
+                    id = it.name,
+                    imageSrc = it.imageSrc
+                )
+            },
+            items = matchHistoryItem.items.map {
+                it?.let {
+                    MatchListItemUiModel.ItemBoxUiModel(
+                        id = it.name,
+                        imageSrc = it.imageSrc
+                    )
+                }
+            },
             heroRoleDrawableId = matchHistoryItem.heroRoleDrawableId,
             kills = matchHistoryItem.kills.toString(),
             deaths = matchHistoryItem.deaths.toString(),

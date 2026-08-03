@@ -1,5 +1,6 @@
 package com.aowen.predcompanion.core.designsystem
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -8,8 +9,11 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.aowen.monolith.ui.theme.Typography
 import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.predcompanion.ui.theme.DarkKhaki
@@ -75,6 +79,11 @@ fun MonolithTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val isDark = when {
+        localTheme != Theme.SYSTEM -> localTheme == Theme.DARK
+        else -> darkTheme
+    }
+
     val colorScheme = when {
         localTheme != Theme.SYSTEM -> {
             if (localTheme == Theme.DARK) DarkColorScheme else LightColorScheme
@@ -87,6 +96,14 @@ fun MonolithTheme(
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDark
+        }
     }
 
     MaterialTheme(

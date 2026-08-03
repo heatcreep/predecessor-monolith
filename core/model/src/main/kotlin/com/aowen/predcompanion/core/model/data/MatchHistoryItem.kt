@@ -3,11 +3,12 @@ package com.aowen.predcompanion.core.model.data
 import androidx.annotation.StringRes
 
 sealed class InventoryItem {
+    abstract val name: String
     abstract val imageSrc: String
 
-    data class Crest(override val imageSrc: String) : InventoryItem()
-    data class Trinket(override val imageSrc: String) : InventoryItem()
-    data class Passive(override val imageSrc: String) : InventoryItem()
+    data class Crest(override val name: String, override val imageSrc: String) : InventoryItem()
+    data class Trinket(override val name: String, override val imageSrc: String) : InventoryItem()
+    data class Passive(override val name: String, override val imageSrc: String) : InventoryItem()
 }
 
 data class MatchHistoryItem(

@@ -1,15 +1,12 @@
 package com.aowen.predcompanion.feature.profile.impl
 
-import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.aowen.predcompanion.core.data.model.MatchHistoryTarget
-import com.aowen.predcompanion.core.data.repository.auth.NewAuthRepository
 import com.aowen.predcompanion.core.data.repository.matches.MatchHistoryRepository
-import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
 import com.aowen.predcompanion.core.data.repository.user.UserRepository
 import com.aowen.predcompanion.core.data.repository.user.UserState
 import com.aowen.predcompanion.core.datastore.Theme
@@ -67,20 +64,11 @@ sealed interface UserUiState {
     ) : UserUiState
 }
 
-enum class ProfileToastState {
-    DELETE,
-    LOGOUT,
-    ERROR,
-    NONE
-}
-
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userPreferencesDataStore: UserPreferencesManager,
     private val themePreferences: ThemePreferences,
     private val userRepository: UserRepository,
-    private val newAuthRepository: NewAuthRepository,
-    private val playerRepository: PlayerRepository,
     private val matchHistoryRepository: MatchHistoryRepository,
     private val matchListItemUiMapper: MatchListItemUiMapper,
 
@@ -108,7 +96,12 @@ class ProfileViewModel @Inject constructor(
                     )
                 )
             }
-            ProfileScreenState(isRefreshing = isRefreshing, console = console, theme = theme, user = user)
+            ProfileScreenState(
+                isRefreshing = isRefreshing,
+                console = console,
+                theme = theme,
+                user = user
+            )
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
@@ -127,6 +120,7 @@ class ProfileViewModel @Inject constructor(
                                 matchListItemUiMapper.buildFrom(it)
                             }
                         }
+
                         else -> emptyFlow()
                     }
                 }
@@ -141,9 +135,11 @@ class ProfileViewModel @Inject constructor(
                 when (userState) {
                     is UserState.SignedIn -> {
                         userRepository.fetchCurrentUser()?.let {
-                            HeroStatsUiState.Loaded(it.players.firstOrNull()?.heroStatistics?.map { it.toHeroStatisticsUiModel() } ?: emptyList())
+                            HeroStatsUiState.Loaded(it.players.firstOrNull()?.heroStatistics?.map { it.toHeroStatisticsUiModel() }
+                                ?: emptyList())
                         } ?: HeroStatsUiState.Error("No current user")
                     }
+
                     else -> HeroStatsUiState.Loading
                 }
             }.stateIn(
@@ -151,9 +147,6 @@ class ProfileViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5_000),
                 HeroStatsUiState.Loading
             )
-
-    private val _showProfileToast = MutableStateFlow(ProfileToastState.NONE)
-    val showProfileToast = _showProfileToast
 
     fun refresh() {
         viewModelScope.launch {
@@ -166,7 +159,6 @@ class ProfileViewModel @Inject constructor(
     fun handleLogout() {
         viewModelScope.launch {
             userRepository.clearUser()
-            _showProfileToast.emit(ProfileToastState.LOGOUT)
         }
     }
 
@@ -180,18 +172,5 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             themePreferences.saveTheme(theme)
         }
-    }
-
-    fun loginIntent() = newAuthRepository.loginIntent()
-
-    fun onLoginResult(data: Intent?) {
-        if (data == null) return
-        viewModelScope.launch {
-            newAuthRepository.onLoginResult(data)
-        }
-    }
-
-    fun onShowToastComplete() {
-        _showProfileToast.value = ProfileToastState.NONE
     }
 }
