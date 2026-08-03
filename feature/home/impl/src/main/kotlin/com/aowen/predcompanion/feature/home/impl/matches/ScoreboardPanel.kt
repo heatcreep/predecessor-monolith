@@ -32,6 +32,7 @@ fun ScoreboardPanel(
     matchPlayerCards: List<MatchDetailsPlayerCardUiModel>,
     openItemDetails: (String) -> Unit,
     navigateToPlayerDetails: (String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -79,7 +80,8 @@ fun ScoreboardPanel(
         ) {
             matchPlayerCards.forEach { matchPlayerCard ->
                 MatchDetailPlayerCard(
-                    matchListItem = matchPlayerCard
+                    matchListItem = matchPlayerCard,
+                    navigateToHeroDetails = navigateToHeroDetails,
                 )
             }
         }

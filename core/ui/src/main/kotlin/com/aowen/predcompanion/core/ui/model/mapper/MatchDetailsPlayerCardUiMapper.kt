@@ -32,6 +32,7 @@ class MatchDetailsPlayerCardUiMapper @Inject constructor(
         return MatchDetailsPlayerCardUiModel(
             heroAndItemDetails = HeroAndItemDetailsUiModel(
                 playerName = playerName,
+                heroId = matchPlayerDetails.heroId,
                 heroImageSrc = heroImageSrc,
                 heroRoleDrawableId = heroRoleMap[matchPlayerDetails.role?.lowercase()]?.drawableId,
                 kills = matchPlayerDetails.kills.toString(),

@@ -62,6 +62,7 @@ import com.aowen.predcompanion.core.resources.R as coreResources
 fun MatchDetailsRoute(
     modifier: Modifier = Modifier,
     navigateToPlayerDetails: (String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
     navigateToItemDetails: (String) -> Unit,
     viewModel: MatchDetailsViewModel
 ) {
@@ -130,6 +131,7 @@ fun MatchDetailsRoute(
                         when (page) {
                             0 -> MatchDetailsTab(
                                 match = state.match,
+                                navigateToHeroDetails = navigateToHeroDetails,
                                 onItemClicked = navigateToItemDetails,
                                 navigateToPlayerDetails = navigateToPlayerDetails
                             )
@@ -152,6 +154,7 @@ fun MatchDetailsTab(
     match: MatchDetailsUiModel,
     modifier: Modifier = Modifier,
     onItemClicked: (String) -> Unit,
+    navigateToHeroDetails: (String) -> Unit = {},
     navigateToPlayerDetails: (String) -> Unit = {}
 ) {
     Surface(
@@ -170,6 +173,7 @@ fun MatchDetailsTab(
                 matchPlayerCards = match.duskTeam.players,
                 openItemDetails = onItemClicked,
                 navigateToPlayerDetails = navigateToPlayerDetails,
+                navigateToHeroDetails = navigateToHeroDetails,
             )
             ScoreboardPanel(
                 teamName = "Dawn",
@@ -177,6 +181,7 @@ fun MatchDetailsTab(
                 matchPlayerCards = match.dawnTeam.players,
                 openItemDetails = onItemClicked,
                 navigateToPlayerDetails = navigateToPlayerDetails,
+                navigateToHeroDetails = navigateToHeroDetails,
             )
         }
     }

@@ -39,7 +39,8 @@ import com.aowen.predcompanion.core.ui.model.MatchDetailsPlayerCardUiModel
 @Composable
 fun MatchDetailPlayerCard(
     modifier: Modifier = Modifier,
-    matchListItem: MatchDetailsPlayerCardUiModel
+    matchListItem: MatchDetailsPlayerCardUiModel,
+    navigateToHeroDetails: (String) -> Unit,
 ) {
 
     Column(
@@ -68,6 +69,9 @@ fun MatchDetailPlayerCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     PlayerIcon(
+                        onClick = {
+                            navigateToHeroDetails(matchListItem.heroAndItemDetails.heroId)
+                        },
                         heroImageUrl = matchListItem.heroAndItemDetails.heroImageSrc
                     ) {
                         matchListItem.heroAndItemDetails.heroRoleDrawableId?.let { roleDrawableId ->

@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 
 data class HeroAndItemDetailsUiModel(
     val playerName: String,
+    val heroId: String,
     val heroImageSrc: String,
     @param:DrawableRes val heroRoleDrawableId: Int?,
     val augment: PlayerPerkUiModel? = null,
