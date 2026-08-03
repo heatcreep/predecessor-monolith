@@ -8,18 +8,16 @@ import com.aowen.predcompanion.core.network.apollo.type.Role
 fun PlayerFragment.asPlayer(): Player {
     val gamesPlayed = generalStatistic?.result?.matchesPlayed ?: 1
     val gamesWon = generalStatistic?.result?.matchesWon ?: 0
+    val latestRating = ratings.lastOrNull()?.playerRatingFragment
     return Player(
         id = id,
         name = name ?: "",
         winRate = (gamesWon.toFloat() / gamesPlayed.toFloat()).toWinRate(),
-        rankIconUrl = ratings.last().playerRatingFragment.rank?.icon?.let {
-            ImageHelpers.buildAssetsUrl(
-                it
-            )
+        rankIconUrl = latestRating?.rank?.icon?.let {
+            ImageHelpers.buildAssetsUrl(it)
         } ?: "",
-        currentRankTitle = ratings.last().playerRatingFragment.rank?.name
-            ?: "",
-        currentRankPoints = ratings.last().playerRatingFragment.points.toString(),
+        currentRankTitle = latestRating?.rank?.name ?: "",
+        currentRankPoints = latestRating?.points?.toString() ?: "",
         favoriteRole = favRole?.toFavoriteRole() ?: "",
         favoriteHero = favHero?.heroFragment?.asHeroDetails(),
         heroStatistics = heroStatistics?.asPlayerHeroStatistics() ?: emptyList()

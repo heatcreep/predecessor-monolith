@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="feature_profile_impl_nav_general_stats">General Stats</string>
+    <string name="feature_profile_impl_page_title">Profile</string>
 </resources>

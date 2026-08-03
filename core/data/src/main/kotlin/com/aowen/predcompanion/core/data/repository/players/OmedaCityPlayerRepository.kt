@@ -70,9 +70,13 @@ class OmedaCityPlayerRepository @Inject constructor(
             }
         )
 
-    override suspend fun fetchPlayerById(playerId: String): Player? {
-        return predGGNetwork.getPlayer(playerId).data?.player?.playerFragment?.asPlayer()
-    }
+    override suspend fun fetchPlayerById(playerId: String): Resource<Player?> =
+        safeGraphQlCall(
+            apiCall = { predGGNetwork.getPlayer(playerId) },
+            transform = { data ->
+                data.player?.playerFragment?.asPlayer()
+            }
+        )
 
     override suspend fun fetchAllPlayerHeroStats(playerId: String): Resource<List<PlayerHeroStats>> =
         safeGraphQlCall(

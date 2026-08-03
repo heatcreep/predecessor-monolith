@@ -8,6 +8,7 @@ import androidx.paging.map
 import com.aowen.predcompanion.core.data.model.MatchHistoryTarget
 import com.aowen.predcompanion.core.data.repository.matches.MatchHistoryRepository
 import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
+import com.aowen.predcompanion.core.network.Resource
 import com.aowen.predcompanion.core.network.apollo.type.PlayerKey
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
 import com.aowen.predcompanion.core.ui.model.PlayerProfileUiModel
@@ -74,14 +75,22 @@ class PlayerDetailsViewModel @AssistedInject constructor(
     private fun loadPlayerDetails() {
         viewModelScope.launch {
             try {
-                val player = omedaCityPlayerRepository.fetchPlayerById(playerId)
-                if (player != null) {
-                    _uiState.value = PlayerDetailsState.Loaded(
-                        PlayerProfileUiModel(
-                            profileCardUiModel = player.toPlayerProfileCardUiModel(),
-                            heroStatisticsList = player.heroStatistics.map { it.toHeroStatisticsUiModel() }
+                when (val player = omedaCityPlayerRepository.fetchPlayerById(playerId)) {
+                    is Resource.Success -> {
+                        val playerData = player.data ?: return@launch
+                        _uiState.value = PlayerDetailsState.Loaded(
+                            PlayerProfileUiModel(
+                                profileCardUiModel = playerData.toPlayerProfileCardUiModel(),
+                                heroStatisticsList = playerData.heroStatistics.map { it.toHeroStatisticsUiModel() }
+                            )
                         )
-                    )
+                    }
+                    is Resource.NetworkError -> {
+                        _uiState.value = PlayerDetailsState.Error(player.errorMessage)
+                    }
+                    is Resource.GenericError -> {
+                        _uiState.value = PlayerDetailsState.Error(player.errorMessage)
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.value = PlayerDetailsState.Error(e.message)

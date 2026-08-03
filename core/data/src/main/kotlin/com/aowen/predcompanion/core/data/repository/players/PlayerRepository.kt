@@ -12,7 +12,7 @@ interface PlayerRepository {
 
     suspend fun fetchPlayerInfo(playerId: String): Resource<PlayerInfo>
 
-    suspend fun fetchPlayerById(playerId: String): Player?
+    suspend fun fetchPlayerById(playerId: String): Resource<Player?>
 
     suspend fun fetchAllPlayerHeroStats(playerId: String): Resource<List<PlayerHeroStats>>
 }

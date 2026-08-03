@@ -48,6 +48,7 @@ data class CurrentUserUiModel(
 )
 
 data class ProfileScreenState(
+    val isRefreshing: Boolean = false,
     val console: Console = Console.PC,
     val theme: Theme = Theme.SYSTEM,
     val user: UserUiState = UserUiState.Loading,
@@ -85,12 +86,17 @@ class ProfileViewModel @Inject constructor(
 
     ) : ViewModel() {
 
+    private val _isRefreshing = MutableStateFlow(false)
+
+    private val refreshTrigger = MutableStateFlow(0L)
+
     val uiState: StateFlow<ProfileScreenState> =
         combine(
             userRepository.currentUserState,
             themePreferences.theme,
             userPreferencesDataStore.console,
-        ) { currentUserState, theme, console ->
+            _isRefreshing,
+        ) { currentUserState, theme, console, isRefreshing ->
             val user = when (currentUserState) {
                 is UserState.Loading -> UserUiState.Loading
                 is UserState.SignedOut -> UserUiState.SignedOut
@@ -102,33 +108,35 @@ class ProfileViewModel @Inject constructor(
                     )
                 )
             }
-            ProfileScreenState(console = console, theme = theme, user = user)
+            ProfileScreenState(isRefreshing = isRefreshing, console = console, theme = theme, user = user)
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
             ProfileScreenState()
         )
 
-    // Re-derives from auth state directly (not `uiState`) so it isn't coupled to
-    // theme/console emissions and cancels/restarts cleanly on sign-in/sign-out.
     val matchHistory: Flow<PagingData<MatchListItemUiModel>> =
-        userRepository.currentUserState
-            .flatMapLatest { userState ->
-                when (userState) {
-                    is UserState.SignedIn -> matchHistoryRepository.getMatchHistoryFor(
-                        MatchHistoryTarget.CurrentUser
-                    ).map { pagingData ->
-                        pagingData.map {
-                            matchListItemUiMapper.buildFrom(it)
+        refreshTrigger.flatMapLatest {
+            userRepository.currentUserState
+                .flatMapLatest { userState ->
+                    when (userState) {
+                        is UserState.SignedIn -> matchHistoryRepository.getMatchHistoryFor(
+                            MatchHistoryTarget.CurrentUser
+                        ).map { pagingData ->
+                            pagingData.map {
+                                matchListItemUiMapper.buildFrom(it)
+                            }
                         }
+                        else -> emptyFlow()
                     }
-                    else -> emptyFlow()
                 }
-            }
-            .cachedIn(viewModelScope)
+        }.cachedIn(viewModelScope)
 
     val heroStats: StateFlow<HeroStatsUiState> =
-        userRepository.currentUserState
+        combine(
+            userRepository.currentUserState,
+            refreshTrigger
+        ) { userState, _ -> userState }
             .mapLatest { userState ->
                 when (userState) {
                     is UserState.SignedIn -> {
@@ -146,6 +154,14 @@ class ProfileViewModel @Inject constructor(
 
     private val _showProfileToast = MutableStateFlow(ProfileToastState.NONE)
     val showProfileToast = _showProfileToast
+
+    fun refresh() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            refreshTrigger.value = System.currentTimeMillis()
+            _isRefreshing.value = false
+        }
+    }
 
     fun handleLogout() {
         viewModelScope.launch {

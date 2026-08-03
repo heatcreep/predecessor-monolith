@@ -58,7 +58,7 @@ fun MonolithApp(
                 itemDetailsEntry()
                 buildsEntry(navigator)
                 searchEntry(navigator)
-                profileEntry(navigator, appState::showSnackbar)
+                profileEntry(navigator)
             }
             NavDisplay(
                 modifier = Modifier.padding(padding),
