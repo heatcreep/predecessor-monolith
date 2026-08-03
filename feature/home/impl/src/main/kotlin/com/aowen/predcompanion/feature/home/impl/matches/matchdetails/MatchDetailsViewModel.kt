@@ -2,7 +2,6 @@ package com.aowen.predcompanion.feature.home.impl.matches.matchdetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
 import com.aowen.predcompanion.core.network.getOrThrow
 import com.aowen.predcompanion.feature.home.impl.matches.model.MatchDetailsUiModel
@@ -12,7 +11,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +34,6 @@ sealed interface MatchDetailsUiState {
 @HiltViewModel(assistedFactory = MatchDetailsViewModel.Factory::class)
 class MatchDetailsViewModel @AssistedInject constructor(
     @Assisted private val matchId: String,
-    private val itemRepository: ItemRepository,
     private val matchRepository: MatchRepository,
     private val matchDetailsUiMapper: MatchDetailsUiMapper
 ) : ViewModel() {
@@ -79,12 +76,8 @@ class MatchDetailsViewModel @AssistedInject constructor(
         _selectedTeamIsDusk.value = false
 
         viewModelScope.launch {
-            val matchDeferred = async { matchRepository.fetchMatchById(matchId) }
-            val warmupDeferred = async { itemRepository.fetchAllItems() }
-
             try {
-                warmupDeferred.await()
-                val match = matchDeferred.await().getOrThrow()
+                val match = matchRepository.fetchMatchById(matchId).getOrThrow()
                 if (match == null) {
                     _error.value = MatchDetailsErrors(errorMessage = "Match not found.")
                     return@launch

@@ -29,8 +29,10 @@ class MatchDetailsPlayerCardUiMapper @Inject constructor(
         val csPerMin = String.format(Locale.US, "%.1f", matchPlayerDetails.minionsKilledPerMin)
         val heroImageSrc = heroRepository.getHeroImageSrcById(matchPlayerDetails.heroId)
         val playerName = matchPlayerDetails.playerName
+        val playerId = matchPlayerDetails.playerId
         return MatchDetailsPlayerCardUiModel(
             heroAndItemDetails = HeroAndItemDetailsUiModel(
+                playerId = playerId,
                 playerName = playerName,
                 heroId = matchPlayerDetails.heroId,
                 heroImageSrc = heroImageSrc,
@@ -42,12 +44,26 @@ class MatchDetailsPlayerCardUiMapper @Inject constructor(
                 eternal = matchPlayerDetails.eternal?.toPlayerPerkUiModel(),
                 minorBlessing1 = matchPlayerDetails.minorBlessing1?.toPlayerPerkUiModel(),
                 minorBlessing2 = matchPlayerDetails.minorBlessing2?.toPlayerPerkUiModel(),
-                crestImageUrl = matchPlayerDetails.crestId?.let { itemRepository.getItemImageSrcById(it) },
-                trinketImageUrl = matchPlayerDetails.trinketId?.let { itemRepository.getItemImageSrcById(it) },
-                itemsImageUrls = matchPlayerDetails.itemIds.map {
-                    itemRepository.getItemImageSrcById(
-                        it
+                crest = matchPlayerDetails.crestId?.let { itemRepository.getItemById(it) }?.let {
+                    HeroAndItemDetailsUiModel.ItemBoxUiModel(
+                        it.imageSrc,
+                        it.name
                     )
+                },
+                trinket = matchPlayerDetails.trinketId?.let { itemRepository.getItemById(it) }
+                    ?.let {
+                        HeroAndItemDetailsUiModel.ItemBoxUiModel(
+                            it.imageSrc,
+                            it.name
+                        )
+                    },
+                items = matchPlayerDetails.itemIds.map {
+                    itemRepository.getItemById(it)?.let {itemDetails ->
+                        HeroAndItemDetailsUiModel.ItemBoxUiModel(
+                            itemDetails.imageSrc,
+                            itemDetails.name
+                        )
+                    }
                 },
                 kdaValue = matchPlayerDetails.getKda(),
                 minionsKilled = context.getString(
@@ -68,7 +84,11 @@ class MatchDetailsPlayerCardUiMapper @Inject constructor(
                 minionsKilled = matchPlayerDetails.minionsKilled.toString(),
                 minionsKilledPerMin = csPerMin,
                 goldEarned = matchPlayerDetails.goldEarned.toString(),
-                goldEarnedPerMin = String.format(Locale.US, "%.1f", matchPlayerDetails.goldEarnedPerMin),
+                goldEarnedPerMin = String.format(
+                    Locale.US,
+                    "%.1f",
+                    matchPlayerDetails.goldEarnedPerMin
+                ),
                 laneMinionsKilled = matchPlayerDetails.laneMinionsKilled.toString(),
                 neutralMinionsKilled = matchPlayerDetails.neutralMinionsKilled.toString(),
                 neutralMinionsTeamJungle = matchPlayerDetails.neutralMinionsTeamJungle.toString(),

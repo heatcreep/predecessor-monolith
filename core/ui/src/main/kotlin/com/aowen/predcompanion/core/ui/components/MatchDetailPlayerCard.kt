@@ -41,6 +41,7 @@ fun MatchDetailPlayerCard(
     modifier: Modifier = Modifier,
     matchListItem: MatchDetailsPlayerCardUiModel,
     navigateToHeroDetails: (String) -> Unit,
+    navigateToItemDetails: (String) -> Unit,
 ) {
 
     Column(
@@ -103,10 +104,26 @@ fun MatchDetailPlayerCard(
                     Spacer(modifier = Modifier.size(2.dp))
                     // Crest and Trinket Column
                     Column {
-                        ItemContainer(imageSrc = matchListItem.heroAndItemDetails.crestImageUrl)
+                        ItemContainer(
+                            imageSrc = matchListItem.heroAndItemDetails.crest?.imageSrc,
+                            onClick = {
+                                val crestName = matchListItem.heroAndItemDetails.crest?.itemName
+                                if(crestName != null) {
+                                    navigateToItemDetails(crestName)
+                                }
+                            }
+                        )
                         Spacer(modifier = Modifier.size(2.dp))
-                        if (matchListItem.heroAndItemDetails.trinketImageUrl != null) {
-                            ItemContainer(imageSrc = matchListItem.heroAndItemDetails.trinketImageUrl)
+                        if (matchListItem.heroAndItemDetails.trinket?.imageSrc != null) {
+                            val trinketName = matchListItem.heroAndItemDetails.trinket.itemName
+                            ItemContainer(
+                                imageSrc = matchListItem.heroAndItemDetails.trinket.imageSrc,
+                                onClick = {
+                                    if(trinketName != null) {
+                                        navigateToItemDetails(trinketName)
+                                    }
+                                }
+                            )
                         } else {
                             Box(
                                 modifier = modifier
@@ -132,8 +149,13 @@ fun MatchDetailPlayerCard(
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                         maxItemsInEachRow = 3,
                     ) {
-                        matchListItem.heroAndItemDetails.itemsImageUrls.forEach { itemImageUrl ->
-                            ItemContainer(imageSrc = itemImageUrl)
+                        matchListItem.heroAndItemDetails.items.forEach { item ->
+                            ItemContainer(imageSrc = item?.imageSrc, onClick = {
+                                val itemName = item?.itemName
+                                if (itemName != null) {
+                                    navigateToItemDetails(itemName)
+                                }
+                            })
                         }
                     }
                 }

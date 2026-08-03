@@ -79,6 +79,11 @@ fun Float.toPercentageString(): String {
 
 private fun ItemFragment.Stat.createStatDetails(): ItemDetails.StatDetails {
     return when (this.stat) {
+        ItemDescriptionStat.ABILITY_HASTE -> ItemDetails.StatDetails(
+            iconId = coreResources.drawable.ability_haste,
+            name = "Ability Haste",
+            value = this.value.toStatValue()
+        )
         ItemDescriptionStat.HEALTH -> ItemDetails.StatDetails(
             iconId = coreResources.drawable.max_health,
             name = "Max Health",

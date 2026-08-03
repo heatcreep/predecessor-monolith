@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -111,6 +112,7 @@ class ProfileViewModel @Inject constructor(
     val matchHistory: Flow<PagingData<MatchListItemUiModel>> =
         refreshTrigger.flatMapLatest {
             userRepository.currentUserState
+                .distinctUntilChanged()
                 .flatMapLatest { userState ->
                     when (userState) {
                         is UserState.SignedIn -> matchHistoryRepository.getMatchHistoryFor(
@@ -128,7 +130,7 @@ class ProfileViewModel @Inject constructor(
 
     val heroStats: StateFlow<HeroStatsUiState> =
         combine(
-            userRepository.currentUserState,
+            userRepository.currentUserState.distinctUntilChanged(),
             refreshTrigger
         ) { userState, _ -> userState }
             .mapLatest { userState ->

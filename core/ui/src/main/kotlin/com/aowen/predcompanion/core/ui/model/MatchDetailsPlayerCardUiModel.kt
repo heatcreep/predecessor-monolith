@@ -3,6 +3,7 @@ package com.aowen.predcompanion.core.ui.model
 import androidx.annotation.DrawableRes
 
 data class HeroAndItemDetailsUiModel(
+    val playerId: String,
     val playerName: String,
     val heroId: String,
     val heroImageSrc: String,
@@ -11,9 +12,9 @@ data class HeroAndItemDetailsUiModel(
     val eternal: PlayerPerkUiModel? = null,
     val minorBlessing1: PlayerPerkUiModel? = null,
     val minorBlessing2: PlayerPerkUiModel? = null,
-    val crestImageUrl: String? = null,
-    val trinketImageUrl: String? = null,
-    val itemsImageUrls: List<String?> = emptyList(),
+    val crest: ItemBoxUiModel? = null,
+    val trinket: ItemBoxUiModel? = null,
+    val items: List<ItemBoxUiModel?> = emptyList(),
     val minionsKilled: String,
     val csPerMin: String,
 
@@ -21,7 +22,9 @@ data class HeroAndItemDetailsUiModel(
     val deaths: String,
     val assists: String,
     val kdaValue: String,
-)
+) {
+    data class ItemBoxUiModel(val imageSrc: String?, val itemName: String? = null)
+}
 
 data class PlayerStatsUiModel(
     val heroImageSrc: String,
