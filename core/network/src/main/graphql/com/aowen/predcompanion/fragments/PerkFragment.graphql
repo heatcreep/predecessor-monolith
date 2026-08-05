@@ -1,0 +1,23 @@
+fragment PerkFragment on Perk {
+    id
+    name
+    data {
+        id
+        displayName
+        description
+        icon
+        eternalCategoryData {
+            displayName
+            id
+        }
+        minorBlessings {
+            id
+            displayName
+            description
+            icon
+            eternalCategory {
+                id
+            }
+        }
+    }
+}

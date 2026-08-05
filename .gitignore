@@ -51,3 +51,6 @@ captures/
 # Signing keys — NEVER commit
 *.jks
 *.keystore.superpowers/
+
+# Claude docs
+docs/superpowers/specs/*

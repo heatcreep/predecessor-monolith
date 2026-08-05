@@ -1,5 +1,6 @@
 package com.aowen.predcompanion.core.network
 
+import com.aowen.predcompanion.core.network.apollo.AllPerksQuery
 import com.aowen.predcompanion.core.network.apollo.AuthedUserQuery
 import com.aowen.predcompanion.core.network.apollo.BuildsQuery
 import com.aowen.predcompanion.core.network.apollo.GuideByIdQuery
@@ -14,6 +15,7 @@ interface PredGGNetworkDataSource {
     suspend fun getUser(): ApolloResponse<AuthedUserQuery.Data>
     suspend fun getAllItems(): ApolloResponse<ItemsQuery.Data>
     suspend fun getAllHeroes(): ApolloResponse<HeroesQuery.Data>
+    suspend fun getAllEternals(): ApolloResponse<AllPerksQuery.Data>
     suspend fun searchPlayers(search: String): ApolloResponse<SearchPlayersQuery.Data>
     suspend fun getPlayer(playerId: String): ApolloResponse<PlayerQuery.Data>
     suspend fun getMatchById(matchId: String): ApolloResponse<MatchByIdQuery.Data>

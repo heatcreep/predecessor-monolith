@@ -25,6 +25,10 @@ class ApolloKotlinPredGGNetwork @Inject constructor(
     override suspend fun getAllHeroes(): ApolloResponse<HeroesQuery.Data> =
         apolloClient.query(HeroesQuery()).execute()
 
+    // ETERNALS
+    override suspend fun getAllEternals(): ApolloResponse<AllPerksQuery.Data> =
+        apolloClient.query(AllPerksQuery()).execute()
+
     // PLAYERS
     override suspend fun searchPlayers(search: String): ApolloResponse<SearchPlayersQuery.Data> =
         apolloClient.query(SearchPlayersQuery(search)).execute()
