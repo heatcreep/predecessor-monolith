@@ -1,6 +1,16 @@
 # Release Notes
 
-## 2.0.0 - Latest
+## 2.0.1 - Latest
+
+### Improvements & Bug Fixes
+
+- Improved sign-in screen with better error and cancel messaging and a new background image
+- Fixed tapping on players and heroes in Match Details to properly navigate to their detail screens
+- Fixed item stat display for certain item types
+- Fixed pull-to-refresh on the Profile screen
+- Fixed item tap navigation on the Profile screen
+
+## 2.0.0
 
 ### Architecture
 
