@@ -50,6 +50,7 @@ fragment MatchPlayerFragment on MatchPlayer {
     gold
     goldSpent
     rating {
+        newPoints
         points
         rank {
             name
@@ -61,9 +62,5 @@ fragment MatchPlayerFragment on MatchPlayer {
         displayName
         description
 
-    }
-    match {
-        id
-        winningTeam
     }
 }

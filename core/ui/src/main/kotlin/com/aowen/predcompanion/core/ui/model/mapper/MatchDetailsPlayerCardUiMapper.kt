@@ -11,6 +11,7 @@ import com.aowen.predcompanion.core.ui.model.HeroAndItemDetailsUiModel
 import com.aowen.predcompanion.core.ui.model.MatchDetailsPlayerCardUiModel
 import com.aowen.predcompanion.core.ui.model.PlayerPerkUiModel
 import com.aowen.predcompanion.core.ui.model.PlayerStatsUiModel
+import com.aowen.predcompanion.core.ui.model.VpChangeUiModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import javax.inject.Inject
@@ -37,6 +38,15 @@ class MatchDetailsPlayerCardUiMapper @Inject constructor(
                 heroId = matchPlayerDetails.heroId,
                 heroImageSrc = heroImageSrc,
                 heroRoleDrawableId = heroRoleMap[matchPlayerDetails.role?.lowercase()]?.drawableId,
+                vpChange = matchPlayerDetails.vpChange?.let { delta ->
+                    VpChangeUiModel(
+                        text = context.getString(
+                            R.string.core_ui_vp_change,
+                            delta
+                        ),
+                        isPositive = delta >= 0L
+                    )
+                },
                 kills = matchPlayerDetails.kills.toString(),
                 deaths = matchPlayerDetails.deaths.toString(),
                 assists = matchPlayerDetails.assists.toString(),
@@ -58,7 +68,7 @@ class MatchDetailsPlayerCardUiMapper @Inject constructor(
                         )
                     },
                 items = matchPlayerDetails.itemIds.map {
-                    itemRepository.getItemById(it)?.let {itemDetails ->
+                    itemRepository.getItemById(it)?.let { itemDetails ->
                         HeroAndItemDetailsUiModel.ItemBoxUiModel(
                             itemDetails.imageSrc,
                             itemDetails.name

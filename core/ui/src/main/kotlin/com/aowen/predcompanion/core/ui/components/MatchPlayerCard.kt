@@ -43,6 +43,7 @@ import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.ui.R
 import com.aowen.predcompanion.core.ui.common.PlayerIcon
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
+import com.aowen.predcompanion.core.ui.model.VpChangeUiModel
 import com.aowen.predcompanion.ui.theme.DarkGreenHighlight35
 import com.aowen.predcompanion.ui.theme.GreenHighlight
 import com.aowen.predcompanion.ui.theme.NeroGrey
@@ -104,13 +105,13 @@ fun MatchPlayerCard(
                             color = MaterialTheme.colorScheme.tertiary,
                             text = if (matchListItem.isWinner) " - Victory" else " - Defeat",
                         )
-                        if (matchListItem.isRanked) {
+                        matchListItem.vpChange?.let {
                             Spacer(modifier = Modifier.size(2.dp))
                             Text(
                                 textAlign = TextAlign.Start,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.tertiary,
-                                text = matchListItem.vpChange
+                                text = matchListItem.vpChange.text
                             )
                         }
                     }
@@ -296,7 +297,10 @@ fun MatchPlayerCardPreview() {
         isWinner = true,
         gameModeStringRes = R.string.core_ui_game_mode_aram,
         isRanked = false,
-        vpChange = "+100",
+        vpChange = VpChangeUiModel(
+            text = "+26 VP",
+            isPositive = true
+        ),
         timeSinceMatch = "1 hour ago",
         heroImageUrl = heroIconUrl,
         heroName = "Hero Name",

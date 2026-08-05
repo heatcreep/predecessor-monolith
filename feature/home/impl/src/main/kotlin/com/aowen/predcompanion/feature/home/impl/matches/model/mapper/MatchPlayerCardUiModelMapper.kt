@@ -1,5 +1,6 @@
 package com.aowen.predcompanion.feature.home.impl.matches.model.mapper
 
+import android.content.Context
 import com.aowen.predcompanion.core.data.model.getKda
 import com.aowen.predcompanion.core.data.model.toDecimal
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
@@ -7,10 +8,14 @@ import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.MatchDetails
 import com.aowen.predcompanion.core.ui.model.MatchPlayerCardUiModel
+import com.aowen.predcompanion.core.ui.model.VpChangeUiModel
 import com.aowen.predcompanion.core.ui.model.toRankColor
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import com.aowen.predcompanion.core.ui.R as coreUiResources
 
 class MatchPlayerCardUiModelMapper @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val itemRepository: ItemRepository,
     private val heroRepository: HeroRepository,
 ) {
@@ -26,7 +31,15 @@ class MatchPlayerCardUiModelMapper @Inject constructor(
                 rank = matchPlayer.rank,
                 rankColor = matchPlayer.rank.toRankColor(),
                 vpTotal = matchPlayer.vpTotal,
-                vpChange = matchPlayer.vpChange,
+                vpChange = matchPlayer.vpChange?.let {
+                    VpChangeUiModel(
+                        text = context.getString(
+                            coreUiResources.string.core_ui_vp_change,
+                            it
+                        ),
+                        isPositive = it >= 0
+                    )
+                },
                 heroImageUrl = heroRepository.getHeroImageSrcById(matchPlayer.heroId),
                 items = matchPlayer.itemIds.mapNotNull {
                     val item = itemRepository.getItemById(it)

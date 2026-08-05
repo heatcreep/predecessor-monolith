@@ -8,6 +8,7 @@ import com.aowen.predcompanion.core.model.data.MatchDetails
 import com.aowen.predcompanion.core.model.data.MatchHistoryItem
 import com.aowen.predcompanion.core.ui.R
 import com.aowen.predcompanion.core.ui.model.MatchListItemUiModel
+import com.aowen.predcompanion.core.ui.model.VpChangeUiModel
 import com.aowen.predcompanion.ui.utils.handleTimeSinceMatch
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
@@ -35,7 +36,12 @@ class MatchListItemUiMapper @Inject constructor(
             isWinner = isWinner,
             gameModeStringRes = null,
             isRanked = match.gameMode == coreResources.string.core_resources_match_type_ranked,
-            vpChange = playerHero.vpChange,
+            vpChange = playerHero.vpChange?.let {
+                VpChangeUiModel(
+                    text = context.getString(R.string.core_ui_vp_change, it),
+                    isPositive = it >= 0
+                )
+            },
             timeSinceMatch = handleTimeSinceMatch(match.endTime),
             heroImageUrl = heroRepository.getHeroImageSrcById(playerHero.heroId),
             heroName = heroRepository.getHeroName(playerHero.heroId),
@@ -64,7 +70,12 @@ class MatchListItemUiMapper @Inject constructor(
             isWinner = matchHistoryItem.isWinner,
             gameModeStringRes = matchHistoryItem.gameModeStringRes,
             isRanked = matchHistoryItem.isRanked,
-            vpChange = context.getString(R.string.core_ui_vp_change, matchHistoryItem.vpChange),
+            vpChange = matchHistoryItem.vpChange?.let {
+                VpChangeUiModel(
+                    text = context.getString(R.string.core_ui_vp_change, matchHistoryItem.vpChange),
+                    isPositive = it >= 0
+                )
+            },
             timeSinceMatch = matchHistoryItem.timeSinceMatch,
             heroImageUrl = matchHistoryItem.heroImageSrc,
             heroName = matchHistoryItem.heroName,

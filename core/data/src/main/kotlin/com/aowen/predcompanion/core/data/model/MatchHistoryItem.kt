@@ -9,6 +9,7 @@ import com.aowen.predcompanion.core.network.apollo.type.PerkSlot
 import com.aowen.predcompanion.core.network.apollo.type.Role
 import com.aowen.predcompanion.core.network.apollo.type.SlotType
 import com.aowen.predcompanion.core.resources.R
+import kotlin.math.roundToLong
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -16,13 +17,8 @@ import kotlin.time.Instant
 fun MatchResultsFragment.Result.asMatchHistoryItem(): MatchHistoryItem {
     val isWinner = this.team == this.match.winningTeam
     val isRanked = this.match.gameMode == GameMode.RANKED
-    val vpChange =
-        this.rating?.newPoints?.let { newPoints ->
-            this.rating?.points?.let { points ->
-                val diff = (newPoints - points).toInt()
-                if (diff >= 0) "+$diff" else "$diff"
-            }
-        } ?: "-"
+    val newPoints = rating?.newPoints
+    val points = rating?.points
     val augmentImageSrc =
         this.perkData?.firstOrNull { it?.slot == PerkSlot.HERO_SPECIFIC_1 }?.icon?.let {
             ImageHelpers.buildAssetsUrl(it)
@@ -63,7 +59,9 @@ fun MatchResultsFragment.Result.asMatchHistoryItem(): MatchHistoryItem {
         isWinner = isWinner,
         gameModeStringRes = getGameModeStringRes(this.match.gameMode),
         isRanked = isRanked,
-        vpChange = vpChange,
+        vpChange = if (newPoints != null && points != null) {
+            (newPoints - points).roundToLong()
+        } else null,
         augmentImageSrc = augmentImageSrc,
         eternalImageSrc = eternalImageSrc,
         crest = crest,

@@ -9,7 +9,7 @@ data class MatchListItemUiModel(
     val isWinner: Boolean,
     @param:StringRes val gameModeStringRes: Int?,
     val isRanked: Boolean,
-    val vpChange: String,
+    val vpChange: VpChangeUiModel? = null,
     val timeSinceMatch: String,
     val heroImageUrl: String,
     val heroName: String,

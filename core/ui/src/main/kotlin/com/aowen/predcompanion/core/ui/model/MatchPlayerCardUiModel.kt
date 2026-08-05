@@ -9,7 +9,7 @@ data class MatchPlayerCardUiModel(
     val rank: String,
     val rankColor: Color,
     val vpTotal: Int,
-    val vpChange: String,
+    val vpChange: VpChangeUiModel? = null,
     val heroImageUrl: String,
     val items: List<PlayerItem>,
     @param:DrawableRes val heroRoleImageId: Int?,

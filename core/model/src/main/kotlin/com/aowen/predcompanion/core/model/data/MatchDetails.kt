@@ -1,9 +1,5 @@
 package com.aowen.predcompanion.core.model.data
 
-data class MatchesDetails(
-    val matches: List<MatchDetails>,
-    val cursor: String? = ""
-)
 
 data class MatchDetails(
     val matchId: String = "",
@@ -16,14 +12,6 @@ data class MatchDetails(
     val dawn: Team = Team.Dawn(emptyList()),
     val dusk: Team = Team.Dusk(emptyList())
 ) {
-
-    enum class MatchType(val text: String) {
-        RANKED("Ranked"),
-        UNRANKED("Unranked"),
-        LEGACY("Legacy"),
-        NITRO("Nitro"),
-        BRAWL("Brawl"),
-    }
 
     data class Perk(
         val iconUrl: String,
@@ -42,7 +30,7 @@ data class MatchDetails(
         val playerId: String = "",
         val playerName: String = "",
         val vpTotal: Int = 0,
-        val vpChange: String = "0",
+        val vpChange: Long? = null,
         val rank: String = "",
         val heroId: String = "",
         val role: String? = null,

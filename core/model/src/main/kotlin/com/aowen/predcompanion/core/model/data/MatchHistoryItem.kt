@@ -17,7 +17,7 @@ data class MatchHistoryItem(
     val isWinner: Boolean,
     @param:StringRes val gameModeStringRes: Int,
     val isRanked: Boolean,
-    val vpChange: String,
+    val vpChange: Long?,
     val augmentImageSrc: String?,
     val eternalImageSrc: String?,
     val crest: InventoryItem.Crest?,

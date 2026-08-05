@@ -18,6 +18,7 @@ data class HeroAndItemDetailsUiModel(
     val minionsKilled: String,
     val csPerMin: String,
 
+    val vpChange: VpChangeUiModel? = null,
     val kills: String,
     val deaths: String,
     val assists: String,

@@ -1,7 +1,6 @@
 package com.aowen.predcompanion.core.data.model
 
 import com.aowen.predcompanion.core.data.helpers.ImageHelpers
-import com.aowen.predcompanion.core.model.data.ItemDetails
 import com.aowen.predcompanion.core.model.data.MatchDetails
 import com.aowen.predcompanion.core.model.data.MatchDetails.Perk
 import com.aowen.predcompanion.core.network.apollo.MatchByIdQuery
@@ -12,6 +11,7 @@ import com.aowen.predcompanion.core.network.apollo.type.SlotType
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.char
+import kotlin.math.roundToLong
 
 fun MatchPlayerFragment.asMatchPlayerDetails(duration: Int = 0): MatchDetails.MatchPlayerDetails? {
 
@@ -27,10 +27,16 @@ fun MatchPlayerFragment.asMatchPlayerDetails(duration: Int = 0): MatchDetails.Ma
         inventoryItemData?.filter { it?.itemDataFragment?.item?.data?.slotType == SlotType.PASSIVE }
             ?.mapNotNull { it?.itemDataFragment?.item?.id } ?: emptyList()
 
+    val newPoints = rating?.newPoints
+    val points = rating?.points
+
     return MatchDetails.MatchPlayerDetails(
         playerId = playerFragment.id,
         playerName = playerFragment.name ?: "🎮 user-${playerFragment.id}",
         vpTotal = rating?.points?.coerceAtLeast(0.0)?.toInt() ?: 0,
+        vpChange = if (newPoints != null && points != null) {
+            (newPoints - points).roundToLong()
+        } else null,
         rank = rating?.rank?.name ?: "",
         heroId = heroFragment.id,
         role = role?.name?.lowercase(),
@@ -126,13 +132,4 @@ fun MatchDetails.MatchPlayerDetails.getKda(): String {
     val deaths = if (this.deaths == 0) 1 else this.deaths
     val kda = (this.kills.toFloat() + this.assists.toFloat()) / deaths.toFloat()
     return if (kda.isNaN()) 0.0.toString() else kda.toDecimal("#.##")
-}
-
-private fun getPlayerItems(
-    itemIds: List<String>,
-    allItems: Map<String, ItemDetails>
-): List<ItemDetails> {
-    return itemIds.mapNotNull {
-        allItems[it]
-    }
 }
