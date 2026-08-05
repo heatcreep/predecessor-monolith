@@ -17,6 +17,10 @@ class FakeUserRepository : UserRepository {
 
     override suspend fun sync() {}
 
+    override suspend fun resetToSignedOut() {
+        _currentUserState.value = UserState.SignedOut
+    }
+
     override suspend fun clearUser() {
         _currentUserState.value = UserState.SignedOut
     }

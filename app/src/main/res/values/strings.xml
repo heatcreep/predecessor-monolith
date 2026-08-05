@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PredCompanion</string>
+    <string name="app_sign_in_error">Oops! Something went wrong, please try signing in again.</string>
+    <string name="app_sign_in_cancel">Sign in attempt was cancelled.</string>
+    <string name="app_sign_in_button_text">Sign in to Pred.gg</string>
 </resources>

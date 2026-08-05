@@ -34,6 +34,8 @@ interface UserRepository {
 
     suspend fun sync()
 
+    suspend fun resetToSignedOut()
+
     suspend fun clearUser()
 }
 
@@ -85,6 +87,10 @@ class OfflineFirstUserRepository @Inject constructor(
             // Keep cached user on network failure
             _currentUserState.emit(UserState.SignedOut)
         }
+    }
+
+    override suspend fun resetToSignedOut() {
+        _currentUserState.emit(UserState.SignedOut)
     }
 
     override suspend fun clearUser() {

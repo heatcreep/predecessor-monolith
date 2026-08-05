@@ -5,14 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -62,9 +59,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     when (userState) {
                         is UserState.Loading -> {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator()
-                            }
+                            FullScreenLoadingIndicator()
                         }
 
                         is UserState.SignedOut, is UserState.Error -> {
@@ -74,6 +69,11 @@ class MainActivity : ComponentActivity() {
                                     lifecycleScope.launch {
                                         newAuthRepository.onLoginResult(data)
                                         userRepository.sync()
+                                    }
+                                },
+                                onLoginCancelled = {
+                                    lifecycleScope.launch {
+                                        userRepository.resetToSignedOut()
                                     }
                                 }
                             )
