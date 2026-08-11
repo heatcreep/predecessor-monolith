@@ -4,95 +4,141 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.model.data.HeroClass
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.HeroRole
-import com.aowen.predcompanion.core.ui.cards.heroes.HeroTileCard
+import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.core.ui.cards.collections.CollectionTileCard
+import com.aowen.predcompanion.core.ui.dropdown.PredCompanionFilterDropdown
+import com.aowen.predcompanion.core.ui.dropdown.PredCompanionSortDropdown
 import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
+import com.aowen.predcompanion.feature.heroes.impl.ui.model.EternalListItemUiModel
 import com.aowen.predcompanion.ui.common.MonolithCollapsableGridColumn
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
+import com.aowen.predcompanion.core.resources.R as coreResources
 
-@Composable
-fun HeroesScreenRoute(
-    modifier: Modifier = Modifier,
-    navigateToHeroDetails: (heroId: String) -> Unit = { _ -> },
-    navigateToSearch: () -> Unit,
-    viewModel: HeroesScreenViewModel = hiltViewModel()
-) {
-
-    val heroesScreenUiState by viewModel.uiState.collectAsState()
-
-    HeroesScreen(
-        uiState = heroesScreenUiState,
-        onFilterRole = viewModel::updateRoleOption,
-        onFilterHeroes = viewModel::getFilteredHeroes,
-        modifier = modifier,
-        navigateToHeroDetails = navigateToHeroDetails,
-        navigateToSearch = navigateToSearch
-    )
-}
+val defaultStats = listOf(
+    "Max Health",
+    "Max Mana",
+    "Health Regen",
+    "Mana Regen",
+    "Physical Power",
+    "Magical Power",
+    "Attack Speed",
+    "Physical Armor",
+    "Magical Armor",
+    "Heal and Shield Increase",
+    "Ability Haste",
+    "Lifesteal",
+    "Magical Lifesteal",
+    "Omnivamp",
+    "Movement Speed",
+    "Physical Penetration",
+    "Magical Penetration",
+    "Critical Chance",
+    "Tenacity",
+)
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HeroesScreen(
     uiState: HeroesScreenUiState,
     onFilterRole: (HeroRole, Boolean) -> Unit,
+    onSelectHeroClass: (HeroClass) -> Unit,
+    onClearSelectedHeroClass: () -> Unit,
+    onSelectItemTier: (String) -> Unit,
+    onSelectStatFilter: (String) -> Unit,
     onFilterHeroes: () -> Unit,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
     navigateToHeroDetails: (heroId: String) -> Unit = { _ -> },
+    navigateToItemDetails: (String) -> Unit = {},
     navigateToSearch: () -> Unit = { }
 ) {
-    val density = LocalDensity.current
-    val screenWidthPx = LocalWindowInfo.current.containerSize.width
-    val screenWidthDp = with(density) { screenWidthPx.toDp() }
 
-    val isTablet = screenWidthDp >= 600.dp
+    val scope = rememberCoroutineScope()
 
     var expanded by remember { mutableStateOf(true) }
     val rotationAngle = remember { Animatable(0f) }
 
-    val listState = rememberLazyGridState()
+    val tabs = listOf(
+        stringResource(R.string.feature_collections_heroes),
+        stringResource(R.string.feature_collections_eternals),
+        stringResource(R.string.feature_collections_items)
+    )
+    val pageCount = tabs.size
 
+    val pagerState = rememberPagerState(
+        pageCount = { pageCount },
+        initialPage = 0
+    )
 
 
     LaunchedEffect(expanded) {
@@ -106,10 +152,14 @@ fun HeroesScreen(
 
     LaunchedEffect(uiState.searchFieldValue) {
         this.launch {
-            delay(500)
+            delay(500.milliseconds)
             onFilterHeroes()
         }
     }
+
+    val heroesListState = rememberLazyGridState()
+    val eternalsListState = rememberLazyGridState()
+    val itemsListState = rememberLazyGridState()
 
     LaunchedEffect(uiState.selectedRoleFilters) {
         onFilterHeroes()
@@ -144,65 +194,69 @@ fun HeroesScreen(
             ) { paddingValues ->
                 Column(
                     modifier = modifier
-                        .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(horizontal = 16.dp)
+                        .fillMaxSize()
                 ) {
-                    MonolithCollapsableGridColumn(listState = listState) {
-                        AnimatedVisibility(visible = expanded) {
-                            LazyRow(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                items(items = HeroRole.entries.dropLast(1)) { role ->
-                                    PredCompanionChipFilter(
-                                        text = role.roleName,
-                                        selected = uiState.selectedRoleFilters.contains(role),
-                                        iconRes = role.simpleDrawableId,
-                                        onClick = {
-                                            onFilterRole(
-                                                role,
-                                                !uiState.selectedRoleFilters.contains(role)
-                                            )
-                                        }
-                                    )
+                    SecondaryTabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        indicator = {
+                            TabRowDefaults.SecondaryIndicator(
+                                modifier = Modifier.tabIndicatorOffset(
+                                    pagerState.currentPage,
+                                    matchContentSize = false
+                                ),
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        },
+                    ) {
+                        tabs.forEachIndexed { index, tabName ->
+                            Tab(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = { Text(text = tabName) },
+                                unselectedContentColor = MaterialTheme.colorScheme.tertiary,
+                                selectedContentColor = MaterialTheme.colorScheme.secondary,
+                                selected = pagerState.currentPage == index,
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(index)
+                                    }
                                 }
-                            }
-                        }
-                    }
-
-                    if (uiState.currentHeroes.isEmpty()) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "No heroes matched your search.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.padding(start = 16.dp)
                             )
                         }
-                    } else {
-                        LazyVerticalGrid(
-                            modifier = Modifier.fillMaxSize(),
-                            state = listState,
-                            columns = GridCells.Fixed(if (isTablet) 6 else 3),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            items(uiState.currentHeroes) { hero ->
-                                HeroTileCard(
-                                    hero = hero,
-                                    onClick = {
-                                        navigateToHeroDetails(hero.id)
-                                    }
-                                )
-                            }
+                    }
+                    HorizontalPager(
+                        modifier = Modifier.fillMaxWidth(),
+                        state = pagerState,
+                        beyondViewportPageCount = pageCount - 1
+                    ) { page ->
+                        when (page) {
+                            0 -> HeroesCollection(
+                                listState = heroesListState,
+                                selectedRoleFilters = uiState.selectedRoleFilters,
+                                currentHeroes = uiState.currentHeroes,
+                                onFilterRole = onFilterRole,
+                                navigateToHeroDetails = navigateToHeroDetails
+                            )
 
+                            1 -> EternalsCollection(
+                                listState = eternalsListState,
+                                currentEternals = uiState.allEternals,
+                                navigateToEternalDetails = {}
+                            )
+
+                            2 -> ItemsCollection(
+                                itemsListState = itemsListState,
+                                items = uiState.allItems,
+                                selectedHeroClass = uiState.selectedHeroClass,
+                                onSelectHeroClass = onSelectHeroClass,
+                                onClearSelectedHeroClass = onClearSelectedHeroClass,
+                                selectedTierFilter = uiState.selectedTierFilter,
+                                onSelectTier = onSelectItemTier,
+                                selectedStatFilters = uiState.selectedStatsFilters,
+                                onSelectStat = onSelectStatFilter,
+                                navigateToItemDetails = navigateToItemDetails
+
+                            )
                         }
                     }
                 }
@@ -210,8 +264,282 @@ fun HeroesScreen(
         }
 
     }
+}
+
+@Composable
+fun HeroesCollection(
+    listState: LazyGridState,
+    modifier: Modifier = Modifier,
+    selectedRoleFilters: List<HeroRole> = emptyList(),
+    currentHeroes: List<HeroDetails> = emptyList(),
+    onFilterRole: (HeroRole, Boolean) -> Unit,
+    navigateToHeroDetails: (String) -> Unit,
+) {
+
+    var expanded by remember { mutableStateOf(true) }
+
+    val density = LocalDensity.current
+    val screenWidthPx = LocalWindowInfo.current.containerSize.width
+    val screenWidthDp = with(density) { screenWidthPx.toDp() }
+
+    val isTablet = screenWidthDp >= 600.dp
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        MonolithCollapsableGridColumn(listState = listState) {
+            AnimatedVisibility(visible = expanded) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(items = HeroRole.entries.dropLast(1)) { role ->
+                        PredCompanionChipFilter(
+                            text = role.roleName,
+                            selected = selectedRoleFilters.contains(role),
+                            iconRes = role.simpleDrawableId,
+                            onClick = {
+                                onFilterRole(
+                                    role,
+                                    selectedRoleFilters.contains(role)
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
+            state = listState,
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            columns = GridCells.Fixed(if (isTablet) 6 else 3),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            items(currentHeroes) { hero ->
+                hero.posterImageId?.let { posterImage ->
+                    CollectionTileCard(
+                        title = hero.displayName,
+                        imageUrl = posterImage,
+                        onClick = {
+                            navigateToHeroDetails(hero.id)
+                        }
+                    )
+                }
+            }
+
+        }
+    }
+
 
 }
+
+@Composable
+fun EternalsCollection(
+    listState: LazyGridState,
+    modifier: Modifier = Modifier,
+    currentEternals: List<EternalListItemUiModel>,
+    navigateToEternalDetails: (String) -> Unit,
+) {
+
+    val density = LocalDensity.current
+    val screenWidthPx = LocalWindowInfo.current.containerSize.width
+    val screenWidthDp = with(density) { screenWidthPx.toDp() }
+
+    val isTablet = screenWidthDp >= 600.dp
+
+
+    LazyVerticalGrid(
+        modifier = modifier.fillMaxSize(),
+        state = listState,
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        columns = GridCells.Fixed(if (isTablet) 6 else 3),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        items(currentEternals) { eternal ->
+
+            CollectionTileCard(
+                title = eternal.name,
+                imageUrl = eternal.imageSrc,
+                onClick = {}
+            )
+
+        }
+
+    }
+
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ItemsCollection(
+    itemsListState: LazyGridState,
+    modifier: Modifier = Modifier,
+    items: List<ItemDetails> = emptyList(),
+    selectedHeroClass: HeroClass? = null,
+    onSelectHeroClass: (HeroClass) -> Unit = {},
+    onClearSelectedHeroClass: () -> Unit = {},
+    selectedTierFilter: String? = "Tier III",
+    onSelectTier: (String) -> Unit = {},
+    selectedStatFilters: List<String> = emptyList(),
+    onSelectStat: (String) -> Unit = {},
+    navigateToItemDetails: (String) -> Unit = {},
+) {
+
+    val density = LocalDensity.current
+    val screenWidthPx = LocalWindowInfo.current.containerSize.width
+    val screenWidthDp = with(density) { screenWidthPx.toDp() }
+
+    val isTablet = screenWidthDp >= 600.dp
+
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val rotationAngle = remember { Animatable(0f) }
+
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(expanded) {
+        this.launch {
+            rotationAngle.animateTo(
+                targetValue = if (expanded) 90f else 0f,
+                animationSpec = tween(durationMillis = 200, easing = LinearEasing),
+            )
+        }
+    }
+
+
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+    ) {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            state = listState,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            item {
+                PredCompanionChipFilter(
+                    text = "All",
+                    iconRes = coreResources.drawable.all_roles,
+                    selected = selectedHeroClass == null,
+                    onClick = onClearSelectedHeroClass
+                )
+            }
+            items(HeroClass.entries.dropLast(1)) {
+                PredCompanionChipFilter(
+                    text = it.label,
+                    iconRes = it.iconRes,
+                    selected = selectedHeroClass == it,
+                    onClick = {
+                        onSelectHeroClass(it)
+                    }
+                )
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            PredCompanionFilterDropdown(
+                selectedOptions = selectedStatFilters,
+                filterOptions = defaultStats,
+                onClickOption = onSelectStat
+            )
+            PredCompanionSortDropdown(
+                selectedOption = selectedTierFilter ?: "Tier",
+                sortOptions = listOf("Tier I", "Tier II", "Tier III"),
+                onClickOption = onSelectTier
+            )
+        }
+        Spacer(modifier = Modifier.size(8.dp))
+        if (items.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Items list is empty")
+            }
+        } else {
+            LazyVerticalGrid(
+                state = itemsListState,
+                modifier = Modifier.fillMaxSize(),
+                columns = GridCells.Fixed(if (isTablet) 5 else 3),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(items) { item ->
+                    SubcomposeAsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(item.imageSrc)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Item image",
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        ItemCard(
+                            itemDetails = item,
+                            onClick = { navigateToItemDetails(item.name) }
+                        ) {
+                            SubcomposeAsyncImageContent(
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.FillWidth
+                            )
+                        }
+                    }
+
+                }
+            }
+        }
+        Spacer(modifier = Modifier.size(16.dp))
+
+    }
+
+}
+
+@Composable
+fun ItemCard(
+    itemDetails: ItemDetails,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    imageContent: @Composable () -> Unit,
+) {
+
+    Card(
+        modifier = Modifier
+            .clickable {
+                onClick()
+            }
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(start = 4.dp, end = 4.dp, bottom = 8.dp),
+        ) {
+            imageContent()
+            Text(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                text = itemDetails.displayName,
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.ExtraBold),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis,
+                softWrap = false
+            )
+
+        }
+    }
+}
+
 
 @Preview(
     showBackground = true,
@@ -277,7 +605,15 @@ fun HeroesScreenPreview() {
                     )
                 ),
                 onFilterRole = { _, _ -> },
-                onFilterHeroes = {}
+                onFilterHeroes = {},
+                onSelectHeroClass = {},
+                onSelectItemTier = {},
+                onSelectStatFilter = {},
+                handleRetry = { },
+                navigateToHeroDetails = { },
+                navigateToSearch = { },
+                onClearSelectedHeroClass = {},
+                navigateToItemDetails = {}
             )
         }
     }
@@ -345,7 +681,15 @@ fun HeroesScreenPreviewDeviceSizes() {
                     )
                 ),
                 onFilterRole = { _, _ -> },
-                onFilterHeroes = {}
+                onFilterHeroes = {},
+                onSelectHeroClass = {},
+                onSelectItemTier = {},
+                onSelectStatFilter = {},
+                handleRetry = { },
+                navigateToHeroDetails = { },
+                navigateToSearch = { },
+                onClearSelectedHeroClass = {},
+                navigateToItemDetails = {}
             )
         }
     }

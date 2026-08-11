@@ -2,6 +2,7 @@ package com.aowen.predcompanion
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aowen.predcompanion.core.data.repository.eternals.EternalRepository
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ sealed interface AppDataState {
 class MainActivityViewModel @Inject constructor(
     private val itemRepository: ItemRepository,
     private val heroRepository: HeroRepository,
+    private val eternalRepository: EternalRepository
 ) : ViewModel() {
 
     private val _appDataState = MutableStateFlow<AppDataState>(AppDataState.Loading("Items"))
@@ -27,6 +29,7 @@ class MainActivityViewModel @Inject constructor(
 
     fun loadAppData() {
         viewModelScope.launch {
+            // Get all items
             _appDataState.value = AppDataState.Loading("Items")
             itemRepository.fetchAllItems()
             if (itemRepository.allItems.value.isEmpty()) {
@@ -34,10 +37,19 @@ class MainActivityViewModel @Inject constructor(
                 return@launch
             }
 
+            // Get all heroes
             _appDataState.value = AppDataState.Loading("Heroes")
             heroRepository.fetchAllHeroes()
             if (heroRepository.allHeroes.value.isEmpty()) {
                 _appDataState.value = AppDataState.Error("Failed to load heroes")
+                return@launch
+            }
+
+            // Get all eternals
+            _appDataState.value = AppDataState.Loading("Eternals")
+            eternalRepository.fetchAllEternals()
+            if (eternalRepository.allEternals.value.isEmpty()) {
+                _appDataState.value = AppDataState.Error("Failed to load eternals")
                 return@launch
             }
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_collections_heroes">Heroes</string>
+    <string name="feature_collections_eternals">Eternals</string>
+    <string name="feature_collections_items">Items</string>
+</resources>

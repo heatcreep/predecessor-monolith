@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.ui.utils
+package com.aowen.predcompanion.core.ui.utils
 
-fun <T> List<T>.filterOrOriginal(predicate: (T) -> Boolean) : List<T> =
-    this.filter(predicate).takeUnless { it.isEmpty() } ?: this@filterOrOriginal
+fun <T> Collection<T>.filterOrOriginal(predicate: (T) -> Boolean) : List<T> =
+    this.toList().filter(predicate).takeUnless { it.isEmpty() } ?: this@filterOrOriginal.toList()

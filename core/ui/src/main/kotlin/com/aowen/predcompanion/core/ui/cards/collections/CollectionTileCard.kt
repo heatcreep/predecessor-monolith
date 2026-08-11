@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.core.ui.cards.heroes
+package com.aowen.predcompanion.core.ui.cards.collections
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,20 +32,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.ui.theme.WarmWhite
 
 @Composable
-fun HeroTileCard(
+fun CollectionTileCard(
     modifier: Modifier = Modifier,
-    hero: HeroDetails,
-    heroImageUrl: String? = hero.posterImageId,
+    title: String,
+    imageUrl: String = "",
     labelTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     isSelected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
-
-    val image = heroImageUrl ?: ""
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -57,9 +54,9 @@ fun HeroTileCard(
         propagateMinConstraints = true
     ) {
         AsyncImage(
-            model = image,
+            model = imageUrl,
             contentScale = ContentScale.FillWidth,
-            contentDescription = hero.displayName,
+            contentDescription = title,
         )
         if (isSelected) {
             Box(
@@ -92,7 +89,7 @@ fun HeroTileCard(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = hero.displayName,
+                        text = title,
                         style = labelTextStyle,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -116,7 +113,7 @@ fun HeroTileCard(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = hero.displayName,
+                    text = title,
                     style = labelTextStyle,
                     color = WarmWhite
                 )
@@ -129,15 +126,12 @@ fun HeroTileCard(
     group = "Hero Card"
 )
 @Composable
-fun HeroCardPreview() {
+fun CollectionCardPreview() {
     MonolithTheme {
         LazyVerticalGrid(GridCells.Fixed(5)) {
             items(5) {
-                HeroTileCard(
-                    hero = HeroDetails(
-                        imageUrl = null,
-                        displayName = "Narbash"
-                    ),
+                CollectionTileCard(
+                    title = "Narbash",
                     isSelected = true
                 )
             }
