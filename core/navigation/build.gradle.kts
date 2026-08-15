@@ -14,6 +14,7 @@ dependencies {
     api(libs.androidx.hilt.navigation.compose)
 
     api(libs.androidx.navigation3.runtime)
+    api(libs.androidx.navigation3.ui)
     implementation(libs.androidx.savedstate.compose)
     implementation(libs.androidx.lifecycle.viewModel.navigation3)
 }

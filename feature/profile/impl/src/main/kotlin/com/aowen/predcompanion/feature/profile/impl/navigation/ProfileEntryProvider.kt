@@ -23,9 +23,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.aowen.predcompanion.feature.heroes.api.navigation.navigateToHeroDetails
+import com.aowen.predcompanion.feature.collections.api.navigation.navigateToHeroDetails
 import com.aowen.predcompanion.feature.home.api.navigation.navigateToMatchDetails
-import com.aowen.predcompanion.feature.items.api.navigation.navigateToItemDetails
+import com.aowen.predcompanion.feature.collections.api.navigation.navigateToItemDetails
 import com.aowen.predcompanion.feature.profile.api.navigation.ProfileNavKey
 import com.aowen.predcompanion.feature.profile.impl.ProfileScreen
 import com.aowen.predcompanion.feature.profile.impl.ProfileViewModel

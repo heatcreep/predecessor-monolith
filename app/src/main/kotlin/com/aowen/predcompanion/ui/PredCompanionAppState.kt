@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.aowen.predcompanion.core.navigation.NavigationState
 import com.aowen.predcompanion.core.navigation.rememberNavigationState
-import com.aowen.predcompanion.feature.home.api.navigation.HomeNavKey
+import com.aowen.predcompanion.feature.collections.api.navigation.CollectionsNavKey
 import com.aowen.predcompanion.navigation.TOP_LEVEL_NAV_ITEMS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ fun rememberPredCompanionAppState(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ): PredCompanionAppState {
-    val navigationState = rememberNavigationState(HomeNavKey, TOP_LEVEL_NAV_ITEMS.keys)
+    val navigationState = rememberNavigationState(CollectionsNavKey, TOP_LEVEL_NAV_ITEMS.keys)
 
     return remember(
         navigationState,

@@ -8,6 +8,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -19,6 +20,8 @@ import com.aowen.predcompanion.core.data.repository.user.UserState
 import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.predcompanion.core.datastore.ThemePreferences
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.ui.utils.LocalMarkupStyles
+import com.aowen.predcompanion.core.ui.utils.rememberMarkupStyles
 import com.aowen.predcompanion.ui.MonolithApp
 import com.aowen.predcompanion.ui.SignInScreen
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
@@ -51,8 +54,8 @@ class MainActivity : ComponentActivity() {
             val localTheme by themePreferences.theme.collectAsStateWithLifecycle(initialValue = Theme.SYSTEM)
             val userState by userRepository.currentUserState.collectAsStateWithLifecycle(initialValue = UserState.Loading)
             val appDataState by viewModel.appDataState.collectAsStateWithLifecycle()
-
             MonolithTheme(localTheme = localTheme) {
+                CompositionLocalProvider(LocalMarkupStyles provides rememberMarkupStyles()) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -105,6 +108,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
+                }
                 }
             }
         }

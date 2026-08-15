@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
-import com.aowen.predcompanion.ui.utils.saveables.FloatAnimatableSaveable
+import com.aowen.predcompanion.core.ui.utils.saveables.FloatAnimatableSaveable
 import kotlinx.coroutines.launch
 
 @Composable

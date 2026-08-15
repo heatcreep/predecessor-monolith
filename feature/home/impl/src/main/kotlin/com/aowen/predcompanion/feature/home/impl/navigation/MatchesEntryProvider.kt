@@ -11,12 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.aowen.predcompanion.feature.heroes.api.navigation.navigateToHeroDetails
+import com.aowen.predcompanion.feature.collections.api.navigation.navigateToHeroDetails
 import com.aowen.predcompanion.feature.home.api.navigation.MatchDetailsNavKey
 import com.aowen.predcompanion.feature.home.api.navigation.navigateToPlayerDetails
 import com.aowen.predcompanion.feature.home.impl.matches.matchdetails.MatchDetailsRoute
 import com.aowen.predcompanion.feature.home.impl.matches.matchdetails.MatchDetailsViewModel
-import com.aowen.predcompanion.feature.items.api.navigation.navigateToItemDetails
+import com.aowen.predcompanion.feature.collections.api.navigation.navigateToItemDetails
 import com.aowen.predcompanion.navigation.Navigator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
 

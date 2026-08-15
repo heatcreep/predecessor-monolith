@@ -1,4 +1,4 @@
-package com.aowen.predcompanion.ui.utils.saveables
+package com.aowen.predcompanion.core.ui.utils.saveables
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D

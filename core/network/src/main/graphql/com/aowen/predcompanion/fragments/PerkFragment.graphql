@@ -6,12 +6,18 @@ fragment PerkFragment on Perk {
         displayName
         description
         icon
+        eternalCategory {
+            id
+        }
         eternalCategoryData {
             displayName
+            description
+            color
             id
         }
         minorBlessings {
             id
+            slot
             displayName
             description
             icon

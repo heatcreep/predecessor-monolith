@@ -64,10 +64,14 @@ class NavigationState(
     val topLevelStack: NavBackStack<NavKey>,
     val subStacks: Map<NavKey, NavBackStack<NavKey>>,
 ) {
+
     val currentTopLevelKey: NavKey by derivedStateOf { topLevelStack.last() }
 
     val topLevelKeys
         get() = subStacks.keys
+
+    val entryKeys: List<NavKey>
+        get() = listOf(currentTopLevelKey)
 
     @get:VisibleForTesting
     val currentSubStack: NavBackStack<NavKey>
@@ -96,7 +100,7 @@ fun NavigationState.toEntries(
         )
     }
 
-    return topLevelStack
+    return entryKeys
         .flatMap { decoratedEntries[it] ?: emptyList() }
         .toMutableStateList()
 }

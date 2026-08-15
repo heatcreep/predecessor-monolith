@@ -12,7 +12,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.aowen.predcompanion.feature.builds.api.navigation.BuildsListNavKey
-import com.aowen.predcompanion.feature.heroes.api.navigation.HeroesNavKey
+import com.aowen.predcompanion.feature.collections.api.navigation.CollectionsNavKey
 import com.aowen.predcompanion.feature.home.api.navigation.HomeNavKey
 import com.aowen.predcompanion.feature.profile.api.navigation.ProfileNavKey
 import com.aowen.predcompanion.core.resources.R as coreResources
@@ -51,7 +51,7 @@ val PROFILE = TopLevelNavItem(
 
 val TOP_LEVEL_NAV_ITEMS = mapOf(
     HomeNavKey to HOME,
-    HeroesNavKey to HEROES,
+    CollectionsNavKey to HEROES,
     BuildsListNavKey to BUILDS,
     ProfileNavKey to PROFILE
 )

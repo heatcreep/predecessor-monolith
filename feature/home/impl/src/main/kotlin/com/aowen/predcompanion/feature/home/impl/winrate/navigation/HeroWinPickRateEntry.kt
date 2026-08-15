@@ -5,7 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.aowen.predcompanion.feature.heroes.api.navigation.navigateToHeroDetails
+import com.aowen.predcompanion.feature.collections.api.navigation.navigateToHeroDetails
 import com.aowen.predcompanion.feature.home.api.navigation.HeroWinPickRateNavKey
 import com.aowen.predcompanion.feature.home.impl.HomeScreenViewModel
 import com.aowen.predcompanion.feature.home.impl.winrate.HeroWinPickRateScreen

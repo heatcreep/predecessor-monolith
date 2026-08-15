@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_collections_heroes">Heroes</string>
+    <string name="feature_collections_eternals">Eternals</string>
+    <string name="feature_collections_items">Items</string>
+    <string name="feature_collection_eternal">Eternal</string>
+    <string name="feature_collection_minor_blessing_1">Minor Blessing 1</string>
+    <string name="feature_collection_minor_blessing_2">Minor Blessing 2</string>
+    <string name="feature_collections_eternal_details_error">Unknown Eternal</string>
+    <string name="feature_collection_eternal_details_loading">Eternal Details</string>
+</resources>

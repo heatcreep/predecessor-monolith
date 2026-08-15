@@ -10,7 +10,7 @@ android {
 dependencies {
     implementation(projects.core.data)
     implementation(projects.feature.builds.api)
-    implementation(projects.feature.items.api)
+    implementation(projects.feature.collections.api)
     implementation(projects.feature.profile.api)
     implementation(projects.feature.search.api)
     implementation(libs.androidx.paging.runtime)

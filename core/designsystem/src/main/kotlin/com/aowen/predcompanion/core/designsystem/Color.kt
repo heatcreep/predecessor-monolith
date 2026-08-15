@@ -33,17 +33,26 @@ val BadgeBlueGreen = Color(0xFF34B9AB)
 val RedHighlight = Color(0xFFAF6969)
 val DarkRedHighlight = Color(0xFF683D3D)
 val RedDanger = Color(0xFF9E0404)
+val AttackDamageRed = Color(0xFFc05959)
+
+// Pink
+val DebuffPink = Color(0xFFce66a0)
 
 // Orange
 val OrangeHighlight = Color(0xFFAF8769)
 
 // Yellow
 val YellowHighlight = Color (0xFFAFAF69)
+val GoldText = Color(0xFFae9644)
+val CritChanceText = Color(0xFFcdc177)
 
 // Blue
 val BlueHighlight = Color(0xFF6969AF)
 val Dusk = Color(0xFF22308D)
-val ManaBlue = Color(0xFF69AFA8)
+val ManaBlue = Color(0xFF668bcb)
+
+// Purple
+val AbilityTextPurple = Color(0xFF907fd4)
 val BadgePurple = Color(0xFF7D2387)
 
 // SOCIAL

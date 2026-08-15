@@ -1,5 +1,8 @@
 package com.aowen.predcompanion.ui
 
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -15,8 +18,11 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaul
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItemColors
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldValue
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
+import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,10 +31,9 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.aowen.predcompanion.core.navigation.toEntries
 import com.aowen.predcompanion.feature.builds.navigation.buildsEntry
-import com.aowen.predcompanion.feature.heroes.impl.navigation.heroesEntry
+import com.aowen.predcompanion.feature.collections.impl.navigation.collectionsEntry
 import com.aowen.predcompanion.feature.home.impl.navigation.homeEntry
 import com.aowen.predcompanion.feature.home.impl.navigation.matchesEntry
-import com.aowen.predcompanion.feature.items.impl.itemdetails.navigation.itemDetailsEntry
 import com.aowen.predcompanion.feature.profile.impl.navigation.profileEntry
 import com.aowen.predcompanion.feature.search.impl.navigation.searchEntry
 import com.aowen.predcompanion.navigation.Navigator
@@ -41,33 +46,23 @@ fun MonolithApp(
 
     val navigator = remember { Navigator(appState.navigationState) }
 
-    val content: @Composable () -> Unit = {
-        Scaffold(
-            snackbarHost = {
-                SnackbarHost(
-                    hostState = appState.snackbarHostState,
-                )
-            },
-        ) { padding ->
-            val topLevelEntryProvider = entryProvider {
-                homeEntry(navigator)
-                heroesEntry(navigator)
-                matchesEntry(navigator)
-                itemDetailsEntry()
-                buildsEntry(navigator)
-                searchEntry(navigator)
-                profileEntry(navigator)
-            }
-            NavDisplay(
-                modifier = Modifier.padding(padding),
-                entries = appState.navigationState.toEntries(topLevelEntryProvider),
-                onBack = { navigator.goBack() }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(
+                hostState = appState.snackbarHostState,
             )
+        },
+    ) { padding ->
+        val topLevelEntryProvider = entryProvider {
+            homeEntry(navigator)
+            collectionsEntry(navigator)
+            matchesEntry(navigator)
+            buildsEntry(navigator)
+            searchEntry(navigator)
+            profileEntry(navigator)
         }
-    }
-
-    if (appState.shouldShowBottomBar) {
         PCNavigationSuiteScaffold(
+            modifier = Modifier.padding(padding),
             navigationSuiteItems = {
                 TOP_LEVEL_NAV_ITEMS.forEach { (key, item) ->
                     val selected = key == appState.navigationState.currentTopLevelKey
@@ -90,21 +85,51 @@ fun MonolithApp(
                     )
                 }
             },
-            content = content
+            isVisible = appState.shouldShowBottomBar,
+            content = {
+                NavDisplay(
+                    entries = appState.navigationState.toEntries(topLevelEntryProvider),
+                    onBack = { navigator.goBack() },
+                    transitionSpec = {
+                        // Slide in from right when navigating forward
+                        slideInHorizontally(initialOffsetX = { it }) togetherWith
+                                slideOutHorizontally(targetOffsetX = { -it })
+                    },
+                    popTransitionSpec = {
+                        // Slide in from left when navigating back
+                        slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                                slideOutHorizontally(targetOffsetX = { it })
+                    },
+                    predictivePopTransitionSpec = {
+                        // Slide in from left when navigating back
+                        slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                                slideOutHorizontally(targetOffsetX = { it })
+                    },
+                )
+            }
         )
-    } else {
-        content()
     }
 }
 
 @Composable
 private fun PCNavigationSuiteScaffold(
+    modifier: Modifier = Modifier,
     navigationSuiteItems: PredCompanionNavigationSuiteScope.() -> Unit,
+    isVisible: Boolean,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo(),
     content: @Composable () -> Unit,
 ) {
     val layoutType = NavigationSuiteScaffoldDefaults
         .calculateFromAdaptiveInfo(windowAdaptiveInfo)
+
+    val state = rememberNavigationSuiteScaffoldState(
+        initialValue = if (isVisible) NavigationSuiteScaffoldValue.Visible
+        else NavigationSuiteScaffoldValue.Hidden
+    )
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) state.show() else state.hide()
+    }
     val navigationSuiteItemColors = NavigationSuiteItemColors(
         navigationBarItemColors = NavigationBarItemDefaults.colors(
             selectedIconColor = PCNavigationDefaults.navigationSelectedContentColor(),
@@ -128,6 +153,8 @@ private fun PCNavigationSuiteScaffold(
         )
     )
     NavigationSuiteScaffold(
+        state = state,
+        modifier = modifier,
         navigationSuiteItems = {
             PredCompanionNavigationSuiteScope(
                 navigationSuiteScope = this,
