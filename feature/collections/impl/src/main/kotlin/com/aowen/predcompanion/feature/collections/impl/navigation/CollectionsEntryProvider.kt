@@ -33,6 +33,8 @@ import com.aowen.predcompanion.feature.collections.impl.itemdetails.ItemDetailsV
 import com.aowen.predcompanion.feature.search.api.navigation.navigateToSearch
 import com.aowen.predcompanion.navigation.Navigator
 
+private const val ANIMATION_SPEED = 300
+
 fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
     entry<CollectionsNavKey> {
         val viewModel = hiltViewModel<HeroesScreenViewModel>()
@@ -58,7 +60,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 // Slide new content up, keeping the old content in place underneath
                 slideInVertically(
                     initialOffsetY = { it },
-                    animationSpec = tween(300)
+                    animationSpec = tween(ANIMATION_SPEED)
                 ) togetherWith ExitTransition.KeepUntilTransitionsFinished
             }
             put(NavDisplay.PopTransitionKey) {
@@ -66,7 +68,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 EnterTransition.None togetherWith
                         slideOutVertically(
                             targetOffsetY = { it },
-                            animationSpec = tween(300)
+                            animationSpec = tween(ANIMATION_SPEED)
                         )
             }
             put(NavDisplay.PredictivePopTransitionKey) {
@@ -74,7 +76,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 EnterTransition.None togetherWith
                         slideOutVertically(
                             targetOffsetY = { it },
-                            animationSpec = tween(300)
+                            animationSpec = tween(ANIMATION_SPEED)
                         )
             }
         }
@@ -99,7 +101,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 // Slide new content up, keeping the old content in place underneath
                 slideInVertically(
                     initialOffsetY = { it },
-                    animationSpec = tween(5000)
+                    animationSpec = tween(ANIMATION_SPEED)
                 ) togetherWith ExitTransition.KeepUntilTransitionsFinished
             }
             put(NavDisplay.PopTransitionKey) {
@@ -107,7 +109,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 EnterTransition.None togetherWith
                         slideOutVertically(
                             targetOffsetY = { it },
-                            animationSpec = tween(5000)
+                            animationSpec = tween(ANIMATION_SPEED)
                         )
             }
             put(NavDisplay.PredictivePopTransitionKey) {
@@ -115,7 +117,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 EnterTransition.None togetherWith
                         slideOutVertically(
                             targetOffsetY = { it },
-                            animationSpec = tween(5000)
+                            animationSpec = tween(ANIMATION_SPEED)
                         )
             }
         }
@@ -127,7 +129,8 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         EternalDetailsScreen(
             eternalDetailsUiState = uiState,
-            onRetry = viewModel::reloadDetails
+            onRetry = viewModel::reloadDetails,
+            navigateBack = { navigator.goBack()}
         )
     }
     entry<ItemDetailsNavKey>(
@@ -136,7 +139,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 // Slide new content up, keeping the old content in place underneath
                 slideInVertically(
                     initialOffsetY = { it },
-                    animationSpec = tween(5000)
+                    animationSpec = tween(ANIMATION_SPEED)
                 ) togetherWith ExitTransition.KeepUntilTransitionsFinished
             }
             put(NavDisplay.PopTransitionKey) {
@@ -144,7 +147,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 EnterTransition.None togetherWith
                         slideOutVertically(
                             targetOffsetY = { it },
-                            animationSpec = tween(5000)
+                            animationSpec = tween(ANIMATION_SPEED)
                         )
             }
             put(NavDisplay.PredictivePopTransitionKey) {
@@ -152,7 +155,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
                 EnterTransition.None togetherWith
                         slideOutVertically(
                             targetOffsetY = { it },
-                            animationSpec = tween(5000)
+                            animationSpec = tween(ANIMATION_SPEED)
                         )
             }
         }
@@ -164,6 +167,7 @@ fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         ItemDetailsScreen(
             uiState = uiState,
+            navigateBack = navigator::goBack
         )
     }
 }

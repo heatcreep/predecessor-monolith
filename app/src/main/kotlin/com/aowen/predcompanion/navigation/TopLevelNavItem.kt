@@ -30,11 +30,11 @@ val HOME = TopLevelNavItem(
     iconTextId = coreResources.string.core_resources_icon_home,
     titleTextId = coreResources.string.core_resources_icon_home
 )
-val HEROES = TopLevelNavItem(
+val COLLECTIONS = TopLevelNavItem(
     selectedIcon = Icons.Filled.Star,
     unselectedIcon = Icons.Outlined.Star,
-    iconTextId = coreResources.string.core_resources_icon_heroes,
-    titleTextId = coreResources.string.core_resources_icon_heroes
+    iconTextId = coreResources.string.core_resources_icon_collections,
+    titleTextId = coreResources.string.core_resources_icon_collections
 )
 val BUILDS = TopLevelNavItem(
     selectedIcon = Icons.AutoMirrored.Filled.MenuBook,
@@ -51,7 +51,7 @@ val PROFILE = TopLevelNavItem(
 
 val TOP_LEVEL_NAV_ITEMS = mapOf(
     HomeNavKey to HOME,
-    CollectionsNavKey to HEROES,
+    CollectionsNavKey to COLLECTIONS,
     BuildsListNavKey to BUILDS,
     ProfileNavKey to PROFILE
 )

@@ -181,7 +181,7 @@ fun CollectionsScreen(
                 contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 topBar = {
                     MonolithTopAppBar(
-                        title = "Heroes",
+                        title = stringResource(R.string.feature_collection_title),
                         actions = {
                             IconButton(onClick = navigateToSearch) {
                                 Icon(

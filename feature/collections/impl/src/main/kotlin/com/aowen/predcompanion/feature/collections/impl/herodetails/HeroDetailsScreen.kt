@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -83,6 +84,7 @@ import com.aowen.predcompanion.ui.components.PlayerLoadingCard
 import com.aowen.predcompanion.ui.theme.BadgeBlueGreen
 import com.aowen.predcompanion.ui.theme.NeroBlack
 import kotlinx.coroutines.launch
+import com.aowen.predcompanion.feature.collections.impl.R as collectionsR
 
 class SampleHeroDetailsScreenUiStateProvider :
     CollectionPreviewParameterProvider<HeroDetailsUiState>(
@@ -117,7 +119,7 @@ fun HeroDetailsScreen(
     Scaffold(
         topBar = {
             MonolithTopAppBar(
-                title = "Hero Details",
+                title = stringResource(collectionsR.string.feature_collections_hero_details),
                 titleStyle = MaterialTheme.typography.bodyLarge,
                 backAction = {
                     IconButton(onClick = navigateBack) {

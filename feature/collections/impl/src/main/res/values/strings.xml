@@ -8,4 +8,8 @@
     <string name="feature_collection_minor_blessing_2">Minor Blessing 2</string>
     <string name="feature_collections_eternal_details_error">Unknown Eternal</string>
     <string name="feature_collection_eternal_details_loading">Eternal Details</string>
+    <string name="feature_collection_title">Collections</string>
+    <string name="feature_collection_item_details">Item Details</string>
+    <string name="feature_collection_eternal_details">Eternal Details</string>
+    <string name="feature_collections_hero_details">Hero Details</string>
 </resources>

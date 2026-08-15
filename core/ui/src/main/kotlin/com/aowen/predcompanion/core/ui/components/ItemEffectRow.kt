@@ -4,8 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,12 +16,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import com.aowen.predcompanion.ui.utils.StyledText
+import com.aowen.predcompanion.core.ui.shared.PredGGMarkupText
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ItemEffectRow(effect: ItemDetails.EffectDetails) {
-
+    val effectLabel = if(effect.condition != null) {
+        "${effect.name} - ${effect.condition}"
+    } else {
+        effect.name
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -27,15 +34,18 @@ fun ItemEffectRow(effect: ItemDetails.EffectDetails) {
         FlowRow(
             modifier = Modifier.fillMaxWidth()
         ) {
-            StyledText(
-                content = if(effect.condition != null) {
-                    "${effect.name} - ${effect.condition}"
-                } else {
-                    effect.name
-                }
+            PredGGMarkupText(
+                text = effectLabel,
+                style = MaterialTheme.typography.bodyMedium
             )
         }
-        StyledText(content = effect.menuDescription ?: "")
+        Spacer(modifier = Modifier.size(4.dp))
+        effect.menuDescription?.let { description ->
+            PredGGMarkupText(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 

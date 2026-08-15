@@ -10,7 +10,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -46,69 +45,64 @@ fun MonolithApp(
 
     val navigator = remember { Navigator(appState.navigationState) }
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(
-                hostState = appState.snackbarHostState,
-            )
-        },
-    ) { padding ->
-        val topLevelEntryProvider = entryProvider {
-            homeEntry(navigator)
-            collectionsEntry(navigator)
-            matchesEntry(navigator)
-            buildsEntry(navigator)
-            searchEntry(navigator)
-            profileEntry(navigator)
-        }
-        PCNavigationSuiteScaffold(
-            modifier = Modifier.padding(padding),
-            navigationSuiteItems = {
-                TOP_LEVEL_NAV_ITEMS.forEach { (key, item) ->
-                    val selected = key == appState.navigationState.currentTopLevelKey
-                    item(
-                        selected = selected,
-                        onClick = { navigator.navigate(key) },
-                        icon = {
-                            Icon(
-                                imageVector = item.unselectedIcon,
-                                contentDescription = null
-                            )
-                        },
-                        selectedIcon = {
-                            Icon(
-                                imageVector = item.selectedIcon,
-                                contentDescription = null
-                            )
-                        },
-                        label = { Text(stringResource(item.iconTextId)) }
-                    )
-                }
-            },
-            isVisible = appState.shouldShowBottomBar,
-            content = {
-                NavDisplay(
-                    entries = appState.navigationState.toEntries(topLevelEntryProvider),
-                    onBack = { navigator.goBack() },
-                    transitionSpec = {
-                        // Slide in from right when navigating forward
-                        slideInHorizontally(initialOffsetX = { it }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { -it })
+
+    val topLevelEntryProvider = entryProvider {
+        homeEntry(navigator)
+        collectionsEntry(navigator)
+        matchesEntry(navigator)
+        buildsEntry(navigator)
+        searchEntry(navigator)
+        profileEntry(navigator)
+    }
+    PCNavigationSuiteScaffold(
+        navigationSuiteItems = {
+            TOP_LEVEL_NAV_ITEMS.forEach { (key, item) ->
+                val selected = key == appState.navigationState.currentTopLevelKey
+                item(
+                    selected = selected,
+                    onClick = { navigator.navigate(key) },
+                    icon = {
+                        Icon(
+                            imageVector = item.unselectedIcon,
+                            contentDescription = null
+                        )
                     },
-                    popTransitionSpec = {
-                        // Slide in from left when navigating back
-                        slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { it })
+                    selectedIcon = {
+                        Icon(
+                            imageVector = item.selectedIcon,
+                            contentDescription = null
+                        )
                     },
-                    predictivePopTransitionSpec = {
-                        // Slide in from left when navigating back
-                        slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                                slideOutHorizontally(targetOffsetX = { it })
-                    },
+                    label = { Text(stringResource(item.iconTextId)) }
                 )
             }
-        )
+        },
+        isVisible = appState.shouldShowBottomBar,
+    ) {
+        Scaffold {
+            NavDisplay(
+                modifier = Modifier.padding(it),
+                entries = appState.navigationState.toEntries(topLevelEntryProvider),
+                onBack = { navigator.goBack() },
+                transitionSpec = {
+                    // Slide in from right when navigating forward
+                    slideInHorizontally(initialOffsetX = { it }) togetherWith
+                            slideOutHorizontally(targetOffsetX = { -it })
+                },
+                popTransitionSpec = {
+                    // Slide in from left when navigating back
+                    slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                            slideOutHorizontally(targetOffsetX = { it })
+                },
+                predictivePopTransitionSpec = {
+                    // Slide in from left when navigating back
+                    slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                            slideOutHorizontally(targetOffsetX = { it })
+                },
+            )
+        }
     }
+
 }
 
 @Composable

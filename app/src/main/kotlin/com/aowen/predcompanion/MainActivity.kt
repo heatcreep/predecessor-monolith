@@ -20,7 +20,9 @@ import com.aowen.predcompanion.core.data.repository.user.UserState
 import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.predcompanion.core.datastore.ThemePreferences
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
+import com.aowen.predcompanion.core.ui.utils.LocalMarkupImageAltText
 import com.aowen.predcompanion.core.ui.utils.LocalMarkupStyles
+import com.aowen.predcompanion.core.ui.utils.rememberMarkupImageAltText
 import com.aowen.predcompanion.core.ui.utils.rememberMarkupStyles
 import com.aowen.predcompanion.ui.MonolithApp
 import com.aowen.predcompanion.ui.SignInScreen
@@ -55,7 +57,10 @@ class MainActivity : ComponentActivity() {
             val userState by userRepository.currentUserState.collectAsStateWithLifecycle(initialValue = UserState.Loading)
             val appDataState by viewModel.appDataState.collectAsStateWithLifecycle()
             MonolithTheme(localTheme = localTheme) {
-                CompositionLocalProvider(LocalMarkupStyles provides rememberMarkupStyles()) {
+                CompositionLocalProvider(
+                    LocalMarkupStyles provides rememberMarkupStyles(),
+                    LocalMarkupImageAltText provides rememberMarkupImageAltText()
+                ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
