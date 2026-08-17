@@ -12,4 +12,7 @@
     <string name="feature_collection_item_details">Item Details</string>
     <string name="feature_collection_eternal_details">Eternal Details</string>
     <string name="feature_collections_hero_details">Hero Details</string>
+    <string name="feature_collections_heroes_error">There was a problem loading heroes.</string>
+    <string name="feature_collections_eternals_error">There was a problem loading Eternals.</string>
+    <string name="feature_collections_items_error">There was a problem loading Items.</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.aowen.predcompanion.feature.collections.impl
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.predcompanion.core.data.repository.eternals.EternalRepository
@@ -21,62 +22,86 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-data class HeroesScreenUiState(
+sealed interface HeroCollectionState {
+    data object Loading : HeroCollectionState
+    data class Success(val content: List<HeroDetails>) : HeroCollectionState
+    data class Error(@param:StringRes val messageRes: Int) : HeroCollectionState
+}
+
+sealed interface EternalCollectionState {
+    data object Loading : EternalCollectionState
+    data class Success(val content: List<EternalListItemUiModel>) : EternalCollectionState
+    data class Error(@param:StringRes val messageRes: Int) : EternalCollectionState
+}
+
+sealed interface ItemCollectionState {
+    data object Loading : ItemCollectionState
+    data class Success(val content: List<ItemDetails>) : ItemCollectionState
+    data class Error(@param:StringRes val messageRes: Int) : ItemCollectionState
+}
+
+data class CollectionScreenUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
-    val allHeroes: List<HeroDetails> = emptyList(),
-    val allEternals: List<EternalListItemUiModel> = emptyList(),
-    val allItems: List<ItemDetails> = emptyList(),
-    val currentHeroes: List<HeroDetails> = emptyList(),
+    val heroesState: HeroCollectionState = HeroCollectionState.Loading,
+    val eternalsState: EternalCollectionState = EternalCollectionState.Loading,
+    val itemsState: ItemCollectionState = ItemCollectionState.Loading,
     val selectedRoleFilters: List<HeroRole> = emptyList(),
     val selectedStatsFilters: List<String> = emptyList(),
     val selectedHeroClass: HeroClass? = null,
     val selectedTierFilter: String? = "Tier III",
-    val searchFieldValue: String = "",
     val selectedTabIndex: Int = 0
 )
 
 @HiltViewModel
-class HeroesScreenViewModel @Inject constructor(
+class CollectionsScreenViewModel @Inject constructor(
     omedaCityHeroRepository: HeroRepository,
     eternalRepository: EternalRepository,
     itemRepository: ItemRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HeroesScreenUiState())
-    val uiState: StateFlow<HeroesScreenUiState> = combine(
+    private val _uiState = MutableStateFlow(CollectionScreenUiState())
+    val uiState: StateFlow<CollectionScreenUiState> = combine(
         _uiState,
         omedaCityHeroRepository.allHeroes,
         eternalRepository.allEternals,
         itemRepository.allItems
     ) { state, heroes, eternals, items ->
         val sortedHeroes = heroes.values.sortedBy { it.displayName }
+        val sortedEternals = eternals.values.sortedBy { it.displayName }
+        val sortedItems = items.values.sortedBy { it.displayName }
+        val heroesState = when {
+            sortedHeroes.isEmpty() -> HeroCollectionState.Error(messageRes = R.string.feature_collections_heroes_error)
+            else -> {
+                val filteredHeroes = sortedHeroes.filterOrOriginal { heroDetails ->
+                    heroDetails.roles.any { role ->
+                        state.selectedRoleFilters.contains(role)
+
+                    }
+                }
+                HeroCollectionState.Success(filteredHeroes)
+            }
+        }
+        val eternalsState = when {
+            sortedEternals.isEmpty() -> EternalCollectionState.Error(messageRes = R.string.feature_collections_eternals_error)
+            else -> EternalCollectionState.Success(sortedEternals.map { it.toUiModel() })
+        }
+        val itemsState = when {
+            sortedItems.isEmpty() -> ItemCollectionState.Error(messageRes = R.string.feature_collections_items_error)
+            else -> ItemCollectionState.Success(sortedItems.filterOrOriginal { it.matchesFilters() })
+        }
         val currentHeroes =
             sortedHeroes.filter { it.roles.any(state.selectedRoleFilters::contains) }
         state.copy(
-            allHeroes = sortedHeroes,
-            allEternals = eternals.values
-                .sortedBy { it.displayName }
-                .map { it.toUiModel() },
-            allItems = items.values
-                .filter { item ->
-                    val matchesClass = state.selectedHeroClass == null ||
-                            item.heroClass == state.selectedHeroClass
-                    val matchesTier = state.selectedTierFilter == null ||
-                            item.rarity.value == state.selectedTierFilter
-                    val matchesStats = state.selectedStatsFilters.isEmpty() ||
-                            state.selectedStatsFilters.all { stat ->
-                                item.stats.map { it.name }.contains(stat)
-                            }
-                    matchesClass && matchesTier && matchesStats
-                },
-            currentHeroes = currentHeroes.ifEmpty { sortedHeroes },
+            heroesState = heroesState,
+            eternalsState = eternalsState,
+            itemsState = itemsState,
             isLoading = false
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
-        initialValue = HeroesScreenUiState()
+        initialValue = CollectionScreenUiState()
     )
 
     fun updateRoleOption(option: HeroRole, isChecked: Boolean) {
@@ -121,23 +146,16 @@ class HeroesScreenViewModel @Inject constructor(
         }
     }
 
-    fun getFilteredHeroes() {
-        // get heroes by role and return the original list if no roles are selected
-        val heroesByRole =
-            uiState.value.allHeroes.filterOrOriginal { heroDetails ->
-                heroDetails.roles.any { role ->
-                    uiState.value.selectedRoleFilters.contains(role)
-
+    private fun ItemDetails.matchesFilters(): Boolean {
+        val state = _uiState.value
+        val matchesClass = state.selectedHeroClass == null ||
+                heroClass == state.selectedHeroClass
+        val matchesTier = state.selectedTierFilter == null ||
+                rarity.value == state.selectedTierFilter
+        val matchesStats = state.selectedStatsFilters.isEmpty() ||
+                state.selectedStatsFilters.all { stat ->
+                    stats.map { it.name }.contains(stat)
                 }
-            }
-
-        // get heroes by search
-        val heroesBySearch = heroesByRole.filter { heroDetails ->
-            heroDetails.displayName.contains(uiState.value.searchFieldValue, ignoreCase = true)
-        }
-
-        _uiState.update {
-            it.copy(currentHeroes = heroesBySearch)
-        }
+        return matchesClass && matchesTier && matchesStats
     }
 }

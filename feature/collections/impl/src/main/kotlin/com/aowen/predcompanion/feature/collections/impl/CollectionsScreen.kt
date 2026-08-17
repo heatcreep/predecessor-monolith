@@ -73,14 +73,11 @@ import com.aowen.predcompanion.core.ui.cards.collections.CollectionTileCard
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionFilterDropdown
 import com.aowen.predcompanion.core.ui.dropdown.PredCompanionSortDropdown
 import com.aowen.predcompanion.core.ui.filters.PredCompanionChipFilter
-import com.aowen.predcompanion.feature.collections.impl.ui.model.EternalListItemUiModel
 import com.aowen.predcompanion.ui.common.MonolithCollapsableGridColumn
 import com.aowen.predcompanion.ui.components.FullScreenErrorWithRetry
 import com.aowen.predcompanion.ui.components.FullScreenLoadingIndicator
 import com.aowen.predcompanion.ui.components.MonolithTopAppBar
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 import com.aowen.predcompanion.core.resources.R as coreResources
 
 val defaultStats = listOf(
@@ -108,13 +105,12 @@ val defaultStats = listOf(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CollectionsScreen(
-    uiState: HeroesScreenUiState,
+    uiState: CollectionScreenUiState,
     onFilterRole: (HeroRole, Boolean) -> Unit,
     onSelectHeroClass: (HeroClass) -> Unit,
     onClearSelectedHeroClass: () -> Unit,
     onSelectItemTier: (String) -> Unit,
     onSelectStatFilter: (String) -> Unit,
-    onFilterHeroes: () -> Unit,
     onSelectTab: (Int) -> Unit,
     modifier: Modifier = Modifier,
     handleRetry: () -> Unit = {},
@@ -153,18 +149,6 @@ fun CollectionsScreen(
                 animationSpec = tween(durationMillis = 200, easing = LinearEasing),
             )
         }
-    }
-
-    LaunchedEffect(uiState.searchFieldValue) {
-        this.launch {
-            delay(500.milliseconds)
-            onFilterHeroes()
-        }
-    }
-
-
-    LaunchedEffect(uiState.selectedRoleFilters) {
-        onFilterHeroes()
     }
 
     if (uiState.isLoading) {
@@ -234,18 +218,18 @@ fun CollectionsScreen(
                         when (page) {
                             0 -> HeroesCollection(
                                 selectedRoleFilters = uiState.selectedRoleFilters,
-                                currentHeroes = uiState.currentHeroes,
+                                heroCollectionState = uiState.heroesState,
                                 onFilterRole = onFilterRole,
                                 navigateToHeroDetails = navigateToHeroDetails
                             )
 
                             1 -> EternalsCollection(
-                                currentEternals = uiState.allEternals,
+                                eternalCollectionState = uiState.eternalsState,
                                 navigateToEternalDetails = navigateToEternalDetails
                             )
 
                             2 -> ItemsCollection(
-                                items = uiState.allItems,
+                                itemCollectionState = uiState.itemsState,
                                 selectedHeroClass = uiState.selectedHeroClass,
                                 onSelectHeroClass = onSelectHeroClass,
                                 onClearSelectedHeroClass = onClearSelectedHeroClass,
@@ -269,7 +253,7 @@ fun CollectionsScreen(
 fun HeroesCollection(
     modifier: Modifier = Modifier,
     selectedRoleFilters: List<HeroRole> = emptyList(),
-    currentHeroes: List<HeroDetails> = emptyList(),
+    heroCollectionState: HeroCollectionState,
     onFilterRole: (HeroRole, Boolean) -> Unit,
     navigateToHeroDetails: (String) -> Unit,
 ) {
@@ -304,7 +288,7 @@ fun HeroesCollection(
                             onClick = {
                                 onFilterRole(
                                     role,
-                                    selectedRoleFilters.contains(role)
+                                    !selectedRoleFilters.contains(role)
                                 )
                             }
                         )
@@ -312,27 +296,40 @@ fun HeroesCollection(
                 }
             }
         }
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            state = listState,
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            columns = GridCells.Fixed(if (isTablet) 6 else 3),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            items(currentHeroes) { hero ->
-                hero.posterImageId?.let { posterImage ->
-                    CollectionTileCard(
-                        title = hero.displayName,
-                        imageUrl = posterImage,
-                        onClick = {
-                            navigateToHeroDetails(hero.id)
-                        }
-                    )
-                }
+        when (heroCollectionState) {
+            is HeroCollectionState.Loading -> {
+                FullScreenLoadingIndicator(stringResource(R.string.feature_collections_heroes))
             }
 
+            is HeroCollectionState.Error -> {
+                FullScreenErrorWithRetry(stringResource(heroCollectionState.messageRes)) { }
+            }
+
+            is HeroCollectionState.Success -> {
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    state = listState,
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    columns = GridCells.Fixed(if (isTablet) 6 else 3),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(heroCollectionState.content) { hero ->
+                        hero.posterImageId?.let { posterImage ->
+                            CollectionTileCard(
+                                title = hero.displayName,
+                                imageUrl = posterImage,
+                                onClick = {
+                                    navigateToHeroDetails(hero.id)
+                                }
+                            )
+                        }
+                    }
+
+                }
+            }
         }
+
     }
 
 
@@ -341,7 +338,7 @@ fun HeroesCollection(
 @Composable
 fun EternalsCollection(
     modifier: Modifier = Modifier,
-    currentEternals: List<EternalListItemUiModel>,
+    eternalCollectionState: EternalCollectionState,
     navigateToEternalDetails: (String) -> Unit,
 ) {
 
@@ -353,26 +350,39 @@ fun EternalsCollection(
 
     val listState = rememberLazyGridState()
 
-    LazyVerticalGrid(
-        modifier = modifier.fillMaxSize(),
-        state = listState,
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        columns = GridCells.Fixed(if (isTablet) 6 else 3),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        items(currentEternals) { eternal ->
-
-            CollectionTileCard(
-                title = eternal.name,
-                imageUrl = eternal.imageSrc,
-                onClick = {
-                    navigateToEternalDetails(eternal.id)
-                }
-            )
-
+    when (eternalCollectionState) {
+        is EternalCollectionState.Loading -> {
+            FullScreenLoadingIndicator(stringResource(R.string.feature_collections_eternals))
         }
 
+        is EternalCollectionState.Error -> {
+            FullScreenErrorWithRetry(errorMessage = stringResource(eternalCollectionState.messageRes)) { }
+        }
+
+        is EternalCollectionState.Success -> {
+            LazyVerticalGrid(
+                modifier = modifier.fillMaxSize(),
+                state = listState,
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                columns = GridCells.Fixed(if (isTablet) 6 else 3),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+
+                items(eternalCollectionState.content) { eternal ->
+
+                    CollectionTileCard(
+                        title = eternal.name,
+                        imageUrl = eternal.imageSrc,
+                        onClick = {
+                            navigateToEternalDetails(eternal.id)
+                        }
+                    )
+
+                }
+
+            }
+        }
     }
 
 
@@ -382,7 +392,7 @@ fun EternalsCollection(
 @Composable
 fun ItemsCollection(
     modifier: Modifier = Modifier,
-    items: List<ItemDetails> = emptyList(),
+    itemCollectionState: ItemCollectionState,
     selectedHeroClass: HeroClass? = null,
     onSelectHeroClass: (HeroClass) -> Unit = {},
     onClearSelectedHeroClass: () -> Unit = {},
@@ -461,42 +471,44 @@ fun ItemsCollection(
             )
         }
         Spacer(modifier = Modifier.size(8.dp))
-        if (items.isEmpty()) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "Items list is empty")
+        when (itemCollectionState) {
+            is ItemCollectionState.Loading -> {
+                FullScreenLoadingIndicator(stringResource(R.string.feature_collections_items))
             }
-        } else {
-            LazyVerticalGrid(
-                state = itemsListState,
-                modifier = Modifier.fillMaxSize(),
-                columns = GridCells.Fixed(if (isTablet) 5 else 3),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(items) { item ->
-                    SubcomposeAsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(item.imageSrc)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Item image",
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        ItemCard(
-                            itemDetails = item,
-                            onClick = { navigateToItemDetails(item.name) }
-                        ) {
-                            SubcomposeAsyncImageContent(
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.FillWidth
-                            )
-                        }
-                    }
 
+            is ItemCollectionState.Error -> {
+                FullScreenErrorWithRetry(stringResource(itemCollectionState.messageRes)) { }
+            }
+
+            is ItemCollectionState.Success -> {
+                LazyVerticalGrid(
+                    state = itemsListState,
+                    modifier = Modifier.fillMaxSize(),
+                    columns = GridCells.Fixed(if (isTablet) 5 else 3),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(itemCollectionState.content) { item ->
+                        SubcomposeAsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(item.imageSrc)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Item image",
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            ItemCard(
+                                itemDetails = item,
+                                onClick = { navigateToItemDetails(item.name) }
+                            ) {
+                                SubcomposeAsyncImageContent(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.FillWidth
+                                )
+                            }
+                        }
+
+                    }
                 }
             }
         }
@@ -551,63 +563,38 @@ fun CollectionsScreenPreview() {
     MonolithTheme {
         Surface {
             CollectionsScreen(
-                uiState = HeroesScreenUiState(
+                uiState = CollectionScreenUiState(
                     isLoading = true,
-                    allHeroes = listOf(
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
-                            displayName = "Narbash"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
-                            displayName = " Lt. Belica"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
-                            displayName = "Morigesh"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
-                            displayName = "TwinBlast"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
-                            displayName = "Greystone"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
-                            displayName = "Grux"
-                        ),
+                    heroesState = HeroCollectionState.Success(
+                        listOf(
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
+                                displayName = "Narbash"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
+                                displayName = " Lt. Belica"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
+                                displayName = "Morigesh"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
+                                displayName = "TwinBlast"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
+                                displayName = "Greystone"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
+                                displayName = "Grux"
+                            ),
+                        )
                     ),
-                    currentHeroes = listOf(
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
-                            displayName = "Narbash"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
-                            displayName = " Lt. Belica"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
-                            displayName = "Morigesh"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
-                            displayName = "TwinBlast"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
-                            displayName = "Greystone"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
-                            displayName = "Grux"
-                        ),
-                    )
                 ),
                 onFilterRole = { _, _ -> },
-                onFilterHeroes = {},
                 onSelectHeroClass = {},
                 onSelectItemTier = {},
                 onSelectStatFilter = {},
@@ -629,63 +616,38 @@ fun CollectionsScreenPreviewDeviceSizes() {
     MonolithTheme {
         Surface {
             CollectionsScreen(
-                uiState = HeroesScreenUiState(
+                uiState = CollectionScreenUiState(
                     isLoading = false,
-                    allHeroes = listOf(
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
-                            displayName = "Narbash"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
-                            displayName = " Lt. Belica"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
-                            displayName = "Morigesh"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
-                            displayName = "TwinBlast"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
-                            displayName = "Greystone"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
-                            displayName = "Grux"
+                    heroesState = HeroCollectionState.Success(
+                        listOf(
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
+                                displayName = "Narbash"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
+                                displayName = " Lt. Belica"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
+                                displayName = "Morigesh"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
+                                displayName = "TwinBlast"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
+                                displayName = "Greystone"
+                            ),
+                            HeroDetails(
+                                imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
+                                displayName = "Grux"
+                            ),
                         ),
                     ),
-                    currentHeroes = listOf(
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/narbash_200.png",
-                            displayName = "Narbash"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/belica_200.png",
-                            displayName = " Lt. Belica"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/morigesh_200.png",
-                            displayName = "Morigesh"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/twinblast_200.png",
-                            displayName = "TwinBlast"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/greystone_200.png",
-                            displayName = "Greystone"
-                        ),
-                        HeroDetails(
-                            imageUrl = "https://cdn.monolith.gg/assets/heroes/grux_200.png",
-                            displayName = "Grux"
-                        ),
-                    )
                 ),
                 onFilterRole = { _, _ -> },
-                onFilterHeroes = {},
                 onSelectHeroClass = {},
                 onSelectItemTier = {},
                 onSelectStatFilter = {},

@@ -16,14 +16,14 @@ import org.junit.Rule
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class HeroesScreenViewModelTest {
+class CollectionsScreenViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     private val fakeHeroRepository = FakeHeroRepository()
 
-    private fun createViewModel() = HeroesScreenViewModel(fakeHeroRepository)
+    private fun createViewModel() = CollectionsScreenViewModel(fakeHeroRepository)
 
     private fun heroDetails(
         id: String,
@@ -36,14 +36,14 @@ class HeroesScreenViewModelTest {
         roles = roles
     )
 
-    private fun HeroesScreenViewModel.privateUiStateFlow(): MutableStateFlow<HeroesScreenUiState> {
-        val field = HeroesScreenViewModel::class.java.getDeclaredField("_uiState")
+    private fun CollectionsScreenViewModel.privateUiStateFlow(): MutableStateFlow<CollectionScreenUiState> {
+        val field = CollectionsScreenViewModel::class.java.getDeclaredField("_uiState")
         field.isAccessible = true
         @Suppress("UNCHECKED_CAST")
-        return field.get(this) as MutableStateFlow<HeroesScreenUiState>
+        return field.get(this) as MutableStateFlow<CollectionScreenUiState>
     }
 
-    private fun HeroesScreenViewModel.setSearchFieldValue(value: String) {
+    private fun CollectionsScreenViewModel.setSearchFieldValue(value: String) {
         privateUiStateFlow().update { it.copy(searchFieldValue = value) }
     }
 
@@ -52,7 +52,7 @@ class HeroesScreenViewModelTest {
         val viewModel = createViewModel()
 
         assertTrue(viewModel.uiState.value.isLoading)
-        assertTrue(viewModel.uiState.value.allHeroes.isEmpty())
+        assertTrue(viewModel.uiState.value.heroesState.isEmpty())
     }
 
     @Test
@@ -68,7 +68,7 @@ class HeroesScreenViewModelTest {
             )
         )
 
-        val heroNames = viewModel.uiState.value.allHeroes.map { it.displayName }
+        val heroNames = viewModel.uiState.value.heroesState.map { it.displayName }
         assertEquals(listOf("Aurora", "Muriel", "Zephyr"), heroNames)
         assertTrue(viewModel.uiState.value.isLoading.not())
 

@@ -23,7 +23,7 @@ import com.aowen.predcompanion.feature.collections.api.navigation.navigateToEter
 import com.aowen.predcompanion.feature.collections.api.navigation.navigateToHeroDetails
 import com.aowen.predcompanion.feature.collections.api.navigation.navigateToItemDetails
 import com.aowen.predcompanion.feature.collections.impl.CollectionsScreen
-import com.aowen.predcompanion.feature.collections.impl.HeroesScreenViewModel
+import com.aowen.predcompanion.feature.collections.impl.CollectionsScreenViewModel
 import com.aowen.predcompanion.feature.collections.impl.eternals.EternalDetailsScreen
 import com.aowen.predcompanion.feature.collections.impl.eternals.EternalDetailsViewModel
 import com.aowen.predcompanion.feature.collections.impl.herodetails.HeroDetailsScreen
@@ -37,12 +37,11 @@ private const val ANIMATION_SPEED = 300
 
 fun EntryProviderScope<NavKey>.collectionsEntry(navigator: Navigator) {
     entry<CollectionsNavKey> {
-        val viewModel = hiltViewModel<HeroesScreenViewModel>()
+        val viewModel = hiltViewModel<CollectionsScreenViewModel>()
         val heroesScreenUiState by viewModel.uiState.collectAsStateWithLifecycle()
         CollectionsScreen(
             uiState = heroesScreenUiState,
             onFilterRole = viewModel::updateRoleOption,
-            onFilterHeroes = viewModel::getFilteredHeroes,
             onSelectHeroClass = viewModel::onSelectHeroClass,
             onClearSelectedHeroClass = viewModel::onClearHeroClass,
             onSelectItemTier = viewModel::onSelectTier,
