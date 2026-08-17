@@ -29,6 +29,8 @@ class AndroidLibraryConventionPlugin: Plugin<Project> {
                 "androidTestImplementation"(libs.findLibrary("kotlin.test").get())
                 "testImplementation"(libs.findLibrary("kotlin.test").get())
                 "testImplementation"(libs.findLibrary("junit4").get())
+                "testImplementation"(libs.findLibrary("kotlinx.coroutines.test").get())
+                "testImplementation"(libs.findLibrary("turbine").get())
             }
         }
     }
