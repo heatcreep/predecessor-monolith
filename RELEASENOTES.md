@@ -1,9 +1,15 @@
 # Release Notes
 
-## 2.0.1 - Latest
+## 2.1.0 - Latest
+
+### New Features
+
+- **Eternals** — Browse the full list of Eternals and view detailed breakdowns of each Eternal's blessings and perks
+- **Collections Tab** — Heroes, Items, and Eternals are now unified under a single Collections tab for easier browsing
 
 ### Improvements & Bug Fixes
 
+- Match History and Match Details now display VP changes for ranked matches
 - Improved sign-in screen with better error and cancel messaging and a new background image
 - Fixed tapping on players and heroes in Match Details to properly navigate to their detail screens
 - Fixed item stat display for certain item types
