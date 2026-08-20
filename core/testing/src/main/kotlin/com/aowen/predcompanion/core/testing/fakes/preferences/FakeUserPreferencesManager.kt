@@ -21,14 +21,9 @@ class FakeUserPreferencesManager(
         Scenario.SkippedOnboarding -> flowOf(true)
         else -> flowOf(false)
     }
-    override val claimedPlayerName: Flow<String?>
-        get() = flowOf("heatcreep.tv")
-
     override suspend fun saveConsole(console: Console) {
         _console.value = console
     }
-
-    override suspend fun saveClaimedPlayerName(playerName: String?) {}
 
     override suspend fun setSkippedOnboarding() {}
 }

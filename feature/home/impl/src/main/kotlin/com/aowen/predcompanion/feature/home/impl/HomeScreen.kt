@@ -22,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import com.aowen.predcompanion.core.designsystem.MonolithTheme
 import com.aowen.predcompanion.core.ui.cards.HeroUiInfo
 import com.aowen.predcompanion.core.ui.cards.HomeScreenHeroesCard
-import com.aowen.predcompanion.ui.components.MonolithAlertDialog
 
 @Composable
 internal fun HomeScreenRoute(
@@ -50,7 +48,6 @@ internal fun HomeScreenRoute(
         navigateToHeroDetails = navigateToHeroDetails,
         navigateToHeroWinPickRate = navigateToHeroWinPickRate,
         handlePullRefresh = homeScreenViewModel::initViewModel,
-        handleRemoveAllFavoriteBuilds = homeScreenViewModel::handleRemoveAllFavoriteBuilds,
         modifier = modifier
     )
 }
@@ -64,27 +61,9 @@ fun HomeScreen(
     navigateToHeroDetails: (String) -> Unit,
     navigateToHeroWinPickRate: (String) -> Unit,
     handlePullRefresh: () -> Unit,
-    handleRemoveAllFavoriteBuilds: () -> Unit = {},
 ) {
 
     val isRefreshing by remember { mutableStateOf(false) }
-
-
-    var clearAllFavoriteBuildsDialogIsOpen by remember {
-        mutableStateOf(false)
-    }
-
-    // Dialog confirming user wants to clear all recent searches
-    if (clearAllFavoriteBuildsDialogIsOpen) {
-        MonolithAlertDialog(
-            bodyText = "Are you sure you want to clear all favorite builds? This action cannot be undone.",
-            onDismissRequest = { clearAllFavoriteBuildsDialogIsOpen = false },
-            onConfirm = {
-                handleRemoveAllFavoriteBuilds()
-                clearAllFavoriteBuildsDialogIsOpen = false
-            }
-        )
-    }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,

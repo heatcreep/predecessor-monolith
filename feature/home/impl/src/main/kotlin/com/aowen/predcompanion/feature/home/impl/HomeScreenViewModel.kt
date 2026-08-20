@@ -3,15 +3,9 @@ package com.aowen.predcompanion.feature.home.impl
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
-import com.aowen.predcompanion.core.data.repository.user.UserClaimedPlayerRepository
-import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
 import com.aowen.predcompanion.core.model.data.HeroStatistics
 import com.aowen.predcompanion.core.network.getOrThrow
-import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.ui.model.mapper.PlayerCardMapper
-import com.aowen.predcompanion.feature.home.impl.usecase.VerifyFavoriteBuildsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -30,21 +24,10 @@ abstract class HomeScreenError {
     abstract val errorMessage: String?
     abstract val error: String?
 
-    data class ClaimedPlayerErrorMessage(
-        override val errorMessage: String? = null,
-        override val error: String? = null
-    ) : HomeScreenError()
-
-    data class FavoriteBuildsErrorMessage(
-        override val errorMessage: String? = null,
-        override val error: String? = null
-    ) : HomeScreenError()
-
     data class HeroStatsErrorMessage(
         override val errorMessage: String? = null,
         override val error: String? = null
     ) : HomeScreenError()
-
 }
 
 
@@ -59,11 +42,6 @@ data class HomeScreenUiState(
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val omedaCityHeroRepository: HeroRepository,
-    private val claimedPlayerRepository: UserClaimedPlayerRepository,
-    private val verifyFavoriteBuildsUseCase: VerifyFavoriteBuildsUseCase,
-    private val favoriteBuildsRepository: UserFavoriteBuildsRepository,
-    private val playerCardMapper: PlayerCardMapper,
-    private val buildListItemUiMapper: BuildListItemUiMapper
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<HomeScreenUiState> = MutableStateFlow(HomeScreenUiState())
@@ -101,34 +79,6 @@ class HomeScreenViewModel @Inject constructor(
                         homeScreenError = _uiState.value.homeScreenError.plus(
                             HomeScreenError.HeroStatsErrorMessage(
                                 errorMessage = "Failed to fetch hero stats",
-                                error = e.message
-                            )
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    fun handleRetryClaimedPlayer() {
-        viewModelScope.launch { claimedPlayerRepository.getClaimedPlayer() }
-    }
-
-    fun handleRemoveAllFavoriteBuilds() {
-        viewModelScope.launch {
-            try {
-                favoriteBuildsRepository.removeAllFavoriteBuilds()
-                _uiState.update {
-                    it.copy(
-                        isLoading = false
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        homeScreenError = _uiState.value.homeScreenError.plus(
-                            HomeScreenError.FavoriteBuildsErrorMessage(
-                                errorMessage = "Failed to remove all favorite builds",
                                 error = e.message
                             )
                         )

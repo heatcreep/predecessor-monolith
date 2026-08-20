@@ -1,13 +1,11 @@
 package com.aowen.predcompanion.core.ui.model.mapper
 
-import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
-import com.aowen.predcompanion.core.data.repository.items.ItemRepository
 import com.aowen.predcompanion.core.model.data.HeroBuild
+import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.ItemDetails
-import io.mockk.every
-import io.mockk.mockk
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.aowen.predcompanion.core.testing.fakes.repository.FakeHeroRepository
+import com.aowen.predcompanion.core.testing.fakes.repository.FakeItemRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -15,21 +13,23 @@ import org.junit.Test
 
 class BuildListItemUiMapperTest {
 
-    private val itemRepository = mockk<ItemRepository>()
-    private val heroRepository = mockk<HeroRepository>()
+    private val fakeItemRepository = FakeItemRepository()
+    private val fakeHeroRepository = FakeHeroRepository()
     private lateinit var mapper: BuildListItemUiMapper
 
-    private val testItems = mapOf(
-        "5" to ItemDetails(id = "5", displayName = "Test Crest", imageSrc = "crest.png"),
-        "1" to ItemDetails(id = "1", displayName = "Sword", imageSrc = "sword.png"),
-        "2" to ItemDetails(id = "2", displayName = "Shield", imageSrc = "shield.png"),
+    private val testItems = listOf(
+        ItemDetails(id = "5", displayName = "Test Crest", imageSrc = "crest.png"),
+        ItemDetails(id = "1", displayName = "Sword", imageSrc = "sword.png"),
+        ItemDetails(id = "2", displayName = "Shield", imageSrc = "shield.png"),
     )
 
     @Before
     fun setUp() {
-        every { itemRepository.allItems } returns MutableStateFlow(testItems)
-        every { heroRepository.getHeroImageSrcById(any()) } returns "hero.png"
-        mapper = BuildListItemUiMapper(itemRepository, heroRepository)
+        fakeItemRepository.emitItems(testItems)
+        fakeHeroRepository.emitHeroes(
+            listOf(HeroDetails(id = "42", name = "TestHero", imageUrl = "hero.png"))
+        )
+        mapper = BuildListItemUiMapper(fakeItemRepository, fakeHeroRepository)
     }
 
     @Test

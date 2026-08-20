@@ -2,8 +2,6 @@ package com.aowen.predcompanion.core.ui.model.mapper
 
 import com.aowen.predcompanion.core.data.repository.heroes.HeroRepository
 import com.aowen.predcompanion.core.data.repository.items.ItemRepository
-import com.aowen.predcompanion.core.database.model.FavoriteBuildListEntity
-import com.aowen.predcompanion.core.model.data.FavoriteBuildListItem
 import com.aowen.predcompanion.core.model.data.HeroBuild
 import com.aowen.predcompanion.core.model.data.HeroRole
 import com.aowen.predcompanion.core.model.data.ItemDetails
@@ -67,41 +65,6 @@ class BuildListItemUiMapper @Inject constructor(
             version = heroBuild.version
         )
     }
-
-    fun buildFrom(
-        favoriteBuildListItem: FavoriteBuildListItem,
-    ): BuildUiListItem {
-        return BuildUiListItem(
-            buildId = favoriteBuildListItem.buildId,
-            title = favoriteBuildListItem.title,
-            author = favoriteBuildListItem.author,
-            role = heroRoleMap[favoriteBuildListItem.role.lowercase()],
-            description = favoriteBuildListItem.description,
-            heroId = favoriteBuildListItem.heroId,
-            heroImageUrl = heroRepository.getHeroImageSrcById(favoriteBuildListItem.heroId.toString()),
-            crest = items[favoriteBuildListItem.crestId.toString()] ?: ItemDetails(),
-            buildItems = favoriteBuildListItem.itemIds.mapNotNull { items[it.toString()] },
-            createdAt = favoriteBuildListItem.createdAt,
-            version = favoriteBuildListItem.gameVersion
-        )
-    }
-}
-
-fun BuildUiListItem.asFavoriteBuildListEntity(): FavoriteBuildListEntity {
-    return FavoriteBuildListEntity(
-        buildId = buildId,
-        heroId = heroId,
-        role = role?.roleName ?: "",
-        title = title,
-        description = description,
-        author = author,
-        crestId = crest.id.toInt(),
-        itemIds = buildItems.map { it.id.toInt() },
-        upvotesCount = 0,
-        downvotesCount = 0,
-        createdAt = createdAt,
-        gameVersion = version ?: ""
-    )
 }
 
 private fun HeroBuild.ItemModule.toUi(items: Map<String, ItemDetails>): ItemModuleUi =

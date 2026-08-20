@@ -1,18 +1,10 @@
 package com.aowen.predcompanion.feature.home.impl
 
 import app.cash.turbine.test
-import com.aowen.predcompanion.core.data.repository.user.FavoriteBuildsState
-import com.aowen.predcompanion.core.data.repository.user.UserClaimedPlayerRepository
-import com.aowen.predcompanion.core.data.repository.user.UserFavoriteBuildsRepository
 import com.aowen.predcompanion.core.model.data.HeroStatistics
 import com.aowen.predcompanion.core.network.Resource
 import com.aowen.predcompanion.core.testing.fakes.repository.FakeHeroRepository
 import com.aowen.predcompanion.core.testing.util.MainDispatcherRule
-import com.aowen.predcompanion.core.ui.model.mapper.BuildListItemUiMapper
-import com.aowen.predcompanion.core.ui.model.mapper.PlayerCardMapper
-import com.aowen.predcompanion.feature.home.impl.usecase.VerifyFavoriteBuildsUseCase
-import io.mockk.coEvery
-import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -26,11 +18,6 @@ class HomeScreenViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val fakeHeroRepository = FakeHeroRepository()
-    private val mockClaimedPlayerRepository = mockk<UserClaimedPlayerRepository>(relaxed = true)
-    private val mockVerifyFavoriteBuildsUseCase = mockk<VerifyFavoriteBuildsUseCase>(relaxed = true)
-    private val mockFavoriteBuildsRepository = mockk<UserFavoriteBuildsRepository>(relaxed = true)
-    private val mockPlayerCardMapper = mockk<PlayerCardMapper>(relaxed = true)
-    private val mockBuildListItemUiMapper = mockk<BuildListItemUiMapper>(relaxed = true)
 
     private val testHeroStats = listOf(
         HeroStatistics(heroId = "1", name = "Dekker", winRate = 55f, pickRate = 10f),
@@ -43,11 +30,6 @@ class HomeScreenViewModelTest {
 
     private fun createViewModel() = HomeScreenViewModel(
         omedaCityHeroRepository = fakeHeroRepository,
-        claimedPlayerRepository = mockClaimedPlayerRepository,
-        verifyFavoriteBuildsUseCase = mockVerifyFavoriteBuildsUseCase,
-        favoriteBuildsRepository = mockFavoriteBuildsRepository,
-        playerCardMapper = mockPlayerCardMapper,
-        buildListItemUiMapper = mockBuildListItemUiMapper,
     )
 
     @Test
@@ -115,43 +97,6 @@ class HomeScreenViewModelTest {
 
             val state = awaitItem()
             assertTrue(state.heroStats.isEmpty())
-        }
-    }
-
-    @Test
-    fun `handleRemoveAllFavoriteBuilds on success completes without error`() = runTest {
-        fakeHeroRepository.heroStatisticsToReturn = Resource.Success(testHeroStats)
-        coEvery { mockFavoriteBuildsRepository.removeAllFavoriteBuilds() } returns Unit
-
-        val viewModel = createViewModel()
-
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertFalse(state.isLoading)
-            assertTrue(state.homeScreenError.isEmpty())
-
-            viewModel.handleRemoveAllFavoriteBuilds()
-
-            val afterRemove = viewModel.uiState.value
-            assertFalse(afterRemove.isLoading)
-            assertTrue(afterRemove.homeScreenError.none { it is HomeScreenError.FavoriteBuildsErrorMessage })
-        }
-    }
-
-    @Test
-    fun `handleRemoveAllFavoriteBuilds on error adds error to list`() = runTest {
-        fakeHeroRepository.heroStatisticsToReturn = Resource.Success(testHeroStats)
-        coEvery { mockFavoriteBuildsRepository.removeAllFavoriteBuilds() } throws RuntimeException("DB error")
-
-        val viewModel = createViewModel()
-
-        viewModel.uiState.test {
-            awaitItem()
-
-            viewModel.handleRemoveAllFavoriteBuilds()
-
-            val state = awaitItem()
-            assertTrue(state.homeScreenError.any { it is HomeScreenError.FavoriteBuildsErrorMessage })
         }
     }
 

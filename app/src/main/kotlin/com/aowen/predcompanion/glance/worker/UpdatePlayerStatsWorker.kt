@@ -22,15 +22,11 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
 import com.aowen.predcompanion.glance.PlayerStatsAppWidget
 import com.aowen.predcompanion.glance.state.PlayerStatsState
 import com.aowen.predcompanion.glance.state.PlayerStatsStateDefinition
-import com.aowen.predcompanion.core.datastore.ClaimedPlayerPreferencesManagerImpl
-import com.aowen.predcompanion.core.network.getOrThrow
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.firstOrNull
 import java.util.concurrent.TimeUnit
 
 
@@ -38,7 +34,6 @@ import java.util.concurrent.TimeUnit
 class UpdatePlayerStatsWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
-    private val omedaCityPlayerRepository: PlayerRepository
 ) : CoroutineWorker(context, params) {
 
     companion object {
@@ -115,25 +110,7 @@ class UpdatePlayerStatsWorker @AssistedInject constructor(
         setWidgetState(PlayerStatsState.Loading)
         return try {
 
-            // Get the claimed player id from the preferences data store
-            val claimedPlayerPreferencesManager =
-                ClaimedPlayerPreferencesManagerImpl(applicationContext)
-            val playerId = claimedPlayerPreferencesManager.claimedPlayerId.firstOrNull()
-
-            // if the player id is not null, fetch the player info and update the widget state
-            if (playerId != null) {
-                val playerInfo = omedaCityPlayerRepository
-                    .fetchPlayerInfo(playerId).getOrThrow()
-                setWidgetState(
-                    PlayerStatsState.Success(
-                        playerInfo = playerInfo,
-                        playerRankUri = ""
-                    )
-                )
-            } else {
-                // if the player id is null, set the widget state to not set
-                setWidgetState(PlayerStatsState.NotSet)
-            }
+            setWidgetState(PlayerStatsState.NotSet)
             Result.success()
         } catch (exception: Exception) {
             Log.e(uniqueWorkName, "Failed to update player stats", exception)
