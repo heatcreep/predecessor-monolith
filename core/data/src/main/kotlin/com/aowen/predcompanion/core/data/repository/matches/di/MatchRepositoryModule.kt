@@ -1,5 +1,7 @@
 package com.aowen.predcompanion.core.data.repository.matches.di
 
+import com.aowen.predcompanion.core.data.repository.matches.MatchHistoryRepository
+import com.aowen.predcompanion.core.data.repository.matches.MatchHistoryRepositoryImpl
 import com.aowen.predcompanion.core.data.repository.matches.MatchRepository
 import com.aowen.predcompanion.core.data.repository.matches.OmedaCityMatchRepository
 import dagger.Binds
@@ -13,4 +15,7 @@ interface MatchRepositoryModule {
 
     @Binds
     fun bindsMatchRepository(impl: OmedaCityMatchRepository): MatchRepository
+
+    @Binds
+    fun bindsMatchHistoryRepository(impl: MatchHistoryRepositoryImpl): MatchHistoryRepository
 }

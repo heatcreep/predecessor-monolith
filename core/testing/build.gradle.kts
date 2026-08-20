@@ -13,8 +13,8 @@ dependencies {
     api(projects.core.data)
     api(projects.core.model)
 
+    implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.test.rules)
     implementation(libs.hilt.android)
     implementation(libs.hilt.android.testing)
-    api(libs.mockk)
 }

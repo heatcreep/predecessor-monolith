@@ -4,7 +4,6 @@ import com.aowen.predcompanion.core.datastore.UserPreferencesManager
 import com.aowen.predcompanion.core.model.ui.theme.Console
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 
 abstract class Scenario {
@@ -13,9 +12,11 @@ abstract class Scenario {
 
 class FakeUserPreferencesManager(
     scenario: Scenario? = null,
+) : UserPreferencesManager {
 
-    ) : UserPreferencesManager {
-    override val console = flowOf(Console.PC)
+    private val _console = MutableStateFlow(Console.PC)
+    override val console: Flow<Console> = _console
+
     override val hasSkippedOnboarding: Flow<Boolean> = when (scenario) {
         Scenario.SkippedOnboarding -> flowOf(true)
         else -> flowOf(false)
@@ -23,24 +24,11 @@ class FakeUserPreferencesManager(
     override val claimedPlayerName: Flow<String?>
         get() = flowOf("heatcreep.tv")
 
-    val _saveConsoleCoutner = MutableStateFlow(0)
-    val saveConsoleCounter: StateFlow<Int> = _saveConsoleCoutner
-
-    val _saveAccessTokenCounter = MutableStateFlow(0)
-    val saveAccessTokenCounter: StateFlow<Int> = _saveAccessTokenCounter
-
-    val _clearAccessTokenCounter = MutableStateFlow(0)
-    val clearAccessTokenCounter: StateFlow<Int> = _clearAccessTokenCounter
-
     override suspend fun saveConsole(console: Console) {
-        _saveConsoleCoutner.value++
+        _console.value = console
     }
 
-    override suspend fun saveClaimedPlayerName(playerName: String?) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun saveClaimedPlayerName(playerName: String?) {}
 
-    override suspend fun setSkippedOnboarding() {
-        TODO("Not yet implemented")
-    }
+    override suspend fun setSkippedOnboarding() {}
 }

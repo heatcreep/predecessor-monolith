@@ -10,9 +10,17 @@ import com.apollographql.apollo.ApolloClient
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class MatchHistoryRepository @Inject constructor(
+interface MatchHistoryRepository {
+    fun getMatchHistoryFor(
+        matchHistoryTarget: MatchHistoryTarget
+    ): Flow<PagingData<MatchHistoryItem>>
+
+    fun invalidate()
+}
+
+class MatchHistoryRepositoryImpl @Inject constructor(
     private val apolloClient: ApolloClient,
-) {
+) : MatchHistoryRepository {
 
     companion object {
         const val PAGE_SIZE = 10
@@ -20,7 +28,7 @@ class MatchHistoryRepository @Inject constructor(
 
     private var currentSource: MatchHistoryPagingSource? = null
 
-    fun getMatchHistoryFor(
+    override fun getMatchHistoryFor(
         matchHistoryTarget: MatchHistoryTarget
     ): Flow<PagingData<MatchHistoryItem>> =
         Pager(
@@ -33,7 +41,7 @@ class MatchHistoryRepository @Inject constructor(
             }
         ).flow
 
-    fun invalidate() {
+    override fun invalidate() {
         currentSource?.invalidate()
     }
 }

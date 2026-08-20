@@ -31,6 +31,7 @@ class AndroidLibraryConventionPlugin: Plugin<Project> {
                 "testImplementation"(libs.findLibrary("junit4").get())
                 "testImplementation"(libs.findLibrary("kotlinx.coroutines.test").get())
                 "testImplementation"(libs.findLibrary("turbine").get())
+                "testImplementation"(libs.findLibrary("mockk").get())
             }
         }
     }

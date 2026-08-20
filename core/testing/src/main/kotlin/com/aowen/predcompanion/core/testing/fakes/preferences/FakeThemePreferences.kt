@@ -2,14 +2,15 @@ package com.aowen.predcompanion.core.testing.fakes.preferences
 
 import com.aowen.predcompanion.core.datastore.Theme
 import com.aowen.predcompanion.core.datastore.ThemePreferences
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class FakeThemePreferences : ThemePreferences {
 
-    override val theme: Flow<Theme> = flowOf(Theme.LIGHT)
+    private val _theme = MutableStateFlow(Theme.SYSTEM)
+    override val theme: StateFlow<Theme> = _theme
 
     override suspend fun saveTheme(theme: Theme) {
-        TODO("Not yet implemented")
+        _theme.value = theme
     }
 }
