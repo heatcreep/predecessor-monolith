@@ -1,8 +1,10 @@
 package com.aowen.predcompanion.feature.search.impl
 
+import app.cash.turbine.test
 import com.aowen.predcompanion.core.model.data.HeroBuild
 import com.aowen.predcompanion.core.model.data.HeroDetails
 import com.aowen.predcompanion.core.model.data.ItemDetails
+import com.aowen.predcompanion.core.model.data.MatchDetails
 import com.aowen.predcompanion.core.model.data.PlayerInfo
 import com.aowen.predcompanion.core.network.Resource
 import com.aowen.predcompanion.core.testing.fakes.repository.FakeBuildRepository
@@ -17,10 +19,10 @@ import com.aowen.predcompanion.core.ui.model.mapper.BuildUiListItem
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -39,8 +41,6 @@ class SearchScreenViewModelTest {
     private lateinit var playerRepository: FakePlayerRepository
     private lateinit var userRecentSearchRepository: FakeUserRecentSearchRepository
     private lateinit var buildListItemUiMapper: BuildListItemUiMapper
-
-    private lateinit var viewModel: SearchScreenViewModel
 
     private val testPlayerDetails = PlayerInfo.PlayerDetails(
         playerId = "player-1",
@@ -74,45 +74,46 @@ class SearchScreenViewModelTest {
     fun `initial state loads recent searches`() = runTest {
         userRecentSearchRepository.recentSearches.add(testPlayerDetails)
 
-        viewModel = createViewModel()
-        val collectJob = launch { viewModel.uiState.collect { } }
-        advanceUntilIdle()
+        val viewModel = createViewModel()
 
-        assertEquals(
-            listOf(testPlayerDetails),
-            viewModel.uiState.value.recentSearchesList
-        )
-        assertEquals(false, viewModel.uiState.value.isLoadingRecentSearches)
-
-        collectJob.cancel()
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertEquals(listOf(testPlayerDetails), state.recentSearchesList)
+            assertEquals(false, state.isLoadingRecentSearches)
+        }
     }
 
     @Test
     fun `setSearchValue updates search field`() = runTest {
-        viewModel = createViewModel()
-        val collectJob = launch { viewModel.uiState.collect { } }
-        advanceUntilIdle()
+        val viewModel = createViewModel()
 
-        viewModel.setSearchValue("Aurox")
+        viewModel.uiState.test {
+            awaitItem()
 
-        assertEquals("Aurox", viewModel.uiState.value.searchFieldValue)
+            viewModel.setSearchValue("Aurox")
 
-        collectJob.cancel()
+            val state = awaitItem()
+            assertEquals("Aurox", state.searchFieldValue)
+        }
     }
 
     @Test
     fun `handleClearSearch clears search and players`() = runTest {
-        viewModel = createViewModel()
-        val collectJob = launch { viewModel.uiState.collect { } }
-        advanceUntilIdle()
+        val viewModel = createViewModel()
 
-        viewModel.setSearchValue("Aurox")
-        viewModel.handleClearSearch()
+        viewModel.uiState.test {
+            awaitItem()
 
-        assertEquals("", viewModel.uiState.value.searchFieldValue)
-        assertEquals(PlayersListState.Empty, viewModel.uiState.value.playersList)
+            viewModel.setSearchValue("Aurox")
+            awaitItem()
 
-        collectJob.cancel()
+            viewModel.handleClearSearch()
+
+            val state = awaitItem()
+            assertEquals("", state.searchFieldValue)
+            assertEquals(PlayersListState.Empty, state.playersList)
+            assertNull(state.searchError)
+        }
     }
 
     @Test
@@ -130,19 +131,22 @@ class SearchScreenViewModelTest {
 
         every { buildListItemUiMapper.buildFrom(any<HeroBuild>()) } returns mockk<BuildUiListItem>(relaxed = true)
 
-        viewModel = createViewModel()
-        val collectJob = launch { viewModel.uiState.collect { } }
-        advanceUntilIdle()
+        val viewModel = createViewModel()
 
-        viewModel.setSearchValue("TestPlayer")
-        viewModel.handleSubmitSearch()
-        advanceUntilIdle()
+        viewModel.uiState.test {
+            awaitItem()
 
-        val playersState = viewModel.uiState.value.playersList
-        assertTrue(playersState is PlayersListState.Success)
-        assertEquals(expectedPlayers, (playersState as PlayersListState.Success).players)
+            viewModel.setSearchValue("TestPlayer")
+            awaitItem()
 
-        collectJob.cancel()
+            viewModel.handleSubmitSearch()
+            advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            val playersState = state.playersList
+            assertTrue(playersState is PlayersListState.Success)
+            assertEquals(expectedPlayers, (playersState as PlayersListState.Success).players)
+        }
     }
 
     @Test
@@ -160,22 +164,94 @@ class SearchScreenViewModelTest {
         buildRepository.buildsToReturn = Resource.Success(emptyList())
         matchRepository.matchToReturn = Resource.Success(null)
 
-        viewModel = createViewModel()
-        val collectJob = launch { viewModel.uiState.collect { } }
-        advanceUntilIdle()
+        val viewModel = createViewModel()
 
-        viewModel.setSearchValue("TestPlayer")
-        viewModel.handleSubmitSearch()
-        advanceUntilIdle()
+        viewModel.uiState.test {
+            awaitItem()
 
-        val playersState = viewModel.uiState.value.playersList
-        assertTrue(playersState is PlayersListState.Error)
-        assertEquals(
-            "Something went wrong",
-            (playersState as PlayersListState.Error).errorMessage
+            viewModel.setSearchValue("TestPlayer")
+            awaitItem()
+
+            viewModel.handleSubmitSearch()
+            advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            val playersState = state.playersList
+            assertTrue(playersState is PlayersListState.Error)
+            assertEquals(
+                "Something went wrong",
+                (playersState as PlayersListState.Error).errorMessage
+            )
+        }
+    }
+
+    @Test
+    fun `handleSubmitSearch filters heroes and items locally`() = runTest {
+        val items = listOf(
+            ItemDetails(id = "1", displayName = "Sword of Dawn"),
+            ItemDetails(id = "2", displayName = "Shield of Dusk"),
+        )
+        val heroes = listOf(
+            HeroDetails(id = "1", displayName = "Dekker"),
+            HeroDetails(id = "2", displayName = "Grux"),
         )
 
-        collectJob.cancel()
+        itemRepository.emitItems(items)
+        heroRepository.emitHeroes(heroes)
+
+        playerRepository.playersByNameToReturn = Resource.Success(emptyList())
+        buildRepository.buildsToReturn = Resource.Success(emptyList())
+        matchRepository.matchToReturn = Resource.Success(null)
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            awaitItem()
+
+            viewModel.setSearchValue("Dek")
+            awaitItem()
+
+            viewModel.handleSubmitSearch()
+            advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            assertEquals(1, state.filteredHeroes.size)
+            assertEquals("Dekker", state.filteredHeroes.first().displayName)
+            assertEquals(0, state.filteredItems.size)
+        }
+    }
+
+    @Test
+    fun `handleSubmitSearch with match found shows success`() = runTest {
+        val items = listOf(ItemDetails(id = "1", displayName = "TestItem"))
+        val heroes = listOf(HeroDetails(id = "1", displayName = "TestHero"))
+
+        itemRepository.emitItems(items)
+        heroRepository.emitHeroes(heroes)
+
+        val testMatch = MatchDetails(matchId = "match-123", gameDuration = 1800)
+        playerRepository.playersByNameToReturn = Resource.Success(emptyList())
+        buildRepository.buildsToReturn = Resource.Success(emptyList())
+        matchRepository.matchToReturn = Resource.Success(testMatch)
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            awaitItem()
+
+            viewModel.setSearchValue("match-123")
+            awaitItem()
+
+            viewModel.handleSubmitSearch()
+            advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            assertTrue(state.foundMatch is MatchSearchState.Success)
+            assertEquals(
+                "match-123",
+                (state.foundMatch as MatchSearchState.Success).match.matchId
+            )
+        }
     }
 
     @Test
@@ -184,23 +260,103 @@ class SearchScreenViewModelTest {
         userRecentSearchRepository.recentSearches.add(testPlayerDetails)
         userRecentSearchRepository.recentSearches.add(secondPlayer)
 
-        viewModel = createViewModel()
-        val collectJob = launch { viewModel.uiState.collect { } }
-        advanceUntilIdle()
+        val viewModel = createViewModel()
 
-        assertEquals(
-            listOf(testPlayerDetails, secondPlayer),
-            viewModel.uiState.value.recentSearchesList
+        viewModel.uiState.test {
+            val initial = awaitItem()
+            assertEquals(
+                listOf(testPlayerDetails, secondPlayer),
+                initial.recentSearchesList
+            )
+
+            viewModel.handleClearSingleRecentSearch(testPlayerDetails.playerId)
+
+            val state = awaitItem()
+            assertEquals(listOf(secondPlayer), state.recentSearchesList)
+        }
+    }
+
+    @Test
+    fun `handleClearAllRecentSearches clears list`() = runTest {
+        userRecentSearchRepository.recentSearches.add(testPlayerDetails)
+
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val initial = awaitItem()
+            assertEquals(1, initial.recentSearchesList.size)
+
+            viewModel.handleClearAllRecentSearches()
+            advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            assertTrue(state.recentSearchesList.isEmpty())
+        }
+    }
+
+    @Test
+    fun `handleAddToRecentSearch adds player to list`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val initial = awaitItem()
+            assertTrue(initial.recentSearchesList.isEmpty())
+
+            viewModel.handleAddToRecentSearch(testPlayerDetails)
+
+            val state = awaitItem()
+            assertEquals(listOf(testPlayerDetails), state.recentSearchesList)
+        }
+    }
+
+    @Test
+    fun `heroes from repository are reflected in allHeroes state`() = runTest {
+        val heroes = listOf(
+            HeroDetails(id = "1", displayName = "Dekker"),
+            HeroDetails(id = "2", displayName = "Grux"),
         )
+        heroRepository.emitHeroes(heroes)
 
-        viewModel.handleClearSingleRecentSearch(testPlayerDetails.playerId)
-        advanceUntilIdle()
+        val viewModel = createViewModel()
 
-        assertEquals(
-            listOf(secondPlayer),
-            viewModel.uiState.value.recentSearchesList
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state.allHeroes is AllHeroesState.Success)
+            assertEquals(
+                2,
+                (state.allHeroes as AllHeroesState.Success).heroes.size
+            )
+        }
+    }
+
+    @Test
+    fun `items from repository are reflected in allItems state`() = runTest {
+        val items = listOf(
+            ItemDetails(id = "1", displayName = "Sword"),
+            ItemDetails(id = "2", displayName = "Shield"),
         )
+        itemRepository.emitItems(items)
 
-        collectJob.cancel()
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state.allItems is AllItemsState.Success)
+            assertEquals(
+                2,
+                (state.allItems as AllItemsState.Success).items.size
+            )
+        }
+    }
+
+    @Test
+    fun `empty repositories show empty states`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state.allHeroes is AllHeroesState.Empty)
+            assertTrue(state.allItems is AllItemsState.Empty)
+        }
     }
 }

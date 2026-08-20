@@ -1,16 +1,15 @@
 package com.aowen.predcompanion.feature.home.impl.playerdetails
 
-import com.aowen.predcompanion.core.data.repository.matches.MatchHistoryRepository
+import app.cash.turbine.test
 import com.aowen.predcompanion.core.data.repository.players.PlayerRepository
 import com.aowen.predcompanion.core.model.data.Player
 import com.aowen.predcompanion.core.model.data.PlayerHeroStatistics
+import com.aowen.predcompanion.core.testing.fakes.repository.FakeMatchHistoryRepository
 import com.aowen.predcompanion.core.testing.fakes.repository.FakePlayerRepository
 import com.aowen.predcompanion.core.testing.util.MainDispatcherRule
 import com.aowen.predcompanion.core.ui.model.mapper.MatchListItemUiMapper
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -24,8 +23,8 @@ class PlayerDetailsViewModelTest {
 
     private val playerId = "player-1"
 
-    private val matchHistoryRepository = mockk<MatchHistoryRepository>(relaxed = true)
-    private val matchListItemUiMapper = mockk<MatchListItemUiMapper>(relaxed = true)
+    private val fakeMatchHistoryRepository = FakeMatchHistoryRepository()
+    private val mockMatchListItemUiMapper = mockk<MatchListItemUiMapper>(relaxed = true)
 
     private val testPlayer = Player(
         id = playerId,
@@ -50,56 +49,66 @@ class PlayerDetailsViewModelTest {
     )
 
     private fun createViewModel(
-        playerRepository: PlayerRepository = FakePlayerRepository(),
+        playerRepository: FakePlayerRepository = FakePlayerRepository(),
     ): PlayerDetailsViewModel {
-        every { matchHistoryRepository.getMatchHistoryFor(any()) } returns emptyFlow()
         return PlayerDetailsViewModel(
             playerId = playerId,
-            matchHistoryRepository = matchHistoryRepository,
+            matchHistoryRepository = fakeMatchHistoryRepository,
             omedaCityPlayerRepository = playerRepository,
-            matchListItemUiMapper = matchListItemUiMapper,
+            matchListItemUiMapper = mockMatchListItemUiMapper,
         )
     }
 
     @Test
-    fun `initial state is loading then loaded on success`() = runTest {
+    fun `successful player load shows loaded state`() = runTest {
         val fakePlayerRepository = FakePlayerRepository().apply {
             playerByIdToReturn = testPlayer
         }
 
         val viewModel = createViewModel(fakePlayerRepository)
 
-        val state = viewModel.uiState.value
-        assertTrue(state is PlayerDetailsState.Loaded)
-        val loadedState = state as PlayerDetailsState.Loaded
-        assertEquals(testPlayer.name, loadedState.playerProfileUiModel.profileCardUiModel.playerName)
-        assertEquals(
-            testPlayer.heroStatistics.size,
-            loadedState.playerProfileUiModel.heroStatisticsList.size
-        )
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state is PlayerDetailsState.Loaded)
+            val loaded = state as PlayerDetailsState.Loaded
+            assertEquals(testPlayer.name, loaded.playerProfileUiModel.profileCardUiModel.playerName)
+            assertEquals(
+                testPlayer.heroStatistics.size,
+                loaded.playerProfileUiModel.heroStatisticsList.size
+            )
+        }
     }
 
     @Test
-    fun `null player keeps loading state`() = runTest {
+    fun `null player returns loading state`() = runTest {
         val fakePlayerRepository = FakePlayerRepository().apply {
             playerByIdToReturn = null
         }
 
         val viewModel = createViewModel(fakePlayerRepository)
 
-        assertEquals(PlayerDetailsState.Loading, viewModel.uiState.value)
+        viewModel.uiState.test {
+            assertEquals(PlayerDetailsState.Loading, awaitItem())
+        }
     }
 
     @Test
-    fun `fetchPlayerById exception sets error state`() = runTest {
+    fun `exception sets error state`() = runTest {
         val mockPlayerRepository = mockk<PlayerRepository>()
         coEvery { mockPlayerRepository.fetchPlayerById(any()) } throws RuntimeException("Network error")
 
-        val viewModel = createViewModel(mockPlayerRepository)
+        val viewModel = PlayerDetailsViewModel(
+            playerId = playerId,
+            matchHistoryRepository = fakeMatchHistoryRepository,
+            omedaCityPlayerRepository = mockPlayerRepository,
+            matchListItemUiMapper = mockMatchListItemUiMapper,
+        )
 
-        val state = viewModel.uiState.value
-        assertTrue(state is PlayerDetailsState.Error)
-        assertEquals("Network error", (state as PlayerDetailsState.Error).errorMessage)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(state is PlayerDetailsState.Error)
+            assertEquals("Network error", (state as PlayerDetailsState.Error).errorMessage)
+        }
     }
 
     @Test
@@ -110,14 +119,16 @@ class PlayerDetailsViewModelTest {
 
         val viewModel = createViewModel(fakePlayerRepository)
 
-        assertEquals(PlayerDetailsState.Loading, viewModel.uiState.value)
+        viewModel.uiState.test {
+            assertEquals(PlayerDetailsState.Loading, awaitItem())
 
-        fakePlayerRepository.playerByIdToReturn = testPlayer
-        viewModel.handleRetry()
+            fakePlayerRepository.playerByIdToReturn = testPlayer
+            viewModel.handleRetry()
 
-        val state = viewModel.uiState.value
-        assertTrue(state is PlayerDetailsState.Loaded)
-        val loadedState = state as PlayerDetailsState.Loaded
-        assertEquals(testPlayer.name, loadedState.playerProfileUiModel.profileCardUiModel.playerName)
+            val state = awaitItem()
+            assertTrue(state is PlayerDetailsState.Loaded)
+            val loaded = state as PlayerDetailsState.Loaded
+            assertEquals(testPlayer.name, loaded.playerProfileUiModel.profileCardUiModel.playerName)
+        }
     }
 }

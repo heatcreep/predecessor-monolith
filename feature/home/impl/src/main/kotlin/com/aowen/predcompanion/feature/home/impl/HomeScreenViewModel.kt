@@ -77,11 +77,10 @@ class HomeScreenViewModel @Inject constructor(
     fun initViewModel() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val heroStatsDeferredResult =
-                async { omedaCityHeroRepository.fetchAllHeroStatistics() }
-
-            val heroStatsResult = heroStatsDeferredResult.await().getOrThrow()
             try {
+                val heroStatsResult =
+                    omedaCityHeroRepository.fetchAllHeroStatistics().getOrThrow()
+
                 val topFiveHeroesByWinRate =
                     heroStatsResult.sortedBy { it.winRate }.reversed().take(5)
                 val topFiveHeroesByPickRate =
@@ -108,7 +107,6 @@ class HomeScreenViewModel @Inject constructor(
                     )
                 }
             }
-
         }
     }
 
